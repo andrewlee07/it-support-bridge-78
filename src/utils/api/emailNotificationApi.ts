@@ -1,7 +1,7 @@
 
 import { ApiResponse, EmailTemplate } from '../types';
 import { mockEmailTemplates } from '../mockData/emailTemplates';
-import { simulateApiResponse } from '../mockData/apiHelpers';
+import { simulateApiResponse, createApiErrorResponse, createApiSuccessResponse } from '../mockData/apiHelpers';
 import { getUserById } from '../mockData';
 
 // In-memory storage of email templates
@@ -32,10 +32,7 @@ export const emailNotificationApi = {
     const template = emailTemplates.find(t => t.triggerOn === eventType && t.isActive);
     
     if (!template) {
-      return {
-        success: false,
-        error: 'No active email template found for this event type',
-      };
+      return createApiErrorResponse<boolean>('No active email template found for this event type');
     }
     
     // Get recipient information
@@ -44,10 +41,7 @@ export const emailNotificationApi = {
       .filter(user => user !== undefined);
     
     if (recipients.length === 0) {
-      return {
-        success: false,
-        error: 'No valid recipients found',
-      };
+      return createApiErrorResponse<boolean>('No valid recipients found');
     }
     
     // In a real application, we would send actual emails here
@@ -58,7 +52,7 @@ export const emailNotificationApi = {
     
     // In a real implementation, we might also log sent emails to a database
     
-    return simulateApiResponse(true);
+    return createApiSuccessResponse(true);
   },
   
   // Update an email template
@@ -69,10 +63,7 @@ export const emailNotificationApi = {
     const templateIndex = emailTemplates.findIndex(t => t.id === id);
     
     if (templateIndex === -1) {
-      return {
-        success: false,
-        error: 'Email template not found',
-      };
+      return createApiErrorResponse<EmailTemplate>('Email template not found', 404);
     }
     
     const existingTemplate = emailTemplates[templateIndex];

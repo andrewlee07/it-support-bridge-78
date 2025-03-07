@@ -6,7 +6,7 @@ import {
   RiskThreshold,
   ApiResponse
 } from '../../types';
-import { simulateApiResponse } from '../../mockData/apiHelpers';
+import { simulateApiResponse, createApiErrorResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -33,10 +33,7 @@ export const riskAssessmentApi = {
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
-      return {
-        success: false,
-        error: 'Change request not found',
-      };
+      return createApiErrorResponse('Change request not found', 404);
     }
     
     // Calculate risk score based on answers

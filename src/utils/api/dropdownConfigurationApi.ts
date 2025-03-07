@@ -14,7 +14,7 @@ import {
   getDropdownConfigurationsByEntityType,
   createDropdownOption
 } from '../mockData/dropdownConfigurations';
-import { simulateApiResponse, simulatePaginatedResponse } from '../mockData/apiHelpers';
+import { simulateApiResponse, simulatePaginatedResponse, createApiErrorResponse, createApiSuccessResponse } from '../mockData/apiHelpers';
 
 export const dropdownConfigurationApi = {
   // Get all dropdown configurations
@@ -41,10 +41,7 @@ export const dropdownConfigurationApi = {
     const configuration = getDropdownConfigurationById(id);
     
     if (!configuration) {
-      return {
-        success: false,
-        error: 'Dropdown configuration not found',
-      };
+      return createApiErrorResponse('Dropdown configuration not found', 404);
     }
     
     return simulateApiResponse(configuration);
@@ -68,10 +65,7 @@ export const dropdownConfigurationApi = {
     );
     
     if (isDuplicate) {
-      return {
-        success: false,
-        error: `A configuration for ${data.entityType} with field name '${data.fieldName}' already exists`,
-      };
+      return createApiErrorResponse(`A configuration for ${data.entityType} with field name '${data.fieldName}' already exists`, 400);
     }
     
     const now = new Date();
@@ -108,10 +102,7 @@ export const dropdownConfigurationApi = {
     const configIndex = configurations.findIndex(config => config.id === id);
     
     if (configIndex === -1) {
-      return {
-        success: false,
-        error: 'Dropdown configuration not found',
-      };
+      return createApiErrorResponse('Dropdown configuration not found', 404);
     }
     
     const updatedConfiguration = {
@@ -140,10 +131,7 @@ export const dropdownConfigurationApi = {
     const configIndex = configurations.findIndex(config => config.id === configId);
     
     if (configIndex === -1) {
-      return {
-        success: false,
-        error: 'Dropdown configuration not found',
-      };
+      return createApiErrorResponse('Dropdown configuration not found', 404);
     }
     
     const configuration = configurations[configIndex];
@@ -151,10 +139,7 @@ export const dropdownConfigurationApi = {
     // Check for duplicate value
     const isDuplicate = configuration.options.some(option => option.value === data.value);
     if (isDuplicate) {
-      return {
-        success: false,
-        error: `An option with value '${data.value}' already exists in this dropdown`,
-      };
+      return createApiErrorResponse(`An option with value '${data.value}' already exists in this dropdown`, 400);
     }
     
     const newOption = createDropdownOption(configId, data.label, data.value);
@@ -186,20 +171,14 @@ export const dropdownConfigurationApi = {
     const configIndex = configurations.findIndex(config => config.id === configId);
     
     if (configIndex === -1) {
-      return {
-        success: false,
-        error: 'Dropdown configuration not found',
-      };
+      return createApiErrorResponse('Dropdown configuration not found', 404);
     }
     
     const configuration = configurations[configIndex];
     const optionIndex = configuration.options.findIndex(option => option.id === optionId);
     
     if (optionIndex === -1) {
-      return {
-        success: false,
-        error: 'Dropdown option not found',
-      };
+      return createApiErrorResponse('Dropdown option not found', 404);
     }
     
     // If trying to update the value, check for duplicates
@@ -209,10 +188,7 @@ export const dropdownConfigurationApi = {
       );
       
       if (isDuplicate) {
-        return {
-          success: false,
-          error: `An option with value '${data.value}' already exists in this dropdown`,
-        };
+        return createApiErrorResponse(`An option with value '${data.value}' already exists in this dropdown`, 400);
       }
     }
     
@@ -253,20 +229,14 @@ export const dropdownConfigurationApi = {
     const configIndex = configurations.findIndex(config => config.id === configId);
     
     if (configIndex === -1) {
-      return {
-        success: false,
-        error: 'Dropdown configuration not found',
-      };
+      return createApiErrorResponse('Dropdown configuration not found', 404);
     }
     
     const configuration = configurations[configIndex];
     const optionIndex = configuration.options.findIndex(option => option.id === optionId);
     
     if (optionIndex === -1) {
-      return {
-        success: false,
-        error: 'Dropdown option not found',
-      };
+      return createApiErrorResponse('Dropdown option not found', 404);
     }
     
     const updatedOption = {
@@ -306,10 +276,7 @@ export const dropdownConfigurationApi = {
     const configIndex = configurations.findIndex(config => config.id === configId);
     
     if (configIndex === -1) {
-      return {
-        success: false,
-        error: 'Dropdown configuration not found',
-      };
+      return createApiErrorResponse('Dropdown configuration not found', 404);
     }
     
     const configuration = configurations[configIndex];
@@ -320,10 +287,7 @@ export const dropdownConfigurationApi = {
     );
     
     if (!optionExists) {
-      return {
-        success: false,
-        error: 'One or more option IDs are invalid',
-      };
+      return createApiErrorResponse('One or more option IDs are invalid', 400);
     }
     
     // Create a map of option IDs to options

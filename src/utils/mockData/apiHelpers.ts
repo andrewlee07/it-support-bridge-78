@@ -52,3 +52,23 @@ export const simulatePaginatedResponse = <T>(
 export const delay = (ms: number = 500): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
+
+// Helper to create standardized API error responses
+export const createApiErrorResponse = <T>(error: string, statusCode: number = 400): ApiResponse<T> => {
+  return {
+    success: false,
+    error,
+    message: error,
+    statusCode
+  };
+};
+
+// Helper to create standardized API success responses
+export const createApiSuccessResponse = <T>(data: T, message: string = 'Operation successful', statusCode: number = 200): ApiResponse<T> => {
+  return {
+    success: true,
+    data,
+    message,
+    statusCode
+  };
+};

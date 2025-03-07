@@ -6,7 +6,7 @@ import {
   ApiResponse, 
   PaginatedResponse
 } from '../../types';
-import { simulateApiResponse, simulatePaginatedResponse } from '../../mockData/apiHelpers';
+import { simulateApiResponse, simulatePaginatedResponse, createApiErrorResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
 import { getUserById } from '../../mockData';
 import { 
@@ -80,10 +80,7 @@ export const changeRequestApi = {
     }
     
     if (!change) {
-      return {
-        success: false,
-        error: 'Change request not found',
-      };
+      return createApiErrorResponse('Change request not found', 404);
     }
     
     return simulateApiResponse(change);
@@ -165,10 +162,7 @@ export const changeRequestApi = {
     }
     
     if (changeIndex === -1) {
-      return {
-        success: false,
-        error: 'Change request not found',
-      };
+      return createApiErrorResponse('Change request not found', 404);
     }
     
     const existingChange = changeRequests[changeIndex];

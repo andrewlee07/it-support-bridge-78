@@ -11,7 +11,7 @@ import {
 import { mockUsers } from '../mockData/users';
 import { mockTickets } from '../mockData/tickets';
 import { mockChangeRequests } from '../mockData/changeManagement';
-import { delay } from '../mockData/apiHelpers';
+import { delay, createApiErrorResponse, createApiSuccessResponse } from '../mockData/apiHelpers';
 import { createAuditEntry } from '../mockData/auditHelpers';
 
 // Mock releases data
@@ -166,10 +166,7 @@ export const getReleases = async (
     );
   }
   
-  return {
-    success: true,
-    data: filteredReleases
-  };
+  return createApiSuccessResponse(filteredReleases);
 };
 
 // Get a single release by ID
@@ -179,16 +176,10 @@ export const getReleaseById = async (id: string): Promise<ApiResponse<Release>> 
   const release = mockReleases.find(release => release.id === id);
   
   if (!release) {
-    return {
-      success: false,
-      error: "Release not found"
-    };
+    return createApiErrorResponse("Release not found", 404);
   }
   
-  return {
-    success: true,
-    data: release
-  };
+  return createApiSuccessResponse(release);
 };
 
 // Create a new release
@@ -217,11 +208,7 @@ export const createRelease = async (
   
   mockReleases.push(newRelease);
   
-  return {
-    success: true,
-    data: newRelease,
-    message: "Release created successfully"
-  };
+  return createApiSuccessResponse(newRelease, "Release created successfully");
 };
 
 // Update an existing release
@@ -235,10 +222,7 @@ export const updateRelease = async (
   const releaseIndex = mockReleases.findIndex(release => release.id === id);
   
   if (releaseIndex === -1) {
-    return {
-      success: false,
-      error: "Release not found"
-    };
+    return createApiErrorResponse("Release not found", 404);
   }
   
   const updatedRelease = {
@@ -259,11 +243,7 @@ export const updateRelease = async (
   
   mockReleases[releaseIndex] = updatedRelease;
   
-  return {
-    success: true,
-    data: updatedRelease,
-    message: "Release updated successfully"
-  };
+  return createApiSuccessResponse(updatedRelease, "Release updated successfully");
 };
 
 // Change release status
@@ -277,10 +257,7 @@ export const updateReleaseStatus = async (
   const releaseIndex = mockReleases.findIndex(release => release.id === id);
   
   if (releaseIndex === -1) {
-    return {
-      success: false,
-      error: "Release not found"
-    };
+    return createApiErrorResponse("Release not found", 404);
   }
   
   const updatedRelease = {
@@ -301,11 +278,7 @@ export const updateReleaseStatus = async (
   
   mockReleases[releaseIndex] = updatedRelease;
   
-  return {
-    success: true,
-    data: updatedRelease,
-    message: `Release status updated to ${status}`
-  };
+  return createApiSuccessResponse(updatedRelease, `Release status updated to ${status}`);
 };
 
 // Approve or reject a release
@@ -319,10 +292,7 @@ export const updateReleaseApproval = async (
   const releaseIndex = mockReleases.findIndex(release => release.id === id);
   
   if (releaseIndex === -1) {
-    return {
-      success: false,
-      error: "Release not found"
-    };
+    return createApiErrorResponse("Release not found", 404);
   }
   
   const updatedRelease = {
@@ -345,11 +315,7 @@ export const updateReleaseApproval = async (
   
   mockReleases[releaseIndex] = updatedRelease;
   
-  return {
-    success: true,
-    data: updatedRelease,
-    message: `Release ${approved ? 'approved' : 'rejected'} successfully`
-  };
+  return createApiSuccessResponse(updatedRelease, `Release ${approved ? 'approved' : 'rejected'} successfully`);
 };
 
 // Add an item to a release
@@ -364,10 +330,7 @@ export const addItemToRelease = async (
   const release = mockReleases.find(release => release.id === releaseId);
   
   if (!release) {
-    return {
-      success: false,
-      error: "Release not found"
-    };
+    return createApiErrorResponse("Release not found", 404);
   }
   
   // Check if item already exists in the release
@@ -376,10 +339,7 @@ export const addItemToRelease = async (
   );
   
   if (existingItem) {
-    return {
-      success: false,
-      error: "Item already exists in this release"
-    };
+    return createApiErrorResponse("Item already exists in this release", 400);
   }
   
   const newItem: ReleaseItem = {
@@ -407,11 +367,7 @@ export const addItemToRelease = async (
   
   mockReleases[releaseIndex].audit.push(auditEntry);
   
-  return {
-    success: true,
-    data: newItem,
-    message: `Item added to release successfully`
-  };
+  return createApiSuccessResponse(newItem, `Item added to release successfully`);
 };
 
 // Remove an item from a release
@@ -425,10 +381,7 @@ export const removeItemFromRelease = async (
   const release = mockReleases.find(release => release.id === releaseId);
   
   if (!release) {
-    return {
-      success: false,
-      error: "Release not found"
-    };
+    return createApiErrorResponse("Release not found", 404);
   }
   
   // Find the item to remove
@@ -437,10 +390,7 @@ export const removeItemFromRelease = async (
   );
   
   if (itemIndex === -1) {
-    return {
-      success: false,
-      error: "Item not found in this release"
-    };
+    return createApiErrorResponse("Item not found in this release", 404);
   }
   
   const removedItem = mockReleaseItems[itemIndex];
@@ -464,10 +414,7 @@ export const removeItemFromRelease = async (
   
   mockReleases[releaseIndex].audit.push(auditEntry);
   
-  return {
-    success: true,
-    message: `Item removed from release successfully`
-  };
+  return createApiSuccessResponse(undefined, `Item removed from release successfully`);
 };
 
 // Get release metrics
@@ -506,10 +453,7 @@ export const getReleaseMetrics = async (): Promise<ApiResponse<any>> => {
       .length
   };
   
-  return {
-    success: true,
-    data: metrics
-  };
+  return createApiSuccessResponse(metrics);
 };
 
 export default {

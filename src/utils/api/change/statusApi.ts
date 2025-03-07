@@ -1,7 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { ChangeRequest, ApiResponse, ClosureReason } from '../../types';
-import { simulateApiResponse } from '../../mockData/apiHelpers';
+import { simulateApiResponse, createApiErrorResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
 import { getUserById } from '../../mockData';
 import { getChangeRequests, updateChangeRequest } from './store';
@@ -17,19 +17,13 @@ export const statusApi = {
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
-      return {
-        success: false,
-        error: 'Change request not found',
-      };
+      return createApiErrorResponse('Change request not found', 404);
     }
     
     const existingChange = changeRequests[changeIndex];
     
     if (existingChange.status !== 'draft') {
-      return {
-        success: false,
-        error: 'Only draft change requests can be submitted',
-      };
+      return createApiErrorResponse('Only draft change requests can be submitted', 400);
     }
     
     // Add audit entry
@@ -64,19 +58,13 @@ export const statusApi = {
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
-      return {
-        success: false,
-        error: 'Change request not found',
-      };
+      return createApiErrorResponse('Change request not found', 404);
     }
     
     const existingChange = changeRequests[changeIndex];
     
     if (existingChange.status !== 'submitted') {
-      return {
-        success: false,
-        error: 'Only submitted change requests can be approved',
-      };
+      return createApiErrorResponse('Only submitted change requests can be approved', 400);
     }
     
     const now = new Date();
@@ -117,19 +105,13 @@ export const statusApi = {
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
-      return {
-        success: false,
-        error: 'Change request not found',
-      };
+      return createApiErrorResponse('Change request not found', 404);
     }
     
     const existingChange = changeRequests[changeIndex];
     
     if (existingChange.status !== 'submitted') {
-      return {
-        success: false,
-        error: 'Only submitted change requests can be rejected',
-      };
+      return createApiErrorResponse('Only submitted change requests can be rejected', 400);
     }
     
     const rejector = getUserById(userId);
@@ -167,19 +149,13 @@ export const statusApi = {
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
-      return {
-        success: false,
-        error: 'Change request not found',
-      };
+      return createApiErrorResponse('Change request not found', 404);
     }
     
     const existingChange = changeRequests[changeIndex];
     
     if (existingChange.status !== 'in-progress') {
-      return {
-        success: false,
-        error: 'Only in-progress change requests can be closed',
-      };
+      return createApiErrorResponse('Only in-progress change requests can be closed', 400);
     }
     
     // Determine final status based on closure reason
