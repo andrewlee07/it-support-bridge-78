@@ -17,7 +17,8 @@ const Sidebar = () => {
   const { user } = useAuth();
   
   const isActiveRoute = (path: string) => {
-    return location.pathname === path || (path !== '/settings' && location.pathname.startsWith(path));
+    if (!path) return false;
+    return location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
   };
   
   // Function to check if user has permission for the menu item

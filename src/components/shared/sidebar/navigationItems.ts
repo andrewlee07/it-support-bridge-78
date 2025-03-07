@@ -18,8 +18,8 @@ import { NavigationItem } from './types';
 export const navigationItems: NavigationItem[] = [
   {
     name: "Dashboard",
-    path: "/",
-    href: "/",
+    path: "/dashboard",
+    href: "/dashboard",
     icon: HomeIcon,
     allowedRoles: ['admin', 'manager', 'user']
   },
@@ -123,18 +123,21 @@ export const settingsItems = [
   {
     name: "SLA Settings",
     path: "/settings/sla",
+    href: "/settings/sla",
     icon: SettingsIcon,
     allowedRoles: ['admin']
   },
   {
     name: "Dropdown Configurations",
     path: "/settings/dropdown-configurations",
+    href: "/settings/dropdown-configurations",
     icon: SettingsIcon,
     allowedRoles: ['admin']
   },
   {
     name: "Risk Assessment",
     path: "/settings/risk-assessment",
+    href: "/settings/risk-assessment",
     icon: BarChartIcon,
     allowedRoles: ['admin']
   },
