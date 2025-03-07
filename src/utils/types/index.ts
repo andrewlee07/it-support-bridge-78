@@ -12,11 +12,15 @@ export * from './api';
 export * from './configuration';
 
 // Explicitly re-export from backlogTypes to avoid name conflicts
-export {
+export type {
   BacklogItem,
   BacklogItemStatus,
   BacklogItemPriority,
   BacklogItemType,
+  BacklogTestCoverage
+} from './backlogTypes';
+
+export {
   calculateReleaseCapacity,
   filterBacklogItemsByRelease,
   filterBacklogItemsByLabel,
@@ -26,7 +30,7 @@ export {
 } from './backlogTypes';
 
 // Explicitly re-export from ticket to avoid name conflicts
-export {
+export type {
   Ticket,
   TicketStatus,
   TicketPriority,
@@ -35,8 +39,3 @@ export {
   TicketFilter,
   TestCoverageRelationship,
 } from './ticket';
-
-// Conditionally re-export BacklogTestCoverage from backlogTypes to avoid duplicate exports
-export { 
-  BacklogTestCoverage
-} from './backlogTypes';

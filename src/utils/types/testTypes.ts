@@ -1,4 +1,3 @@
-
 // Test Case Management Types
 
 // Status types
@@ -46,6 +45,19 @@ export interface TestCaseCoverage {
   testCaseId: string;
   status: TestStatus;
   lastExecutionDate?: Date;
+}
+
+// Release test coverage interface
+export interface TestCoverage {
+  releaseId: string;
+  totalTestCases: number;
+  passedTests: number;
+  failedTests: number;
+  blockedTests: number;
+  notRunTests: number;
+  coveragePercentage: number;
+  riskLevel: 'high' | 'medium' | 'low';
+  readiness: 'go' | 'no-go' | 'warning';
 }
 
 export interface Bug {
