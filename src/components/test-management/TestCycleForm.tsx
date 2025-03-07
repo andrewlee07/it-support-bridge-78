@@ -36,14 +36,14 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
-// Form schema for test cycle
+// Form schema for test cycle - update to match all possible TestCycleStatus values
 const testCycleSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
   releaseId: z.string().optional(),
   startDate: z.date({ required_error: 'Start date is required' }),
   endDate: z.date({ required_error: 'End date is required' }),
-  status: z.enum(['planned', 'in-progress', 'completed']),
+  status: z.enum(['planned', 'in-progress', 'in_progress', 'completed', 'aborted']),
   testCases: z.array(z.string()).min(1, { message: 'At least one test case is required.' }),
 });
 
@@ -70,6 +70,18 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
     queryFn: fetchTestCases,
   });
 
+  // Normalize the status value to handle both 'in-progress' and 'in_progress'
+  const normalizeStatus = (status: string | undefined) => {
+    if (!status) return 'planned';
+    
+    // Normalize all variants of in-progress to a single format used in the UI
+    if (status === 'in_progress' || status === 'in-progress') {
+      return 'in-progress';
+    }
+    
+    return status;
+  };
+
   // Initialize form with default values
   const form = useForm<TestCycleFormValues>({
     resolver: zodResolver(testCycleSchema),
@@ -79,7 +91,7 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
       releaseId: initialData?.releaseId || '',
       startDate: initialData?.startDate ? new Date(initialData.startDate) : new Date(),
       endDate: initialData?.endDate ? new Date(initialData.endDate) : new Date(new Date().setDate(new Date().getDate() + 14)),
-      status: initialData?.status || 'planned',
+      status: normalizeStatus(initialData?.status) as any,
       testCases: initialData?.testCases || [],
     },
   });
@@ -306,6 +318,7 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
                       <SelectItem value="planned">Planned</SelectItem>
                       <SelectItem value="in-progress">In Progress</SelectItem>
                       <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="aborted">Aborted</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

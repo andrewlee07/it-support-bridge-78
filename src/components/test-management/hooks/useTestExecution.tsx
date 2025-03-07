@@ -40,7 +40,7 @@ export const useTestExecution = (testCycleId?: string) => {
     setSelectedTestCases([]);
   };
 
-  // Execute a test case
+  // Execute a test case with improved status handling
   const executeTestCase = async (testCaseId: string, status: TestStatus, comments: string = '') => {
     if (!user) {
       toast({
@@ -61,6 +61,9 @@ export const useTestExecution = (testCycleId?: string) => {
         execStatus = 'passed';
       } else if (status === 'fail' || status === 'failed') {
         execStatus = 'failed';
+      } else if (status === 'in_progress' || status === 'in-progress') {
+        // Handle in-progress status - map to appropriate backend value
+        execStatus = 'blocked'; // Defaulting to blocked for in-progress
       }
 
       // Call the executeTest function with the required parameters
@@ -100,7 +103,7 @@ export const useTestExecution = (testCycleId?: string) => {
     }
   };
 
-  // We need to convert the TestCase from testData to match our TestCase type
+  // Convert the TestCase from testData to match our TestCase type
   const convertTestCases = (testCases: any[]): TestCase[] => {
     return testCases.map(tc => ({
       id: tc.id,

@@ -98,6 +98,7 @@ const TestCaseFormFields: React.FC = () => {
                 <SelectItem value="pass">Pass</SelectItem>
                 <SelectItem value="fail">Fail</SelectItem>
                 <SelectItem value="blocked">Blocked</SelectItem>
+                {/* We only expose the main statuses in the UI but support all possible values in the schema */}
               </SelectContent>
             </Select>
             <FormMessage />

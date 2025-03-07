@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { TestCase } from '@/utils/types/testTypes';
+import { TestCase, mapTestStatus } from '@/utils/types/testTypes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { testCaseSchema, TestCaseFormValues } from './forms/testCaseSchema';
@@ -33,7 +33,10 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
       description: initialData?.description || '',
       stepsToReproduce: initialData?.stepsToReproduce?.length ? initialData.stepsToReproduce : [''],
       expectedResults: initialData?.expectedResults || '',
-      status: initialData?.status || 'not-run',
+      // Handle potential 'in_progress' status by normalizing it to a valid UI status
+      status: initialData?.status && (initialData.status === 'in_progress' || initialData.status === 'in-progress') 
+        ? 'not-run' 
+        : (initialData?.status || 'not-run'),
       assignedTester: initialData?.assignedTester || user?.id || '',
       relatedRequirement: initialData?.relatedRequirement || '',
     },
