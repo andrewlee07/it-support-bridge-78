@@ -12,6 +12,7 @@ import {
   PackageIcon,
   ClipboardListIcon,
   BarChartIcon,
+  BugIcon,
 } from "lucide-react";
 import { NavigationItem } from './types';
 
@@ -99,6 +100,13 @@ export const navigationItems: NavigationItem[] = [
         path: "/test-execution",
         href: "/test-execution",
         icon: ClipboardListIcon,
+        allowedRoles: ['admin', 'manager', 'user']
+      },
+      {
+        name: "Bugs",
+        path: "/bugs",
+        href: "/bugs",
+        icon: BugIcon,
         allowedRoles: ['admin', 'manager', 'user']
       },
     ],
