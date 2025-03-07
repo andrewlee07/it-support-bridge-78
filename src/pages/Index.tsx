@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -8,7 +9,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header with Logo */}
-      <header className="w-full py-4 px-6 md:px-12 border-b">
+      <header className="w-full py-4 px-6 md:px-12 border-b bg-white">
         <div className="max-w-screen-xl mx-auto flex justify-between items-center">
           <div className="flex items-center">
             <img 
@@ -36,10 +37,10 @@ const Index = () => {
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" className="text-base bg-[#42284e] hover:bg-[#42284e]/90 text-white" asChild>
-                  <Link to="/login">
-                    Login
+                   <Link to="/login">
+                     Login
                     <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
+                   </Link>
                 </Button>
               </div>
             </motion.div>
@@ -138,12 +139,14 @@ const Index = () => {
         <div className="container max-w-screen-xl mx-auto px-4 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <img 
-                src="/lovable-uploads/9f8e5267-ab6c-409e-99f0-0517f48fc1b8.png" 
-                alt="We Are Group" 
-                className="h-12 mb-4"
-              />
-              <p className="text-sm text-white/80">
+              <div className="bg-white inline-block p-2 rounded">
+                <img 
+                  src="/lovable-uploads/9f8e5267-ab6c-409e-99f0-0517f48fc1b8.png" 
+                  alt="We Are Group" 
+                  className="h-12 mb-1"
+                />
+              </div>
+              <p className="text-sm text-white/80 mt-3">
                 We Are Group is a trading name of We Are Group Holdings Ltd.
               </p>
             </div>
