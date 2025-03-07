@@ -4,6 +4,7 @@ export type TestStatus = 'not-run' | 'pass' | 'fail' | 'blocked' | 'passed' | 'f
 export type BugSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type BugPriority = 'urgent' | 'high' | 'medium' | 'low';
 export type BugStatus = 'new' | 'in-progress' | 'fixed' | 'verified' | 'closed' | 'open' | 'in_progress' | 'resolved';
+export type TestCycleStatus = 'planned' | 'in_progress' | 'completed' | 'aborted' | 'in-progress';
 
 export interface TestCase {
   id: string;
@@ -55,7 +56,7 @@ export interface TestCycle {
   releaseId?: string;
   startDate: Date;
   endDate: Date;
-  status: 'planned' | 'in_progress' | 'completed' | 'aborted' | 'in-progress';
+  status: TestCycleStatus;
   testCases: string[]; // Test Case IDs
   createdAt: Date;
   updatedAt: Date;
@@ -93,3 +94,17 @@ export interface ExportableBug extends Omit<Bug, 'createdAt' | 'updatedAt'> {
   createdAt: string;
   updatedAt: string;
 }
+
+// Helper function to map between different status format versions
+export const mapTestStatus = (status: string): TestStatus => {
+  switch (status) {
+    case 'passed': return 'pass';
+    case 'failed': return 'fail';
+    case 'draft': return 'not-run';
+    default: return status as TestStatus;
+  }
+};
+
+export const mapBugStatus = (status: string): BugStatus => {
+  return status as BugStatus;
+};
