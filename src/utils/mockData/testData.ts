@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { TestCase, Bug, TestCycle, TestExecution } from '../types/testTypes';
+import { TestCase, Bug, TestCycle, TestExecution, TestManagementStats } from '../types/testTypes';
 import { delay, simulateApiResponse } from './apiHelpers';
 import { User } from '../types';
 
@@ -172,7 +172,7 @@ export const updateTestCase = async (
   await delay(500);
   const testCaseIndex = testCases.findIndex(tc => tc.id === id);
   if (testCaseIndex === -1) {
-    return simulateApiResponse(null, 'Test case not found', false);
+    return simulateApiResponse(null, 'Test case not found');
   }
   
   testCases[testCaseIndex] = {
@@ -188,7 +188,7 @@ export const deleteTestCase = async (id: string) => {
   await delay(500);
   const testCaseIndex = testCases.findIndex(tc => tc.id === id);
   if (testCaseIndex === -1) {
-    return simulateApiResponse(null, 'Test case not found', false);
+    return simulateApiResponse(null, 'Test case not found');
   }
   
   testCases.splice(testCaseIndex, 1);
@@ -228,7 +228,7 @@ export const updateBug = async (
   await delay(500);
   const bugIndex = bugs.findIndex(b => b.id === id);
   if (bugIndex === -1) {
-    return simulateApiResponse(null, 'Bug not found', false);
+    return simulateApiResponse(null, 'Bug not found');
   }
   
   bugs[bugIndex] = {

@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/utils/types';
 import NavLink from './sidebar/NavLink';
 import SettingsMenu from './sidebar/SettingsMenu';
-import { navigationItems, bottomNavigationItems, settingsItems } from './sidebar/navigationItems';
+import { navigationItems, settingsItems } from './sidebar/navigationItems';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -80,17 +80,7 @@ const Sidebar = () => {
         </div>
         
         <div className="space-y-1 px-3">
-          {bottomNavigationItems.map((item) => (
-            // Only render if user has permission
-            hasPermission(item.allowedRoles) && (
-              <NavLink 
-                key={item.path} 
-                item={item} 
-                isActive={isActiveRoute(item.path)}
-                collapsed={collapsed} 
-              />
-            )
-          ))}
+          {/* Help menu item would go here */}
         </div>
       </div>
     </div>
