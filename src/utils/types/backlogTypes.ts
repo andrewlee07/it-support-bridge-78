@@ -24,6 +24,20 @@ export interface BacklogItem {
   labels: string[]; // Tags for filtering
   createdAt: Date;
   updatedAt: Date;
+  // Test coverage related fields
+  testCoverage?: BacklogTestCoverage;
+  relatedTestCaseIds?: string[]; // IDs of associated test cases
+  relatedBugIds?: string[]; // IDs of associated bugs
+}
+
+// Test coverage metrics for backlog items
+export interface BacklogTestCoverage {
+  totalTestCases: number;
+  passedTests: number;
+  failedTests: number;
+  notExecutedTests: number;
+  coveragePercentage: number;
+  lastUpdated: Date;
 }
 
 // API response types for Backlog Management
@@ -52,6 +66,15 @@ export interface ExportableBacklogItem extends Omit<BacklogItem, 'createdAt' | '
   dueDate?: string;
 }
 
+// Traceability mapping
+export interface TraceabilityMapping {
+  backlogItemId: string;
+  testCaseIds: string[];
+  bugIds: string[];
+  requirementIds: string[];
+  coverage: number; // Percentage of test coverage
+}
+
 // Helper function to calculate capacity percentage for a release
 export const calculateReleaseCapacity = (
   backlogItems: BacklogItem[],
@@ -71,4 +94,17 @@ export const filterBacklogItemsByRelease = (items: BacklogItem[], releaseId?: st
 
 export const filterBacklogItemsByLabel = (items: BacklogItem[], label: string): BacklogItem[] => {
   return items.filter(item => item.labels.includes(label));
+};
+
+// New helper functions for test coverage
+export const filterBacklogItemsByTestCoverage = (items: BacklogItem[], minCoverage: number): BacklogItem[] => {
+  return items.filter(item => (item.testCoverage?.coveragePercentage || 0) >= minCoverage);
+};
+
+export const getBacklogItemsWithoutTests = (items: BacklogItem[]): BacklogItem[] => {
+  return items.filter(item => !item.testCoverage || item.testCoverage.totalTestCases === 0);
+};
+
+export const getBacklogItemsWithFailingTests = (items: BacklogItem[]): BacklogItem[] => {
+  return items.filter(item => item.testCoverage && item.testCoverage.failedTests > 0);
 };

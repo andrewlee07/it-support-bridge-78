@@ -6,6 +6,8 @@ export type TicketCategory = 'hardware' | 'software' | 'network' | 'access' | 'o
 export type TicketType = 'incident' | 'service' | 'change';
 
 import { AuditEntry } from './audit';
+import { TestCase } from './testTypes';
+import { BacklogItem } from './backlogTypes';
 
 export interface Ticket {
   id: string;
@@ -36,4 +38,22 @@ export interface TicketFilter {
   dateFrom?: Date;
   dateTo?: Date;
   searchQuery?: string;
+}
+
+// Test coverage relationship
+export interface TestCoverageRelationship {
+  backlogItemId: string;
+  testCaseId: string;
+  coverageType: 'direct' | 'indirect';
+  createdAt: Date;
+}
+
+// Test coverage metrics
+export interface BacklogTestCoverage {
+  backlogItemId: string;
+  totalTestCases: number;
+  passedTests: number;
+  failedTests: number;
+  notExecutedTests: number;
+  coveragePercentage: number;
 }

@@ -36,6 +36,16 @@ export interface TestCase {
   priority?: TestPriority;
   type?: TestType;
   createdBy?: string;
+  // Backlog integration fields
+  relatedBacklogItemIds?: string[]; // IDs of associated backlog items
+  coverage?: TestCoverage[];
+}
+
+export interface TestCoverage {
+  backlogItemId: string;
+  testCaseId: string;
+  status: TestStatus;
+  lastExecutionDate?: Date;
 }
 
 export interface Bug {
@@ -57,6 +67,10 @@ export interface Bug {
   assignedTo?: string;
   // Added for Release integration
   releaseId?: string;
+  // Backlog integration fields
+  relatedBacklogItemId?: string; // ID of associated backlog item
+  generatedBacklogItem?: boolean; // Whether this bug has generated a backlog item
+  backlogItemId?: string; // ID of the generated backlog item
 }
 
 export interface TestExecution {
@@ -70,6 +84,8 @@ export interface TestExecution {
   executionDate?: Date; // Either executionDate or executedAt must be present
   executedAt?: Date; // For compatibility with testData
   notes?: string; // For compatibility with testData
+  // Backlog integration fields
+  affectedBacklogItems?: string[]; // IDs of affected backlog items
 }
 
 export interface TestCycle {
@@ -139,6 +155,26 @@ export interface TestExecutionForRelease {
   failed: number;
   blocked: number;
   progress: number; // Percentage of tests executed
+}
+
+// Traceability Matrix data structure
+export interface TraceabilityMatrix {
+  backlogItems: {
+    id: string;
+    title: string;
+    coverage: number;
+    testCases: {
+      id: string;
+      title: string;
+      status: TestStatus;
+      lastExecuted?: Date;
+    }[];
+    bugs: {
+      id: string;
+      title: string;
+      status: BugStatus;
+    }[];
+  }[];
 }
 
 // Helper function to map between different status format versions

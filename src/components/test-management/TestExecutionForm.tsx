@@ -23,27 +23,43 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { CheckCircle, XCircle, AlertTriangle, Clock, Bug } from 'lucide-react';
-import { TestCase, TestStatus } from '@/utils/types/testTypes';
+import { TestCase, TestStatus, Bug, BugStatus } from '@/utils/types/testTypes';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 import StatusBadge from './ui/StatusBadge';
+import BugCreationDialog from './BugCreationDialog';
 
 interface TestExecutionFormProps {
   testCase: TestCase;
   onExecute: (testCaseId: string, status: TestStatus, comments: string) => Promise<{ success: boolean }>;
   onLinkBug?: (testCaseId: string) => void;
+  onBugCreated?: (bug: Bug, backlogItem?: BacklogItem) => void;
 }
 
 const TestExecutionForm: React.FC<TestExecutionFormProps> = ({ 
   testCase, 
   onExecute,
-  onLinkBug
+  onLinkBug,
+  onBugCreated
 }) => {
   const [comments, setComments] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
 
   const handleExecute = async (status: TestStatus) => {
     setIsSubmitting(true);
-    await onExecute(testCase.id, status, comments);
+    const result = await onExecute(testCase.id, status, comments);
     setIsSubmitting(false);
+    
+    // If the test fails, offer to create a bug
+    if (result.success && status === 'fail' && !isBugDialogOpen) {
+      setIsBugDialogOpen(true);
+    }
+  };
+
+  const handleBugCreated = (bug: Bug, backlogItem?: BacklogItem) => {
+    if (onBugCreated) {
+      onBugCreated(bug, backlogItem);
+    }
   };
 
   return (
@@ -95,6 +111,14 @@ const TestExecutionForm: React.FC<TestExecutionFormProps> = ({
               Link Bug
             </Button>
           )}
+          <Button 
+            variant="outline" 
+            onClick={() => setIsBugDialogOpen(true)}
+            disabled={isSubmitting}
+          >
+            <Bug className="h-4 w-4 mr-2" />
+            Create Bug
+          </Button>
         </div>
         <div className="flex items-center gap-2">
           <AlertDialog>
@@ -137,6 +161,14 @@ const TestExecutionForm: React.FC<TestExecutionFormProps> = ({
           </Button>
         </div>
       </CardFooter>
+
+      {/* Bug Creation Dialog */}
+      <BugCreationDialog
+        testCase={testCase}
+        isOpen={isBugDialogOpen}
+        onClose={() => setIsBugDialogOpen(false)}
+        onSuccess={handleBugCreated}
+      />
     </Card>
   );
 };
