@@ -12,6 +12,7 @@ import Incidents from "./pages/Incidents";
 import ServiceRequests from "./pages/ServiceRequests";
 import Users from "./pages/Users";
 import MainLayout from "./layouts/MainLayout";
+import SLASettings from "./pages/SLASettings";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/incidents" element={<Incidents />} />
               <Route path="/service-requests" element={<ServiceRequests />} />
               <Route path="/users" element={<Users />} />
+              <Route path="/settings/sla" element={<SLASettings />} />
               {/* These routes would be implemented in future iterations */}
               <Route path="/changes" element={<NotFound />} />
               <Route path="/assets" element={<NotFound />} />
