@@ -9,7 +9,12 @@ import {
 import { simulateApiResponse, simulatePaginatedResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
 import { getUserById } from '../../mockData';
-import { changeRequests } from './store';
+import { 
+  getChangeRequests, 
+  setChangeRequests, 
+  updateChangeRequest,
+  generateChangeId
+} from './store';
 
 // Change request operations
 export const changeRequestApi = {
@@ -25,7 +30,7 @@ export const changeRequestApi = {
       search?: string;
     }
   ): Promise<PaginatedResponse<ChangeRequest>> => {
-    let filteredChanges = [...changeRequests];
+    let filteredChanges = [...getChangeRequests()];
     
     // Apply filters
     if (filters) {
@@ -62,7 +67,7 @@ export const changeRequestApi = {
   
   // Get a specific change request by ID
   getChangeRequestById: async (id: string): Promise<ApiResponse<ChangeRequest>> => {
-    const change = changeRequests.find(c => c.id === id);
+    const change = getChangeRequests().find(c => c.id === id);
     
     if (!change) {
       return {
@@ -88,7 +93,7 @@ export const changeRequestApi = {
       createdBy: string;
     }
   ): Promise<ApiResponse<ChangeRequest>> => {
-    const newId = uuidv4();
+    const newId = generateChangeId();
     const now = new Date();
     
     const newChangeRequest: ChangeRequest = {
@@ -121,7 +126,9 @@ export const changeRequestApi = {
       ]
     };
     
-    changeRequests.push(newChangeRequest);
+    const currentChangeRequests = getChangeRequests();
+    const updatedChangeRequests = [...currentChangeRequests, newChangeRequest];
+    setChangeRequests(updatedChangeRequests);
     
     return simulateApiResponse(newChangeRequest);
   },
@@ -132,6 +139,7 @@ export const changeRequestApi = {
     data: Partial<ChangeRequest>,
     userId: string
   ): Promise<ApiResponse<ChangeRequest>> => {
+    const changeRequests = getChangeRequests();
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
@@ -175,7 +183,7 @@ export const changeRequestApi = {
       audit: updatedAudit
     };
     
-    changeRequests[changeIndex] = updatedChange;
+    updateChangeRequest(changeIndex, updatedChange);
     
     return simulateApiResponse(updatedChange);
   },

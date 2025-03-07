@@ -4,7 +4,7 @@ import { ChangeRequest, ApiResponse } from '../../types';
 import { simulateApiResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
 import { getUserById } from '../../mockData';
-import { changeRequests } from './store';
+import { getChangeRequests, updateChangeRequest } from './store';
 
 // Change status operations
 export const statusApi = {
@@ -13,6 +13,7 @@ export const statusApi = {
     id: string,
     userId: string
   ): Promise<ApiResponse<ChangeRequest>> => {
+    const changeRequests = getChangeRequests();
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
@@ -48,7 +49,7 @@ export const statusApi = {
       audit: updatedAudit
     };
     
-    changeRequests[changeIndex] = updatedChange;
+    updateChangeRequest(changeIndex, updatedChange);
     
     return simulateApiResponse(updatedChange);
   },
@@ -59,6 +60,7 @@ export const statusApi = {
     userId: string,
     assignTo?: string
   ): Promise<ApiResponse<ChangeRequest>> => {
+    const changeRequests = getChangeRequests();
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
@@ -100,7 +102,7 @@ export const statusApi = {
       audit: updatedAudit
     };
     
-    changeRequests[changeIndex] = updatedChange;
+    updateChangeRequest(changeIndex, updatedChange);
     
     return simulateApiResponse(updatedChange);
   },
@@ -111,6 +113,7 @@ export const statusApi = {
     userId: string,
     reason: string
   ): Promise<ApiResponse<ChangeRequest>> => {
+    const changeRequests = getChangeRequests();
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
@@ -148,7 +151,7 @@ export const statusApi = {
       audit: updatedAudit
     };
     
-    changeRequests[changeIndex] = updatedChange;
+    updateChangeRequest(changeIndex, updatedChange);
     
     return simulateApiResponse(updatedChange);
   },
