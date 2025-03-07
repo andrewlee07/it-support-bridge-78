@@ -21,6 +21,7 @@ import Assets from "./pages/Assets";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
 import DropdownConfigurations from "./pages/settings/DropdownConfigurations";
+import RiskAssessmentSettings from "./pages/settings/RiskAssessmentSettings";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -62,6 +63,7 @@ const App = () => {
                       <Route path="/users" element={<Users />} />
                       <Route path="/settings/sla" element={<SLASettings />} />
                       <Route path="/settings/dropdowns" element={<DropdownConfigurations />} />
+                      <Route path="/settings/risk-assessment" element={<RiskAssessmentSettings />} />
                       <Route path="/settings" element={<NotFound />} />
                     </Route>
                     

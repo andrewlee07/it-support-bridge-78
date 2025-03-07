@@ -13,14 +13,23 @@ import {
   Monitor, 
   ChevronLeft, 
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  Shield,
+  GaugeCircle,
+  ListTodo
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/utils/types';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
   
@@ -31,6 +40,13 @@ const Sidebar = () => {
     icon: React.ElementType;
     allowedRoles: UserRole[];
   }
+  
+  // Define settings submenu items
+  const settingsItems: NavItem[] = [
+    { name: 'SLA Configuration', path: '/settings/sla', icon: GaugeCircle, allowedRoles: ['admin'] },
+    { name: 'Dropdown Fields', path: '/settings/dropdowns', icon: ListTodo, allowedRoles: ['admin'] },
+    { name: 'Risk Assessment', path: '/settings/risk-assessment', icon: Shield, allowedRoles: ['admin'] },
+  ];
   
   const navigationItems: NavItem[] = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, allowedRoles: ['admin', 'it', 'user'] },
@@ -43,12 +59,11 @@ const Sidebar = () => {
   ];
   
   const bottomNavigationItems: NavItem[] = [
-    { name: 'Settings', path: '/settings', icon: Settings, allowedRoles: ['admin'] },
     { name: 'Help & Support', path: '/help', icon: HelpCircle, allowedRoles: ['admin', 'it', 'user'] },
   ];
 
   const isActiveRoute = (path: string) => {
-    return location.pathname === path;
+    return location.pathname === path || (path !== '/settings' && location.pathname.startsWith(path));
   };
   
   // Function to check if user has permission for the menu item
@@ -56,6 +71,9 @@ const Sidebar = () => {
     if (!user) return false;
     return allowedRoles.includes(user.role);
   };
+
+  // Check if any settings items are accessible to the current user
+  const hasSettingsAccess = settingsItems.some(item => hasPermission(item.allowedRoles));
 
   return (
     <div 
@@ -99,6 +117,60 @@ const Sidebar = () => {
               </Link>
             )
           ))}
+          
+          {/* Settings Menu (with submenu) */}
+          {hasSettingsAccess && (
+            collapsed ? (
+              <Link 
+                to="/settings"
+                className={cn(
+                  "flex items-center gap-3 px-2 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors justify-center",
+                  location.pathname.startsWith('/settings') && "bg-primary/10 text-primary font-medium"
+                )}
+              >
+                <Settings className="h-5 w-5" />
+              </Link>
+            ) : (
+              <Collapsible
+                open={settingsOpen}
+                onOpenChange={setSettingsOpen}
+                className="w-full"
+              >
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "flex w-full justify-between items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
+                      location.pathname.startsWith('/settings') && "bg-primary/10 text-primary font-medium"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Settings className="h-5 w-5 flex-shrink-0" />
+                      <span>Settings</span>
+                    </div>
+                    <ChevronRight className={cn("h-4 w-4 transition-transform", settingsOpen && "rotate-90")} />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pl-4 pt-1">
+                  {settingsItems.map((item) => (
+                    hasPermission(item.allowedRoles) && (
+                      <Link 
+                        key={item.path} 
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
+                          isActiveRoute(item.path) && "bg-primary/10 text-primary font-medium"
+                        )}
+                      >
+                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                        <span>{item.name}</span>
+                      </Link>
+                    )
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            )
+          )}
         </div>
         
         <div className="space-y-1 px-3">
