@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
@@ -16,6 +15,8 @@ import { changeApi } from '@/utils/api/changeApi';
 import { emailNotificationApi } from '@/utils/api/emailNotificationApi';
 import { ChangeRequest, ChangeStatus } from '@/utils/types';
 import { format } from 'date-fns';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 const Changes = () => {
   const navigate = useNavigate();
