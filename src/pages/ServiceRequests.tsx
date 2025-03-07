@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getTicketsByType } from '@/utils/mockData';
+import { getTicketsByType, generateServiceRequestId } from '@/utils/mockData';
 import TicketList from '@/components/tickets/TicketList';
 import TicketForm from '@/components/tickets/TicketForm';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ const ServiceRequests = () => {
   
   const handleSubmit = (data: Partial<Ticket>) => {
     // In a real app, this would connect to an API
-    console.log('Submitting service request:', data);
+    console.log('Submitting service request:', { ...data, id: generateServiceRequestId() });
     setShowForm(false);
     toast.success('Service request created successfully!');
   };

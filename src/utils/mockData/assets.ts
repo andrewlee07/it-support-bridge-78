@@ -5,7 +5,7 @@ import { createAuditEntries } from './auditHelpers';
 // Mock assets
 export const mockAssets: Asset[] = [
   {
-    id: 'asset-1',
+    id: 'CI00001',
     name: 'Dell XPS 15',
     type: 'hardware',
     status: 'in-use',
@@ -18,10 +18,10 @@ export const mockAssets: Asset[] = [
     notes: 'Executive laptop',
     createdAt: new Date(2023, 0, 16),
     updatedAt: new Date(2023, 0, 16),
-    audit: createAuditEntries('asset-1', 'asset', 'user-1'),
+    audit: createAuditEntries('CI00001', 'asset', 'user-1'),
   },
   {
-    id: 'asset-2',
+    id: 'CI00002',
     name: 'Microsoft Office 365',
     type: 'software',
     status: 'in-use',
@@ -31,10 +31,10 @@ export const mockAssets: Asset[] = [
     notes: 'Company-wide license',
     createdAt: new Date(2023, 0, 3),
     updatedAt: new Date(2023, 0, 3),
-    audit: createAuditEntries('asset-2', 'asset', 'user-1'),
+    audit: createAuditEntries('CI00002', 'asset', 'user-1'),
   },
   {
-    id: 'asset-3',
+    id: 'CI00003',
     name: 'iPhone 13',
     type: 'hardware',
     status: 'in-use',
@@ -46,10 +46,10 @@ export const mockAssets: Asset[] = [
     location: 'Main Office',
     createdAt: new Date(2023, 2, 11),
     updatedAt: new Date(2023, 2, 11),
-    audit: createAuditEntries('asset-3', 'asset', 'user-2'),
+    audit: createAuditEntries('CI00003', 'asset', 'user-2'),
   },
   {
-    id: 'asset-4',
+    id: 'CI00004',
     name: 'Adobe Creative Cloud',
     type: 'license',
     status: 'in-use',
@@ -59,10 +59,10 @@ export const mockAssets: Asset[] = [
     manufacturer: 'Adobe',
     createdAt: new Date(2023, 1, 16),
     updatedAt: new Date(2023, 1, 16),
-    audit: createAuditEntries('asset-4', 'asset', 'user-1'),
+    audit: createAuditEntries('CI00004', 'asset', 'user-1'),
   },
   {
-    id: 'asset-5',
+    id: 'CI00005',
     name: 'HP LaserJet Printer',
     type: 'hardware',
     status: 'in-use',
@@ -73,11 +73,37 @@ export const mockAssets: Asset[] = [
     location: 'Marketing Department',
     createdAt: new Date(2022, 11, 6),
     updatedAt: new Date(2022, 11, 6),
-    audit: createAuditEntries('asset-5', 'asset', 'user-2'),
+    audit: createAuditEntries('CI00005', 'asset', 'user-2'),
   },
 ];
 
 // Helper function to get asset by ID
 export const getAssetById = (id: string): Asset | undefined => {
-  return mockAssets.find(asset => asset.id === id);
+  // Handle partial ID search
+  if (id.startsWith('CI')) {
+    return mockAssets.find(asset => asset.id === id);
+  } else {
+    // Partial ID search - look for any asset that contains this ID segment
+    return mockAssets.find(asset => asset.id.toLowerCase().includes(id.toLowerCase()));
+  }
+};
+
+// Get the next asset ID number
+export const getNextAssetIdNumber = (): number => {
+  const existingIds = mockAssets.map(asset => {
+    if (asset.id.startsWith('CI')) {
+      const numericPart = asset.id.replace('CI', '');
+      return parseInt(numericPart, 10);
+    }
+    return 0;
+  });
+  
+  const maxId = Math.max(...existingIds, 0);
+  return maxId + 1;
+};
+
+// Generate a new asset ID with format CI00001
+export const generateAssetId = (): string => {
+  const nextNumber = getNextAssetIdNumber();
+  return `CI${nextNumber.toString().padStart(5, '0')}`;
 };

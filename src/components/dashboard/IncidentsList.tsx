@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -95,7 +94,7 @@ const IncidentsList: React.FC<IncidentsListProps> = ({ tickets, compact = false 
             tickets.map((ticket) => (
               <tr key={ticket.id} className="hover:bg-muted/40 transition-colors">
                 <td className="py-3 text-sm">
-                  <span className="font-mono text-xs">{ticket.id.split('-')[1]}</span>
+                  <span className="font-mono text-xs">{ticket.id}</span>
                 </td>
                 <td className="py-3 text-sm font-medium">
                   <Link to={`/tickets/${ticket.id}`} className="hover:text-primary">
