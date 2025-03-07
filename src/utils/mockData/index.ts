@@ -1,4 +1,3 @@
-
 // Re-export all mock data from individual files
 import { mockUsers, getUserById } from './users';
 import { 
@@ -16,7 +15,7 @@ import {
   getChangeRequestById, 
   mockRiskAssessmentQuestions, 
   calculateRiskLevel 
-} from './changeManagement';
+} from './changeManagement'; // This now uses the index.ts in the changeManagement folder
 import { mockSLAs } from './slas';
 import { mockEmailTemplates } from './emailTemplates';
 import { getDashboardStats } from './dashboardStats';
