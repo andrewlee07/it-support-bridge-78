@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PaginatedResponse, Ticket } from '@/utils/types';
-import { ticketApi } from '@/utils/api'; // Updated import to use ticketApi directly
+import { ticketApi } from '@/utils/api';
 import TicketList from './TicketList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,10 +10,11 @@ import { AlertCircle } from 'lucide-react';
 
 const ServiceRequestsList: React.FC = () => {
   const [page, setPage] = useState(1);
+  const limit = 10;
   
   const { data, isLoading, error } = useQuery<PaginatedResponse<Ticket>>({
     queryKey: ['serviceRequests', page],
-    queryFn: () => ticketApi.getTicketsByType('service', page, 10), // Updated to use ticketApi directly
+    queryFn: () => ticketApi.getTicketsByType('service', page, limit),
   });
   
   if (isLoading) {
@@ -42,7 +43,7 @@ const ServiceRequestsList: React.FC = () => {
   
   return (
     <div>
-      {data?.items && data.items.length > 0 ? (
+      {data && data.items.length > 0 ? (
         <TicketList tickets={data.items} type="service" />
       ) : (
         <div className="text-center py-12">

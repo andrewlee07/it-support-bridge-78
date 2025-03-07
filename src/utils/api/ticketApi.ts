@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { Ticket, TicketStatus, TicketPriority, TicketType } from '../types';
+import { Ticket, TicketStatus, TicketPriority, TicketType, PaginatedResponse } from '../types';
 
 // Define the TicketComment interface since it's missing from the types file
 interface TicketComment {
@@ -56,26 +56,29 @@ export const fetchTickets = async (): Promise<{ success: boolean; data?: Ticket[
 };
 
 // Get tickets by type with pagination
-export const getTicketsByType = async (type: TicketType, page: number, limit: number): Promise<{ success: boolean; data?: { items: Ticket[]; total: number; page: number }; error?: string }> => {
+export const getTicketsByType = async (type: TicketType, page: number, limit: number): Promise<PaginatedResponse<Ticket>> => {
   try {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    // In a real application, this would fetch filtered tickets from an API
-    // For now, return empty pagination result
-    return { 
-      success: true, 
-      data: {
-        items: [],
-        total: 0,
-        page
-      }
+    // Return data in the format expected by the component
+    return {
+      items: [],
+      total: 0,
+      page,
+      limit,
+      totalPages: 0
     };
   } catch (error) {
     console.error('Error fetching tickets by type:', error);
-    return { 
-      success: false, 
-      error: `Failed to fetch ${type} tickets. Please try again later.` 
+    // Since we're returning PaginatedResponse<Ticket> directly, we need to 
+    // still return a valid object even on error
+    return {
+      items: [],
+      total: 0,
+      page,
+      limit,
+      totalPages: 0
     };
   }
 };
@@ -201,7 +204,7 @@ export const changeTicketStatus = async (ticketId: string, status: TicketStatus)
 export const ticketApi = {
   createTicket,
   fetchTickets,
-  getTicketsByType, // Add the new function to the exported object
+  getTicketsByType,
   fetchTicketById,
   updateTicket,
   addComment,
