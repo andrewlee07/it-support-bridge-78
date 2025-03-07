@@ -43,6 +43,18 @@ import {
   fetchTestStats
 } from './testData';
 
+// Import backlog items exports
+import {
+  backlogItems,
+  fetchBacklogItems,
+  fetchBacklogItemById,
+  createBacklogItem,
+  updateBacklogItem,
+  assignToRelease,
+  removeFromRelease,
+  getBacklogStats
+} from './backlogItems';
+
 // Export all mock data and helper functions
 export {
   // Users
@@ -102,5 +114,15 @@ export {
   createTestCycle,
   testExecutions,
   executeTest,
-  fetchTestStats
+  fetchTestStats,
+  
+  // Backlog Management
+  backlogItems,
+  fetchBacklogItems,
+  fetchBacklogItemById,
+  createBacklogItem,
+  updateBacklogItem,
+  assignToRelease,
+  removeFromRelease,
+  getBacklogStats
 };

@@ -1,100 +1,114 @@
 
 import {
-  LayoutDashboard,
-  AlertCircle,
-  HelpCircle,
-  Users,
-  Settings,
-  Wrench,
-  RefreshCw,
-  Briefcase,
-  BarChart2,
-  FileText,
-  ClipboardList
-} from 'lucide-react';
+  HomeIcon,
+  AlertCircleIcon,
+  MessageSquareIcon,
+  PanelRightIcon,
+  UserIcon,
+  SettingsIcon,
+  BarChart2Icon,
+  BoxIcon,
+  FileTextIcon,
+  PackageIcon,
+  ClipboardListIcon,
+  BarChartIcon,
+  PackageOpenIcon,
+} from "lucide-react";
+import { NavigationItem } from "./types";
 
-import { NavItem } from './types';
-
-export const navigationItems: NavItem[] = [
+export const navigationItems: NavigationItem[] = [
   {
-    name: 'Dashboard',
-    path: '/dashboard',
-    icon: LayoutDashboard,
-    allowedRoles: ['admin', 'it', 'user']
+    name: "Dashboard",
+    href: "/",
+    icon: HomeIcon,
   },
   {
-    name: 'Incidents',
-    path: '/incidents',
-    icon: AlertCircle,
-    allowedRoles: ['admin', 'it', 'user']
+    name: "Incident Management",
+    icon: AlertCircleIcon,
+    collapsed: true,
+    items: [
+      {
+        name: "Incidents",
+        href: "/incidents",
+        icon: AlertCircleIcon,
+      },
+      {
+        name: "Service Requests",
+        href: "/service-requests",
+        icon: MessageSquareIcon,
+      },
+    ],
   },
   {
-    name: 'Service Requests',
-    path: '/service-requests',
-    icon: FileText,
-    allowedRoles: ['admin', 'it', 'user']
+    name: "Change Management",
+    href: "/changes",
+    icon: PanelRightIcon,
   },
   {
-    name: 'Test Tracking',
-    path: '/test-tracking',
-    icon: ClipboardList,
-    allowedRoles: ['admin', 'it', 'user']
+    name: "Release Management",
+    icon: PackageIcon,
+    collapsed: true,
+    items: [
+      {
+        name: "Releases",
+        href: "/releases",
+        icon: PackageIcon,
+      },
+      {
+        name: "Backlog",
+        href: "/backlog",
+        icon: ClipboardListIcon,
+      },
+    ],
   },
   {
-    name: 'Changes',
-    path: '/changes',
-    icon: RefreshCw,
-    allowedRoles: ['admin', 'it']
+    name: "Asset Management",
+    href: "/assets",
+    icon: BoxIcon,
   },
   {
-    name: 'Releases',
-    path: '/releases',
-    icon: Briefcase,
-    allowedRoles: ['admin', 'it']
+    name: "Test Management",
+    icon: FileTextIcon,
+    collapsed: true,
+    items: [
+      {
+        name: "Test Tracking",
+        href: "/test-tracking",
+        icon: FileTextIcon,
+      },
+      {
+        name: "Test Execution",
+        href: "/test-execution",
+        icon: ClipboardListIcon,
+      },
+    ],
   },
   {
-    name: 'Assets',
-    path: '/assets',
-    icon: Wrench,
-    allowedRoles: ['admin', 'it']
+    name: "Users",
+    href: "/users",
+    icon: UserIcon,
   },
   {
-    name: 'Users',
-    path: '/users',
-    icon: Users,
-    allowedRoles: ['admin']
+    name: "Reports",
+    href: "/reports",
+    icon: BarChart2Icon,
   },
-  {
-    name: 'Reports',
-    path: '/reports',
-    icon: BarChart2,
-    allowedRoles: ['admin', 'it']
-  },
-  {
-    name: 'Help',
-    path: '/help',
-    icon: HelpCircle,
-    allowedRoles: ['admin', 'it', 'user']
-  }
 ];
 
-export const settingsItems: NavItem[] = [
+export const settingsNavigationItems: NavigationItem[] = [
   {
-    name: 'SLA Configuration',
-    path: '/settings/sla',
-    icon: Settings,
-    allowedRoles: ['admin']
+    name: "SLA Settings",
+    href: "/settings/sla",
+    icon: SettingsIcon,
   },
   {
-    name: 'Dropdown Fields',
-    path: '/settings/dropdowns',
-    icon: Settings,
-    allowedRoles: ['admin']
+    name: "Dropdown Configurations",
+    href: "/settings/dropdown-configurations",
+    icon: SettingsIcon,
   },
   {
-    name: 'Risk Assessment',
-    path: '/settings/risk-assessment',
-    icon: Settings,
-    allowedRoles: ['admin']
-  }
+    name: "Risk Assessment",
+    href: "/settings/risk-assessment",
+    icon: BarChartIcon,
+  },
 ];
