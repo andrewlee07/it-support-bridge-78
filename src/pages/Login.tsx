@@ -38,7 +38,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#b047c9]/10 to-[#05b2e6]/5 flex flex-col">
       {/* Header with Logo */}
-      <header className="w-full py-4 px-6 md:px-12 bg-white">
+      <header className="w-full py-4 px-6 md:px-12 bg-white shadow-sm">
         <div className="max-w-screen-xl mx-auto">
           <div className="flex items-center">
             <img 

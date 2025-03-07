@@ -9,7 +9,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header with Logo */}
-      <header className="w-full py-4 px-6 md:px-12 border-b bg-white">
+      <header className="w-full py-4 px-6 md:px-12 border-b bg-white shadow-sm">
         <div className="max-w-screen-xl mx-auto flex justify-between items-center">
           <div className="flex items-center">
             <img 
@@ -139,7 +139,7 @@ const Index = () => {
         <div className="container max-w-screen-xl mx-auto px-4 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <div className="bg-white inline-block p-2 rounded">
+              <div className="bg-white inline-block p-2 rounded shadow">
                 <img 
                   src="/lovable-uploads/9f8e5267-ab6c-409e-99f0-0517f48fc1b8.png" 
                   alt="We Are Group" 
