@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -106,6 +107,7 @@ const BugForm: React.FC<BugFormProps> = ({
       // In a real app, you would upload the file to your server or cloud storage
       // For now, we'll just use a placeholder URL
       setFileUrl('/lovable-uploads/bf3633e2-5031-4a59-ab35-ffd5b863fbfc.png');
+      form.setValue('attachment', '/lovable-uploads/bf3633e2-5031-4a59-ab35-ffd5b863fbfc.png');
       toast({
         title: 'File uploaded',
         description: 'Screenshot has been uploaded successfully.',
@@ -153,7 +155,7 @@ const BugForm: React.FC<BugFormProps> = ({
           attachment: data.attachment,
         });
       } else {
-        // Create new bug - pass the user ID for createdBy
+        // Create new bug - pass the user ID for createdBy and ensure all required fields
         result = await createBug({
           title: data.title,
           description: data.description,
@@ -161,8 +163,8 @@ const BugForm: React.FC<BugFormProps> = ({
           severity: data.severity,
           priority: data.priority,
           status: data.status,
-          assignedDeveloper: data.assignedDeveloper,
-          relatedTestCase: data.relatedTestCase,
+          assignedDeveloper: data.assignedDeveloper || '',
+          relatedTestCase: data.relatedTestCase || '',
           attachment: data.attachment || '',
           createdBy: user.id, // Add the createdBy field with current user ID
         }, user.id);

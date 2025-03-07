@@ -67,7 +67,7 @@ export const createBug = async (
     id: uuidv4(),
     createdAt: new Date(),
     updatedAt: new Date(),
-    createdBy: userId
+    createdBy: userId // Using the provided userId
   };
   bugs.push(newBug);
   return simulateApiResponse(newBug);

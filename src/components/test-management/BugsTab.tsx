@@ -28,7 +28,7 @@ const BugsTab = () => {
         {isLoadingBugs ? (
           <div className="animate-pulse">Loading bugs...</div>
         ) : (
-          <BugList />
+          <BugList bugs={bugsData?.data || []} />
         )}
       </CardContent>
     </Card>
