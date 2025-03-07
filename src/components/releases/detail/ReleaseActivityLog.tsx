@@ -3,7 +3,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
-import { AuditEntry } from '@/utils/types';
+import { AuditEntry } from '@/utils/types/audit';
 
 interface ReleaseActivityLogProps {
   auditEntries: AuditEntry[];

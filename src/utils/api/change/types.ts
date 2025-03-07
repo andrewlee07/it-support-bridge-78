@@ -9,7 +9,7 @@ import {
   RiskLevel,
   RiskThreshold,
   ChangeCategory
-} from '../../types';
+} from '@/utils/types';
 
 // Risk threshold configuration updated based on requirements
 export const defaultRiskThresholds: RiskThreshold[] = [
