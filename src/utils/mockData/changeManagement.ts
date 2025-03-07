@@ -2,7 +2,8 @@
 import { 
   ChangeRequest, 
   RiskLevel, 
-  RiskAssessmentQuestion 
+  RiskAssessmentQuestion,
+  ChangeCategory
 } from '../types';
 import { createAuditEntries } from './auditHelpers';
 
@@ -68,7 +69,7 @@ export const mockChangeRequests: ChangeRequest[] = [
     description: 'Upgrade all office routers to new firmware version.',
     status: 'approved',
     priority: 'medium',
-    category: 'network',
+    category: 'normal', // Changed from 'network' to a valid ChangeCategory
     type: 'change',
     createdBy: 'user-2',
     assignedTo: 'user-1',
@@ -96,7 +97,7 @@ export const mockChangeRequests: ChangeRequest[] = [
     description: 'Migrate email server to new cloud infrastructure.',
     status: 'submitted',
     priority: 'high',
-    category: 'software',
+    category: 'emergency', // Changed from 'software' to a valid ChangeCategory
     type: 'change',
     createdBy: 'user-2',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 2)),
@@ -121,7 +122,7 @@ export const mockChangeRequests: ChangeRequest[] = [
     description: 'Deploy latest Windows security updates to all workstations.',
     status: 'completed',
     priority: 'medium',
-    category: 'software',
+    category: 'standard', // Changed from 'software' to a valid ChangeCategory
     type: 'change',
     createdBy: 'user-2',
     assignedTo: 'user-2',
