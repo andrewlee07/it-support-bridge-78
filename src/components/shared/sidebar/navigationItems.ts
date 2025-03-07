@@ -24,7 +24,6 @@ export const navigationItems: NavItem[] = [
   { name: 'Asset Management', path: '/assets', icon: Monitor, allowedRoles: ['admin', 'it'] },
   { name: 'Users', path: '/users', icon: Users, allowedRoles: ['admin'] },
   { name: 'Reports', path: '/reports', icon: BarChart4, allowedRoles: ['admin', 'it'] },
-  { name: 'Risk Assessment', path: '/settings/risk-assessment', icon: Shield, allowedRoles: ['admin'] },
 ];
 
 // Settings submenu items
