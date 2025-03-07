@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -34,7 +35,7 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
       expectedResults: initialData?.expectedResults || '',
       // Handle potential status values by normalizing them
       status: initialData?.status 
-        ? (initialData.status === 'in_progress' || initialData.status === 'in-progress' 
+        ? (initialData.status === 'in_progress' || initialData.status === 'in-progress'  
             ? 'not-run' 
             : initialData.status)
         : 'not-run',

@@ -2,7 +2,7 @@
 // Test Case Management Types
 
 // Status types
-export type TestStatus = 'not-run' | 'pass' | 'fail' | 'blocked' | 'passed' | 'failed' | 'draft' | 'ready' | 'in_progress';
+export type TestStatus = 'not-run' | 'pass' | 'fail' | 'blocked' | 'passed' | 'failed' | 'draft' | 'ready' | 'in_progress' | 'in-progress';
 export type BugSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type BugPriority = 'urgent' | 'high' | 'medium' | 'low';
 export type BugStatus = 
