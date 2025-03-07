@@ -90,7 +90,7 @@ export const updateTestCase = async (
   await delay(500);
   const testCaseIndex = testCases.findIndex(tc => tc.id === id);
   if (testCaseIndex === -1) {
-    return simulateApiResponse(null, 'Test case not found', 404);
+    return simulateApiResponse(null, 'Test case not found');
   }
   
   testCases[testCaseIndex] = {
@@ -106,7 +106,7 @@ export const deleteTestCase = async (id: string) => {
   await delay(500);
   const testCaseIndex = testCases.findIndex(tc => tc.id === id);
   if (testCaseIndex === -1) {
-    return simulateApiResponse(null, 'Test case not found', 404);
+    return simulateApiResponse(null, 'Test case not found');
   }
   
   testCases.splice(testCaseIndex, 1);

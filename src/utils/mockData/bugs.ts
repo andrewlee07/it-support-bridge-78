@@ -80,7 +80,7 @@ export const updateBug = async (
   await delay(500);
   const bugIndex = bugs.findIndex(b => b.id === id);
   if (bugIndex === -1) {
-    return simulateApiResponse(null, 'Bug not found', 404);
+    return simulateApiResponse(null, 'Bug not found');
   }
   
   bugs[bugIndex] = {
