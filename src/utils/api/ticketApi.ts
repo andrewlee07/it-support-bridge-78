@@ -1,4 +1,3 @@
-
 import { 
   Ticket, 
   TicketFilter, 
@@ -10,7 +9,11 @@ import {
   mockTickets, 
   getTicketById, 
   simulateApiResponse, 
-  simulatePaginatedResponse 
+  simulatePaginatedResponse, 
+  mockConversationHistory,
+  delay,
+  uuidv4,
+  CommentData
 } from '../mockData';
 
 // Ticket API
@@ -167,5 +170,27 @@ export const ticketApi = {
     };
     
     return simulateApiResponse(updatedTicket, 1000);
+  },
+  
+  // Get conversation history for a ticket
+  getConversationHistory: (ticketId: string) => {
+    return simulateApiResponse(mockConversationHistory[ticketId] || [], undefined);
+  },
+  
+  // Create a comment for a ticket
+  createComment: async (ticketId: string, commentData: CommentData) => {
+    await delay(500);
+    const newComment = {
+      id: uuidv4(),
+      ...commentData,
+      createdAt: new Date(),
+    };
+    
+    if (!mockConversationHistory[ticketId]) {
+      mockConversationHistory[ticketId] = [];
+    }
+    
+    mockConversationHistory[ticketId].push(newComment);
+    return simulateApiResponse(newComment, undefined);
   },
 };

@@ -24,18 +24,20 @@ import {
 } from '@/components/ui/select';
 import { TestCase, TestStatus } from '@/utils/types/testTypes';
 import { createTestCase, updateTestCase } from '@/utils/mockData/testData';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Form schema for test case
+// Form schema for test case - ensuring all required fields are validated
 const testCaseSchema = z.object({
   title: z.string().min(3, { message: 'Title must be at least 3 characters.' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
-  stepsToReproduce: z.array(z.string()).min(1, { message: 'At least one step is required.' }),
+  stepsToReproduce: z.array(z.string()).refine(steps => steps.some(step => step.trim() !== ''), {
+    message: 'At least one non-empty step is required.',
+  }),
   expectedResults: z.string().min(5, { message: 'Expected results must be at least 5 characters.' }),
   status: z.enum(['not-run', 'pass', 'fail', 'blocked']),
-  assignedTester: z.string().optional(),
+  assignedTester: z.string().optional(), // Optional but should default to the current user
   relatedRequirement: z.string().optional(),
 });
 
@@ -62,7 +64,7 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
-      stepsToReproduce: initialData?.stepsToReproduce || [''],
+      stepsToReproduce: initialData?.stepsToReproduce?.length ? initialData.stepsToReproduce : [''],
       expectedResults: initialData?.expectedResults || '',
       status: initialData?.status || 'not-run',
       assignedTester: initialData?.assignedTester || user?.id || '',
@@ -105,29 +107,27 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
       if (filteredSteps.length === 0) {
         form.setError('stepsToReproduce', {
           type: 'manual',
-          message: 'At least one step is required.',
+          message: 'At least one non-empty step is required.',
         });
         setLoading(false);
         return;
       }
 
-      data.stepsToReproduce = filteredSteps;
+      // Prepare the data to submit
+      const testCaseData = {
+        ...data,
+        stepsToReproduce: filteredSteps,
+        // Ensure assignedTester is set - default to current user if not specified
+        assignedTester: data.assignedTester || user.id,
+      };
 
       let result;
       if (initialData?.id) {
         // Update existing test case
-        result = await updateTestCase(initialData.id, data);
+        result = await updateTestCase(initialData.id, testCaseData);
       } else {
-        // Create new test case - ensure all required fields are passed
-        result = await createTestCase({
-          title: data.title,
-          description: data.description,
-          stepsToReproduce: data.stepsToReproduce,
-          expectedResults: data.expectedResults,
-          status: data.status,
-          assignedTester: data.assignedTester,
-          relatedRequirement: data.relatedRequirement,
-        });
+        // Create new test case
+        result = await createTestCase(testCaseData);
       }
 
       if (result.success) {
@@ -234,6 +234,12 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
               >
                 <Plus className="h-4 w-4" /> Add Step
               </Button>
+              {/* Show form error for steps if any */}
+              {form.formState.errors.stepsToReproduce && (
+                <p className="text-sm font-medium text-destructive">
+                  {form.formState.errors.stepsToReproduce.message}
+                </p>
+              )}
             </div>
 
             <FormField
