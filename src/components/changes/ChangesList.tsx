@@ -133,7 +133,7 @@ const ChangesList: React.FC<ChangesListProps> = ({
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle className="text-xl font-medium">{change.title}</CardTitle>
-                <div className="text-sm text-muted-foreground mt-1">CR-{change.id}</div>
+                <div className="text-sm text-muted-foreground mt-1">{change.id}</div>
               </div>
               <div className="flex gap-2">
                 <Badge className={getStatusColor(change.status)}>
@@ -185,6 +185,6 @@ const ChangesList: React.FC<ChangesListProps> = ({
       ))}
     </div>
   );
-};
+}
 
 export default ChangesList;

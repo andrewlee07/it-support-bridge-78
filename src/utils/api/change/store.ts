@@ -13,9 +13,24 @@ let riskThresholds: RiskThreshold[] = [...defaultRiskThresholds];
 // In-memory storage for change requests - starts with mock data
 let changeRequests: ChangeRequest[] = [...mockChangeRequests];
 
-// Generate a new unique ID for change requests
+// Get the next change ID number
+const getNextChangeIdNumber = (): number => {
+  const existingIds = changeRequests.map(change => {
+    if (change.id.startsWith('CHG')) {
+      const numericPart = change.id.replace('CHG', '');
+      return parseInt(numericPart, 10);
+    }
+    return 0;
+  });
+  
+  const maxId = Math.max(...existingIds, 0);
+  return maxId + 1;
+};
+
+// Generate a new change ID with format CHG00001
 export const generateChangeId = (): string => {
-  return uuidv4();
+  const nextNumber = getNextChangeIdNumber();
+  return `CHG${nextNumber.toString().padStart(5, '0')}`;
 };
 
 // Getter and setter functions for the stores

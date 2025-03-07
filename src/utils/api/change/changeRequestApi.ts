@@ -54,7 +54,8 @@ export const changeRequestApi = {
         const searchLower = filters.search.toLowerCase();
         filteredChanges = filteredChanges.filter(c => 
           c.title.toLowerCase().includes(searchLower) || 
-          c.description.toLowerCase().includes(searchLower)
+          c.description.toLowerCase().includes(searchLower) ||
+          c.id.toLowerCase().includes(searchLower) // This enables partial ID search
         );
       }
     }
@@ -67,7 +68,16 @@ export const changeRequestApi = {
   
   // Get a specific change request by ID
   getChangeRequestById: async (id: string): Promise<ApiResponse<ChangeRequest>> => {
-    const change = getChangeRequests().find(c => c.id === id);
+    // Handle partial ID search
+    let change: ChangeRequest | undefined;
+    
+    if (id.startsWith('CHG')) {
+      // Exact ID search
+      change = getChangeRequests().find(c => c.id === id);
+    } else {
+      // Partial ID search - look for any change that contains this ID segment
+      change = getChangeRequests().find(c => c.id.toLowerCase().includes(id.toLowerCase()));
+    }
     
     if (!change) {
       return {
@@ -140,7 +150,16 @@ export const changeRequestApi = {
     userId: string
   ): Promise<ApiResponse<ChangeRequest>> => {
     const changeRequests = getChangeRequests();
-    const changeIndex = changeRequests.findIndex(c => c.id === id);
+    
+    // Handle partial ID search for update
+    let changeIndex = changeRequests.findIndex(c => c.id === id);
+    
+    if (changeIndex === -1 && !id.startsWith('CHG')) {
+      // Try partial match if exact match fails and it's not already a full ID
+      changeIndex = changeRequests.findIndex(c => 
+        c.id.toLowerCase().includes(id.toLowerCase())
+      );
+    }
     
     if (changeIndex === -1) {
       return {
