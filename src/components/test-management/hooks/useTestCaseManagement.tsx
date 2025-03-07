@@ -1,26 +1,16 @@
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { TestCase } from '@/utils/types/testTypes';
-import { fetchTestCases, deleteTestCase } from '@/utils/mockData/testData';
+import { deleteTestCase } from '@/utils/mockData/testData';
+import { useTestCases } from './useTestCases';
 
 export const useTestCaseManagement = () => {
   const { toast } = useToast();
+  const { refetch } = useTestCases();
   const [selectedTestCase, setSelectedTestCase] = useState<TestCase | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
-  // Fetch test cases
-  const { 
-    data: testCasesResponse, 
-    isLoading, 
-    isError, 
-    refetch 
-  } = useQuery({
-    queryKey: ['testCases'],
-    queryFn: fetchTestCases,
-  });
 
   // View test case details
   const viewTestCase = (testCase: TestCase) => {
@@ -67,10 +57,6 @@ export const useTestCaseManagement = () => {
   };
 
   return {
-    testCasesResponse,
-    isLoading,
-    isError,
-    refetch,
     selectedTestCase,
     isViewDialogOpen,
     setIsViewDialogOpen,
