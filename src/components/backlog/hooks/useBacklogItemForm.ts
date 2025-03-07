@@ -68,12 +68,19 @@ export const useBacklogItemForm = ({ initialData, onSuccess, onCancel }: UseBack
         });
         toast.success('Backlog item updated successfully');
       } else {
-        // Create new item
-        result = await createBacklogItem({
+        // Create new item - ensure all required properties are present
+        const newItemData = {
           ...data,
+          title: data.title,             // Explicitly include required props 
+          description: data.description, // to satisfy TypeScript
+          status: data.status,
+          priority: data.priority,
+          type: data.type,
           creator: user.id,
           labels: data.labels || [],
-        });
+        };
+        
+        result = await createBacklogItem(newItemData);
         toast.success('Backlog item created successfully');
       }
       
