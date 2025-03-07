@@ -48,7 +48,7 @@ const ReleaseDetailDialogs: React.FC<ReleaseDetailDialogsProps> = ({
           {selectedBacklogItem && (
             <BacklogItemDetail 
               item={selectedBacklogItem} 
-              onEdit={() => onEditBacklogItem(selectedBacklogItem)} 
+              onEdit={onEditBacklogItem}
             />
           )}
         </DialogContent>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
@@ -53,7 +52,6 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
   const [selectedStatus, setSelectedStatus] = useState<BacklogItemStatus[]>([]);
   const [selectedBacklogItem, setSelectedBacklogItem] = useState<BacklogItem | null>(null);
 
-  // Get all backlog items with filtering
   const { data: backlogItemsResponse, isLoading } = useQuery({
     queryKey: ['backlogItems', selectedReleaseId, selectedStatus, searchQuery],
     queryFn: () => fetchBacklogItems(
@@ -63,7 +61,6 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
     ),
   });
 
-  // Get all releases for filtering
   const { data: releasesResponse } = useQuery({
     queryKey: ['releases'],
     queryFn: () => getReleases(),
@@ -121,7 +118,11 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
     }
   };
 
-  // Filter by multiple statuses (checkbox-like behavior)
+  const handleDeleteItem = (id: string) => {
+    console.log('Delete item:', id);
+    setSelectedBacklogItem(null);
+  };
+
   const handleStatusChange = (status: BacklogItemStatus) => {
     setSelectedStatus(prev => 
       prev.includes(status) 
@@ -292,8 +293,9 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
           </DialogHeader>
           {selectedBacklogItem && (
             <BacklogItemDetail 
-              backlogItem={selectedBacklogItem} 
-              onEdit={handleEditSelected} 
+              item={selectedBacklogItem} 
+              onEdit={handleEditSelected}
+              onDelete={handleDeleteItem}
             />
           )}
         </DialogContent>

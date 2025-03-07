@@ -6,15 +6,18 @@ import { Badge } from '@/components/ui/badge';
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import { format } from 'date-fns';
 import { getReleases } from '@/utils/api/release/releaseQueries';
-import { Release } from '@/utils/api/release/types';
 
 interface BacklogItemDetailProps {
   item: BacklogItem;
   onEdit: (item: BacklogItem) => void;
-  onDelete: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({ item, onEdit, onDelete }) => {
+const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({ 
+  item, 
+  onEdit, 
+  onDelete 
+}) => {
   const [releaseName, setReleaseName] = useState<string>('None');
 
   useEffect(() => {
@@ -22,10 +25,10 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({ item, onEdit, onD
     const fetchReleaseName = async () => {
       if (item.releaseId) {
         try {
-          const releases = await getReleases();
-          const release = releases.find(r => r.id === item.releaseId);
+          const releasesResponse = await getReleases();
+          const release = releasesResponse.data?.find(r => r.id === item.releaseId);
           if (release) {
-            setReleaseName(release.name);
+            setReleaseName(release.title);
           }
         } catch (error) {
           console.error('Error fetching release:', error);
@@ -98,7 +101,9 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({ item, onEdit, onD
       
       <CardFooter className="flex justify-end space-x-2 pt-2">
         <Button variant="outline" onClick={() => onEdit(item)}>Edit</Button>
-        <Button variant="destructive" onClick={() => onDelete(item.id)}>Delete</Button>
+        {onDelete && (
+          <Button variant="destructive" onClick={() => onDelete(item.id)}>Delete</Button>
+        )}
       </CardFooter>
     </Card>
   );
