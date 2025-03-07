@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { 
   Release, 
@@ -328,7 +327,7 @@ export const updateReleaseApproval = async (
   
   const updatedRelease = {
     ...mockReleases[releaseIndex],
-    approvalStatus: approved ? 'approved' : 'rejected',
+    approvalStatus: approved ? 'approved' as const : 'rejected' as const,
     approvedBy: approved ? userId : undefined,
     approvedAt: approved ? new Date() : undefined,
     updatedAt: new Date()

@@ -124,6 +124,7 @@ export interface Asset {
 // Release management types
 export type ReleaseStatus = 'Planned' | 'In Progress' | 'Deployed' | 'Cancelled';
 export type ReleaseType = 'major' | 'minor' | 'patch' | 'emergency';
+export type ReleaseApprovalStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Release {
   id: string;
@@ -136,7 +137,7 @@ export interface Release {
   owner: string;
   createdAt: Date;
   updatedAt: Date;
-  approvalStatus: 'pending' | 'approved' | 'rejected';
+  approvalStatus: ReleaseApprovalStatus;
   approvedBy?: string;
   approvedAt?: Date;
   items: ReleaseItem[];

@@ -37,3 +37,8 @@ export const simulatePaginatedResponse = <T>(
     }, 500);
   });
 };
+
+// Add the missing delay function
+export const delay = (ms: number = 500): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};

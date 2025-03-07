@@ -13,7 +13,7 @@ import { AuditEntry } from './types';
  */
 export const createAuditEntry = (
   entityId: string,
-  entityType: 'ticket' | 'asset' | 'user' | 'change',
+  entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release',
   message: string,
   performedBy: string
 ): AuditEntry => {
@@ -40,7 +40,7 @@ export const createAuditEntry = (
 export const addAuditEntry = (
   existingEntries: AuditEntry[],
   entityId: string,
-  entityType: 'ticket' | 'asset' | 'user' | 'change',
+  entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release',
   message: string,
   performedBy: string
 ): AuditEntry[] => {
