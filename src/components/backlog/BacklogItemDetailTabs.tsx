@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BacklogItem } from '@/utils/types/backlogTypes';
-import { TestCase } from '@/utils/types/testTypes';
-import { Info, TestTube, Network } from 'lucide-react';
+import { TestCase } from '@/utils/types/test/testCase';
+import { Info, TestTube } from 'lucide-react';
 import TestCoverageTab from './TestCoverageTab';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import TestCaseDetails from '@/components/test-management/TestCaseDetails';
@@ -44,6 +44,7 @@ const BacklogItemDetailTabs: React.FC<BacklogItemDetailTabsProps> = ({
       
       <TabsContent value="tests">
         <TestCoverageTab 
+          backlogItemId={backlogItem.id}
           backlogItem={backlogItem} 
           onViewTestCase={handleViewTestCase}
         />

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Card,
@@ -38,33 +39,42 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { TestCoverageIndicator } from "@/components/shared/TestCoverageIndicator";
-import { LinkTestCaseDialog } from "@/components/shared/LinkTestCaseDialog";
+import { TestCoverageIndicator } from "@/components/backlog/TestCoverageIndicator"; // Changed path
+import { LinkTestCaseDialog } from "@/components/backlog/LinkTestCaseDialog"; // Changed path
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import { TestCase } from '@/utils/types/test/testCase';
 import { TestStatus } from '@/utils/types/test/testStatus';
-import {
-  BacklogTestCoverage,
-} from '@/utils/types/backlogTypes';
+import { BacklogTestCoverage } from '@/utils/types/backlogTypes';
 
+// Update the props interface to match BacklogItemDetailTabs expectations
 interface TestCoverageTabProps {
   backlogItemId: string;
-  riskLevel: "high" | "medium" | "low";
+  riskLevel?: "high" | "medium" | "low";
+  backlogItem?: BacklogItem; // Added to match usage in BacklogItemDetailTabs
+  onViewTestCase?: (testCase: TestCase) => void; // Added to match usage in BacklogItemDetailTabs
 }
 
-// Update the BacklogCoverage type to match the expected structure
+// Fix the BacklogCoverage interface to match BacklogTestCoverage
 interface BacklogCoverage {
-  totalTests: number;
-  passed: number;
-  failed: number;
-  notRun: number;
-  coverage: number;
+  totalTestCases: number; // Changed from totalTests
+  passedTests: number; // Changed from passed
+  failedTests: number; // Changed from failed
+  notExecutedTests: number; // Changed from notRun
+  coveragePercentage: number; // Changed from coverage
 }
 
-const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ backlogItemId, riskLevel }) => {
+const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ 
+  backlogItemId, 
+  riskLevel,
+  backlogItem,
+  onViewTestCase
+}) => {
   const { toast } = useToast();
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [overallCoverage, setOverallCoverage] = useState(0);
+  
+  // Use the backlogItem prop if provided, otherwise use backlogItemId
+  const itemId = backlogItem?.id || backlogItemId;
 
   useEffect(() => {
     // Mock function to simulate coverage calculation
@@ -80,7 +90,7 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ backlogItemId, riskLe
     };
 
     calculateCoverage();
-  }, [backlogItemId]);
+  }, [itemId]);
 
   const handleOpenLinkDialog = () => {
     setIsLinkDialogOpen(true);
@@ -97,7 +107,7 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ backlogItemId, riskLe
     });
   };
 
-  // Fix the TestCoverageIndicator props
+  // Fix the props for TestCoverageIndicator
   return (
     <Card>
       <CardHeader>
@@ -152,7 +162,7 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ backlogItemId, riskLe
 
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Linked Test Cases</h3>
-          <TestCaseTable />
+          <TestCaseTable onViewTestCase={onViewTestCase} />
         </div>
 
         <div className="flex justify-end">
@@ -160,20 +170,22 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ backlogItemId, riskLe
         </div>
       </CardContent>
 
-      {/* Update the LinkTestCaseDialog props */}
-      <LinkTestCaseDialog
-        isOpen={isLinkDialogOpen}
-        backlogItem={{ id: backlogItemId, title: "" } as BacklogItem}
-        onClose={handleCloseLinkDialog}
-        onSuccess={handleTestCaseLinked}
-      />
+      {/* Updated LinkTestCaseDialog props */}
+      {backlogItem && (
+        <LinkTestCaseDialog
+          isOpen={isLinkDialogOpen}
+          backlogItem={backlogItem}
+          onClose={handleCloseLinkDialog}
+          onSuccess={handleTestCaseLinked}
+        />
+      )}
     </Card>
   );
 };
 
 export default TestCoverageTab;
 
-const TestCaseTable = () => {
+const TestCaseTable: React.FC<{onViewTestCase?: (testCase: TestCase) => void}> = ({ onViewTestCase }) => {
   // Mock data for demonstration
   const mockTestCases = [
     {
@@ -198,11 +210,12 @@ const TestCaseTable = () => {
 
   // Fix the mock data structure to match BacklogTestCoverage
   const mockCoverage: BacklogTestCoverage = {
-    totalTests: 5,
+    totalTestCases: 5,
     passedTests: 3,
     failedTests: 1,
-    notRunTests: 1,
-    coveragePercentage: 80
+    notExecutedTests: 1,
+    coveragePercentage: 80,
+    lastUpdated: new Date()
   };
 
   return (
@@ -253,7 +266,7 @@ const TestCaseTable = () => {
                   : "N/A"}
               </TableCell>
               <TableCell className="text-right">
-                <TestCaseActions testCase={testCase} />
+                <TestCaseActions testCase={testCase} onViewTestCase={onViewTestCase} />
               </TableCell>
             </TableRow>
           );
@@ -265,9 +278,10 @@ const TestCaseTable = () => {
 
 interface TestCaseActionsProps {
   testCase: TestCase;
+  onViewTestCase?: (testCase: TestCase) => void;
 }
 
-const TestCaseActions: React.FC<TestCaseActionsProps> = ({ testCase }) => {
+const TestCaseActions: React.FC<TestCaseActionsProps> = ({ testCase, onViewTestCase }) => {
   const { toast } = useToast();
 
   const handleRemoveTestCase = () => {
@@ -275,6 +289,12 @@ const TestCaseActions: React.FC<TestCaseActionsProps> = ({ testCase }) => {
       title: "Test case unlinked",
       description: "The test case has been successfully unlinked from the backlog item.",
     });
+  };
+
+  const handleView = () => {
+    if (onViewTestCase) {
+      onViewTestCase(testCase);
+    }
   };
 
   return (
@@ -288,7 +308,7 @@ const TestCaseActions: React.FC<TestCaseActionsProps> = ({ testCase }) => {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>View</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleView}>View</DropdownMenuItem>
         <DropdownMenuItem>Edit</DropdownMenuItem>
         <DropdownMenuSeparator />
         <AlertDialog>

@@ -6,6 +6,8 @@ import {
   testCases,
   backlogItems,
   testBacklogRelationships,
+  addTestBacklogRelationship,
+  removeTestBacklogRelationship,
   ApiResponse,
   TestCoverageRelationship
 } from './common';
@@ -47,7 +49,8 @@ export const linkTestCaseToBacklogItem = async (
     createdAt: new Date(),
   };
   
-  testBacklogRelationships.push(newRelationship);
+  // Add to relationships using the helper function
+  addTestBacklogRelationship(newRelationship);
   
   // Update test case
   const testCaseIndex = testCases.findIndex(tc => tc.id === testCaseId);
@@ -83,13 +86,8 @@ export const unlinkTestCaseFromBacklogItem = async (
 ): Promise<ApiResponse<boolean>> => {
   await delay(500);
   
-  // Remove relationship
-  const initialLength = testBacklogRelationships.length;
-  testBacklogRelationships = testBacklogRelationships.filter(
-    rel => !(rel.testCaseId === testCaseId && rel.backlogItemId === backlogItemId)
-  );
-  
-  const removed = initialLength > testBacklogRelationships.length;
+  // Remove relationship using the helper function
+  const removed = removeTestBacklogRelationship(testCaseId, backlogItemId);
   
   if (!removed) {
     return createApiErrorResponse('Relationship not found', 404);

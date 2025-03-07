@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Form } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { ChangeRequest, TicketCategory, TicketPriority, ChangeCategory, ClosureReason, ApproverRole } from '@/utils/types';
+import { ChangeRequest, TicketCategory, ChangeCategory, ClosureReason, ApproverRole } from '@/utils/types';
 
 // Import our component sections
 import BasicInfoSection from './form/BasicInfoSection';
@@ -64,13 +64,22 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
   const { user } = useAuth();
   const { toast } = useToast();
   
+  // Safely map any priority to a valid form value
+  const mapPriority = (priority: any): 'P1' | 'P2' | 'P3' | 'P4' => {
+    if (priority === 'P1' || priority === 'P2' || priority === 'P3' || priority === 'P4') {
+      return priority;
+    }
+    // Default to P2 for any other value including 'medium'
+    return 'P2';
+  };
+  
   const form = useForm<ChangeRequestFormValues>({
     resolver: zodResolver(changeRequestSchema),
     defaultValues: {
       title: initialData?.title || "",
       description: initialData?.description || "",
       category: (initialData?.category as TicketCategory) || "software",
-      priority: (initialData?.priority as TicketPriority) || "P2",
+      priority: mapPriority(initialData?.priority) || "P2", // Using the safe mapping function
       changeCategory: (initialData?.category as ChangeCategory) || "normal",
       startDate: initialData?.startDate ? new Date(initialData.startDate) : new Date(Date.now() + 86400000), // tomorrow
       endDate: initialData?.endDate ? new Date(initialData.endDate) : new Date(Date.now() + 172800000), // day after tomorrow
