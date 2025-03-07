@@ -1,4 +1,3 @@
-
 import {
   Ticket,
   User,
@@ -9,12 +8,10 @@ import {
   ApiResponse,
   PaginatedResponse,
   TicketType,
-  TicketStatus,
-  TicketPriority,
-  TicketCategory,
   EmailTemplate,
   RiskAssessmentQuestion
 } from './types';
+
 import {
   mockTickets,
   mockUsers,
