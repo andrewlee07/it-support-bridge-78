@@ -4,6 +4,8 @@ import { Release } from '@/utils/types/release';
 import ReleaseDetail from '@/components/releases/ReleaseDetail';
 import ReleaseDetailBacklogItems from '@/components/releases/ReleaseDetailBacklogItems';
 import { BacklogItem } from '@/utils/types/backlogTypes';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ReleaseTestsTab from '../test-integration/ReleaseTestsTab';
 
 interface ReleaseDetailContentProps {
   releaseId: string;
@@ -48,11 +50,22 @@ const ReleaseDetailContent: React.FC<ReleaseDetailContentProps> = ({
         canApprove={canApprove}
       />
       
-      <ReleaseDetailBacklogItems 
-        releaseId={releaseId} 
-        onAddItems={onAddItem}
-        onViewItem={onViewBacklogItem}
-      />
+      <Tabs defaultValue="backlog" className="mt-6">
+        <TabsList>
+          <TabsTrigger value="backlog">Backlog Items</TabsTrigger>
+          <TabsTrigger value="tests">Test Management</TabsTrigger>
+        </TabsList>
+        <TabsContent value="backlog" className="mt-4">
+          <ReleaseDetailBacklogItems 
+            releaseId={releaseId} 
+            onAddItems={onAddItem}
+            onViewItem={onViewBacklogItem}
+          />
+        </TabsContent>
+        <TabsContent value="tests" className="mt-4">
+          <ReleaseTestsTab releaseId={releaseId} />
+        </TabsContent>
+      </Tabs>
     </>
   );
 };

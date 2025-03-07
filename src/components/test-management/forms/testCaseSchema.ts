@@ -13,6 +13,8 @@ export const testCaseSchema = z.object({
   status: z.enum(['not-run', 'pass', 'fail', 'blocked', 'passed', 'failed', 'draft', 'ready', 'in_progress', 'in-progress']),
   assignedTester: z.string().optional(), // Optional but should default to the current user
   relatedRequirement: z.string().optional(),
+  releaseId: z.string().optional(), // Added for release integration
+  applicable: z.boolean().optional(), // Added for release integration
 });
 
 export type TestCaseFormValues = z.infer<typeof testCaseSchema>;

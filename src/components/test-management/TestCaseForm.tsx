@@ -15,12 +15,14 @@ interface TestCaseFormProps {
   initialData?: Partial<TestCase>;
   onSuccess?: (testCase: TestCase) => void;
   onCancel?: () => void;
+  releaseId?: string; // Added for direct association with a release
 }
 
 const TestCaseForm: React.FC<TestCaseFormProps> = ({
   initialData,
   onSuccess,
   onCancel,
+  releaseId,
 }) => {
   const { user } = useAuth();
   const { handleSubmit, loading, isEditing } = useTestCaseSubmit({ initialData, onSuccess });
@@ -41,6 +43,8 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
         : 'not-run',
       assignedTester: initialData?.assignedTester || user?.id || '',
       relatedRequirement: initialData?.relatedRequirement || '',
+      releaseId: initialData?.releaseId || releaseId || '', // Use provided releaseId or from initialData
+      applicable: initialData?.applicable || !!releaseId, // If releaseId is provided, mark as applicable
     },
   });
 

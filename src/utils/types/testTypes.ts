@@ -26,6 +26,9 @@ export interface TestCase {
   relatedRequirement?: string;
   createdAt: Date;
   updatedAt: Date;
+  // Added for Release integration
+  releaseId?: string;
+  applicable?: boolean; // Whether this test case is applicable to the release
   // Legacy fields
   preConditions?: string;
   steps?: string[];
@@ -52,6 +55,8 @@ export interface Bug {
   reportedBy?: string; // Backward compatibility
   // For compatibility with testData
   assignedTo?: string;
+  // Added for Release integration
+  releaseId?: string;
 }
 
 export interface TestExecution {
@@ -111,6 +116,29 @@ export interface ExportableTestCase extends Omit<TestCase, 'createdAt' | 'update
 export interface ExportableBug extends Omit<Bug, 'createdAt' | 'updatedAt'> {
   createdAt: string;
   updatedAt: string;
+}
+
+// New interfaces for Release test coverage
+export interface TestCoverage {
+  releaseId: string;
+  totalTestCases: number;
+  passedTests: number;
+  failedTests: number;
+  blockedTests: number;
+  notRunTests: number;
+  coveragePercentage: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  readiness: 'go' | 'no-go' | 'warning';
+}
+
+export interface TestExecutionForRelease {
+  releaseId: string;
+  testCycleId: string;
+  totalExecuted: number;
+  passed: number;
+  failed: number;
+  blocked: number;
+  progress: number; // Percentage of tests executed
 }
 
 // Helper function to map between different status format versions
