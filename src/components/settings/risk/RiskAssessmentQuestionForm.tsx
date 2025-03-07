@@ -159,7 +159,7 @@ const RiskAssessmentQuestionForm: React.FC<RiskAssessmentQuestionFormProps> = ({
               </p>
               
               <div className="space-y-4">
-                {answerFields.map((field, index) => (
+                {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start space-x-3">
                     <div className="flex-1 space-y-2">
                       <FormField
@@ -203,7 +203,7 @@ const RiskAssessmentQuestionForm: React.FC<RiskAssessmentQuestionFormProps> = ({
                       variant="ghost"
                       size="icon"
                       onClick={() => remove(index)}
-                      disabled={answerFields.length <= 1}
+                      disabled={fields.length <= 1}
                     >
                       <X className="h-4 w-4" />
                     </Button>
