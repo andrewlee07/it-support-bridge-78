@@ -11,3 +11,4 @@ export * from './email';
 export * from './dashboard';
 export * from './api';
 export * from './configuration';
+export * from './backlogTypes';

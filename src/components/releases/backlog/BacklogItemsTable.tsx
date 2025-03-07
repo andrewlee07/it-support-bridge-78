@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BacklogItem } from '@/utils/types';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 import { 
   Table, 
   TableBody, 

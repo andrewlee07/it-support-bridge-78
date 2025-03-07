@@ -2,7 +2,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBacklogItems } from '@/utils/api/backlogApi';
-import { BacklogItem } from '@/utils/types';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 import { calculateReleaseCapacity } from '@/utils/types/backlogTypes';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

@@ -1,91 +1,58 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { fetchBacklogItems } from '@/utils/api/backlogApi';
-import { Input } from '@/components/ui/input';
 import { BacklogItem } from '@/utils/types/backlogTypes';
-import { Badge } from '@/components/ui/badge';
+import { fetchBacklogItems } from '@/utils/api/backlogApi';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 
 interface BacklogItemSelectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectItems: (items: BacklogItem[]) => Promise<void>;
-  releaseId: string;
+  releaseId?: string;
 }
 
 const BacklogItemSelectionDialog: React.FC<BacklogItemSelectionDialogProps> = ({
   open,
   onOpenChange,
   onSelectItems,
-  releaseId,
+  releaseId
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
+  const [selectedItems, setSelectedItems] = useState<BacklogItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Get unassigned backlog items
+  // Fetch unassigned backlog items
   const { data: unassignedItemsResponse, isLoading } = useQuery({
-    queryKey: ['backlogItems', 'unassigned', searchQuery],
-    queryFn: () => fetchBacklogItems('unassigned', undefined, searchQuery),
-    enabled: open, // Only fetch when dialog is open
+    queryKey: ['unassignedBacklogItems', releaseId],
+    queryFn: () => fetchBacklogItems('', ['open', 'ready']),
+    enabled: open,
   });
 
-  const unassignedItems = unassignedItemsResponse?.data || [];
+  const unassignedItems = (unassignedItemsResponse?.data || [])
+    .filter(item => !item.releaseId || item.releaseId !== releaseId);
 
-  const toggleSelection = (itemId: string) => {
-    setSelectedItems(prev => ({
-      ...prev,
-      [itemId]: !prev[itemId]
-    }));
-  };
-
-  const toggleSelectAll = () => {
-    const allSelected = unassignedItems.every(item => selectedItems[item.id]);
-    
-    if (allSelected) {
-      setSelectedItems({});
-    } else {
-      const newSelection = unassignedItems.reduce((acc, item) => {
-        acc[item.id] = true;
-        return acc;
-      }, {} as Record<string, boolean>);
-      
-      setSelectedItems(newSelection);
-    }
+  const handleItemToggle = (item: BacklogItem) => {
+    setSelectedItems(prev =>
+      prev.some(i => i.id === item.id)
+        ? prev.filter(i => i.id !== item.id)
+        : [...prev, item]
+    );
   };
 
   const handleSubmit = async () => {
+    if (selectedItems.length === 0) return;
+
     setIsSubmitting(true);
-    
     try {
-      const selectedBacklogItems = unassignedItems.filter(
-        item => selectedItems[item.id]
-      );
-      
-      await onSelectItems(selectedBacklogItems);
-      setSelectedItems({});
+      await onSelectItems(selectedItems);
+      setSelectedItems([]);
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to add items to release:', error);
+      console.error('Error assigning items to release:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -93,100 +60,74 @@ const BacklogItemSelectionDialog: React.FC<BacklogItemSelectionDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Backlog Items to Release</DialogTitle>
-          <DialogDescription>
-            Select backlog items to assign to this release.
-          </DialogDescription>
         </DialogHeader>
-        
-        <div className="py-4">
-          <Input
-            placeholder="Search backlog items..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="mb-4"
-          />
-          
-          {isLoading ? (
-            <div className="h-48 flex items-center justify-center">
-              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-            </div>
-          ) : unassignedItems.length === 0 ? (
-            <div className="text-center py-12 border rounded-md">
-              <p className="text-muted-foreground">
-                No unassigned backlog items found
-              </p>
-            </div>
-          ) : (
-            <ScrollArea className="h-96 border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">
-                      <Checkbox
-                        checked={
-                          unassignedItems.length > 0 &&
-                          unassignedItems.every(item => selectedItems[item.id])
-                        }
-                        onCheckedChange={toggleSelectAll}
-                        aria-label="Select all"
-                      />
-                    </TableHead>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Points</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {unassignedItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedItems[item.id] || false}
-                          onCheckedChange={() => toggleSelection(item.id)}
-                          aria-label={`Select ${item.title}`}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">{item.id}</TableCell>
-                      <TableCell>{item.title}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {item.status.charAt(0).toUpperCase() + item.status.slice(1).replace('-', ' ')}
+
+        {isLoading ? (
+          <div className="py-8 text-center">Loading available backlog items...</div>
+        ) : unassignedItems.length === 0 ? (
+          <div className="py-8 text-center">No available backlog items to add</div>
+        ) : (
+          <>
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-4">
+                {unassignedItems.map(item => (
+                  <div 
+                    key={item.id} 
+                    className="flex items-start space-x-3 p-3 border rounded-md hover:bg-muted/30 transition-colors"
+                  >
+                    <Checkbox 
+                      id={`item-${item.id}`}
+                      checked={selectedItems.some(i => i.id === item.id)}
+                      onCheckedChange={() => handleItemToggle(item)}
+                    />
+                    <div className="flex-1">
+                      <label 
+                        htmlFor={`item-${item.id}`}
+                        className="text-sm font-medium cursor-pointer hover:underline"
+                      >
+                        {item.title}
+                      </label>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <Badge variant="outline" className="text-xs">
+                          {item.type}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
+                        <Badge 
+                          className="text-xs"
+                          variant={item.priority === 'critical' ? 'destructive' : 'outline'}
+                        >
                           {item.priority}
                         </Badge>
-                      </TableCell>
-                      <TableCell>{item.storyPoints || 0}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        {item.storyPoints && (
+                          <Badge variant="secondary" className="text-xs">
+                            {item.storyPoints} points
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </ScrollArea>
-          )}
-        </div>
-        
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSubmit} 
-            disabled={
-              isSubmitting || 
-              Object.keys(selectedItems).length === 0 ||
-              !Object.values(selectedItems).some(selected => selected)
-            }
-          >
-            {isSubmitting ? 'Adding...' : 'Add Selected Items'}
-          </Button>
-        </DialogFooter>
+
+            <div className="flex justify-end space-x-2 mt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSubmit}
+                disabled={selectedItems.length === 0 || isSubmitting}
+              >
+                {isSubmitting ? 'Adding...' : `Add ${selectedItems.length} Items`}
+              </Button>
+            </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -21,7 +21,7 @@ const Sidebar = () => {
   };
   
   // Function to check if user has permission for the menu item
-  const hasPermission = (allowedRoles: UserRole[]): boolean => {
+  const hasPermission = (allowedRoles: string[]): boolean => {
     if (!user) return false;
     return allowedRoles.includes(user.role);
   };
@@ -56,11 +56,11 @@ const Sidebar = () => {
         <div className="space-y-1 px-3">
           {navigationItems.map((item) => (
             // Only render if user has permission
-            hasPermission(item.allowedRoles) && (
+            hasPermission(item.allowedRoles || []) && (
               <NavLink 
-                key={item.path} 
+                key={item.path || item.name} 
                 item={item} 
-                isActive={isActiveRoute(item.path)}
+                isActive={isActiveRoute(item.path || '')}
                 collapsed={collapsed} 
               />
             )

@@ -2,10 +2,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { NavItem } from './types';
+import { NavigationItem } from './types';
 
 interface NavLinkProps {
-  item: NavItem;
+  item: NavigationItem;
   isActive: boolean;
   collapsed: boolean;
 }
@@ -13,7 +13,7 @@ interface NavLinkProps {
 const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
   return (
     <Link 
-      to={item.path}
+      to={item.path || item.href || '#'}
       className={cn(
         "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
         isActive && "bg-primary/10 text-primary font-medium",

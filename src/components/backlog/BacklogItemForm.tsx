@@ -65,8 +65,10 @@ const BacklogItemForm: React.FC<BacklogItemFormProps> = ({
   useEffect(() => {
     const fetchReleases = async () => {
       try {
-        const releasesData = await getReleases();
-        setReleases(releasesData);
+        const releasesResponse = await getReleases();
+        if (releasesResponse.data) {
+          setReleases(releasesResponse.data);
+        }
       } catch (error) {
         console.error('Error fetching releases:', error);
         toast.error('Failed to load releases');
@@ -90,7 +92,7 @@ const BacklogItemForm: React.FC<BacklogItemFormProps> = ({
           // These fields shouldn't be updateable via the form
           id: initialData.id,
           createdAt: initialData.createdAt,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date()
         });
         toast.success('Backlog item updated successfully');
       } else {
@@ -99,7 +101,11 @@ const BacklogItemForm: React.FC<BacklogItemFormProps> = ({
           ...data,
           creator: user.id,
           labels: data.labels || [],
-          type: data.type as BacklogItemType,
+          type: data.type,
+          title: data.title,
+          description: data.description,
+          status: data.status,
+          priority: data.priority
         });
         toast.success('Backlog item created successfully');
       }
@@ -286,7 +292,7 @@ const BacklogItemForm: React.FC<BacklogItemFormProps> = ({
                     <SelectItem value="">None</SelectItem>
                     {releases.map((release) => (
                       <SelectItem key={release.id} value={release.id}>
-                        {release.name}
+                        {release.title}
                       </SelectItem>
                     ))}
                   </SelectContent>

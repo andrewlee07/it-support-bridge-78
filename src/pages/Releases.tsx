@@ -50,7 +50,7 @@ const Releases = () => {
     queryKey: ['releases', activeTab, searchQuery, statusFilter],
     queryFn: async () => {
       const status = statusFilter || getStatusFromTab(activeTab);
-      const response = await getReleases(status, searchQuery);
+      const response = await getReleases();
       if (!response.success) {
         throw new Error(response.error || 'Failed to fetch releases');
       }

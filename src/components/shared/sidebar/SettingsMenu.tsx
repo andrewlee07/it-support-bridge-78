@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/collapsible";
 import { settingsItems } from './navigationItems';
 import NavLink from './NavLink';
-import { NavItem } from './types';
+import { NavigationItem } from './types';
 
 interface SettingsMenuProps {
   collapsed: boolean;

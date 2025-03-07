@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BacklogItem } from '@/utils/types';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 

@@ -14,7 +14,7 @@ interface ReleaseDetailDialogsProps {
   setSelectedBacklogItem: (item: BacklogItem | null) => void;
   editingBacklogItem: BacklogItem | null;
   setEditingBacklogItem: (item: BacklogItem | null) => void;
-  onSelectItems: (items: BacklogItem[]) => void;
+  onSelectItems: (items: BacklogItem[]) => Promise<void>;
   onEditBacklogItem: (item: BacklogItem) => void;
   onBacklogItemUpdated: () => void;
 }

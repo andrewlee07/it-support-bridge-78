@@ -12,9 +12,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children, 
   redirectPath = "/login" 
 }) => {
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (isLoading) {
+  if (loading) {
     // You could return a loading spinner here
     return <div>Loading...</div>;
   }
