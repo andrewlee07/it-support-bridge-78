@@ -33,7 +33,7 @@ const CustomFormField: React.FC<CustomFormFieldProps> = ({
           <FormLabel>{label}</FormLabel>
           <FormControl>
             {React.isValidElement(children)
-              ? React.cloneElement(children, { ...field })
+              ? React.cloneElement(children as React.ReactElement, { ...field })
               : children}
           </FormControl>
           {description && (
