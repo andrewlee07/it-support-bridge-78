@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -13,13 +12,13 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Tag as TagIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { UseFormReturn } from 'react-hook-form';
 import { BacklogItemFormValues } from './forms/backlogItemSchema';
 import { Release } from '@/utils/api/release/types';
-import TagInput from './TagInput';
+import TagInput from '@/components/shared/TagInput';
 
 interface BacklogItemFormFieldsProps {
   form: UseFormReturn<BacklogItemFormValues>;
@@ -261,7 +260,6 @@ const BacklogItemFormFields: React.FC<BacklogItemFormFieldsProps> = ({
         />
       </div>
 
-      {/* New Labels field with TagInput component */}
       <FormField
         control={form.control}
         name="labels"
@@ -274,11 +272,13 @@ const BacklogItemFormFields: React.FC<BacklogItemFormFieldsProps> = ({
                 onChange={field.onChange}
                 placeholder="Type and press Enter to add labels"
                 maxTags={10}
+                maxLength={30}
+                icon={<TagIcon className="h-3 w-3" />}
               />
             </FormControl>
             <FormMessage />
             <p className="text-xs text-muted-foreground mt-1">
-              Add labels to categorize this item. Press Enter after each label.
+              Add labels to categorize this item. Press Enter after each label (max 30 characters per label).
             </p>
           </FormItem>
         )}
