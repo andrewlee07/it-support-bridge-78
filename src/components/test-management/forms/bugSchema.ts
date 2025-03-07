@@ -1,11 +1,10 @@
 
 import * as z from 'zod';
-import { BugSeverity, BugPriority, BugStatus } from '@/utils/types/testTypes';
 
 // Convert enum-like types to zod enum schemas
 const bugSeverityEnum = z.enum(['critical', 'high', 'medium', 'low'] as const);
-const bugPriorityEnum = z.enum(['urgent', 'high', 'medium', 'low'] as const);
-const bugStatusEnum = z.enum(['new', 'in-progress', 'fixed', 'verified', 'closed', 'open', 'in_progress', 'resolved'] as const);
+const bugPriorityEnum = z.enum(['high', 'medium', 'low'] as const);
+const bugStatusEnum = z.enum(['open', 'in_progress', 'resolved', 'closed', 'fixed', 'verified'] as const);
 
 // Form schema for bug report
 export const bugSchema = z.object({

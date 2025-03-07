@@ -20,7 +20,7 @@ import {
 import { mockSLAs } from './slas';
 import { mockEmailTemplates } from './emailTemplates';
 import { getDashboardStats } from './dashboardStats';
-import { simulateApiResponse, simulatePaginatedResponse, delay } from './apiHelpers';
+import { simulateApiResponse, simulatePaginatedResponse, delay, createApiSuccessResponse, createApiErrorResponse } from './apiHelpers';
 
 // Import all test management exports
 import {
@@ -82,6 +82,8 @@ export {
   simulateApiResponse,
   simulatePaginatedResponse,
   delay,
+  createApiSuccessResponse,
+  createApiErrorResponse,
   
   // Test Management
   testCases,

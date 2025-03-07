@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTestStats, fetchBugs, fetchTestCases } from '@/utils/mockData/testData';
@@ -37,7 +36,7 @@ const TestDashboard = () => {
   // Fetch test cases (we'll use this for filtered test cases by status)
   const { data: testCasesData, isLoading: isLoadingTestCases } = useQuery({
     queryKey: ['testCases', statusFilter],
-    queryFn: () => fetchTestCases(statusFilter),
+    queryFn: () => fetchTestCases(),
   });
 
   // Filter handler for the status chart

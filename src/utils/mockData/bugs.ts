@@ -1,93 +1,72 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { Bug } from '../types/testTypes';
-import { delay, simulateApiResponse } from './apiHelpers';
-import { testCases } from './testCases';
+import { delay, createApiSuccessResponse, createApiErrorResponse } from './apiHelpers';
+import { ApiResponse } from '../types';
+import { Bug, BugPriority, BugSeverity, BugStatus } from '../types/testTypes';
 
-// Sample Bugs
-export const bugs: Bug[] = [
+// Mock Bugs data
+export let bugs: Bug[] = [
   {
-    id: uuidv4(),
-    title: 'Login button unresponsive after multiple attempts',
-    description: 'After 3 failed login attempts, the login button becomes unresponsive',
-    stepsToReproduce: [
-      'Navigate to login page',
-      'Enter invalid credentials 3 times in a row',
-      'Try to click the login button again'
-    ],
-    severity: 'high',
+    id: 'bug-1',
+    title: 'Login button not working',
+    description: 'Login button is not responding when clicked',
+    stepsToReproduce: ['Open login page', 'enter credentials', 'click login button'],
+    severity: 'critical',
     priority: 'high',
-    status: 'new',
-    assignedDeveloper: '2', // Jane Smith (IT Staff)
-    relatedTestCase: testCases[1].id,
-    attachment: '/lovable-uploads/bf3633e2-5031-4a59-ab35-ffd5b863fbfc.png',
-    createdAt: new Date(2023, 11, 1),
-    updatedAt: new Date(2023, 11, 1),
-    createdBy: '3' // Bob Johnson (End User)
-  },
-  {
-    id: uuidv4(),
-    title: 'Password reset email not received',
-    description: 'Password reset email is not being received after clicking submit',
-    stepsToReproduce: [
-      'Navigate to login page',
-      'Click on "Forgot password"',
-      'Enter email address',
-      'Click submit',
-      'Check email inbox'
-    ],
-    severity: 'medium',
-    priority: 'medium',
-    status: 'in-progress',
-    assignedDeveloper: '1', // John Doe (Admin)
-    relatedTestCase: testCases[2].id,
-    createdAt: new Date(2023, 11, 5),
-    updatedAt: new Date(2023, 11, 7),
-    createdBy: '2' // Jane Smith (IT Staff)
-  }
-];
-
-// API mocks for bugs
-export const fetchBugs = () => {
-  return simulateApiResponse(bugs);
-};
-
-export const fetchBugById = (id: string) => {
-  const bug = bugs.find(b => b.id === id);
-  return simulateApiResponse(bug);
-};
-
-export const createBug = async (
-  bug: Omit<Bug, 'id' | 'createdAt' | 'updatedAt'>,
-  userId: string
-) => {
-  await delay(500);
-  const newBug: Bug = {
-    ...bug,
-    id: uuidv4(),
+    status: 'open',
+    reportedBy: 'user-1',
+    createdBy: 'user-1',
     createdAt: new Date(),
     updatedAt: new Date(),
-    createdBy: userId // Using the provided userId
-  };
-  bugs.push(newBug);
-  return simulateApiResponse(newBug);
+  },
+  {
+    id: 'bug-2',
+    title: 'Incorrect error message',
+    description: 'Error message is not clear',
+    stepsToReproduce: ['Attempt login with invalid credentials'],
+    severity: 'medium',
+    priority: 'medium',
+    status: 'open',
+    reportedBy: 'user-2',
+    createdBy: 'user-2',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
+
+// Bug API functions
+export const fetchBugs = async (): Promise<ApiResponse<Bug[]>> => {
+  await delay(500);
+  return createApiSuccessResponse(bugs);
 };
 
-export const updateBug = async (
-  id: string,
-  updates: Partial<Omit<Bug, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>>
-) => {
+export const fetchBugById = async (id: string): Promise<ApiResponse<Bug | null>> => {
   await delay(500);
-  const bugIndex = bugs.findIndex(b => b.id === id);
-  if (bugIndex === -1) {
-    return simulateApiResponse(null, 'Bug not found', 404);
+  const bug = bugs.find(b => b.id === id);
+  if (!bug) {
+    return createApiErrorResponse<Bug | null>('Bug not found', 404);
   }
-  
-  bugs[bugIndex] = {
-    ...bugs[bugIndex],
-    ...updates,
-    updatedAt: new Date()
+  return createApiSuccessResponse(bug);
+};
+
+export const createBug = async (bug: Omit<Bug, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Bug>> => {
+  await delay(500);
+  const newBug: Bug = {
+    id: uuidv4(),
+    ...bug,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
-  
-  return simulateApiResponse(bugs[bugIndex]);
+  bugs.push(newBug);
+  return createApiSuccessResponse(newBug);
+};
+
+export const updateBug = async (id: string, updates: Partial<Bug>): Promise<ApiResponse<Bug | null>> => {
+  await delay(500);
+  const index = bugs.findIndex(b => b.id === id);
+  if (index === -1) {
+    return createApiErrorResponse<Bug | null>('Bug not found', 404);
+  }
+  bugs[index] = { ...bugs[index], ...updates, updatedAt: new Date() };
+  return createApiSuccessResponse(bugs[index]);
 };

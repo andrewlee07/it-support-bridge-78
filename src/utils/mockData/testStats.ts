@@ -1,49 +1,47 @@
 
+import { delay, createApiSuccessResponse } from './apiHelpers';
+import { ApiResponse } from '../types';
 import { TestManagementStats } from '../types/testTypes';
-import { delay, simulateApiResponse } from './apiHelpers';
 import { testCases } from './testCases';
 import { bugs } from './bugs';
+import { testExecutions } from './testExecutions';
 import { testCycles } from './testCycles';
 
-// Test stats calculation for dashboard
-export const fetchTestStats = async () => {
-  await delay(700);
-  
+export const fetchTestStats = async (): Promise<ApiResponse<TestManagementStats>> => {
+  await delay(500);
+
   const totalTestCases = testCases.length;
-  const passedTests = testCases.filter(tc => tc.status === 'pass').length;
-  const failedTests = testCases.filter(tc => tc.status === 'fail').length;
-  const blockedTests = testCases.filter(tc => tc.status === 'blocked').length;
-  const notRunTests = testCases.filter(tc => tc.status === 'not-run').length;
+  const passed = testExecutions.filter(te => te.status === 'passed').length;
+  const failed = testExecutions.filter(te => te.status === 'failed').length;
+  const blocked = testExecutions.filter(te => te.status === 'blocked').length;
+  const notExecuted = totalTestCases - passed - failed - blocked;
   
-  const totalBugs = bugs.length;
-  const openBugs = bugs.filter(b => ['new', 'in-progress'].includes(b.status)).length;
-  const fixedBugs = bugs.filter(b => ['fixed', 'verified', 'closed'].includes(b.status)).length;
+  // Get open bugs count
+  const openBugs = bugs.filter(b => b.status === 'open').length;
   
-  const testCycleProgress = testCycles.map(cycle => {
-    const cycleTestCases = testCases.filter(tc => cycle.testCases.includes(tc.id));
-    const completedTests = cycleTestCases.filter(tc => tc.status !== 'not-run').length;
-    const progress = cycleTestCases.length > 0 
-      ? Math.round((completedTests / cycleTestCases.length) * 100) 
-      : 0;
-    
-    return {
-      cycleId: cycle.id,
-      cycleName: cycle.name,
-      progress
-    };
-  });
-  
+  // Mock test cycle progress
+  const testCycleProgress = testCycles.map(cycle => ({
+    cycleId: cycle.id,
+    cycleName: cycle.name,
+    progress: Math.floor(Math.random() * 100) // Randomly generate progress percentage
+  }));
+
   const stats: TestManagementStats = {
     totalTestCases,
-    passedTests,
-    failedTests,
-    blockedTests,
-    notRunTests,
-    totalBugs,
+    passedTests: passed,
+    failedTests: failed,
+    blockedTests: blocked,
+    notRunTests: notExecuted,
+    totalBugs: bugs.length,
     openBugs,
-    fixedBugs,
-    testCycleProgress
+    fixedBugs: bugs.filter(b => b.status === 'fixed').length,
+    testCycleProgress,
+    // Legacy fields for compatibility
+    passed,
+    failed,
+    blocked,
+    notExecuted,
   };
-  
-  return simulateApiResponse(stats);
+
+  return createApiSuccessResponse(stats);
 };

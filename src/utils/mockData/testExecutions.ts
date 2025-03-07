@@ -1,49 +1,29 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { TestExecution, TestStatus } from '../types/testTypes';
-import { delay, simulateApiResponse } from './apiHelpers';
-import { testCases } from './testCases';
-import { bugs } from './bugs';
+import { delay, createApiSuccessResponse } from './apiHelpers';
+import { ApiResponse } from '../types';
+import { TestExecution } from '../types/testTypes';
 
-// Sample Test Executions
-export const testExecutions: TestExecution[] = [
-  {
-    id: uuidv4(),
-    testCaseId: testCases[0].id,
-    executionDate: new Date(2023, 10, 20),
-    status: 'pass',
-    comments: 'Login worked as expected',
-    executedBy: '2', // Jane Smith (IT Staff)
-    linkedBugs: []
-  },
-  {
-    id: uuidv4(),
-    testCaseId: testCases[1].id,
-    executionDate: new Date(2023, 11, 1),
-    status: 'fail',
-    comments: 'Login button became unresponsive after multiple attempts',
-    executedBy: '2', // Jane Smith (IT Staff)
-    linkedBugs: [bugs[0].id]
-  }
-];
+// Mock Test Executions data
+export let testExecutions: TestExecution[] = [];
 
-// API mocks for test executions
+// Test Execution API functions
 export const executeTest = async (
-  execution: Omit<TestExecution, 'id'>
-) => {
+  testCaseId: string, 
+  testCycleId: string, 
+  status: 'passed' | 'failed' | 'blocked', 
+  notes?: string
+): Promise<ApiResponse<TestExecution>> => {
   await delay(500);
-  const newExecution: TestExecution = {
-    ...execution,
-    id: uuidv4()
+  const newTestExecution: TestExecution = {
+    id: uuidv4(),
+    testCycleId: testCycleId,
+    testCaseId: testCaseId,
+    status: status,
+    notes: notes,
+    executedBy: 'user-1', // Mock user
+    executedAt: new Date(),
   };
-  
-  // Update the test case status
-  const testCaseIndex = testCases.findIndex(tc => tc.id === execution.testCaseId);
-  if (testCaseIndex !== -1) {
-    testCases[testCaseIndex].status = execution.status;
-    testCases[testCaseIndex].updatedAt = new Date();
-  }
-  
-  testExecutions.push(newExecution);
-  return simulateApiResponse(newExecution);
+  testExecutions.push(newTestExecution);
+  return createApiSuccessResponse(newTestExecution);
 };

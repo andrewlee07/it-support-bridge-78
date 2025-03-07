@@ -1,40 +1,39 @@
 
 import { v4 as uuidv4 } from 'uuid';
+import { delay, createApiSuccessResponse } from './apiHelpers';
+import { ApiResponse } from '../types';
 import { TestCycle } from '../types/testTypes';
-import { delay, simulateApiResponse } from './apiHelpers';
-import { testCases } from './testCases';
 
-// Sample Test Cycles
-export const testCycles: TestCycle[] = [
+// Mock Test Cycles data
+export let testCycles: TestCycle[] = [
   {
-    id: uuidv4(),
-    name: 'Authentication Testing - Q4 2023',
-    description: 'Verify all authentication features for Q4 release',
-    releaseId: 'rel-001',
-    startDate: new Date(2023, 10, 15),
-    endDate: new Date(2023, 11, 15),
-    status: 'in-progress',
-    testCases: testCases.map(tc => tc.id),
-    createdAt: new Date(2023, 10, 10),
-    updatedAt: new Date(2023, 10, 10)
-  }
+    id: 'cycle-1',
+    name: 'Regression Test Cycle',
+    description: 'Full regression test cycle for the new release',
+    startDate: new Date(),
+    endDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+    testCases: ['tc-1', 'tc-2'],
+    status: 'planned',
+    createdBy: 'user-1',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
 ];
 
-// API mocks for test cycles
-export const fetchTestCycles = () => {
-  return simulateApiResponse(testCycles);
+// Test Cycle API functions
+export const fetchTestCycles = async (): Promise<ApiResponse<TestCycle[]>> => {
+  await delay(500);
+  return createApiSuccessResponse(testCycles);
 };
 
-export const createTestCycle = async (
-  testCycle: Omit<TestCycle, 'id' | 'createdAt' | 'updatedAt'>
-) => {
+export const createTestCycle = async (testCycle: Omit<TestCycle, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<TestCycle>> => {
   await delay(500);
   const newTestCycle: TestCycle = {
-    ...testCycle,
     id: uuidv4(),
+    ...testCycle,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   };
   testCycles.push(newTestCycle);
-  return simulateApiResponse(newTestCycle);
+  return createApiSuccessResponse(newTestCycle);
 };
