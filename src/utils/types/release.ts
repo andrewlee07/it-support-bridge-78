@@ -1,10 +1,20 @@
 
-// Release management types
-import { AuditEntry } from './audit';
+// Release management
+export type ReleaseType = 'major' | 'minor' | 'patch' | 'emergency';
 
 export type ReleaseStatus = 'Planned' | 'In Progress' | 'Deployed' | 'Cancelled';
-export type ReleaseType = 'major' | 'minor' | 'patch' | 'emergency';
+
 export type ReleaseApprovalStatus = 'pending' | 'approved' | 'rejected';
+
+// Release item can link to other entities
+export interface ReleaseItem {
+  id: string;
+  releaseId: string;
+  itemId: string;
+  itemType: 'change' | 'incident' | 'asset';
+  addedAt: Date;
+  addedBy: string;
+}
 
 export interface Release {
   id: string;
@@ -18,17 +28,21 @@ export interface Release {
   createdAt: Date;
   updatedAt: Date;
   approvalStatus: ReleaseApprovalStatus;
-  approvedBy?: string;
   approvedAt?: Date;
+  approvedBy?: string;
   items: ReleaseItem[];
-  audit: AuditEntry[];
+  audit: any[];
 }
 
-export interface ReleaseItem {
-  id: string;
-  releaseId: string;
-  itemId: string;
-  itemType: 'change' | 'incident' | 'asset';
-  addedAt: Date;
-  addedBy: string;
+// Release metrics
+export interface ReleaseMetrics {
+  totalReleases: number;
+  deployedReleases: number;
+  pendingReleases: number;
+  cancelledReleases: number;
+  releasesByMonth: {
+    month: string;
+    count: number;
+  }[];
+  successRate: number;
 }

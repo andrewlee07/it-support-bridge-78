@@ -1,26 +1,24 @@
 
-import { Release, ReleaseStatus, ReleaseItem, ApiResponse } from './types';
+import { Release, ReleaseStatus, ReleaseItem, ApiResponse } from '@/utils/types';
 
 // Import functionality from separate modules
 import { 
   getReleases, 
   getReleaseById, 
   getReleaseMetrics,
-  mockReleases as queryMockReleases 
+  mockReleases
 } from './releaseQueries';
 
 import { 
   createRelease, 
   updateRelease, 
   updateReleaseStatus, 
-  updateReleaseApproval,
-  mockReleases as mutationMockReleases
+  updateReleaseApproval
 } from './releaseMutations';
 
 import { 
   addItemToRelease, 
-  removeItemFromRelease,
-  mockReleases as itemMockReleases
+  removeItemFromRelease
 } from './releaseItemOperations';
 
 // Export all functionality
@@ -34,6 +32,7 @@ export {
   addItemToRelease,
   removeItemFromRelease,
   getReleaseMetrics,
+  mockReleases
 };
 
 // Export default object with all functions
