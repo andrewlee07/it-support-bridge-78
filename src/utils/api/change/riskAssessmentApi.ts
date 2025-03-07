@@ -8,6 +8,7 @@ import {
 } from '../../types';
 import { simulateApiResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
+import { v4 as uuidv4 } from 'uuid';
 import { 
   getChangeRequests, 
   getRiskQuestions, 
@@ -93,7 +94,15 @@ export const riskAssessmentApi = {
     questions: RiskAssessmentQuestion[],
     userId: string
   ): Promise<ApiResponse<RiskAssessmentQuestion[]>> => {
-    setRiskQuestions(questions);
+    // Ensure all questions have IDs
+    const processedQuestions = questions.map(q => {
+      if (!q.id) {
+        return { ...q, id: `question-${uuidv4()}` };
+      }
+      return q;
+    });
+    
+    setRiskQuestions(processedQuestions);
     
     return simulateApiResponse(getRiskQuestions());
   },
@@ -108,7 +117,15 @@ export const riskAssessmentApi = {
     newThresholds: RiskThreshold[],
     userId: string
   ): Promise<ApiResponse<RiskThreshold[]>> => {
-    setRiskThresholds(newThresholds);
+    // Ensure all thresholds have IDs
+    const processedThresholds = newThresholds.map(t => {
+      if (!t.id) {
+        return { ...t, id: `threshold-${uuidv4()}` };
+      }
+      return t;
+    });
+    
+    setRiskThresholds(processedThresholds);
     
     return simulateApiResponse(getRiskThresholds());
   },

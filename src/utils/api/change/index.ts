@@ -2,7 +2,7 @@
 import { changeRequestApi } from './changeRequestApi';
 import { statusApi } from './statusApi';
 import { riskAssessmentApi } from './riskAssessmentApi';
-import { calculateRiskLevelFromThresholds } from './types';
+import { calculateRiskLevelFromThresholds, generateThresholdId } from './types';
 
 // Export the refactored changeApi with all functionality
 export const changeApi = {
@@ -27,5 +27,5 @@ export const changeApi = {
   calculateRiskScore: riskAssessmentApi.calculateRiskScore,
 };
 
-// Export the helper function for direct access
-export { calculateRiskLevelFromThresholds };
+// Export the helper functions for direct access
+export { calculateRiskLevelFromThresholds, generateThresholdId };

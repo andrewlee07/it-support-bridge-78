@@ -29,3 +29,8 @@ export const calculateRiskLevelFromThresholds = (score: number, thresholds: Risk
   // Fallback to high if no threshold matches
   return 'high';
 };
+
+// Helper function to generate a new threshold ID
+export const generateThresholdId = (): string => {
+  return `threshold-${Date.now()}`;
+};
