@@ -66,7 +66,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
         >
           <div className="flex items-center gap-3">
             <Settings className="h-5 w-5 flex-shrink-0" />
-            <span>Settings</span>
+            <span>Admin Settings</span>
           </div>
           <ChevronRight className={cn("h-4 w-4 transition-transform", settingsOpen && "rotate-90")} />
         </Button>
