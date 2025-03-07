@@ -1,9 +1,12 @@
 
 import React, { useState } from 'react';
-import { Bell, Moon, Search, Settings, Sun, User } from 'lucide-react';
+import { Bell, Moon, Search, Settings, Sun, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface NavbarProps {
   toggleDarkMode: () => void;
@@ -12,6 +15,36 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ toggleDarkMode, isDarkMode }) => {
   const [searchActive, setSearchActive] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Get the first letter of each name part for the avatar
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase();
+  };
+
+  // Convert role to display format
+  const getRoleDisplay = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'Administrator';
+      case 'it':
+        return 'IT Support';
+      case 'user':
+        return 'End User';
+      default:
+        return role;
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="h-16 px-4 border-b border-border/40 bg-background/80 backdrop-blur-md flex items-center justify-between">
@@ -71,32 +104,44 @@ const Navbar: React.FC<NavbarProps> = ({ toggleDarkMode, isDarkMode }) => {
           </PopoverContent>
         </Popover>
         
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-              <User className="h-4 w-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-56 p-0" align="end">
-            <div className="p-4 border-b border-border">
-              <div className="font-medium">Jane Smith</div>
-              <div className="text-sm text-muted-foreground">IT Support</div>
-            </div>
-            <div className="p-2">
-              <Button variant="ghost" className="w-full justify-start text-sm" size="sm">
-                <User className="mr-2 h-4 w-4" />
-                Profile
+        {user && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                <Avatar className="h-9 w-9">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                    {getInitials(user.name)}
+                  </AvatarFallback>
+                </Avatar>
               </Button>
-              <Button variant="ghost" className="w-full justify-start text-sm" size="sm">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-              <Button variant="ghost" className="w-full justify-start text-sm" size="sm">
-                Log out
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-0" align="end">
+              <div className="p-4 border-b border-border">
+                <div className="font-medium">{user.name}</div>
+                <div className="text-sm text-muted-foreground">{getRoleDisplay(user.role)}</div>
+              </div>
+              <div className="p-2">
+                <Button variant="ghost" className="w-full justify-start text-sm" size="sm">
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </Button>
+                <Button variant="ghost" className="w-full justify-start text-sm" size="sm">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-sm" 
+                  size="sm"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
       </div>
     </div>
   );

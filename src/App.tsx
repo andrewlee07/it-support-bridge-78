@@ -18,38 +18,59 @@ import SLASettings from "./pages/SLASettings";
 import Changes from "./pages/Changes";
 import Assets from "./pages/Assets";
 import Reports from "./pages/Reports";
-
-// Create a client
-const queryClient = new QueryClient();
+import Login from "./pages/Login";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const App = () => {
+  // Create a client
+  const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route element={<MainLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/incidents" element={<Incidents />} />
-                <Route path="/service-requests" element={<ServiceRequests />} />
-                <Route path="/users" element={<Users />} />
-                <Route path="/changes" element={<Changes />} />
-                <Route path="/assets" element={<Assets />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/settings/sla" element={<SLASettings />} />
-                {/* These routes would be implemented in future iterations */}
-                <Route path="/settings" element={<NotFound />} />
-                <Route path="/help" element={<NotFound />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AnimatePresence mode="wait">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                
+                {/* Protected routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route element={<MainLayout />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    
+                    {/* Routes accessible by all authenticated users */}
+                    <Route path="/incidents" element={<Incidents />} />
+                    <Route path="/service-requests" element={<ServiceRequests />} />
+                    
+                    {/* Admin and IT staff only routes */}
+                    <Route element={<ProtectedRoute allowedRoles={['admin', 'it']} />}>
+                      <Route path="/changes" element={<Changes />} />
+                      <Route path="/assets" element={<Assets />} />
+                      <Route path="/reports" element={<Reports />} />
+                    </Route>
+                    
+                    {/* Admin only routes */}
+                    <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                      <Route path="/users" element={<Users />} />
+                      <Route path="/settings/sla" element={<SLASettings />} />
+                      <Route path="/settings" element={<NotFound />} />
+                    </Route>
+                    
+                    <Route path="/help" element={<NotFound />} />
+                  </Route>
+                </Route>
+                
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnimatePresence>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
