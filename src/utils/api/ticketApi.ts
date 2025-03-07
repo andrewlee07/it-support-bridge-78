@@ -1,7 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { Ticket, TicketStatus, TicketPriority, TicketType, ApiResponse } from '../types';
-import { simulateApiResponse } from '../mockData/apiHelpers';
+import { Ticket, TicketStatus, TicketPriority, TicketType } from '../types';
 
 // Define the TicketComment interface since it's missing from the types file
 interface TicketComment {
@@ -53,6 +52,31 @@ export const fetchTickets = async (): Promise<{ success: boolean; data?: Ticket[
   } catch (error) {
     console.error('Error fetching tickets:', error);
     return { success: false, error: 'Failed to fetch tickets. Please try again later.' };
+  }
+};
+
+// Get tickets by type with pagination
+export const getTicketsByType = async (type: TicketType, page: number, limit: number): Promise<{ success: boolean; data?: { items: Ticket[]; total: number; page: number }; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // In a real application, this would fetch filtered tickets from an API
+    // For now, return empty pagination result
+    return { 
+      success: true, 
+      data: {
+        items: [],
+        total: 0,
+        page
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching tickets by type:', error);
+    return { 
+      success: false, 
+      error: `Failed to fetch ${type} tickets. Please try again later.` 
+    };
   }
 };
 
@@ -177,6 +201,7 @@ export const changeTicketStatus = async (ticketId: string, status: TicketStatus)
 export const ticketApi = {
   createTicket,
   fetchTickets,
+  getTicketsByType, // Add the new function to the exported object
   fetchTicketById,
   updateTicket,
   addComment,
