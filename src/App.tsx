@@ -23,6 +23,7 @@ import Login from "./pages/Login";
 import Releases from "./pages/Releases";
 import NewRelease from "./pages/NewRelease";
 import ReleaseDetail from "./pages/ReleaseDetail";
+import TestTracking from "./pages/TestTracking";
 import DropdownConfigurations from "./pages/settings/DropdownConfigurations";
 import RiskAssessmentSettings from "./pages/settings/RiskAssessmentSettings";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -52,6 +53,7 @@ const App = () => {
                     {/* Routes accessible by all authenticated users */}
                     <Route path="/incidents" element={<Incidents />} />
                     <Route path="/service-requests" element={<ServiceRequests />} />
+                    <Route path="/test-tracking" element={<TestTracking />} />
                     
                     {/* Admin and IT staff only routes */}
                     <Route element={<ProtectedRoute allowedRoles={['admin', 'it']} />}>
