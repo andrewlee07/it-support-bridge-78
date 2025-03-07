@@ -6,9 +6,11 @@ import {
   getTicketById, 
   getTicketsByType, 
   getTicketsByStatus, 
-  getTicketsByPriority 
+  getTicketsByPriority,
+  generateIncidentId,
+  generateServiceRequestId
 } from './tickets';
-import { mockAssets, getAssetById } from './assets';
+import { mockAssets, getAssetById, generateAssetId } from './assets';
 import { 
   mockChangeRequests, 
   getChangeRequestById, 
@@ -32,10 +34,13 @@ export {
   getTicketsByType,
   getTicketsByStatus,
   getTicketsByPriority,
+  generateIncidentId,
+  generateServiceRequestId,
   
   // Assets
   mockAssets,
   getAssetById,
+  generateAssetId,
   
   // Change Management
   mockChangeRequests,
