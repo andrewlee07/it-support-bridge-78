@@ -1,35 +1,20 @@
 
-// Re-export all API functions from individual modules
-
-// Ticket API
-export * from './ticketApi';
-
-// Change API
-export * from './changeApi';
-
-// Release API
-export * from './releaseApi';
-
-// Asset API
+// Re-export all API functions
 export * from './assetApi';
-
-// SLA API
+export * from './backlogApi';
+export * from './changeApi';
+export * from './dashboardApi';
+export * from './dropdownConfigurationApi';
+export * from './emailApi';
+export * from './emailNotificationApi';
+export * from './releaseApi';
 export * from './slaApi';
-
-// User API
+export * from './testBacklogIntegrationApi';
+export * from './testReleaseApi';
+export * from './ticketApi';
 export * from './userApi';
 
-// Email API
-export * from './emailApi';
-
-// Dashboard API
-export * from './dashboardApi';
-
-// Dropdown Configuration API
-export * from './dropdownConfigurationApi';
-
-// Email Notification API
-export * from './emailNotificationApi';
-
-// Backlog API
-export * from './backlogApi';
+// Re-export from subdirectories
+export * from './change';
+export * from './release';
+export * from './test-integration';
