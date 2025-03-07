@@ -16,6 +16,7 @@ import Users from "./pages/Users";
 import MainLayout from "./layouts/MainLayout";
 import SLASettings from "./pages/SLASettings";
 import Changes from "./pages/Changes";
+import NewChangeRequest from "./pages/NewChangeRequest";
 import Assets from "./pages/Assets";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
@@ -50,6 +51,7 @@ const App = () => {
                     {/* Admin and IT staff only routes */}
                     <Route element={<ProtectedRoute allowedRoles={['admin', 'it']} />}>
                       <Route path="/changes" element={<Changes />} />
+                      <Route path="/changes/new" element={<NewChangeRequest />} />
                       <Route path="/assets" element={<Assets />} />
                       <Route path="/reports" element={<Reports />} />
                     </Route>
