@@ -11,7 +11,7 @@ import {
   ChangeCategory
 } from '../../types';
 
-// Risk threshold configuration
+// Risk threshold configuration updated based on requirements
 export const defaultRiskThresholds: RiskThreshold[] = [
   { id: 'threshold-1', level: 'low', minScore: 1, maxScore: 2 },
   { id: 'threshold-2', level: 'medium', minScore: 2, maxScore: 4 },

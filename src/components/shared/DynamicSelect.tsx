@@ -50,7 +50,7 @@ const DynamicSelect: React.FC<DynamicSelectProps> = ({
       <SelectTrigger className={className}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-background">
         {selectOptions.map(option => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
