@@ -2,13 +2,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBugs } from '@/utils/mockData/testData';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import BugList from './BugList';
 
 const BugsTab = () => {
@@ -19,19 +12,13 @@ const BugsTab = () => {
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Bug Tracking</CardTitle>
-        <CardDescription>Track and manage bugs</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {isLoadingBugs ? (
-          <div className="animate-pulse">Loading bugs...</div>
-        ) : (
-          <BugList bugs={bugsData?.data || []} />
-        )}
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      {isLoadingBugs ? (
+        <div className="animate-pulse p-4 rounded-lg border">Loading bugs...</div>
+      ) : (
+        <BugList bugs={bugsData?.data || []} />
+      )}
+    </div>
   );
 };
 

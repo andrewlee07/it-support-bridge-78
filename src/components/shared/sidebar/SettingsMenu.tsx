@@ -38,7 +38,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
   if (collapsed) {
     return (
       <Link 
-        to="/settings"
+        to="/settings/sla"
         className={cn(
           "flex items-center gap-3 px-2 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors justify-center",
           locationPathname.startsWith('/settings') && "bg-primary/10 text-primary font-medium"

@@ -54,6 +54,7 @@ const App = () => {
                     <Route path="/incidents" element={<Incidents />} />
                     <Route path="/service-requests" element={<ServiceRequests />} />
                     <Route path="/test-tracking" element={<TestTracking />} />
+                    <Route path="/help" element={<NotFound />} />
                     
                     {/* Admin and IT staff only routes */}
                     <Route element={<ProtectedRoute allowedRoles={['admin', 'it']} />}>
@@ -72,10 +73,8 @@ const App = () => {
                       <Route path="/settings/sla" element={<SLASettings />} />
                       <Route path="/settings/dropdowns" element={<DropdownConfigurations />} />
                       <Route path="/settings/risk-assessment" element={<RiskAssessmentSettings />} />
-                      <Route path="/settings" element={<NotFound />} />
+                      <Route path="/settings" element={<SLASettings />} />
                     </Route>
-                    
-                    <Route path="/help" element={<NotFound />} />
                   </Route>
                 </Route>
                 
