@@ -1,9 +1,10 @@
 
-import { UserRole } from '@/utils/types';
+import { ReactNode } from 'react';
 
-export interface NavItem {
+export interface NavigationItem {
   name: string;
-  path: string;
+  href?: string;
   icon: React.ElementType;
-  allowedRoles: UserRole[];
+  collapsed?: boolean;
+  items?: NavigationItem[];
 }

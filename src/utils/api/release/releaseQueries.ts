@@ -1,98 +1,99 @@
+import { Release, ReleaseStatus } from './types';
+import { mockReleases } from './mockData';
 
-import { Release, ReleaseStatus, ApiResponse } from '../../types';
-import { delay, createApiErrorResponse, createApiSuccessResponse } from '../../mockData/apiHelpers';
-import { initializedReleases } from './mockData';
-
-// Reference to the mock data
-let mockReleases = [...initializedReleases];
-
-/**
- * Get all releases with optional filtering
- */
-export const getReleases = async (
-  status?: ReleaseStatus,
-  searchQuery?: string
-): Promise<ApiResponse<Release[]>> => {
-  await delay();
+// Get all releases with optional filter
+export const getReleases = async (filters?: {
+  status?: ReleaseStatus;
+  startDate?: Date;
+  endDate?: Date;
+  search?: string;
+}): Promise<Release[]> => {
+  // Simulating API call with delay
+  await new Promise(resolve => setTimeout(resolve, 200));
   
   let filteredReleases = [...mockReleases];
   
-  if (status) {
-    filteredReleases = filteredReleases.filter(release => release.status === status);
+  // Apply filters if provided
+  if (filters) {
+    if (filters.status) {
+      filteredReleases = filteredReleases.filter(release => release.status === filters.status);
+    }
+    
+    if (filters.startDate) {
+      filteredReleases = filteredReleases.filter(release => 
+        new Date(release.scheduledDate) >= new Date(filters.startDate!)
+      );
+    }
+    
+    if (filters.endDate) {
+      filteredReleases = filteredReleases.filter(release => 
+        new Date(release.scheduledDate) <= new Date(filters.endDate!)
+      );
+    }
+    
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredReleases = filteredReleases.filter(release => 
+        release.name.toLowerCase().includes(searchLower) || 
+        release.description.toLowerCase().includes(searchLower)
+      );
+    }
   }
   
-  if (searchQuery) {
-    const query = searchQuery.toLowerCase();
-    filteredReleases = filteredReleases.filter(release => 
-      release.title.toLowerCase().includes(query) || 
-      release.version.toLowerCase().includes(query) ||
-      release.description.toLowerCase().includes(query)
-    );
+  return filteredReleases;
+};
+
+// Get a single release by ID
+export const getReleaseById = async (id: string): Promise<Release | null> => {
+  await new Promise(resolve => setTimeout(resolve, 100));
+  return mockReleases.find(release => release.id === id) || null;
+};
+
+// Create a new release
+export const createRelease = async (release: Omit<Release, 'id' | 'createdAt' | 'updatedAt'>): Promise<Release> => {
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  const newRelease: Release = {
+    id: `release-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...release,
+  };
+  
+  // In a real app, you would save this to a database
+  mockReleases.push(newRelease);
+  
+  return newRelease;
+};
+
+// Update an existing release
+export const updateRelease = async (id: string, updates: Partial<Release>): Promise<Release> => {
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  const index = mockReleases.findIndex(release => release.id === id);
+  if (index === -1) {
+    throw new Error(`Release with ID ${id} not found`);
   }
   
-  return createApiSuccessResponse(filteredReleases);
+  const updatedRelease = {
+    ...mockReleases[index],
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  };
+  
+  mockReleases[index] = updatedRelease;
+  
+  return updatedRelease;
 };
 
-/**
- * Get a single release by ID
- */
-export const getReleaseById = async (id: string): Promise<ApiResponse<Release>> => {
-  await delay();
+// Delete a release
+export const deleteRelease = async (id: string): Promise<void> => {
+  await new Promise(resolve => setTimeout(resolve, 200));
   
-  const release = mockReleases.find(release => release.id === id);
-  
-  if (!release) {
-    return createApiErrorResponse("Release not found", 404);
+  const index = mockReleases.findIndex(release => release.id === id);
+  if (index === -1) {
+    throw new Error(`Release with ID ${id} not found`);
   }
   
-  return createApiSuccessResponse(release);
-};
-
-/**
- * Get release metrics
- */
-export const getReleaseMetrics = async (): Promise<ApiResponse<any>> => {
-  await delay();
-  
-  const statusCounts = {
-    Planned: mockReleases.filter(r => r.status === 'Planned').length,
-    'In Progress': mockReleases.filter(r => r.status === 'In Progress').length,
-    Deployed: mockReleases.filter(r => r.status === 'Deployed').length,
-    Cancelled: mockReleases.filter(r => r.status === 'Cancelled').length
-  };
-  
-  const typeCounts = {
-    major: mockReleases.filter(r => r.type === 'major').length,
-    minor: mockReleases.filter(r => r.type === 'minor').length,
-    patch: mockReleases.filter(r => r.type === 'patch').length,
-    emergency: mockReleases.filter(r => r.type === 'emergency').length
-  };
-  
-  const metrics = {
-    totalReleases: mockReleases.length,
-    statusCounts,
-    typeCounts,
-    upcomingReleases: mockReleases
-      .filter(r => r.status === 'Planned' && new Date(r.plannedDate) > new Date())
-      .length,
-    deployedThisMonth: mockReleases
-      .filter(r => {
-        const now = new Date();
-        const releaseDate = new Date(r.plannedDate);
-        return r.status === 'Deployed' && 
-              releaseDate.getMonth() === now.getMonth() && 
-              releaseDate.getFullYear() === now.getFullYear();
-      })
-      .length
-  };
-  
-  return createApiSuccessResponse(metrics);
-};
-
-// Export mockReleases for use in other modules
-export { mockReleases };
-
-// Set mockReleases for testing/mocking
-export const setMockReleases = (releases: Release[]) => {
-  mockReleases = releases;
+  mockReleases.splice(index, 1);
 };

@@ -12,9 +12,15 @@ import {
   PackageIcon,
   ClipboardListIcon,
   BarChartIcon,
-  PackageOpenIcon,
 } from "lucide-react";
-import { NavigationItem } from "./types";
+
+export interface NavigationItem {
+  name: string;
+  href?: string;
+  icon: React.ElementType;
+  collapsed?: boolean;
+  items?: NavigationItem[];
+}
 
 export const navigationItems: NavigationItem[] = [
   {

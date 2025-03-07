@@ -60,7 +60,7 @@ function App() {
         <Route
           index
           element={
-            <ProtectedRoute>
+            <ProtectedRoute redirectPath="/login">
               <Index />
             </ProtectedRoute>
           }
@@ -70,7 +70,7 @@ function App() {
         <Route
           path="/"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute redirectPath="/login">
               <MainLayout />
             </ProtectedRoute>
           }
