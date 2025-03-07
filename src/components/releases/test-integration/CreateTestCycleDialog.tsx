@@ -78,8 +78,12 @@ const CreateTestCycleDialog: React.FC<CreateTestCycleDialogProps> = ({
     mutationFn: async (data: TestCycleFormValues) => {
       if (!user) throw new Error('User not authenticated');
       
+      // Ensure all required properties are included
       const response = await createTestCycleForRelease(releaseId, {
-        ...data,
+        name: data.name,
+        description: data.description,
+        startDate: data.startDate,
+        endDate: data.endDate,
         status: 'planned',
         testCases: [],
         createdBy: user.id

@@ -27,6 +27,9 @@ const TestCaseFormFields = () => {
 
   const releases = releasesResponse?.data || [];
 
+  // Get the current steps to pass to StepsSection
+  const steps = form.watch('stepsToReproduce') || [''];
+
   return (
     <div className="space-y-4">
       <FormField
@@ -119,7 +122,7 @@ const TestCaseFormFields = () => {
         />
       </div>
 
-      <StepsSection />
+      <StepsSection steps={steps} />
 
       <FormField
         control={form.control}
