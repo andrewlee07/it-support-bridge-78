@@ -1,21 +1,22 @@
-
-import { ticketApi } from './ticketApi';
 import { userApi } from './userApi';
+import { ticketApi } from './ticketApi';
 import { assetApi } from './assetApi';
-import { changeApi } from './changeApi';
 import { slaApi } from './slaApi';
-import { emailApi } from './emailApi';
 import { dashboardApi } from './dashboardApi';
+import { emailApi } from './emailApi';
+import { emailNotificationApi } from './emailNotificationApi';
+import { changeApi } from './change';
+import { dropdownConfigurationApi } from './dropdownConfigurationApi';
 
-// Export all APIs
-export const api = {
-  tickets: ticketApi,
-  users: userApi,
-  assets: assetApi,
-  changes: changeApi,
-  slas: slaApi,
-  emails: emailApi,
-  dashboard: dashboardApi,
+// Combine all APIs for export
+export {
+  userApi,
+  ticketApi,
+  assetApi,
+  slaApi,
+  dashboardApi,
+  emailApi,
+  emailNotificationApi,
+  changeApi,
+  dropdownConfigurationApi
 };
-
-export default api;

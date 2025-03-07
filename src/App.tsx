@@ -20,6 +20,7 @@ import NewChangeRequest from "./pages/NewChangeRequest";
 import Assets from "./pages/Assets";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
+import DropdownConfigurations from "./pages/settings/DropdownConfigurations";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -60,6 +61,7 @@ const App = () => {
                     <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                       <Route path="/users" element={<Users />} />
                       <Route path="/settings/sla" element={<SLASettings />} />
+                      <Route path="/settings/dropdowns" element={<DropdownConfigurations />} />
                       <Route path="/settings" element={<NotFound />} />
                     </Route>
                     
