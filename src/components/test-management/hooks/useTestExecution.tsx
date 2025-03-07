@@ -39,7 +39,7 @@ export const useTestExecution = (testCycleId?: string) => {
     setSelectedTestCases([]);
   };
 
-  // Execute a test case - fixed to match the expected signature
+  // Execute a test case
   const executeTestCase = async (testCaseId: string, status: TestStatus, comments: string = '') => {
     if (!user) {
       toast({
@@ -54,14 +54,19 @@ export const useTestExecution = (testCycleId?: string) => {
     try {
       // Convert status to match what executeTest expects
       let execStatus: 'passed' | 'failed' | 'blocked' = 'blocked';
-      if (status === 'passed') {
+      if (status === 'pass' || status === 'passed') {
         execStatus = 'passed';
-      } else if (status === 'failed') {
+      } else if (status === 'fail' || status === 'failed') {
         execStatus = 'failed';
       }
 
       // Call the executeTest function with the required parameters
-      const result = await executeTest(testCaseId, testCycleId || 'default-cycle', execStatus, comments);
+      const result = await executeTest(
+        testCaseId, 
+        testCycleId || 'default-cycle', 
+        execStatus, 
+        comments
+      );
       
       if (result.success) {
         toast({
@@ -92,8 +97,25 @@ export const useTestExecution = (testCycleId?: string) => {
     }
   };
 
+  // We need to convert the TestCase from testData to match our TestCase type
+  const convertTestCases = (testCases: any[]): TestCase[] => {
+    return testCases.map(tc => ({
+      id: tc.id,
+      title: tc.title,
+      description: tc.description,
+      stepsToReproduce: tc.steps || [],
+      expectedResults: tc.expectedResult || '',
+      status: tc.status === 'passed' ? 'pass' : 
+              tc.status === 'failed' ? 'fail' : tc.status,
+      assignedTester: tc.createdBy || tc.assignedTester,
+      relatedRequirement: tc.relatedRequirement || '',
+      createdAt: tc.createdAt,
+      updatedAt: tc.updatedAt
+    }));
+  };
+
   return {
-    testCasesData: testCasesData?.data as TestCase[] || [],
+    testCasesData: testCasesData?.data ? convertTestCases(testCasesData.data) : [],
     isLoadingTestCases,
     selectedTestCases,
     isExecutingTest,

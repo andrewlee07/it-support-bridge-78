@@ -1,23 +1,25 @@
 
-import { userApi } from './userApi';
-import { ticketApi } from './ticketApi';
-import { assetApi } from './assetApi';
-import { slaApi } from './slaApi';
-import { dashboardApi } from './dashboardApi';
-import { emailApi } from './emailApi';
-import { emailNotificationApi } from './emailNotificationApi';
-import { changeApi } from './change';
-import { dropdownConfigurationApi } from './dropdownConfigurationApi';
+// Re-export API modules
+import * as userApi from './userApi';
+import * as ticketApi from './ticketApi';
+import * as assetApi from './assetApi';
+import * as changeApi from './changeApi';
+import * as emailApi from './emailApi';
+import * as releaseApi from './releaseApi';
+import * as slaApi from './slaApi';
+import * as dashboardApi from './dashboardApi';
+import * as dropdownConfigurationApi from './dropdownConfigurationApi';
+import * as emailNotificationApi from './emailNotificationApi';
 
-// Combine all APIs for export
 export {
   userApi,
   ticketApi,
   assetApi,
+  changeApi,
+  emailApi,
+  releaseApi,
   slaApi,
   dashboardApi,
-  emailApi,
-  emailNotificationApi,
-  changeApi,
-  dropdownConfigurationApi
+  dropdownConfigurationApi,
+  emailNotificationApi
 };

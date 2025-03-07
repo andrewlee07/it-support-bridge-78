@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TestCase } from '@/utils/types/testTypes';
+import { TestCase, TestStatus } from '@/utils/types/testTypes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -17,12 +17,20 @@ const TestExecutionSummary: React.FC<TestExecutionSummaryProps> = ({
   onRefresh,
   onExport
 }) => {
+  // Helper function to check status with compatibility for both formats
+  const hasStatus = (testCase: TestCase, status: string): boolean => {
+    const tc = testCase as any;
+    return tc.status === status || 
+           (status === 'pass' && tc.status === 'passed') ||
+           (status === 'fail' && tc.status === 'failed');
+  };
+
   // Calculate statistics
   const totalTests = testCases.length;
-  const passedTests = testCases.filter(tc => tc.status === 'pass').length;
-  const failedTests = testCases.filter(tc => tc.status === 'fail').length;
-  const blockedTests = testCases.filter(tc => tc.status === 'blocked').length;
-  const notRunTests = testCases.filter(tc => tc.status === 'not-run').length;
+  const passedTests = testCases.filter(tc => hasStatus(tc, 'pass')).length;
+  const failedTests = testCases.filter(tc => hasStatus(tc, 'fail')).length;
+  const blockedTests = testCases.filter(tc => hasStatus(tc, 'blocked')).length;
+  const notRunTests = testCases.filter(tc => hasStatus(tc, 'not-run')).length;
 
   // Calculate progress
   const completionPercentage = totalTests > 0 

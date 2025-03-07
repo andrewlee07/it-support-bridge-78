@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Bug } from '@/utils/types/testTypes';
+import { Bug, BugStatus } from '@/utils/types/testTypes';
 import { createBug, updateBug, fetchTestCases } from '@/utils/mockData/testData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash, Upload } from 'lucide-react';
@@ -34,7 +34,7 @@ const bugSchema = z.object({
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
   stepsToReproduce: z.array(z.string()).min(1, { message: 'At least one step is required.' }),
   severity: z.enum(['critical', 'high', 'medium', 'low']),
-  priority: z.enum(['high', 'medium', 'low']),
+  priority: z.enum(['urgent', 'high', 'medium', 'low']),
   status: z.enum(['open', 'in_progress', 'resolved', 'closed', 'fixed', 'verified', 'new', 'in-progress']),
   assignedDeveloper: z.string().optional(),
   relatedTestCase: z.string().optional(),
@@ -148,7 +148,7 @@ const BugForm: React.FC<BugFormProps> = ({
           stepsToReproduce: data.stepsToReproduce,
           severity: data.severity,
           priority: data.priority,
-          status: data.status,
+          status: data.status as BugStatus,
           assignedTo: data.assignedDeveloper,
           relatedTestCase: data.relatedTestCase,
           attachment: data.attachment,
@@ -161,12 +161,12 @@ const BugForm: React.FC<BugFormProps> = ({
           stepsToReproduce: data.stepsToReproduce,
           severity: data.severity,
           priority: data.priority,
-          status: data.status,
+          status: data.status as BugStatus,
           assignedTo: data.assignedDeveloper || '',
           relatedTestCase: data.relatedTestCase || '',
           attachment: data.attachment || '',
           reportedBy: user.id,
-          createdBy: user.id, // Add the createdBy field with current user ID
+          createdBy: user.id,
         });
       }
 
@@ -320,6 +320,7 @@ const BugForm: React.FC<BugFormProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="urgent">Urgent</SelectItem>
                         <SelectItem value="high">High</SelectItem>
                         <SelectItem value="medium">Medium</SelectItem>
                         <SelectItem value="low">Low</SelectItem>

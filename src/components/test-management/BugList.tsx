@@ -34,8 +34,31 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
     enabled: !initialBugs,
   });
 
+  // Convert API bugs to our Bug type
+  const convertApiBugsToBugs = (apiBugs: any[]): Bug[] => {
+    return apiBugs.map(bug => ({
+      id: bug.id,
+      title: bug.title,
+      description: bug.description,
+      stepsToReproduce: Array.isArray(bug.stepsToReproduce) 
+        ? bug.stepsToReproduce 
+        : [bug.stepsToReproduce],
+      severity: bug.severity,
+      priority: bug.priority,
+      status: bug.status,
+      assignedDeveloper: bug.assignedTo,
+      relatedTestCase: bug.relatedTestCase,
+      attachment: bug.attachment,
+      createdAt: bug.createdAt,
+      updatedAt: bug.updatedAt,
+      createdBy: bug.createdBy || bug.reportedBy || '',
+      reportedBy: bug.reportedBy
+    }));
+  };
+
   // Use either the provided bugs or the fetched bugs
-  const displayBugs = initialBugs || bugsResponse?.data || [];
+  const displayBugs = initialBugs || 
+    (bugsResponse?.data ? convertApiBugsToBugs(bugsResponse.data) : []);
 
   // Quick status updates
   const handleStatusUpdate = async (id: string, status: BugStatus) => {
@@ -107,7 +130,7 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
         </div>
       ) : (
         <BugTable 
-          bugs={displayBugs as Bug[]}
+          bugs={displayBugs}
           onView={viewBug}
           onEdit={editBug}
           onStatusUpdate={handleStatusUpdate}

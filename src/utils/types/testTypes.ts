@@ -1,6 +1,6 @@
 
 // Test Case Management Types
-export type TestStatus = 'draft' | 'ready' | 'in_progress' | 'passed' | 'failed' | 'blocked' | 'not-run';
+export type TestStatus = 'not-run' | 'pass' | 'fail' | 'blocked' | 'passed' | 'failed';
 export type BugSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type BugPriority = 'urgent' | 'high' | 'medium' | 'low';
 export type BugStatus = 'new' | 'in-progress' | 'fixed' | 'verified' | 'closed' | 'open' | 'in_progress' | 'resolved';
@@ -55,7 +55,7 @@ export interface TestCycle {
   releaseId?: string;
   startDate: Date;
   endDate: Date;
-  status: 'planned' | 'in-progress' | 'completed' | 'in_progress' | 'aborted';
+  status: 'planned' | 'in_progress' | 'completed' | 'aborted' | 'in-progress';
   testCases: string[]; // Test Case IDs
   createdAt: Date;
   updatedAt: Date;

@@ -38,11 +38,17 @@ export const useTestCaseSubmit = ({ initialData, onSuccess }: UseTestCaseSubmitP
         };
       }
 
+      // Map status values to be compatible with TestCaseStatus
+      let apiStatus = data.status;
+      if (data.status === 'not-run') apiStatus = 'draft';
+      if (data.status === 'pass') apiStatus = 'passed';
+      if (data.status === 'fail') apiStatus = 'failed';
+
       // Convert to the format expected by the testData API
       const testCaseData = {
         title: data.title,
         description: data.description,
-        status: data.status === 'not-run' ? 'draft' : data.status,
+        status: apiStatus,
         preConditions: "",
         steps: filteredSteps,
         expectedResult: data.expectedResults,
@@ -66,7 +72,24 @@ export const useTestCaseSubmit = ({ initialData, onSuccess }: UseTestCaseSubmitP
           title: `Test case ${initialData?.id ? 'updated' : 'created'} successfully`,
           description: `Test case "${data.title}" has been ${initialData?.id ? 'updated' : 'created'}.`,
         });
-        if (onSuccess) onSuccess(result.data as TestCase);
+        if (onSuccess) {
+          // Convert the API response format to TestCase format before passing to onSuccess
+          const testCase: TestCase = {
+            id: result.data.id,
+            title: result.data.title,
+            description: result.data.description,
+            stepsToReproduce: result.data.steps || [],
+            expectedResults: result.data.expectedResult || '',
+            status: result.data.status === 'passed' ? 'pass' : 
+                    result.data.status === 'failed' ? 'fail' : 
+                    result.data.status === 'draft' ? 'not-run' : result.data.status,
+            assignedTester: result.data.assignedTo || result.data.createdBy,
+            relatedRequirement: '',
+            createdAt: result.data.createdAt,
+            updatedAt: result.data.updatedAt,
+          };
+          onSuccess(testCase);
+        }
         return { success: true };
       } else {
         toast({
