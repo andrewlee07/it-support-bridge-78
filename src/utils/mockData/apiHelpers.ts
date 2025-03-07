@@ -9,13 +9,15 @@ export const simulateApiResponse = <T>(data: T, error?: string, statusCode: numb
         resolve({
           success: false,
           error,
-          message: error
+          message: error,
+          statusCode: statusCode || 400 // Default to 400 for errors
         });
       } else {
         resolve({
           success: true,
           data,
-          message: 'Operation successful'
+          message: 'Operation successful',
+          statusCode: statusCode
         });
       }
     }, 500);

@@ -1,3 +1,4 @@
+
 // Re-export all test management related mock data from individual files
 import { 
   testCases, 
@@ -31,8 +32,10 @@ import {
   fetchTestStats
 } from './testStats';
 
+import { ApiResponse } from '../types';
+
 // Export the original function and add a new one that supports filtering
-const fetchTestCases = (statusFilter = null) => {
+const fetchTestCases = (statusFilter = null): Promise<ApiResponse<typeof testCases>> => {
   if (statusFilter) {
     // If a status filter is provided, filter the test cases
     const filtered = testCases.filter(tc => tc.status === statusFilter);

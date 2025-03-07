@@ -2,6 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { TestCase } from '../types/testTypes';
 import { delay, simulateApiResponse } from './apiHelpers';
+import { ApiResponse } from '../types';
 
 // Sample Test Cases
 export const testCases: TestCase[] = [
@@ -59,7 +60,7 @@ export const testCases: TestCase[] = [
 ];
 
 // API mocks for fetching test cases
-export const fetchTestCases = () => {
+export const fetchTestCases = (): Promise<ApiResponse<TestCase[]>> => {
   return Promise.resolve({
     success: true,
     message: 'Test cases retrieved successfully',
@@ -68,7 +69,7 @@ export const fetchTestCases = () => {
   });
 };
 
-export const fetchTestCaseById = (id: string) => {
+export const fetchTestCaseById = (id: string): Promise<ApiResponse<TestCase | null>> => {
   const testCase = testCases.find(tc => tc.id === id);
   if (!testCase) {
     return Promise.resolve({
@@ -89,7 +90,7 @@ export const fetchTestCaseById = (id: string) => {
 // API mocks for managing test cases
 export const createTestCase = async (
   testCase: Omit<TestCase, 'id' | 'createdAt' | 'updatedAt'>
-) => {
+): Promise<ApiResponse<TestCase>> => {
   await delay(500);
   const newTestCase: TestCase = {
     ...testCase,
@@ -109,7 +110,7 @@ export const createTestCase = async (
 export const updateTestCase = async (
   id: string,
   updates: Partial<Omit<TestCase, 'id' | 'createdAt' | 'updatedAt'>>
-) => {
+): Promise<ApiResponse<TestCase>> => {
   await delay(500);
   const testCaseIndex = testCases.findIndex(tc => tc.id === id);
   if (testCaseIndex === -1) {
@@ -135,7 +136,7 @@ export const updateTestCase = async (
   });
 };
 
-export const deleteTestCase = async (id: string) => {
+export const deleteTestCase = async (id: string): Promise<ApiResponse<boolean>> => {
   await delay(500);
   const testCaseIndex = testCases.findIndex(tc => tc.id === id);
   if (testCaseIndex === -1) {

@@ -37,7 +37,7 @@ export const useTestCaseManagement = () => {
       } else {
         toast({
           title: 'Error',
-          description: result.error || 'Failed to delete test case.',
+          description: result.message || 'Failed to delete test case.',
           variant: 'destructive',
         });
       }

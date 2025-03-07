@@ -201,6 +201,7 @@ export interface ApiResponse<T = any> {
   data?: T;
 }
 
+// PaginatedResponse
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;
