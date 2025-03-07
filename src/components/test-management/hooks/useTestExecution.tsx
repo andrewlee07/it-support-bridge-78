@@ -61,9 +61,9 @@ export const useTestExecution = (testCycleId?: string) => {
         execStatus = 'passed';
       } else if (status === 'fail' || status === 'failed') {
         execStatus = 'failed';
-      } else if (status === 'in_progress' || status === 'in-progress') {
-        // Handle in-progress status - map to appropriate backend value
-        execStatus = 'blocked'; // Defaulting to blocked for in-progress
+      } else if (status === 'in_progress' || status === 'in-progress' || status === 'not-run') {
+        // Handle both in_progress and in-progress status formats
+        execStatus = 'blocked'; // Defaulting to blocked for in-progress/not-run
       }
 
       // Call the executeTest function with the required parameters
