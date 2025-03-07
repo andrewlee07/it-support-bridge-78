@@ -1,3 +1,4 @@
+
 // User types
 export type UserRole = 'admin' | 'it' | 'user';
 
@@ -120,11 +121,42 @@ export interface Asset {
   audit: AuditEntry[];
 }
 
+// Release management types
+export type ReleaseStatus = 'Planned' | 'In Progress' | 'Deployed' | 'Cancelled';
+export type ReleaseType = 'major' | 'minor' | 'patch' | 'emergency';
+
+export interface Release {
+  id: string;
+  title: string;
+  version: string;
+  type: ReleaseType;
+  description: string;
+  plannedDate: Date;
+  status: ReleaseStatus;
+  owner: string;
+  createdAt: Date;
+  updatedAt: Date;
+  approvalStatus: 'pending' | 'approved' | 'rejected';
+  approvedBy?: string;
+  approvedAt?: Date;
+  items: ReleaseItem[];
+  audit: AuditEntry[];
+}
+
+export interface ReleaseItem {
+  id: string;
+  releaseId: string;
+  itemId: string;
+  itemType: 'change' | 'incident' | 'asset';
+  addedAt: Date;
+  addedBy: string;
+}
+
 // Audit trail
 export interface AuditEntry {
   id: string;
   entityId: string;
-  entityType: 'ticket' | 'asset' | 'user' | 'change';
+  entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release';
   message: string;
   performedBy: string;
   timestamp: Date;

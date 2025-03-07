@@ -20,6 +20,9 @@ import NewChangeRequest from "./pages/NewChangeRequest";
 import Assets from "./pages/Assets";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
+import Releases from "./pages/Releases";
+import NewRelease from "./pages/NewRelease";
+import ReleaseDetail from "./pages/ReleaseDetail";
 import DropdownConfigurations from "./pages/settings/DropdownConfigurations";
 import RiskAssessmentSettings from "./pages/settings/RiskAssessmentSettings";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -54,6 +57,9 @@ const App = () => {
                     <Route element={<ProtectedRoute allowedRoles={['admin', 'it']} />}>
                       <Route path="/changes" element={<Changes />} />
                       <Route path="/changes/new" element={<NewChangeRequest />} />
+                      <Route path="/releases" element={<Releases />} />
+                      <Route path="/releases/new" element={<NewRelease />} />
+                      <Route path="/releases/:id" element={<ReleaseDetail />} />
                       <Route path="/assets" element={<Assets />} />
                       <Route path="/reports" element={<Reports />} />
                     </Route>

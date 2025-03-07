@@ -11,7 +11,8 @@ import {
   HelpCircle,
   Shield,
   GaugeCircle,
-  ListTodo
+  ListTodo,
+  Package
 } from 'lucide-react';
 import { NavItem } from './types';
 
@@ -21,6 +22,7 @@ export const navigationItems: NavItem[] = [
   { name: 'Incidents', path: '/incidents', icon: AlertCircle, allowedRoles: ['admin', 'it', 'user'] },
   { name: 'Service Requests', path: '/service-requests', icon: FileText, allowedRoles: ['admin', 'it', 'user'] },
   { name: 'Change Management', path: '/changes', icon: ClipboardList, allowedRoles: ['admin', 'it'] },
+  { name: 'Release Management', path: '/releases', icon: Package, allowedRoles: ['admin', 'it'] },
   { name: 'Asset Management', path: '/assets', icon: Monitor, allowedRoles: ['admin', 'it'] },
   { name: 'Users', path: '/users', icon: Users, allowedRoles: ['admin'] },
   { name: 'Reports', path: '/reports', icon: BarChart4, allowedRoles: ['admin', 'it'] },
