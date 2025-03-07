@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { RiskAssessmentQuestion, RiskAssessmentQuestionOption } from '@/utils/types';
@@ -40,6 +40,7 @@ const RiskAssessmentQuestionForm: React.FC<RiskAssessmentQuestionFormProps> = ({
   onCancel,
   isSubmitting = false,
 }) => {
+  // Initialize the form with React Hook Form
   const form = useForm<QuestionFormValues>({
     resolver: zodResolver(questionFormSchema),
     defaultValues: initialData ? {
@@ -59,8 +60,10 @@ const RiskAssessmentQuestionForm: React.FC<RiskAssessmentQuestionFormProps> = ({
     },
   });
 
-  const { fields: answerFields, append, remove } = form.useFieldArray({
-    name: "answers",
+  // Use useFieldArray to handle dynamic fields
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "answers"
   });
 
   const handleSubmit = (values: QuestionFormValues) => {

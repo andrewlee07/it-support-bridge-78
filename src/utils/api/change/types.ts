@@ -34,3 +34,13 @@ export const calculateRiskLevelFromThresholds = (score: number, thresholds: Risk
 export const generateThresholdId = (): string => {
   return `threshold-${Date.now()}`;
 };
+
+// Helper function to ensure a threshold has an ID
+export const ensureThresholdId = (threshold: Partial<RiskThreshold> & { level: RiskLevel, minScore: number, maxScore: number }): RiskThreshold => {
+  return {
+    id: threshold.id || generateThresholdId(),
+    level: threshold.level,
+    minScore: threshold.minScore,
+    maxScore: threshold.maxScore
+  };
+};

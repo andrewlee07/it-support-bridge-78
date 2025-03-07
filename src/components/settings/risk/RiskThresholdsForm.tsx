@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ensureThresholdId } from '@/utils/api/change';
 
 // Schema for the thresholds form
 const thresholdsFormSchema = z.object({
@@ -48,9 +49,9 @@ const RiskThresholdsForm: React.FC<RiskThresholdsFormProps> = ({
   isSubmitting = false,
 }) => {
   // Find the thresholds for each risk level
-  const lowThreshold = thresholds.find(t => t.level === 'low') || { minScore: 1, maxScore: 2 };
-  const mediumThreshold = thresholds.find(t => t.level === 'medium') || { minScore: 2, maxScore: 4 };
-  const highThreshold = thresholds.find(t => t.level === 'high') || { minScore: 4, maxScore: 5 };
+  const lowThreshold = thresholds.find(t => t.level === 'low') || { id: '', minScore: 1, maxScore: 2, level: 'low' as const };
+  const mediumThreshold = thresholds.find(t => t.level === 'medium') || { id: '', minScore: 2, maxScore: 4, level: 'medium' as const };
+  const highThreshold = thresholds.find(t => t.level === 'high') || { id: '', minScore: 4, maxScore: 5, level: 'high' as const };
 
   const form = useForm<ThresholdsFormValues>({
     resolver: zodResolver(thresholdsFormSchema),
@@ -66,9 +67,24 @@ const RiskThresholdsForm: React.FC<RiskThresholdsFormProps> = ({
 
   const handleSubmit = (values: ThresholdsFormValues) => {
     const updatedThresholds: RiskThreshold[] = [
-      { ...lowThreshold, level: 'low', minScore: values.lowMin, maxScore: values.lowMax },
-      { ...mediumThreshold, level: 'medium', minScore: values.mediumMin, maxScore: values.mediumMax },
-      { ...highThreshold, level: 'high', minScore: values.highMin, maxScore: values.highMax },
+      ensureThresholdId({ 
+        id: lowThreshold.id, 
+        level: 'low', 
+        minScore: values.lowMin, 
+        maxScore: values.lowMax 
+      }),
+      ensureThresholdId({ 
+        id: mediumThreshold.id, 
+        level: 'medium', 
+        minScore: values.mediumMin, 
+        maxScore: values.mediumMax 
+      }),
+      ensureThresholdId({ 
+        id: highThreshold.id, 
+        level: 'high', 
+        minScore: values.highMin, 
+        maxScore: values.highMax 
+      }),
     ];
     
     onSubmit(updatedThresholds);

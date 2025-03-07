@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { RiskThreshold } from '@/utils/types';
-import { ensureThresholdId } from '@/utils/formHelpers';
+import { ensureThresholdId } from '@/utils/api/change';
 
 // Schema for risk thresholds
 const thresholdSchema = z.object({
@@ -34,9 +34,9 @@ export type ThresholdFormValues = z.infer<typeof thresholdSchema>;
 
 export const useRiskThresholdsForm = (thresholds: RiskThreshold[]) => {
   // Find thresholds by level
-  const lowThreshold = thresholds.find(t => t.level === 'low') || { level: 'low', minScore: 1, maxScore: 2 };
-  const mediumThreshold = thresholds.find(t => t.level === 'medium') || { level: 'medium', minScore: 2, maxScore: 4 };
-  const highThreshold = thresholds.find(t => t.level === 'high') || { level: 'high', minScore: 4, maxScore: 5 };
+  const lowThreshold = thresholds.find(t => t.level === 'low') || { id: '', level: 'low' as const, minScore: 1, maxScore: 2 };
+  const mediumThreshold = thresholds.find(t => t.level === 'medium') || { id: '', level: 'medium' as const, minScore: 2, maxScore: 4 };
+  const highThreshold = thresholds.find(t => t.level === 'high') || { id: '', level: 'high' as const, minScore: 4, maxScore: 5 };
 
   // Initialize form with default values
   const form = useForm<ThresholdFormValues>({
