@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBugs, updateBug } from '@/utils/mockData/testData';
@@ -70,18 +69,26 @@ const SeverityBadge = ({ severity }: { severity: BugSeverity }) => {
   );
 };
 
-const BugList: React.FC = () => {
+interface BugListProps {
+  bugs?: Bug[];
+}
+
+const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [selectedBug, setSelectedBug] = useState<Bug | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-  // Fetch bugs
+  // Fetch bugs - only if initialBugs is not provided
   const { data: bugsResponse, isLoading, isError, refetch } = useQuery({
     queryKey: ['bugs'],
     queryFn: fetchBugs,
+    enabled: !initialBugs,
   });
+
+  // Use either the provided bugs or the fetched bugs
+  const displayBugs = initialBugs || bugsResponse?.data || [];
 
   // Quick status updates
   const handleStatusUpdate = async (id: string, status: BugStatus) => {
@@ -127,7 +134,7 @@ const BugList: React.FC = () => {
     refetch();
   };
 
-  if (isError) {
+  if (isError && !initialBugs) {
     return (
       <Card className="w-full">
         <CardContent className="pt-6">
@@ -146,7 +153,7 @@ const BugList: React.FC = () => {
         <CardTitle>Bugs</CardTitle>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading && !initialBugs ? (
           // Loading skeleton
           <div className="space-y-2">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -169,7 +176,7 @@ const BugList: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {bugsResponse?.data?.length === 0 ? (
+                {displayBugs.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center h-32">
                       <div className="flex flex-col items-center justify-center">
@@ -179,7 +186,7 @@ const BugList: React.FC = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  bugsResponse?.data?.map((bug) => (
+                  displayBugs.map((bug) => (
                     <TableRow key={bug.id}>
                       <TableCell className="font-medium">
                         <div 

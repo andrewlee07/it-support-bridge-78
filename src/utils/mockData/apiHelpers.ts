@@ -1,16 +1,24 @@
 
 import { ApiResponse, PaginatedResponse } from '../types';
 
-// Simulate API responses
-export const simulateApiResponse = <T>(data: T, delay: number = 500): Promise<ApiResponse<T>> => {
+// Simulate API responses with optional status code
+export const simulateApiResponse = <T>(data: T, error?: string, statusCode: number = 200): Promise<ApiResponse<T>> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve({
-        success: true,
-        data,
-        message: 'Operation successful'
-      });
-    }, delay);
+      if (error) {
+        resolve({
+          success: false,
+          error,
+          message: error
+        });
+      } else {
+        resolve({
+          success: true,
+          data,
+          message: 'Operation successful'
+        });
+      }
+    }, 500);
   });
 };
 
