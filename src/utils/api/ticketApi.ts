@@ -1,14 +1,21 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { Ticket, TicketComment, TicketPriority, TicketStatus, TicketType } from '../types';
+import { Ticket, TicketStatus, TicketPriority, TicketType, ApiResponse } from '../types';
 import { simulateApiResponse } from '../mockData/apiHelpers';
-import { users } from '../mockData';
+
+// Define the TicketComment interface since it's missing from the types file
+interface TicketComment {
+  id: string;
+  content: string;
+  authorId: string;
+  createdAt: Date;
+}
 
 // Mock data for conversation history
 export const mockConversationHistory: Record<string, TicketComment[]> = {};
 
 // Create a new ticket
-export const createTicket = async (ticketData: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt' | 'assignee' | 'comments'>): Promise<{ success: boolean; data?: Ticket; error?: string }> => {
+export const createTicket = async (ticketData: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt' | 'audit'>): Promise<{ success: boolean; data?: Ticket; error?: string }> => {
   try {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -21,20 +28,16 @@ export const createTicket = async (ticketData: Omit<Ticket, 'id' | 'createdAt' |
     const newTicket: Ticket = {
       id,
       ...ticketData,
-      assignee: null, // Initially unassigned
-      status: 'open',
+      assignedTo: ticketData.assignedTo || undefined,
       createdAt: now,
       updatedAt: now,
-      comments: []
+      audit: []
     };
     
-    // Initialize conversation history for this ticket
-    mockConversationHistory[id] = [];
-    
-    return simulateApiResponse({ success: true, data: newTicket }, '200');
+    return { success: true, data: newTicket };
   } catch (error) {
     console.error('Error creating ticket:', error);
-    return simulateApiResponse({ success: false, error: 'Failed to create ticket. Please try again later.' }, '500');
+    return { success: false, error: 'Failed to create ticket. Please try again later.' };
   }
 };
 
@@ -46,10 +49,10 @@ export const fetchTickets = async (): Promise<{ success: boolean; data?: Ticket[
     
     // For now, return empty array as we don't have persistent storage
     // In a real application, this would fetch from an API or database
-    return simulateApiResponse({ success: true, data: [] }, '200');
+    return { success: true, data: [] };
   } catch (error) {
     console.error('Error fetching tickets:', error);
-    return simulateApiResponse({ success: false, error: 'Failed to fetch tickets. Please try again later.' }, '500');
+    return { success: false, error: 'Failed to fetch tickets. Please try again later.' };
   }
 };
 
@@ -61,10 +64,10 @@ export const fetchTicketById = async (id: string): Promise<{ success: boolean; d
     
     // In a real application, this would fetch from an API or database
     // For now, return error as we don't have persistent storage
-    return simulateApiResponse({ success: false, error: 'Ticket not found' }, '404');
+    return { success: false, error: 'Ticket not found' };
   } catch (error) {
     console.error('Error fetching ticket:', error);
-    return simulateApiResponse({ success: false, error: 'Failed to fetch ticket. Please try again later.' }, '500');
+    return { success: false, error: 'Failed to fetch ticket. Please try again later.' };
   }
 };
 
@@ -83,17 +86,18 @@ export const updateTicket = async (id: string, ticketData: Partial<Ticket>): Pro
       type: ticketData.type as TicketType || 'incident',
       priority: ticketData.priority as TicketPriority || 'medium',
       status: ticketData.status as TicketStatus || 'open',
-      requester: ticketData.requester || 'unknown',
-      assignee: ticketData.assignee || null,
+      createdBy: ticketData.createdBy || 'unknown',
+      assignedTo: ticketData.assignedTo,
       createdAt: new Date(),
       updatedAt: new Date(),
-      comments: []
+      category: ticketData.category || 'other',
+      audit: []
     };
     
-    return simulateApiResponse({ success: true, data: updatedTicket }, '200');
+    return { success: true, data: updatedTicket };
   } catch (error) {
     console.error('Error updating ticket:', error);
-    return simulateApiResponse({ success: false, error: 'Failed to update ticket. Please try again later.' }, '500');
+    return { success: false, error: 'Failed to update ticket. Please try again later.' };
   }
 };
 
@@ -118,10 +122,10 @@ export const addComment = async (ticketId: string, commentData: Omit<TicketComme
       mockConversationHistory[ticketId] = [newComment];
     }
     
-    return simulateApiResponse({ success: true, data: newComment }, '200');
+    return { success: true, data: newComment };
   } catch (error) {
     console.error('Error adding comment:', error);
-    return simulateApiResponse({ success: false, error: 'Failed to add comment. Please try again later.' }, '500');
+    return { success: false, error: 'Failed to add comment. Please try again later.' };
   }
 };
 
@@ -134,10 +138,10 @@ export const fetchComments = async (ticketId: string): Promise<{ success: boolea
     // Return comments from conversation history if it exists
     const comments = mockConversationHistory[ticketId] || [];
     
-    return simulateApiResponse({ success: true, data: comments }, '200');
+    return { success: true, data: comments };
   } catch (error) {
     console.error('Error fetching comments:', error);
-    return simulateApiResponse({ success: false, error: 'Failed to fetch comments. Please try again later.' }, '500');
+    return { success: false, error: 'Failed to fetch comments. Please try again later.' };
   }
 };
 
@@ -148,10 +152,10 @@ export const assignTicket = async (ticketId: string, userId: string): Promise<{ 
     await new Promise(resolve => setTimeout(resolve, 800));
     
     // In a real application, this would update in an API or database
-    return simulateApiResponse({ success: true }, '200');
+    return { success: true };
   } catch (error) {
     console.error('Error assigning ticket:', error);
-    return simulateApiResponse({ success: false, error: 'Failed to assign ticket. Please try again later.' }, '500');
+    return { success: false, error: 'Failed to assign ticket. Please try again later.' };
   }
 };
 
@@ -162,9 +166,21 @@ export const changeTicketStatus = async (ticketId: string, status: TicketStatus)
     await new Promise(resolve => setTimeout(resolve, 800));
     
     // In a real application, this would update in an API or database
-    return simulateApiResponse({ success: true }, '200');
+    return { success: true };
   } catch (error) {
     console.error('Error changing ticket status:', error);
-    return simulateApiResponse({ success: false, error: 'Failed to change ticket status. Please try again later.' }, '500');
+    return { success: false, error: 'Failed to change ticket status. Please try again later.' };
   }
+};
+
+// Export as a namespace to fix the import in index.ts
+export const ticketApi = {
+  createTicket,
+  fetchTickets,
+  fetchTicketById,
+  updateTicket,
+  addComment,
+  fetchComments,
+  assignTicket,
+  changeTicketStatus
 };
