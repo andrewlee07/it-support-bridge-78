@@ -1,17 +1,20 @@
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-// Fix the imports to use default imports instead of named imports
 import RiskThresholdsForm from '@/components/settings/risk/RiskThresholdsForm';
 import RiskAssessmentQuestionForm from '@/components/settings/risk/RiskAssessmentQuestionForm';
 import { changeApi } from '@/utils/api/changeApi';
 import PageTransition from '@/components/shared/PageTransition';
+import { RiskAssessmentQuestion, RiskThreshold } from '@/utils/types';
+import { useToast } from '@/hooks/use-toast';
 
 const RiskAssessmentSettings = () => {
+  const { toast } = useToast();
+
   // Fetch risk assessment questions
-  const { data: questionsData, isLoading: isLoadingQuestions } = useQuery({
+  const { data: questionsData, isLoading: isLoadingQuestions, refetch: refetchQuestions } = useQuery({
     queryKey: ['riskQuestions'],
     queryFn: async () => {
       const response = await changeApi.getRiskAssessmentQuestions();
@@ -20,13 +23,63 @@ const RiskAssessmentSettings = () => {
   });
 
   // Fetch risk thresholds
-  const { data: thresholdsData, isLoading: isLoadingThresholds } = useQuery({
+  const { data: thresholdsData, isLoading: isLoadingThresholds, refetch: refetchThresholds } = useQuery({
     queryKey: ['riskThresholds'],
     queryFn: async () => {
       const response = await changeApi.getRiskThresholds();
       return response.data;
     }
   });
+
+  // Mutation for saving a question
+  const questionMutation = useMutation({
+    mutationFn: async (questionData: RiskAssessmentQuestion) => {
+      const response = await changeApi.saveRiskAssessmentQuestion(questionData);
+      return response.data;
+    },
+    onSuccess: () => {
+      toast({ 
+        title: "Question saved",
+        description: "Risk assessment question has been saved successfully" 
+      });
+      refetchQuestions();
+    },
+    onError: () => {
+      toast({ 
+        title: "Error saving question",
+        description: "There was a problem saving the risk assessment question",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Mutation for saving thresholds
+  const thresholdMutation = useMutation({
+    mutationFn: async (thresholdData: RiskThreshold[]) => {
+      const response = await changeApi.saveRiskThresholds(thresholdData);
+      return response.data;
+    },
+    onSuccess: () => {
+      toast({ 
+        title: "Thresholds saved",
+        description: "Risk thresholds have been saved successfully" 
+      });
+      refetchThresholds();
+    },
+    onError: () => {
+      toast({ 
+        title: "Error saving thresholds",
+        description: "There was a problem saving the risk thresholds",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Dummy functions for handling empty forms
+  const handleCancelQuestion = () => {
+    // In a real app, would redirect to questions list or clear form
+    console.log('Question edit cancelled');
+  };
 
   return (
     <PageTransition>
@@ -59,7 +112,12 @@ const RiskAssessmentSettings = () => {
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
                   ) : (
-                    <RiskAssessmentQuestionForm questions={questionsData || []} />
+                    <RiskAssessmentQuestionForm
+                      initialData={undefined}
+                      onSubmit={(data) => questionMutation.mutate(data)}
+                      onCancel={handleCancelQuestion}
+                      isSubmitting={questionMutation.isPending}
+                    />
                   )}
                 </CardContent>
               </Card>
@@ -79,7 +137,11 @@ const RiskAssessmentSettings = () => {
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
                   ) : (
-                    <RiskThresholdsForm thresholds={thresholdsData || []} />
+                    <RiskThresholdsForm
+                      thresholds={thresholdsData || []}
+                      onSubmit={(data) => thresholdMutation.mutate(data)}
+                      isSubmitting={thresholdMutation.isPending}
+                    />
                   )}
                 </CardContent>
               </Card>
