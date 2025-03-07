@@ -1,196 +1,170 @@
-import { 
-  Ticket, 
-  TicketFilter, 
-  TicketType, 
-  ApiResponse, 
-  PaginatedResponse 
-} from '../types';
-import { 
-  mockTickets, 
-  getTicketById, 
-  simulateApiResponse, 
-  simulatePaginatedResponse, 
-  mockConversationHistory,
-  delay,
-  uuidv4,
-  CommentData
-} from '../mockData';
 
-// Ticket API
-export const ticketApi = {
-  // Get all tickets with optional filtering and pagination
-  getTickets: async (
-    filter?: TicketFilter,
-    page: number = 1,
-    limit: number = 10
-  ): Promise<PaginatedResponse<Ticket>> => {
-    let filteredTickets = [...mockTickets];
+import { v4 as uuidv4 } from 'uuid';
+import { Ticket, TicketComment, TicketPriority, TicketStatus, TicketType } from '../types';
+import { simulateApiResponse } from '../mockData/apiHelpers';
+import { users } from '../mockData';
+
+// Mock data for conversation history
+export const mockConversationHistory: Record<string, TicketComment[]> = {};
+
+// Create a new ticket
+export const createTicket = async (ticketData: Omit<Ticket, 'id' | 'createdAt' | 'updatedAt' | 'assignee' | 'comments'>): Promise<{ success: boolean; data?: Ticket; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
     
-    if (filter) {
-      // Apply filters
-      if (filter.type && filter.type.length > 0) {
-        filteredTickets = filteredTickets.filter(ticket => 
-          filter.type?.includes(ticket.type)
-        );
-      }
-      
-      if (filter.status && filter.status.length > 0) {
-        filteredTickets = filteredTickets.filter(ticket => 
-          filter.status?.includes(ticket.status)
-        );
-      }
-      
-      if (filter.priority && filter.priority.length > 0) {
-        filteredTickets = filteredTickets.filter(ticket => 
-          filter.priority?.includes(ticket.priority)
-        );
-      }
-      
-      if (filter.category && filter.category.length > 0) {
-        filteredTickets = filteredTickets.filter(ticket => 
-          filter.category?.includes(ticket.category)
-        );
-      }
-      
-      if (filter.assignedTo) {
-        filteredTickets = filteredTickets.filter(ticket => 
-          ticket.assignedTo === filter.assignedTo
-        );
-      }
-      
-      if (filter.createdBy) {
-        filteredTickets = filteredTickets.filter(ticket => 
-          ticket.createdBy === filter.createdBy
-        );
-      }
-      
-      if (filter.dateFrom) {
-        filteredTickets = filteredTickets.filter(ticket => 
-          new Date(ticket.createdAt) >= new Date(filter.dateFrom!)
-        );
-      }
-      
-      if (filter.dateTo) {
-        filteredTickets = filteredTickets.filter(ticket => 
-          new Date(ticket.createdAt) <= new Date(filter.dateTo!)
-        );
-      }
-      
-      if (filter.searchQuery) {
-        const query = filter.searchQuery.toLowerCase();
-        filteredTickets = filteredTickets.filter(ticket => 
-          ticket.title.toLowerCase().includes(query) || 
-          ticket.description.toLowerCase().includes(query)
-        );
-      }
-    }
+    // Generate ID and dates
+    const id = uuidv4();
+    const now = new Date();
     
-    // Sort by createdAt (most recent first)
-    filteredTickets.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    
-    return simulatePaginatedResponse(filteredTickets, page, limit);
-  },
-  
-  // Get tickets by type
-  getTicketsByType: async (
-    type: TicketType,
-    page: number = 1,
-    limit: number = 10
-  ): Promise<PaginatedResponse<Ticket>> => {
-    const typeTickets = mockTickets.filter(ticket => ticket.type === type);
-    return simulatePaginatedResponse(typeTickets, page, limit);
-  },
-  
-  // Get a specific ticket by ID
-  getTicketById: async (id: string): Promise<ApiResponse<Ticket>> => {
-    const ticket = getTicketById(id);
-    
-    if (!ticket) {
-      return {
-        success: false,
-        error: 'Ticket not found',
-      };
-    }
-    
-    return simulateApiResponse(ticket);
-  },
-  
-  // Create a new ticket
-  createTicket: async (ticketData: Partial<Ticket>): Promise<ApiResponse<Ticket>> => {
-    // In a real API, this would validate and save to a database
+    // Create new ticket object
     const newTicket: Ticket = {
-      id: `ticket-${mockTickets.length + 1}`,
-      title: ticketData.title || '',
+      id,
+      ...ticketData,
+      assignee: null, // Initially unassigned
+      status: 'open',
+      createdAt: now,
+      updatedAt: now,
+      comments: []
+    };
+    
+    // Initialize conversation history for this ticket
+    mockConversationHistory[id] = [];
+    
+    return simulateApiResponse({ success: true, data: newTicket }, '200');
+  } catch (error) {
+    console.error('Error creating ticket:', error);
+    return simulateApiResponse({ success: false, error: 'Failed to create ticket. Please try again later.' }, '500');
+  }
+};
+
+// Fetch all tickets
+export const fetchTickets = async (): Promise<{ success: boolean; data?: Ticket[]; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // For now, return empty array as we don't have persistent storage
+    // In a real application, this would fetch from an API or database
+    return simulateApiResponse({ success: true, data: [] }, '200');
+  } catch (error) {
+    console.error('Error fetching tickets:', error);
+    return simulateApiResponse({ success: false, error: 'Failed to fetch tickets. Please try again later.' }, '500');
+  }
+};
+
+// Fetch a single ticket by ID
+export const fetchTicketById = async (id: string): Promise<{ success: boolean; data?: Ticket; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // In a real application, this would fetch from an API or database
+    // For now, return error as we don't have persistent storage
+    return simulateApiResponse({ success: false, error: 'Ticket not found' }, '404');
+  } catch (error) {
+    console.error('Error fetching ticket:', error);
+    return simulateApiResponse({ success: false, error: 'Failed to fetch ticket. Please try again later.' }, '500');
+  }
+};
+
+// Update ticket
+export const updateTicket = async (id: string, ticketData: Partial<Ticket>): Promise<{ success: boolean; data?: Ticket; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // In a real application, this would update in an API or database
+    // For now, return success but the data won't persist
+    const updatedTicket: Ticket = {
+      id,
+      title: ticketData.title || 'Unknown',
       description: ticketData.description || '',
-      status: ticketData.status || 'open',
-      priority: ticketData.priority || 'medium',
-      category: ticketData.category || 'other',
-      type: ticketData.type || 'incident',
-      createdBy: ticketData.createdBy || 'user-1', // Default to first user if not specified
+      type: ticketData.type as TicketType || 'incident',
+      priority: ticketData.priority as TicketPriority || 'medium',
+      status: ticketData.status as TicketStatus || 'open',
+      requester: ticketData.requester || 'unknown',
+      assignee: ticketData.assignee || null,
       createdAt: new Date(),
       updatedAt: new Date(),
-      audit: [
-        {
-          id: `audit-ticket-${mockTickets.length + 1}-1`,
-          entityId: `ticket-${mockTickets.length + 1}`,
-          entityType: 'ticket',
-          message: 'Ticket created',
-          performedBy: ticketData.createdBy || 'user-1',
-          timestamp: new Date(),
-        }
-      ],
+      comments: []
     };
     
-    // In a real implementation, we would add the ticket to the database
-    // For now, we'll just return the new ticket
-    return simulateApiResponse(newTicket, 1000);
-  },
-  
-  // Update an existing ticket
-  updateTicket: async (
-    id: string, 
-    ticketData: Partial<Ticket>
-  ): Promise<ApiResponse<Ticket>> => {
-    const ticket = getTicketById(id);
+    return simulateApiResponse({ success: true, data: updatedTicket }, '200');
+  } catch (error) {
+    console.error('Error updating ticket:', error);
+    return simulateApiResponse({ success: false, error: 'Failed to update ticket. Please try again later.' }, '500');
+  }
+};
+
+// Add comment to ticket
+export const addComment = async (ticketId: string, commentData: Omit<TicketComment, 'id' | 'createdAt'>): Promise<{ success: boolean; data?: TicketComment; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
     
-    if (!ticket) {
-      return {
-        success: false,
-        error: 'Ticket not found',
-      };
-    }
-    
-    // In a real API, this would update the database record
-    const updatedTicket: Ticket = {
-      ...ticket,
-      ...ticketData,
-      updatedAt: new Date(),
-    };
-    
-    return simulateApiResponse(updatedTicket, 1000);
-  },
-  
-  // Get conversation history for a ticket
-  getConversationHistory: (ticketId: string) => {
-    return simulateApiResponse(mockConversationHistory[ticketId] || [], undefined);
-  },
-  
-  // Create a comment for a ticket
-  createComment: async (ticketId: string, commentData: CommentData) => {
-    await delay(500);
-    const newComment = {
+    // Create new comment
+    const newComment: TicketComment = {
       id: uuidv4(),
       ...commentData,
-      createdAt: new Date(),
+      createdAt: new Date()
     };
     
-    if (!mockConversationHistory[ticketId]) {
-      mockConversationHistory[ticketId] = [];
+    // Add to conversation history if it exists
+    if (mockConversationHistory[ticketId]) {
+      mockConversationHistory[ticketId].push(newComment);
+    } else {
+      // Initialize if doesn't exist
+      mockConversationHistory[ticketId] = [newComment];
     }
     
-    mockConversationHistory[ticketId].push(newComment);
-    return simulateApiResponse(newComment, undefined);
-  },
+    return simulateApiResponse({ success: true, data: newComment }, '200');
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    return simulateApiResponse({ success: false, error: 'Failed to add comment. Please try again later.' }, '500');
+  }
+};
+
+// Fetch comments for a ticket
+export const fetchComments = async (ticketId: string): Promise<{ success: boolean; data?: TicketComment[]; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Return comments from conversation history if it exists
+    const comments = mockConversationHistory[ticketId] || [];
+    
+    return simulateApiResponse({ success: true, data: comments }, '200');
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    return simulateApiResponse({ success: false, error: 'Failed to fetch comments. Please try again later.' }, '500');
+  }
+};
+
+// Assign ticket
+export const assignTicket = async (ticketId: string, userId: string): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // In a real application, this would update in an API or database
+    return simulateApiResponse({ success: true }, '200');
+  } catch (error) {
+    console.error('Error assigning ticket:', error);
+    return simulateApiResponse({ success: false, error: 'Failed to assign ticket. Please try again later.' }, '500');
+  }
+};
+
+// Change ticket status
+export const changeTicketStatus = async (ticketId: string, status: TicketStatus): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // In a real application, this would update in an API or database
+    return simulateApiResponse({ success: true }, '200');
+  } catch (error) {
+    console.error('Error changing ticket status:', error);
+    return simulateApiResponse({ success: false, error: 'Failed to change ticket status. Please try again later.' }, '500');
+  }
 };
