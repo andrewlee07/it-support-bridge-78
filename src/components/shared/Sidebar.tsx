@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -56,6 +55,8 @@ const Sidebar = () => {
     { name: 'Asset Management', path: '/assets', icon: Monitor, allowedRoles: ['admin', 'it'] },
     { name: 'Users', path: '/users', icon: Users, allowedRoles: ['admin'] },
     { name: 'Reports', path: '/reports', icon: BarChart4, allowedRoles: ['admin', 'it'] },
+    // Add Risk Assessment directly to the main navigation
+    { name: 'Risk Assessment', path: '/settings/risk-assessment', icon: Shield, allowedRoles: ['admin'] },
   ];
   
   const bottomNavigationItems: NavItem[] = [

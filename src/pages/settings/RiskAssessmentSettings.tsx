@@ -3,8 +3,9 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RiskThresholdsForm } from '@/components/settings/risk/RiskThresholdsForm';
-import { RiskAssessmentQuestionForm } from '@/components/settings/risk/RiskAssessmentQuestionForm';
+// Fix the imports to use default imports instead of named imports
+import RiskThresholdsForm from '@/components/settings/risk/RiskThresholdsForm';
+import RiskAssessmentQuestionForm from '@/components/settings/risk/RiskAssessmentQuestionForm';
 import { changeApi } from '@/utils/api/changeApi';
 import PageTransition from '@/components/shared/PageTransition';
 
