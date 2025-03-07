@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchTestStats, fetchBugs } from '@/utils/mockData/testData';
+import { fetchTestStats, fetchBugs, fetchTestCases } from '@/utils/mockData/testData';
 import {
   Card,
   CardContent,
@@ -15,8 +15,13 @@ import {
   Bug,
   BarChart4,
 } from 'lucide-react';
+import { TestStatus } from '@/utils/types/testTypes';
+import TestStatusChart from './TestStatusChart';
+import { SeverityBadge, StatusBadge } from '../ui/BugBadges';
 
 const TestDashboard = () => {
+  const [statusFilter, setStatusFilter] = useState<TestStatus | null>(null);
+
   // Fetch test stats
   const { data: testStatsData, isLoading: isLoadingTestStats } = useQuery({
     queryKey: ['testStats'],
@@ -28,6 +33,17 @@ const TestDashboard = () => {
     queryKey: ['bugs'],
     queryFn: fetchBugs,
   });
+
+  // Fetch test cases (we'll use this for filtered test cases by status)
+  const { data: testCasesData, isLoading: isLoadingTestCases } = useQuery({
+    queryKey: ['testCases', statusFilter],
+    queryFn: () => fetchTestCases(statusFilter),
+  });
+
+  // Filter handler for the status chart
+  const handleStatusFilter = (status: TestStatus | null) => {
+    setStatusFilter(status);
+  };
 
   return (
     <div className="space-y-4">
@@ -113,41 +129,23 @@ const TestDashboard = () => {
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         {/* Test Status Chart Card */}
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Test Status</CardTitle>
-            <CardDescription>Distribution of test case statuses</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-60 flex items-center justify-center">
-              {isLoadingTestStats ? (
+        <div className="col-span-1">
+          {isLoadingTestStats ? (
+            <Card>
+              <CardContent className="h-[350px] flex items-center justify-center">
                 <div className="animate-pulse">Loading chart data...</div>
-              ) : (
-                <div className="text-center">
-                  <p>Chart will be implemented here</p>
-                  <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                      <span>Passed: {testStatsData?.data?.passedTests || 0}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                      <span>Failed: {testStatsData?.data?.failedTests || 0}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-                      <span>Blocked: {testStatsData?.data?.blockedTests || 0}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-gray-300"></div>
-                      <span>Not Run: {testStatsData?.data?.notRunTests || 0}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          ) : (
+            <TestStatusChart
+              passedTests={testStatsData?.data?.passedTests || 0}
+              failedTests={testStatsData?.data?.failedTests || 0}
+              blockedTests={testStatsData?.data?.blockedTests || 0}
+              notRunTests={testStatsData?.data?.notRunTests || 0}
+              onFilterByStatus={handleStatusFilter}
+            />
+          )}
+        </div>
 
         {/* Recent Bugs Card */}
         <Card className="col-span-1">
@@ -172,12 +170,8 @@ const TestDashboard = () => {
                     <div>
                       <h4 className="text-sm font-medium">{bug.title}</h4>
                       <div className="flex mt-1 space-x-2">
-                        <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800">
-                          {bug.severity}
-                        </span>
-                        <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-                          {bug.status}
-                        </span>
+                        <SeverityBadge severity={bug.severity} />
+                        <StatusBadge status={bug.status} />
                       </div>
                     </div>
                   </div>
@@ -187,6 +181,48 @@ const TestDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Filtered Test Cases (only shown when filter is active) */}
+      {statusFilter && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Filtered Test Cases</CardTitle>
+                <CardDescription>
+                  Showing test cases with status: {statusFilter}
+                </CardDescription>
+              </div>
+              <button 
+                className="text-sm text-primary hover:underline"
+                onClick={() => setStatusFilter(null)}
+              >
+                Clear filter
+              </button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoadingTestCases ? (
+              <div className="animate-pulse">Loading filtered test cases...</div>
+            ) : testCasesData?.data.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground">
+                No test cases found with this status
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {testCasesData?.data.map((testCase) => (
+                  <div key={testCase.id} className="p-2 border rounded-md">
+                    <div className="font-medium">{testCase.title}</div>
+                    <div className="text-sm text-muted-foreground mt-1 truncate">
+                      {testCase.description}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

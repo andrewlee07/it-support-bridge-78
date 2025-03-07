@@ -1,8 +1,7 @@
-
 // Re-export all test management related mock data from individual files
 import { 
   testCases, 
-  fetchTestCases, 
+  fetchTestCases as originalFetchTestCases, 
   fetchTestCaseById,
   createTestCase,
   updateTestCase,
@@ -31,6 +30,23 @@ import {
 import {
   fetchTestStats
 } from './testStats';
+
+// Export the original function and add a new one that supports filtering
+const fetchTestCases = (statusFilter = null) => {
+  if (statusFilter) {
+    // If a status filter is provided, filter the test cases
+    const filtered = testCases.filter(tc => tc.status === statusFilter);
+    return Promise.resolve({
+      success: true,
+      message: 'Test cases retrieved successfully',
+      statusCode: 200,
+      data: filtered
+    });
+  }
+  
+  // Otherwise, use the original function
+  return originalFetchTestCases();
+};
 
 // Export everything
 export {
