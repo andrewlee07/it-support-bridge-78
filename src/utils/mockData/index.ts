@@ -20,7 +20,28 @@ import {
 import { mockSLAs } from './slas';
 import { mockEmailTemplates } from './emailTemplates';
 import { getDashboardStats } from './dashboardStats';
-import { simulateApiResponse, simulatePaginatedResponse } from './apiHelpers';
+import { simulateApiResponse, simulatePaginatedResponse, delay } from './apiHelpers';
+
+// Import all test management exports
+import {
+  testCases,
+  fetchTestCases,
+  fetchTestCaseById,
+  createTestCase,
+  updateTestCase,
+  deleteTestCase,
+  bugs,
+  fetchBugs,
+  fetchBugById,
+  createBug,
+  updateBug,
+  testCycles,
+  fetchTestCycles,
+  createTestCycle,
+  testExecutions,
+  executeTest,
+  fetchTestStats
+} from './testData';
 
 // Export all mock data and helper functions
 export {
@@ -59,5 +80,25 @@ export {
   
   // API Helpers
   simulateApiResponse,
-  simulatePaginatedResponse
+  simulatePaginatedResponse,
+  delay,
+  
+  // Test Management
+  testCases,
+  fetchTestCases,
+  fetchTestCaseById,
+  createTestCase,
+  updateTestCase,
+  deleteTestCase,
+  bugs,
+  fetchBugs,
+  fetchBugById,
+  createBug,
+  updateBug,
+  testCycles,
+  fetchTestCycles,
+  createTestCycle,
+  testExecutions,
+  executeTest,
+  fetchTestStats
 };
