@@ -3,6 +3,7 @@ import React from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+// Fix the imports to use default imports instead of named imports
 import RiskThresholdsForm from '@/components/settings/risk/RiskThresholdsForm';
 import RiskAssessmentQuestionForm from '@/components/settings/risk/RiskAssessmentQuestionForm';
 import { changeApi } from '@/utils/api/changeApi';
@@ -34,7 +35,10 @@ const RiskAssessmentSettings = () => {
   // Mutation for saving a question
   const questionMutation = useMutation({
     mutationFn: async (questionData: RiskAssessmentQuestion) => {
-      const response = await changeApi.saveRiskAssessmentQuestion(questionData);
+      const response = await changeApi.updateRiskAssessmentQuestions(
+        questionsData ? [...questionsData, questionData] : [questionData],
+        'admin-user' // Hardcoded user ID for now
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -56,7 +60,7 @@ const RiskAssessmentSettings = () => {
   // Mutation for saving thresholds
   const thresholdMutation = useMutation({
     mutationFn: async (thresholdData: RiskThreshold[]) => {
-      const response = await changeApi.saveRiskThresholds(thresholdData);
+      const response = await changeApi.updateRiskThresholds(thresholdData, 'admin-user');
       return response.data;
     },
     onSuccess: () => {
