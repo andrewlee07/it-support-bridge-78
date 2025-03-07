@@ -8,7 +8,14 @@ import {
 } from '../../types';
 import { simulateApiResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
-import { changeRequests, riskQuestions, riskThresholds } from './store';
+import { 
+  getChangeRequests, 
+  getRiskQuestions, 
+  getRiskThresholds, 
+  setRiskQuestions, 
+  setRiskThresholds,
+  updateChangeRequest
+} from './store';
 import { calculateRiskLevelFromThresholds } from './types';
 
 // Risk assessment operations
@@ -19,6 +26,9 @@ export const riskAssessmentApi = {
     answers: RiskAssessmentAnswer[],
     userId: string
   ): Promise<ApiResponse<any>> => {
+    const changeRequests = getChangeRequests();
+    const riskQuestions = getRiskQuestions();
+    const riskThresholds = getRiskThresholds();
     const changeIndex = changeRequests.findIndex(c => c.id === id);
     
     if (changeIndex === -1) {
@@ -68,14 +78,14 @@ export const riskAssessmentApi = {
       audit: updatedAudit
     };
     
-    changeRequests[changeIndex] = updatedChange;
+    updateChangeRequest(changeIndex, updatedChange);
     
     return simulateApiResponse(updatedChange);
   },
   
   // Get risk assessment questions
   getRiskAssessmentQuestions: async (): Promise<ApiResponse<RiskAssessmentQuestion[]>> => {
-    return simulateApiResponse(riskQuestions);
+    return simulateApiResponse(getRiskQuestions());
   },
   
   // Update risk assessment questions
@@ -83,14 +93,14 @@ export const riskAssessmentApi = {
     questions: RiskAssessmentQuestion[],
     userId: string
   ): Promise<ApiResponse<RiskAssessmentQuestion[]>> => {
-    riskQuestions = questions;
+    setRiskQuestions(questions);
     
-    return simulateApiResponse(riskQuestions);
+    return simulateApiResponse(getRiskQuestions());
   },
   
   // Get risk thresholds
   getRiskThresholds: async (): Promise<ApiResponse<RiskThreshold[]>> => {
-    return simulateApiResponse(riskThresholds);
+    return simulateApiResponse(getRiskThresholds());
   },
   
   // Update risk thresholds
@@ -98,15 +108,17 @@ export const riskAssessmentApi = {
     newThresholds: RiskThreshold[],
     userId: string
   ): Promise<ApiResponse<RiskThreshold[]>> => {
-    riskThresholds = newThresholds;
+    setRiskThresholds(newThresholds);
     
-    return simulateApiResponse(riskThresholds);
+    return simulateApiResponse(getRiskThresholds());
   },
   
   // Calculate risk score and level from answers
   calculateRiskScore: async (
     answers: { questionId: string; selectedOptionId: string }[]
   ): Promise<ApiResponse<{ score: number; level: RiskLevel }>> => {
+    const riskQuestions = getRiskQuestions();
+    const riskThresholds = getRiskThresholds();
     let totalScore = 0;
     let totalWeight = 0;
     
