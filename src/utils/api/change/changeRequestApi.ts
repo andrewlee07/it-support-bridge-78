@@ -96,10 +96,12 @@ export const changeRequestApi = {
       description: string;
       category: string;
       priority: string;
+      changeCategory?: string;
       startDate: Date;
       endDate: Date;
       implementationPlan: string;
       rollbackPlan: string;
+      approverRoles?: string[];
       createdBy: string;
     }
   ): Promise<ApiResponse<ChangeRequest>> => {
@@ -124,6 +126,8 @@ export const changeRequestApi = {
       assessmentAnswers: [],
       implementationPlan: data.implementationPlan,
       rollbackPlan: data.rollbackPlan,
+      category: data.changeCategory as any,
+      approverRoles: data.approverRoles as any[] || ['it'],
       audit: [
         {
           id: uuidv4(),

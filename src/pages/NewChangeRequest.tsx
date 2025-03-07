@@ -15,6 +15,7 @@ const NewChangeRequest = () => {
 
   const createChangeMutation = useMutation({
     mutationFn: async (data: any) => {
+      // Map the changeCategory to proper category if needed
       return await changeApi.createChangeRequest({
         ...data,
         createdBy: user!.id,

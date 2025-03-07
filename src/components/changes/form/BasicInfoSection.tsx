@@ -35,7 +35,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ form }) => {
         />
       </CustomFormField>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <CustomFormField
           form={form}
           name="category"
@@ -68,6 +68,23 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ form }) => {
               <SelectItem value="low">Low</SelectItem>
               <SelectItem value="medium">Medium</SelectItem>
               <SelectItem value="high">High</SelectItem>
+            </SelectContent>
+          </Select>
+        </CustomFormField>
+        
+        <CustomFormField
+          form={form}
+          name="changeCategory"
+          label="Change Type"
+        >
+          <Select onValueChange={field => form.setValue('changeCategory', field)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select change type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="standard">Standard</SelectItem>
+              <SelectItem value="normal">Normal</SelectItem>
+              <SelectItem value="emergency">Emergency</SelectItem>
             </SelectContent>
           </Select>
         </CustomFormField>

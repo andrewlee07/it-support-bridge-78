@@ -50,6 +50,9 @@ export interface SLA {
 // Change management types
 export type ChangeStatus = 'draft' | 'submitted' | 'approved' | 'in-progress' | 'completed' | 'failed' | 'cancelled';
 export type RiskLevel = 'low' | 'medium' | 'high';
+export type ChangeCategory = 'standard' | 'normal' | 'emergency';
+export type ClosureReason = 'successful' | 'successful-with-issues' | 'rolled-back' | 'failed';
+export type ApproverRole = 'it' | 'user';
 
 export interface ChangeRequest extends Omit<Ticket, 'status'> {
   status: ChangeStatus;
@@ -60,6 +63,9 @@ export interface ChangeRequest extends Omit<Ticket, 'status'> {
   assessmentAnswers: RiskAssessmentAnswer[];
   implementationPlan: string;
   rollbackPlan: string;
+  category?: ChangeCategory;
+  closureReason?: ClosureReason;
+  approverRoles?: ApproverRole[];
   approvedBy?: string;
   approvedAt?: Date;
 }

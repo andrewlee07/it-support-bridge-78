@@ -16,6 +16,7 @@ export const changeApi = {
   submitChangeRequest: statusApi.submitChangeRequest,
   approveChangeRequest: statusApi.approveChangeRequest,
   rejectChangeRequest: statusApi.rejectChangeRequest,
+  closeChangeRequest: statusApi.closeChangeRequest,
   
   // Risk assessment operations
   completeRiskAssessment: riskAssessmentApi.completeRiskAssessment,

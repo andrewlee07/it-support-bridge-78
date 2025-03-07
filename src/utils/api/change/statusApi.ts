@@ -1,6 +1,5 @@
-
 import { v4 as uuidv4 } from 'uuid';
-import { ChangeRequest, ApiResponse } from '../../types';
+import { ChangeRequest, ApiResponse, ClosureReason } from '../../types';
 import { simulateApiResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
 import { getUserById } from '../../mockData';
@@ -147,6 +146,63 @@ export const statusApi = {
     const updatedChange: ChangeRequest = {
       ...existingChange,
       status: 'cancelled',
+      updatedAt: new Date(),
+      audit: updatedAudit
+    };
+    
+    updateChangeRequest(changeIndex, updatedChange);
+    
+    return simulateApiResponse(updatedChange);
+  },
+  
+  // Close a change request with a specific reason
+  closeChangeRequest: async (
+    id: string,
+    userId: string,
+    closureReason: ClosureReason,
+    notes?: string
+  ): Promise<ApiResponse<ChangeRequest>> => {
+    const changeRequests = getChangeRequests();
+    const changeIndex = changeRequests.findIndex(c => c.id === id);
+    
+    if (changeIndex === -1) {
+      return {
+        success: false,
+        error: 'Change request not found',
+      };
+    }
+    
+    const existingChange = changeRequests[changeIndex];
+    
+    if (existingChange.status !== 'in-progress') {
+      return {
+        success: false,
+        error: 'Only in-progress change requests can be closed',
+      };
+    }
+    
+    // Determine final status based on closure reason
+    let finalStatus: 'completed' | 'failed';
+    if (closureReason === 'failed' || closureReason === 'rolled-back') {
+      finalStatus = 'failed';
+    } else {
+      finalStatus = 'completed';
+    }
+    
+    // Add audit entry
+    const updatedAudit = addAuditEntry(
+      existingChange.audit,
+      id,
+      'change',
+      `Change request closed as ${closureReason}${notes ? ': ' + notes : ''}`,
+      userId
+    );
+    
+    // Update the change request
+    const updatedChange: ChangeRequest = {
+      ...existingChange,
+      status: finalStatus,
+      closureReason: closureReason,
       updatedAt: new Date(),
       audit: updatedAudit
     };
