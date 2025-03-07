@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +10,7 @@ import TestCaseDetails from './TestCaseDetails';
 import TestCaseTable from './TestCaseTable';
 import { useTestCaseManagement } from './hooks/useTestCaseManagement';
 import { useTestCases } from './hooks/useTestCases';
+import { TestCase } from '@/utils/types/testTypes';
 
 const TestCaseList: React.FC = () => {
   const { testCasesData, isLoadingTestCases, isError, refetch } = useTestCases();
@@ -36,10 +36,18 @@ const TestCaseList: React.FC = () => {
     );
   }
 
+  // Convert the testCasesData to compatible TestCase type
+  const compatibleTestCases = testCasesData ? testCasesData.map(tc => ({
+    ...tc,
+    stepsToReproduce: tc.steps || [],
+    expectedResults: tc.expectedResult || '',
+    assignedTester: tc.createdBy,
+  } as unknown as TestCase)) : [];
+
   return (
     <div className="w-full">
       <TestCaseTable 
-        testCases={testCasesData}
+        testCases={compatibleTestCases}
         onView={viewTestCase}
         onEdit={editTestCase}
         onDelete={handleDelete}
@@ -49,7 +57,7 @@ const TestCaseList: React.FC = () => {
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-3xl">
           {selectedTestCase && (
-            <TestCaseDetails testCase={selectedTestCase} />
+            <TestCaseDetails testCase={selectedTestCase as TestCase} />
           )}
         </DialogContent>
       </Dialog>
@@ -59,7 +67,7 @@ const TestCaseList: React.FC = () => {
         <DialogContent className="sm:max-w-3xl">
           {selectedTestCase && (
             <TestCaseForm 
-              initialData={selectedTestCase} 
+              initialData={selectedTestCase as TestCase} 
               onSuccess={handleEditSuccess}
               onCancel={() => setIsEditDialogOpen(false)}
             />

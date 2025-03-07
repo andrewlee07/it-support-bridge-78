@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,8 +34,8 @@ const bugSchema = z.object({
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
   stepsToReproduce: z.array(z.string()).min(1, { message: 'At least one step is required.' }),
   severity: z.enum(['critical', 'high', 'medium', 'low']),
-  priority: z.enum(['urgent', 'high', 'medium', 'low']),
-  status: z.enum(['new', 'in-progress', 'fixed', 'verified', 'closed']),
+  priority: z.enum(['high', 'medium', 'low']),
+  status: z.enum(['open', 'in_progress', 'resolved', 'closed', 'fixed', 'verified', 'new', 'in-progress']),
   assignedDeveloper: z.string().optional(),
   relatedTestCase: z.string().optional(),
   attachment: z.string().optional(),
@@ -150,7 +149,7 @@ const BugForm: React.FC<BugFormProps> = ({
           severity: data.severity,
           priority: data.priority,
           status: data.status,
-          assignedDeveloper: data.assignedDeveloper,
+          assignedTo: data.assignedDeveloper,
           relatedTestCase: data.relatedTestCase,
           attachment: data.attachment,
         });
@@ -163,11 +162,12 @@ const BugForm: React.FC<BugFormProps> = ({
           severity: data.severity,
           priority: data.priority,
           status: data.status,
-          assignedDeveloper: data.assignedDeveloper || '',
+          assignedTo: data.assignedDeveloper || '',
           relatedTestCase: data.relatedTestCase || '',
           attachment: data.attachment || '',
+          reportedBy: user.id,
           createdBy: user.id, // Add the createdBy field with current user ID
-        }, user.id);
+        });
       }
 
       if (result.success) {
@@ -320,7 +320,6 @@ const BugForm: React.FC<BugFormProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="urgent">Urgent</SelectItem>
                         <SelectItem value="high">High</SelectItem>
                         <SelectItem value="medium">Medium</SelectItem>
                         <SelectItem value="low">Low</SelectItem>
@@ -348,11 +347,14 @@ const BugForm: React.FC<BugFormProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="new">New</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="open">Open</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="resolved">Resolved</SelectItem>
+                      <SelectItem value="closed">Closed</SelectItem>
                       <SelectItem value="fixed">Fixed</SelectItem>
                       <SelectItem value="verified">Verified</SelectItem>
-                      <SelectItem value="closed">Closed</SelectItem>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

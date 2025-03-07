@@ -38,15 +38,18 @@ export const useTestCaseSubmit = ({ initialData, onSuccess }: UseTestCaseSubmitP
         };
       }
 
-      // Prepare the data to submit - ensure all required fields are included
-      const testCaseData: Omit<TestCase, 'id' | 'createdAt' | 'updatedAt'> = {
+      // Convert to the format expected by the testData API
+      const testCaseData = {
         title: data.title,
         description: data.description,
-        stepsToReproduce: filteredSteps,
-        expectedResults: data.expectedResults,
-        status: data.status,
-        assignedTester: data.assignedTester || user.id,
-        relatedRequirement: data.relatedRequirement,
+        status: data.status === 'not-run' ? 'draft' : data.status,
+        preConditions: "",
+        steps: filteredSteps,
+        expectedResult: data.expectedResults,
+        priority: "medium",
+        type: "e2e",
+        createdBy: user.id,
+        assignedTo: data.assignedTester,
       };
 
       let result;

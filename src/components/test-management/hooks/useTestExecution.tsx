@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { fetchTestCases, executeTest } from '@/utils/mockData/testData';
-import { TestCase, TestExecution, TestStatus } from '@/utils/types/testTypes';
+import { TestCase, TestStatus } from '@/utils/types/testTypes';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useTestExecution = (testCycleId?: string) => {
@@ -39,8 +39,8 @@ export const useTestExecution = (testCycleId?: string) => {
     setSelectedTestCases([]);
   };
 
-  // Execute a test case
-  const executeTestCase = async (testCaseId: string, status: TestStatus, comments: string = '', attachments: string[] = []) => {
+  // Execute a test case - fixed to match the expected signature
+  const executeTestCase = async (testCaseId: string, status: TestStatus, comments: string = '') => {
     if (!user) {
       toast({
         title: 'Authentication required',
@@ -52,16 +52,16 @@ export const useTestExecution = (testCycleId?: string) => {
 
     setIsExecutingTest(true);
     try {
-      const testExecution: Omit<TestExecution, 'id'> = {
-        testCaseId,
-        executionDate: new Date(),
-        status,
-        comments,
-        executedBy: user.id,
-        linkedBugs: []
-      };
+      // Convert status to match what executeTest expects
+      let execStatus: 'passed' | 'failed' | 'blocked' = 'blocked';
+      if (status === 'passed') {
+        execStatus = 'passed';
+      } else if (status === 'failed') {
+        execStatus = 'failed';
+      }
 
-      const result = await executeTest(testExecution);
+      // Call the executeTest function with the required parameters
+      const result = await executeTest(testCaseId, testCycleId || 'default-cycle', execStatus, comments);
       
       if (result.success) {
         toast({
@@ -93,7 +93,7 @@ export const useTestExecution = (testCycleId?: string) => {
   };
 
   return {
-    testCasesData: testCasesData?.data || [],
+    testCasesData: testCasesData?.data as TestCase[] || [],
     isLoadingTestCases,
     selectedTestCases,
     isExecutingTest,

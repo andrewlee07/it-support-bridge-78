@@ -1,9 +1,9 @@
 
 // Test Case Management Types
-export type TestStatus = 'not-run' | 'pass' | 'fail' | 'blocked';
+export type TestStatus = 'draft' | 'ready' | 'in_progress' | 'passed' | 'failed' | 'blocked' | 'not-run';
 export type BugSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type BugPriority = 'urgent' | 'high' | 'medium' | 'low';
-export type BugStatus = 'new' | 'in-progress' | 'fixed' | 'verified' | 'closed';
+export type BugStatus = 'new' | 'in-progress' | 'fixed' | 'verified' | 'closed' | 'open' | 'in_progress' | 'resolved';
 
 export interface TestCase {
   id: string;
@@ -32,6 +32,7 @@ export interface Bug {
   createdAt: Date;
   updatedAt: Date;
   createdBy: string; // User ID
+  reportedBy?: string; // Backward compatibility
 }
 
 export interface TestExecution {
@@ -42,6 +43,9 @@ export interface TestExecution {
   comments: string;
   executedBy: string; // User ID
   linkedBugs: string[]; // Bug IDs
+  testCycleId?: string; // For compatibility with testData
+  notes?: string; // For compatibility with testData
+  executedAt?: Date; // For compatibility with testData
 }
 
 export interface TestCycle {
@@ -51,10 +55,11 @@ export interface TestCycle {
   releaseId?: string;
   startDate: Date;
   endDate: Date;
-  status: 'planned' | 'in-progress' | 'completed';
+  status: 'planned' | 'in-progress' | 'completed' | 'in_progress' | 'aborted';
   testCases: string[]; // Test Case IDs
   createdAt: Date;
   updatedAt: Date;
+  createdBy?: string; // For compatibility with testData
 }
 
 // API response types for Test Management
@@ -72,6 +77,10 @@ export interface TestManagementStats {
     cycleName: string;
     progress: number; // Percentage complete
   }[];
+  passed?: number; // For compatibility with testData
+  failed?: number; // For compatibility with testData
+  blocked?: number; // For compatibility with testData
+  notExecuted?: number; // For compatibility with testData
 }
 
 // For CSV Export

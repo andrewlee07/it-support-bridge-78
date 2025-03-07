@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Card,
@@ -135,7 +134,7 @@ const TestExecutionTab = () => {
               </div>
             ) : (
               <TestCaseSelectionTable
-                testCases={testCasesData || []}
+                testCases={testCasesData as unknown as TestCase[]}
                 selectedTestCases={selectedTestCases}
                 onToggleSelection={toggleTestCaseSelection}
                 onSelectAll={selectAllTestCases}
@@ -157,7 +156,7 @@ const TestExecutionTab = () => {
           <TabsContent value="results">
             {testCasesData && testCasesData.length > 0 ? (
               <TestExecutionSummary
-                testCases={testCasesData}
+                testCases={testCasesData as unknown as TestCase[]}
                 onRefresh={refetch}
                 onExport={handleExportResults}
               />

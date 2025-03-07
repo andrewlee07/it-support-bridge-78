@@ -26,12 +26,15 @@ export interface Bug {
   id: string;
   title: string;
   description: string;
-  stepsToReproduce: string;
+  stepsToReproduce: string[];
   severity: 'critical' | 'high' | 'medium' | 'low';
   priority: TestPriority;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'fixed' | 'verified';
   reportedBy: string;
   assignedTo?: string;
+  relatedTestCase?: string;
+  attachment?: string;
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -65,6 +68,16 @@ export interface TestStats {
   failed: number;
   blocked: number;
   notExecuted: number;
+  passedTests: number;
+  failedTests: number;
+  blockedTests: number;
+  notRunTests: number;
+  openBugs: number;
+  testCycleProgress: {
+    cycleId: string;
+    cycleName: string;
+    progress: number; // Percentage complete
+  }[];
 }
 
 // Mock Data
@@ -243,7 +256,7 @@ export const createTestCycle = async (testCycle: Omit<TestCycle, 'id' | 'created
   return createApiSuccessResponse(newTestCycle);
 };
 
-export const executeTest = async (testCycleId: string, testCaseId: string, status: 'passed' | 'failed' | 'blocked', notes?: string): Promise<ApiResponse<TestExecution>> => {
+export const executeTest = async (testCaseId: string, testCycleId: string, status: 'passed' | 'failed' | 'blocked', notes?: string): Promise<ApiResponse<TestExecution>> => {
   await delay(500);
   const newTestExecution: TestExecution = {
     id: uuidv4(),
@@ -266,6 +279,16 @@ export const fetchTestStats = async (): Promise<ApiResponse<TestStats>> => {
   const failed = testExecutions.filter(te => te.status === 'failed').length;
   const blocked = testExecutions.filter(te => te.status === 'blocked').length;
   const notExecuted = totalTestCases - passed - failed - blocked;
+  
+  // Get open bugs count
+  const openBugs = bugs.filter(b => b.status === 'open').length;
+  
+  // Mock test cycle progress
+  const testCycleProgress = testCycles.map(cycle => ({
+    cycleId: cycle.id,
+    cycleName: cycle.name,
+    progress: Math.floor(Math.random() * 100) // Randomly generate progress percentage
+  }));
 
   const stats: TestStats = {
     totalTestCases,
@@ -273,6 +296,13 @@ export const fetchTestStats = async (): Promise<ApiResponse<TestStats>> => {
     failed,
     blocked,
     notExecuted,
+    // Add additional properties needed by the dashboard
+    passedTests: passed,
+    failedTests: failed,
+    blockedTests: blocked,
+    notRunTests: notExecuted,
+    openBugs,
+    testCycleProgress
   };
 
   return createApiSuccessResponse(stats);

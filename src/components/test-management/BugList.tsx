@@ -107,7 +107,7 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
         </div>
       ) : (
         <BugTable 
-          bugs={displayBugs}
+          bugs={displayBugs as Bug[]}
           onView={viewBug}
           onEdit={editBug}
           onStatusUpdate={handleStatusUpdate}
