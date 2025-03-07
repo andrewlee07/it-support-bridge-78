@@ -1,6 +1,6 @@
 
 import { User, ApiResponse, PaginatedResponse } from '../types';
-import { mockUsers, getUserById, simulateApiResponse, simulatePaginatedResponse } from '../mockData';
+import { mockUsers, getUserById, simulateApiResponse, simulatePaginatedResponse, createApiErrorResponse } from '../mockData';
 
 // User API
 export const userApi = {
@@ -17,10 +17,7 @@ export const userApi = {
     const user = getUserById(id);
     
     if (!user) {
-      return {
-        success: false,
-        error: 'User not found',
-      };
+      return createApiErrorResponse<User>('User not found', 404);
     }
     
     return simulateApiResponse(user);

@@ -1,6 +1,6 @@
 
 import { Asset, ApiResponse, PaginatedResponse } from '../types';
-import { mockAssets, getAssetById, simulateApiResponse, simulatePaginatedResponse } from '../mockData';
+import { mockAssets, getAssetById, simulateApiResponse, simulatePaginatedResponse, createApiErrorResponse } from '../mockData';
 
 // Asset API
 export const assetApi = {
@@ -17,10 +17,7 @@ export const assetApi = {
     const asset = getAssetById(id);
     
     if (!asset) {
-      return {
-        success: false,
-        error: 'Asset not found',
-      };
+      return createApiErrorResponse<Asset>('Asset not found', 404);
     }
     
     return simulateApiResponse(asset);
