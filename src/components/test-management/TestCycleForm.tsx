@@ -116,7 +116,7 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
         setLoading(false);
         return;
       } else {
-        // Create new test cycle
+        // Create new test cycle with all required fields
         result = await createTestCycle({
           name: data.name,
           description: data.description,

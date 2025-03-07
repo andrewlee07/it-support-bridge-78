@@ -113,12 +113,15 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
         return;
       }
 
-      // Prepare the data to submit
-      const testCaseData = {
-        ...data,
+      // Prepare the data to submit - ensure all required fields are included
+      const testCaseData: Omit<TestCase, 'id' | 'createdAt' | 'updatedAt'> = {
+        title: data.title,
+        description: data.description,
         stepsToReproduce: filteredSteps,
-        // Ensure assignedTester is set - default to current user if not specified
+        expectedResults: data.expectedResults,
+        status: data.status,
         assignedTester: data.assignedTester || user.id,
+        relatedRequirement: data.relatedRequirement,
       };
 
       let result;
