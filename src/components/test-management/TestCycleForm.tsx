@@ -34,6 +34,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 // Form schema for test cycle
 const testCycleSchema = z.object({
@@ -116,7 +117,15 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
         return;
       } else {
         // Create new test cycle
-        result = await createTestCycle(data);
+        result = await createTestCycle({
+          name: data.name,
+          description: data.description,
+          releaseId: data.releaseId,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          status: data.status,
+          testCases: data.testCases,
+        });
       }
 
       if (result.success) {

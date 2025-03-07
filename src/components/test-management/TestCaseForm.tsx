@@ -27,7 +27,6 @@ import { createTestCase, updateTestCase } from '@/utils/mockData/testData';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
 
 // Form schema for test case
 const testCaseSchema = z.object({
@@ -119,8 +118,16 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
         // Update existing test case
         result = await updateTestCase(initialData.id, data);
       } else {
-        // Create new test case
-        result = await createTestCase(data);
+        // Create new test case - ensure all required fields are passed
+        result = await createTestCase({
+          title: data.title,
+          description: data.description,
+          stepsToReproduce: data.stepsToReproduce,
+          expectedResults: data.expectedResults,
+          status: data.status,
+          assignedTester: data.assignedTester,
+          relatedRequirement: data.relatedRequirement,
+        });
       }
 
       if (result.success) {

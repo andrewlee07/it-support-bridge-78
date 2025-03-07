@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,14 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Bug, BugSeverity, BugPriority, BugStatus } from '@/utils/types/testTypes';
+import { Bug } from '@/utils/types/testTypes';
 import { createBug, updateBug, fetchTestCases } from '@/utils/mockData/testData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash, Upload } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 
-// Form schema for bug
+// Form schema for bug report
 const bugSchema = z.object({
   title: z.string().min(3, { message: 'Title must be at least 3 characters.' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
@@ -39,7 +38,7 @@ const bugSchema = z.object({
   status: z.enum(['new', 'in-progress', 'fixed', 'verified', 'closed']),
   assignedDeveloper: z.string().optional(),
   relatedTestCase: z.string().optional(),
-  // attachment is handled separately
+  attachment: z.string().optional(),
 });
 
 type BugFormValues = z.infer<typeof bugSchema>;
@@ -58,9 +57,9 @@ const BugForm: React.FC<BugFormProps> = ({
   const { toast } = useToast();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [attachment, setAttachment] = useState<string | undefined>(initialData?.attachment);
+  const [fileUrl, setFileUrl] = useState<string | null>(initialData?.attachment || null);
 
-  // Fetch test cases for the dropdown
+  // Fetch test cases for dropdown
   const { data: testCasesResponse } = useQuery({
     queryKey: ['testCases'],
     queryFn: fetchTestCases,
@@ -78,6 +77,7 @@ const BugForm: React.FC<BugFormProps> = ({
       status: initialData?.status || 'new',
       assignedDeveloper: initialData?.assignedDeveloper || '',
       relatedTestCase: initialData?.relatedTestCase || '',
+      attachment: initialData?.attachment || '',
     },
   });
 
@@ -105,7 +105,7 @@ const BugForm: React.FC<BugFormProps> = ({
     if (file) {
       // In a real app, you would upload the file to your server or cloud storage
       // For now, we'll just use a placeholder URL
-      setAttachment('/lovable-uploads/bf3633e2-5031-4a59-ab35-ffd5b863fbfc.png');
+      setFileUrl('/lovable-uploads/bf3633e2-5031-4a59-ab35-ffd5b863fbfc.png');
       toast({
         title: 'File uploaded',
         description: 'Screenshot has been uploaded successfully.',
@@ -117,7 +117,7 @@ const BugForm: React.FC<BugFormProps> = ({
     if (!user) {
       toast({
         title: 'Authentication required',
-        description: 'You must be logged in to create or update bugs.',
+        description: 'You must be logged in to report bugs.',
         variant: 'destructive',
       });
       return;
@@ -141,15 +141,30 @@ const BugForm: React.FC<BugFormProps> = ({
       let result;
       if (initialData?.id) {
         // Update existing bug
-        result = await updateBug(initialData.id, { 
-          ...data,
-          attachment 
+        result = await updateBug(initialData.id, {
+          title: data.title,
+          description: data.description,
+          stepsToReproduce: data.stepsToReproduce,
+          severity: data.severity,
+          priority: data.priority,
+          status: data.status,
+          assignedDeveloper: data.assignedDeveloper,
+          relatedTestCase: data.relatedTestCase,
+          attachment: data.attachment,
         });
       } else {
-        // Create new bug
+        // Create new bug - pass the user ID for createdBy
         result = await createBug({
-          ...data,
-          attachment
+          title: data.title,
+          description: data.description,
+          stepsToReproduce: data.stepsToReproduce,
+          severity: data.severity,
+          priority: data.priority,
+          status: data.status,
+          assignedDeveloper: data.assignedDeveloper,
+          relatedTestCase: data.relatedTestCase,
+          attachment: data.attachment || '',
+          createdBy: user.id, // Add the createdBy field with current user ID
         }, user.id);
       }
 
@@ -375,11 +390,11 @@ const BugForm: React.FC<BugFormProps> = ({
             <div>
               <FormLabel>Attachment (Screenshot)</FormLabel>
               <div className="mt-2 space-y-4">
-                {attachment ? (
+                {fileUrl ? (
                   <div className="rounded-md border p-2">
                     <div className="flex items-center gap-2">
                       <img 
-                        src={attachment} 
+                        src={fileUrl} 
                         alt="Bug screenshot" 
                         className="h-20 w-auto object-cover rounded"
                       />
@@ -393,7 +408,7 @@ const BugForm: React.FC<BugFormProps> = ({
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => setAttachment(undefined)}
+                        onClick={() => setFileUrl(null)}
                       >
                         <Trash className="h-4 w-4" />
                         <span className="sr-only">Remove</span>
