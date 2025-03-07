@@ -23,7 +23,7 @@ const changeRequestSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters" }),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }),
   category: z.enum(['hardware', 'software', 'network', 'access', 'other'] as const),
-  priority: z.enum(['low', 'medium', 'high'] as const),
+  priority: z.enum(['P1', 'P2', 'P3', 'P4'] as const),
   changeCategory: z.enum(['standard', 'normal', 'emergency'] as const),
   startDate: z.date().min(new Date(), { message: "Start date must be in the future" }),
   endDate: z.date(),
@@ -70,7 +70,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
       title: initialData?.title || "",
       description: initialData?.description || "",
       category: (initialData?.category as TicketCategory) || "software",
-      priority: (initialData?.priority as TicketPriority) || "medium",
+      priority: (initialData?.priority as TicketPriority) || "P2",
       changeCategory: (initialData?.category as ChangeCategory) || "normal",
       startDate: initialData?.startDate ? new Date(initialData.startDate) : new Date(Date.now() + 86400000), // tomorrow
       endDate: initialData?.endDate ? new Date(initialData.endDate) : new Date(Date.now() + 172800000), // day after tomorrow

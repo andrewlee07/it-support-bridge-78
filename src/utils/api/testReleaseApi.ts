@@ -2,11 +2,24 @@
 import { v4 as uuidv4 } from 'uuid';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from '../mockData/apiHelpers';
 import { ApiResponse } from '../types';
-import { TestCycle, TestCase, TestCoverage, TestExecutionForRelease } from '../types/testTypes';
+import { TestCycle, TestCase, TestExecutionForRelease } from '../types/testTypes';
 import { testCycles, createTestCycle } from '../mockData/testCycles';
 import { testCases } from '../mockData/testCases';
 import { testExecutions } from '../mockData/testExecutions';
 import { getReleaseById } from './release/releaseQueries';
+
+// Define a release-specific test coverage interface
+export interface ReleaseCoverage {
+  releaseId: string;
+  totalTestCases: number;
+  passedTests: number;
+  failedTests: number;
+  blockedTests: number;
+  notRunTests: number;
+  coveragePercentage: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  readiness: 'go' | 'no-go' | 'warning';
+}
 
 // Create a new test cycle for a specific release
 export const createTestCycleForRelease = async (
@@ -63,7 +76,7 @@ export const getTestCasesByReleaseId = async (releaseId: string): Promise<ApiRes
 };
 
 // Get test coverage metrics for a specific release
-export const getTestCoverageByReleaseId = async (releaseId: string): Promise<ApiResponse<TestCoverage>> => {
+export const getTestCoverageByReleaseId = async (releaseId: string): Promise<ApiResponse<ReleaseCoverage>> => {
   await delay(500);
   
   // Get all test cases for the release
@@ -111,7 +124,7 @@ export const getTestCoverageByReleaseId = async (releaseId: string): Promise<Api
     readiness = 'warning';
   }
   
-  const coverage: TestCoverage = {
+  const coverage: ReleaseCoverage = {
     releaseId,
     totalTestCases,
     passedTests,

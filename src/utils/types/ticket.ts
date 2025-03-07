@@ -47,13 +47,3 @@ export interface TestCoverageRelationship {
   coverageType: 'direct' | 'indirect';
   createdAt: Date;
 }
-
-// Test coverage metrics
-export interface BacklogTestCoverage {
-  backlogItemId: string;
-  totalTestCases: number;
-  passedTests: number;
-  failedTests: number;
-  notExecutedTests: number;
-  coveragePercentage: number;
-}

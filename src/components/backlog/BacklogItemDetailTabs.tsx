@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import { TestCase } from '@/utils/types/testTypes';
-import { Info, TestTube, RelationshipModel } from 'lucide-react';
+import { Info, TestTube, Network } from 'lucide-react';
 import TestCoverageTab from './TestCoverageTab';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import TestCaseDetails from '@/components/test-management/TestCaseDetails';

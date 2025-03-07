@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bug } from '@/utils/types/testTypes';
+import { Bug as BugType } from '@/utils/types/testTypes';
 import { fetchTestCases } from '@/utils/mockData/testData';
 import { useQuery } from '@tanstack/react-query';
 import { bugSchema, BugFormValues } from './forms/bugSchema';
@@ -13,8 +13,8 @@ import { useBugSubmit } from './hooks/useBugSubmit';
 import BugFormFields from './forms/BugFormFields';
 
 interface BugFormProps {
-  initialData?: Partial<Bug>;
-  onSuccess?: (bug: Bug) => void;
+  initialData?: Partial<BugType>;
+  onSuccess?: (bug: BugType) => void;
   onCancel?: () => void;
 }
 

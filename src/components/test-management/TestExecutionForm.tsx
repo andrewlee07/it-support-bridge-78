@@ -22,17 +22,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { CheckCircle, XCircle, AlertTriangle, Clock, Bug } from 'lucide-react';
-import { TestCase, TestStatus, Bug, BugStatus } from '@/utils/types/testTypes';
+import { CheckCircle, XCircle, AlertTriangle, Clock, BugIcon } from 'lucide-react';
+import { TestCase, TestStatus } from '@/utils/types/testTypes';
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import StatusBadge from './ui/StatusBadge';
 import BugCreationDialog from './BugCreationDialog';
+import type { Bug as BugType } from '@/utils/types/testTypes';
 
 interface TestExecutionFormProps {
   testCase: TestCase;
   onExecute: (testCaseId: string, status: TestStatus, comments: string) => Promise<{ success: boolean }>;
   onLinkBug?: (testCaseId: string) => void;
-  onBugCreated?: (bug: Bug, backlogItem?: BacklogItem) => void;
+  onBugCreated?: (bug: BugType, backlogItem?: BacklogItem) => void;
 }
 
 const TestExecutionForm: React.FC<TestExecutionFormProps> = ({ 
@@ -56,7 +57,7 @@ const TestExecutionForm: React.FC<TestExecutionFormProps> = ({
     }
   };
 
-  const handleBugCreated = (bug: Bug, backlogItem?: BacklogItem) => {
+  const handleBugCreated = (bug: BugType, backlogItem?: BacklogItem) => {
     if (onBugCreated) {
       onBugCreated(bug, backlogItem);
     }
@@ -107,7 +108,7 @@ const TestExecutionForm: React.FC<TestExecutionFormProps> = ({
               onClick={() => onLinkBug(testCase.id)}
               disabled={isSubmitting}
             >
-              <Bug className="h-4 w-4 mr-2" />
+              <BugIcon className="h-4 w-4 mr-2" />
               Link Bug
             </Button>
           )}
@@ -116,7 +117,7 @@ const TestExecutionForm: React.FC<TestExecutionFormProps> = ({
             onClick={() => setIsBugDialogOpen(true)}
             disabled={isSubmitting}
           >
-            <Bug className="h-4 w-4 mr-2" />
+            <BugIcon className="h-4 w-4 mr-2" />
             Create Bug
           </Button>
         </div>

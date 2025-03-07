@@ -38,10 +38,10 @@ export interface TestCase {
   createdBy?: string;
   // Backlog integration fields
   relatedBacklogItemIds?: string[]; // IDs of associated backlog items
-  coverage?: TestCoverage[];
+  coverage?: TestCaseCoverage[];
 }
 
-export interface TestCoverage {
+export interface TestCaseCoverage {
   backlogItemId: string;
   testCaseId: string;
   status: TestStatus;
@@ -134,19 +134,7 @@ export interface ExportableBug extends Omit<Bug, 'createdAt' | 'updatedAt'> {
   updatedAt: string;
 }
 
-// New interfaces for Release test coverage
-export interface TestCoverage {
-  releaseId: string;
-  totalTestCases: number;
-  passedTests: number;
-  failedTests: number;
-  blockedTests: number;
-  notRunTests: number;
-  coveragePercentage: number;
-  riskLevel: 'low' | 'medium' | 'high';
-  readiness: 'go' | 'no-go' | 'warning';
-}
-
+// New interfaces for Release test coverage - renamed to avoid conflicts
 export interface TestExecutionForRelease {
   releaseId: string;
   testCycleId: string;
