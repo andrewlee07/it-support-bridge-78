@@ -85,6 +85,14 @@ export interface RiskAssessmentAnswer {
   value: number;
 }
 
+// New risk threshold configuration
+export interface RiskThreshold {
+  id: string;
+  level: RiskLevel;
+  minScore: number;
+  maxScore: number;
+}
+
 // Asset types
 export type AssetStatus = 'available' | 'in-use' | 'maintenance' | 'retired';
 export type AssetType = 'hardware' | 'software' | 'license' | 'other';
@@ -123,7 +131,7 @@ export interface EmailTemplate {
   name: string;
   subject: string;
   body: string;
-  triggerOn: 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 'sla-breach' | 'change-approved';
+  triggerOn: 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 'sla-breach' | 'change-approved' | 'change-submitted';
   isActive: boolean;
 }
 
