@@ -39,6 +39,7 @@ export interface TestCase {
   // Backlog integration fields
   relatedBacklogItemIds?: string[]; // IDs of associated backlog items
   coverage?: TestCaseCoverage[];
+  lastExecutionDate?: Date; // Added to support TestCoverageTab
 }
 
 export interface TestCaseCoverage {
@@ -63,7 +64,8 @@ export interface TestCoverage {
 
 // Props interface for TestCoverageIndicator component
 export interface TestCoverageIndicatorProps {
-  coverage: {
+  coveragePercentage?: number; // Added for backward compatibility
+  coverage?: {
     total: number;
     covered: number;
     passed: number;

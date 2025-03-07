@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusIcon, TestTube, Bug } from 'lucide-react';
 import { BacklogItem } from '@/utils/types/backlogTypes';
-import { TestCase, TestCoverage } from '@/utils/types/testTypes';
+import { TestCase, TestStatus, BugStatus, BugSeverity } from '@/utils/types/testTypes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
@@ -17,6 +17,22 @@ import StatusBadge from '@/components/test-management/ui/StatusBadge';
 interface TestCoverageTabProps {
   backlogItem: BacklogItem;
   onViewTestCase?: (testCase: TestCase) => void;
+}
+
+// Define interfaces for mock data to ensure type safety
+interface MockTestCase {
+  id: string;
+  title: string;
+  status: TestStatus;
+  lastExecutionDate?: Date;
+}
+
+interface MockBug {
+  id: string;
+  title: string;
+  status: BugStatus;
+  severity: BugSeverity;
+  createdAt: Date;
 }
 
 const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ 
@@ -36,52 +52,52 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
   };
   
   // Mock test cases - in a real implementation, this would come from the API
-  const mockTestCases = [
+  const mockTestCases: MockTestCase[] = [
     {
       id: 'tc-1',
       title: 'Verify user can create a new item',
-      status: 'pass' as const,
+      status: 'pass',
       lastExecutionDate: new Date(Date.now() - 86400000), // 1 day ago
     },
     {
       id: 'tc-2',
       title: 'Verify validation errors display correctly',
-      status: 'pass' as const,
+      status: 'pass',
       lastExecutionDate: new Date(Date.now() - 172800000), // 2 days ago
     },
     {
       id: 'tc-3',
       title: 'Verify item deletion requires confirmation',
-      status: 'fail' as const,
+      status: 'fail',
       lastExecutionDate: new Date(Date.now() - 43200000), // 12 hours ago
     },
     {
       id: 'tc-4', 
       title: 'Verify item list pagination',
-      status: 'not-run' as const,
+      status: 'not-run',
       lastExecutionDate: undefined,
     },
     {
       id: 'tc-5',
       title: 'Verify item search functionality',
-      status: 'pass' as const,
+      status: 'pass',
       lastExecutionDate: new Date(Date.now() - 259200000), // 3 days ago
     }
   ];
   
-  const mockBugs = [
+  const mockBugs: MockBug[] = [
     {
       id: 'bug-1',
       title: 'Pagination fails on last page',
-      status: 'open' as const,
-      severity: 'medium' as const,
+      status: 'open',
+      severity: 'medium',
       createdAt: new Date(Date.now() - 43200000), // 12 hours ago
     },
     {
       id: 'bug-2',
       title: 'Search doesn\'t handle special characters',
-      status: 'in-progress' as const,
-      severity: 'low' as const,
+      status: 'in-progress',
+      severity: 'low',
       createdAt: new Date(Date.now() - 604800000), // 7 days ago
     }
   ];
@@ -106,7 +122,12 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
           <CardContent>
             <div className="space-y-6">
               <TestCoverageIndicator 
-                coveragePercentage={coverage.coveragePercentage}
+                coverage={{
+                  total: coverage.totalTestCases,
+                  covered: coverage.passedTests + coverage.failedTests,
+                  passed: coverage.passedTests,
+                  failed: coverage.failedTests
+                }}
                 size="lg"
               />
               
@@ -227,7 +248,23 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          onClick={() => onViewTestCase && onViewTestCase(testCase as TestCase)}
+                          onClick={() => {
+                            if (onViewTestCase) {
+                              // Create a complete TestCase object from our mock data
+                              const fullTestCase: TestCase = {
+                                id: testCase.id,
+                                title: testCase.title,
+                                description: "Auto-generated description for mock data",
+                                stepsToReproduce: ["Step 1", "Step 2"],
+                                expectedResults: "Expected result for mock data",
+                                status: testCase.status,
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                                lastExecutionDate: testCase.lastExecutionDate
+                              };
+                              onViewTestCase(fullTestCase);
+                            }
+                          }}
                         >
                           View
                         </Button>
@@ -275,7 +312,8 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
                       </TableCell>
                       <TableCell>
                         <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          bug.severity === 'high' ? 'bg-red-100 text-red-800' :
+                          bug.severity === 'critical' ? 'bg-red-100 text-red-800' :
+                          bug.severity === 'high' ? 'bg-orange-100 text-orange-800' :
                           bug.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-green-100 text-green-800'
                         }`}>
@@ -295,15 +333,18 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
       </Tabs>
       
       {/* Link Test Case Dialog */}
-      <LinkTestCaseDialog
-        isOpen={isLinkTestCaseDialogOpen}
-        onClose={() => setIsLinkTestCaseDialogOpen(false)}
-        backlogItemId={backlogItem.id}
-        onSuccess={() => {
-          // Would refresh test cases in a real implementation
-          setIsLinkTestCaseDialogOpen(false);
-        }}
-      />
+      <Dialog open={isLinkTestCaseDialogOpen} onOpenChange={setIsLinkTestCaseDialogOpen}>
+        <DialogContent>
+          <LinkTestCaseDialog
+            backlogItem={backlogItem}
+            onClose={() => setIsLinkTestCaseDialogOpen(false)}
+            onSuccess={() => {
+              // Would refresh test cases in a real implementation
+              setIsLinkTestCaseDialogOpen(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
