@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { UseFormReturn } from 'react-hook-form';
 import { BacklogItemFormValues } from './forms/backlogItemSchema';
 import { Release } from '@/utils/api/release/types';
+import TagInput from './TagInput';
 
 interface BacklogItemFormFieldsProps {
   form: UseFormReturn<BacklogItemFormValues>;
@@ -259,6 +260,29 @@ const BacklogItemFormFields: React.FC<BacklogItemFormFieldsProps> = ({
           )}
         />
       </div>
+
+      {/* New Labels field with TagInput component */}
+      <FormField
+        control={form.control}
+        name="labels"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Labels</FormLabel>
+            <FormControl>
+              <TagInput 
+                value={field.value || []} 
+                onChange={field.onChange}
+                placeholder="Type and press Enter to add labels"
+                maxTags={10}
+              />
+            </FormControl>
+            <FormMessage />
+            <p className="text-xs text-muted-foreground mt-1">
+              Add labels to categorize this item. Press Enter after each label.
+            </p>
+          </FormItem>
+        )}
+      />
 
       <div className="flex justify-end space-x-2 pt-4">
         <Button type="button" variant="outline" onClick={onCancel}>
