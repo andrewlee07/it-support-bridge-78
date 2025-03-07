@@ -1,3 +1,4 @@
+
 // Test Case Management Types
 
 // Status types
@@ -47,7 +48,7 @@ export interface TestCaseCoverage {
   lastExecutionDate?: Date;
 }
 
-// Release test coverage interface
+// Test coverage interface for components that need it
 export interface TestCoverage {
   releaseId: string;
   totalTestCases: number;
@@ -58,6 +59,18 @@ export interface TestCoverage {
   coveragePercentage: number;
   riskLevel: 'high' | 'medium' | 'low';
   readiness: 'go' | 'no-go' | 'warning';
+}
+
+// Props interface for TestCoverageIndicator component
+export interface TestCoverageIndicatorProps {
+  coverage: {
+    total: number;
+    covered: number;
+    passed: number;
+    failed: number;
+  };
+  size?: 'sm' | 'md' | 'lg';
+  indicatorClassName?: string;
 }
 
 export interface Bug {

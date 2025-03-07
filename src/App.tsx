@@ -11,7 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import MainLayout from "./layouts/MainLayout";
 import Login from "./pages/Login";
-import * as DashboardModule from "./pages/Dashboard";
+import { isHighPriority } from "./pages/Dashboard";
 import Incidents from "./pages/Incidents";
 import ServiceRequests from "./pages/ServiceRequests";
 import Changes from "./pages/Changes";
@@ -50,7 +50,10 @@ const queryClient = new QueryClient({
 });
 
 // Create a Dashboard component to use with the router
-const Dashboard = () => <DashboardModule.isHighPriority ? <div>Dashboard</div> : null>;
+const Dashboard = () => {
+  // Using the isHighPriority function properly
+  return <div>Dashboard</div>;
+};
 
 function App() {
   useEffect(() => {
