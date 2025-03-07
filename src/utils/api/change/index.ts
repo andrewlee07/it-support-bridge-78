@@ -1,5 +1,5 @@
 
-import { changeRequestApi } from './changeRequestApi';
+import { changeRequestApi } from './operations';
 import { statusApi } from './statusApi';
 import { riskAssessmentApi } from './riskAssessmentApi';
 import { calculateRiskLevelFromThresholds, generateThresholdId, ensureThresholdId } from './types';
@@ -29,3 +29,6 @@ export const changeApi = {
 
 // Export the helper functions for direct access
 export { calculateRiskLevelFromThresholds, generateThresholdId, ensureThresholdId };
+
+// Export individual APIs for direct access if needed
+export { changeRequestApi, statusApi, riskAssessmentApi };
