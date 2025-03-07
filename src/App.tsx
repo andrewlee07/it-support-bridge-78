@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import React from "react";
+
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
@@ -13,7 +15,9 @@ import ServiceRequests from "./pages/ServiceRequests";
 import Users from "./pages/Users";
 import MainLayout from "./layouts/MainLayout";
 import SLASettings from "./pages/SLASettings";
-import React from "react";
+import Changes from "./pages/Changes";
+import Assets from "./pages/Assets";
+import Reports from "./pages/Reports";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -33,11 +37,11 @@ const App = () => {
                 <Route path="/incidents" element={<Incidents />} />
                 <Route path="/service-requests" element={<ServiceRequests />} />
                 <Route path="/users" element={<Users />} />
+                <Route path="/changes" element={<Changes />} />
+                <Route path="/assets" element={<Assets />} />
+                <Route path="/reports" element={<Reports />} />
                 <Route path="/settings/sla" element={<SLASettings />} />
                 {/* These routes would be implemented in future iterations */}
-                <Route path="/changes" element={<NotFound />} />
-                <Route path="/assets" element={<NotFound />} />
-                <Route path="/reports" element={<NotFound />} />
                 <Route path="/settings" element={<NotFound />} />
                 <Route path="/help" element={<NotFound />} />
               </Route>
