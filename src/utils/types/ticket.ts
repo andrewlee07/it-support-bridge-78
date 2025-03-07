@@ -6,7 +6,7 @@ export type TicketCategory = 'hardware' | 'software' | 'network' | 'access' | 'o
 export type TicketType = 'incident' | 'service' | 'change';
 
 import { AuditEntry } from './audit';
-import { TestCase } from './testTypes';
+import { TestCase } from './test';
 import { BacklogItem } from './backlogTypes';
 
 export interface Ticket {

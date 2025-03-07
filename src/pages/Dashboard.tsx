@@ -10,3 +10,5 @@ export const isHighPriority = (priority: TicketPriority): boolean => {
 export const Dashboard = () => {
   return <div>Dashboard Content</div>;
 };
+
+export default Dashboard;

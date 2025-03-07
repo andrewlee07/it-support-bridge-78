@@ -39,3 +39,6 @@ export type {
   TicketFilter,
   TestCoverageRelationship,
 } from './ticket';
+
+// Re-export test-related types from new location
+export * from './test';
