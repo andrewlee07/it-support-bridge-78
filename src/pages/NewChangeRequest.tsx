@@ -40,6 +40,7 @@ const NewChangeRequest = () => {
   });
 
   const handleSubmit = (data: any) => {
+    console.log("Change request data with assessment:", data);
     createChangeMutation.mutate(data);
   };
 

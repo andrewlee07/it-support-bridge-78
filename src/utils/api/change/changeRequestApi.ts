@@ -1,10 +1,10 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { 
   ChangeRequest, 
   ChangeStatus,
   ApiResponse, 
-  PaginatedResponse
+  PaginatedResponse,
+  RiskAssessmentAnswer
 } from '../../types';
 import { simulateApiResponse, simulatePaginatedResponse, createApiErrorResponse } from '../../mockData/apiHelpers';
 import { addAuditEntry } from '../../auditUtils';
@@ -13,8 +13,11 @@ import {
   getChangeRequests, 
   setChangeRequests, 
   updateChangeRequest,
-  generateChangeId
+  generateChangeId,
+  getRiskQuestions,
+  getRiskThresholds
 } from './store';
+import { calculateRiskLevelFromThresholds } from './types';
 
 // Change request operations
 export const changeRequestApi = {
@@ -99,11 +102,40 @@ export const changeRequestApi = {
       implementationPlan: string;
       rollbackPlan: string;
       approverRoles?: string[];
+      assessmentAnswers?: RiskAssessmentAnswer[];
       createdBy: string;
     }
   ): Promise<ApiResponse<ChangeRequest>> => {
     const newId = generateChangeId();
     const now = new Date();
+    
+    // Calculate risk score if assessment answers are provided
+    let riskScore = 0;
+    let riskLevel = 'low';
+    
+    if (data.assessmentAnswers && data.assessmentAnswers.length > 0) {
+      const riskQuestions = getRiskQuestions();
+      const riskThresholds = getRiskThresholds();
+      
+      // Calculate weighted score
+      let totalScore = 0;
+      let totalWeight = 0;
+      
+      for (const answer of data.assessmentAnswers) {
+        const question = riskQuestions.find(q => q.id === answer.questionId);
+        
+        if (question) {
+          totalScore += answer.value * question.weight;
+          totalWeight += question.weight;
+        }
+      }
+      
+      // Calculate final score (rounded to 1 decimal place)
+      riskScore = totalWeight > 0 ? Math.round((totalScore / totalWeight) * 10) / 10 : 0;
+      
+      // Determine risk level
+      riskLevel = calculateRiskLevelFromThresholds(riskScore, riskThresholds);
+    }
     
     const newChangeRequest: ChangeRequest = {
       id: newId,
@@ -118,9 +150,9 @@ export const changeRequestApi = {
       updatedAt: now,
       startDate: new Date(data.startDate),
       endDate: new Date(data.endDate),
-      riskScore: 0,
-      riskLevel: 'low',
-      assessmentAnswers: [],
+      riskScore: riskScore,
+      riskLevel: riskLevel as any,
+      assessmentAnswers: data.assessmentAnswers || [],
       implementationPlan: data.implementationPlan,
       rollbackPlan: data.rollbackPlan,
       approverRoles: data.approverRoles as any[] || ['it'],

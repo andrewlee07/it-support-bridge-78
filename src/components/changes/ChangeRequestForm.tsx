@@ -16,6 +16,7 @@ import PlanningSection from './form/PlanningSection';
 import ApproverSection from './form/ApproverSection';
 import ClosureSection from './form/ClosureSection';
 import FormActions from './form/FormActions';
+import RiskAssessmentSection from './form/RiskAssessmentSection';
 
 // Form schema
 const changeRequestSchema = z.object({
@@ -31,6 +32,11 @@ const changeRequestSchema = z.object({
   approverRoles: z.array(z.enum(['it', 'user'] as const)).optional(),
   closureReason: z.enum(['successful', 'successful-with-issues', 'rolled-back', 'failed'] as const).optional(),
   closureNotes: z.string().optional(),
+  assessmentAnswers: z.array(z.object({
+    questionId: z.string(),
+    selectedOptionId: z.string(),
+    value: z.number()
+  })).optional(),
 }).refine(data => data.endDate > data.startDate, {
   message: "End date must be after start date",
   path: ["endDate"],
@@ -73,6 +79,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
       approverRoles: initialData?.approverRoles || ['it'],
       closureReason: initialData?.closureReason,
       closureNotes: "",
+      assessmentAnswers: initialData?.assessmentAnswers || [],
     }
   });
 
@@ -104,6 +111,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
                 <BasicInfoSection form={form} />
                 <DateSelectionSection form={form} />
                 <PlanningSection form={form} />
+                <RiskAssessmentSection form={form} />
                 <ApproverSection form={form} />
               </>
             )}
