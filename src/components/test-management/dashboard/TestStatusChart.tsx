@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { TestStatus } from '@/utils/types/testTypes';
@@ -63,10 +62,10 @@ const TestStatusChart: React.FC<TestStatusChartProps> = ({
   const totalTests = passedTests + failedTests + blockedTests + notRunTests;
   
   const chartData: StatusCount[] = [
-    { status: 'pass', count: passedTests, color: STATUS_COLORS['pass'], label: STATUS_LABELS['pass'] },
-    { status: 'fail', count: failedTests, color: STATUS_COLORS['fail'], label: STATUS_LABELS['fail'] },
-    { status: 'blocked', count: blockedTests, color: STATUS_COLORS['blocked'], label: STATUS_LABELS['blocked'] },
-    { status: 'not-run', count: notRunTests, color: STATUS_COLORS['not-run'], label: STATUS_LABELS['not-run'] },
+    { status: 'pass' as TestStatus, count: passedTests, color: STATUS_COLORS['pass'], label: STATUS_LABELS['pass'] },
+    { status: 'fail' as TestStatus, count: failedTests, color: STATUS_COLORS['fail'], label: STATUS_LABELS['fail'] },
+    { status: 'blocked' as TestStatus, count: blockedTests, color: STATUS_COLORS['blocked'], label: STATUS_LABELS['blocked'] },
+    { status: 'not-run' as TestStatus, count: notRunTests, color: STATUS_COLORS['not-run'], label: STATUS_LABELS['not-run'] },
   ].filter(item => item.count > 0); // Only show statuses that have counts > 0
 
   // Custom tooltip component for the chart

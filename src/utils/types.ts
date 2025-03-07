@@ -1,4 +1,3 @@
-
 // User types
 export type UserRole = 'admin' | 'it' | 'user';
 
@@ -194,11 +193,12 @@ export interface DashboardStats {
 }
 
 // API response types
-export interface ApiResponse<T> {
+export interface ApiResponse<T = any> {
   success: boolean;
-  data?: T;
-  error?: string;
   message?: string;
+  error?: string;
+  statusCode: number;
+  data?: T;
 }
 
 export interface PaginatedResponse<T> {

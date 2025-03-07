@@ -44,8 +44,17 @@ const fetchTestCases = (statusFilter = null) => {
     });
   }
   
-  // Otherwise, use the original function
-  return originalFetchTestCases();
+  // Otherwise, use the original function which we need to ensure returns the same shape
+  return originalFetchTestCases().then(response => {
+    // If originalFetchTestCases doesn't include statusCode, add it
+    if (!('statusCode' in response)) {
+      return {
+        ...response,
+        statusCode: 200 // Assume success status code
+      };
+    }
+    return response;
+  });
 };
 
 // Export everything

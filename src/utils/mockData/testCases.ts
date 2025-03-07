@@ -60,12 +60,30 @@ export const testCases: TestCase[] = [
 
 // API mocks for fetching test cases
 export const fetchTestCases = () => {
-  return simulateApiResponse(testCases);
+  return Promise.resolve({
+    success: true,
+    message: 'Test cases retrieved successfully',
+    statusCode: 200,
+    data: testCases
+  });
 };
 
 export const fetchTestCaseById = (id: string) => {
   const testCase = testCases.find(tc => tc.id === id);
-  return simulateApiResponse(testCase);
+  if (!testCase) {
+    return Promise.resolve({
+      success: false,
+      message: 'Test case not found',
+      statusCode: 404,
+      data: null
+    });
+  }
+  return Promise.resolve({
+    success: true,
+    message: 'Test case retrieved successfully',
+    statusCode: 200,
+    data: testCase
+  });
 };
 
 // API mocks for managing test cases
@@ -80,7 +98,12 @@ export const createTestCase = async (
     updatedAt: new Date()
   };
   testCases.push(newTestCase);
-  return simulateApiResponse(newTestCase);
+  return Promise.resolve({
+    success: true,
+    message: 'Test case created successfully',
+    statusCode: 201,
+    data: newTestCase
+  });
 };
 
 export const updateTestCase = async (
@@ -90,7 +113,12 @@ export const updateTestCase = async (
   await delay(500);
   const testCaseIndex = testCases.findIndex(tc => tc.id === id);
   if (testCaseIndex === -1) {
-    return simulateApiResponse(null, 'Test case not found', 404);
+    return Promise.resolve({
+      success: false,
+      message: 'Test case not found',
+      statusCode: 404,
+      data: null
+    });
   }
   
   testCases[testCaseIndex] = {
@@ -99,16 +127,31 @@ export const updateTestCase = async (
     updatedAt: new Date()
   };
   
-  return simulateApiResponse(testCases[testCaseIndex]);
+  return Promise.resolve({
+    success: true,
+    message: 'Test case updated successfully',
+    statusCode: 200,
+    data: testCases[testCaseIndex]
+  });
 };
 
 export const deleteTestCase = async (id: string) => {
   await delay(500);
   const testCaseIndex = testCases.findIndex(tc => tc.id === id);
   if (testCaseIndex === -1) {
-    return simulateApiResponse(null, 'Test case not found', 404);
+    return Promise.resolve({
+      success: false,
+      message: 'Test case not found',
+      statusCode: 404,
+      data: null
+    });
   }
   
   testCases.splice(testCaseIndex, 1);
-  return simulateApiResponse(true);
+  return Promise.resolve({
+    success: true,
+    message: 'Test case deleted successfully',
+    statusCode: 200,
+    data: true
+  });
 };
