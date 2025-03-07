@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -37,12 +36,16 @@ type ChangeRequestFormValues = z.infer<typeof changeRequestSchema>;
 
 interface ChangeRequestFormProps {
   onSubmit: (data: ChangeRequestFormValues) => void;
+  onCancel?: () => void;
+  isSubmitting?: boolean;
   initialData?: Partial<ChangeRequest>;
   isEditing?: boolean;
 }
 
 const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({ 
   onSubmit, 
+  onCancel,
+  isSubmitting = false,
   initialData, 
   isEditing = false 
 }) => {
@@ -289,11 +292,15 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
           </CardContent>
           
           <CardFooter className="flex justify-between">
-            <Button variant="outline" type="button" onClick={() => window.history.back()}>
+            <Button 
+              variant="outline" 
+              type="button" 
+              onClick={onCancel || (() => window.history.back())}
+            >
               Cancel
             </Button>
-            <Button type="submit">
-              {isEditing ? "Update Change Request" : "Submit Change Request"}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Processing..." : (isEditing ? "Update Change Request" : "Submit Change Request")}
             </Button>
           </CardFooter>
         </form>
