@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { TestCase } from '@/utils/types/testTypes';
+import { TestCase, mapTestStatus } from '@/utils/types/testTypes';
 import { createTestCase, updateTestCase } from '@/utils/mockData/testData';
 import { TestCaseFormValues } from './testCaseSchema';
 
@@ -38,11 +38,15 @@ export const useTestCaseSubmit = ({ initialData, onSuccess }: UseTestCaseSubmitP
         };
       }
 
+      // Make sure the status is compatible with the backend
+      // Convert from TestCaseFormValues status to a compatible status string
+      const mappedStatus = mapTestStatus(data.status);
+
       // Create the test case data with both new and legacy fields for compatibility
       const testCaseData: Partial<TestCase> = {
         title: data.title,
         description: data.description,
-        status: data.status,
+        status: mappedStatus,
         stepsToReproduce: filteredSteps,
         expectedResults: data.expectedResults,
         // Legacy fields for backwards compatibility

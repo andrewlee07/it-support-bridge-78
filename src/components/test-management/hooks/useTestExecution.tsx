@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { fetchTestCases, executeTest } from '@/utils/mockData/testData';
-import { TestCase, TestStatus } from '@/utils/types/testTypes';
+import { fetchTestCases } from '@/utils/mockData/testData';
+import { executeTest } from '@/utils/mockData/testExecutions';
+import { TestCase, TestStatus, mapTestStatus } from '@/utils/types/testTypes';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useTestExecution = (testCycleId?: string) => {
@@ -54,6 +55,8 @@ export const useTestExecution = (testCycleId?: string) => {
     try {
       // Convert status to match what executeTest expects
       let execStatus: 'passed' | 'failed' | 'blocked' = 'blocked';
+      
+      // Handle all possible status values and map them to expected values
       if (status === 'pass' || status === 'passed') {
         execStatus = 'passed';
       } else if (status === 'fail' || status === 'failed') {
@@ -105,8 +108,7 @@ export const useTestExecution = (testCycleId?: string) => {
       description: tc.description,
       stepsToReproduce: tc.steps || [],
       expectedResults: tc.expectedResult || '',
-      status: tc.status === 'passed' ? 'pass' : 
-              tc.status === 'failed' ? 'fail' : tc.status,
+      status: mapTestStatus(tc.status), // Use the mapping function to ensure consistent status values
       assignedTester: tc.createdBy || tc.assignedTester,
       relatedRequirement: tc.relatedRequirement || '',
       createdAt: tc.createdAt,
