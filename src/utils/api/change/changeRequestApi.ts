@@ -114,7 +114,7 @@ export const changeRequestApi = {
       description: data.description,
       status: 'draft',
       priority: data.priority as any,
-      category: data.category as any,
+      category: data.changeCategory as any, // Using the changeCategory field for ChangeRequest.category
       type: 'change',
       createdBy: data.createdBy,
       createdAt: now,
@@ -126,7 +126,6 @@ export const changeRequestApi = {
       assessmentAnswers: [],
       implementationPlan: data.implementationPlan,
       rollbackPlan: data.rollbackPlan,
-      category: data.changeCategory as any,
       approverRoles: data.approverRoles as any[] || ['it'],
       audit: [
         {

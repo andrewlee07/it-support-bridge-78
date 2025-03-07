@@ -54,8 +54,9 @@ export type ChangeCategory = 'standard' | 'normal' | 'emergency';
 export type ClosureReason = 'successful' | 'successful-with-issues' | 'rolled-back' | 'failed';
 export type ApproverRole = 'it' | 'user';
 
-export interface ChangeRequest extends Omit<Ticket, 'status'> {
+export interface ChangeRequest extends Omit<Ticket, 'status' | 'category'> {
   status: ChangeStatus;
+  category: ChangeCategory;
   startDate: Date;
   endDate: Date;
   riskScore: number;
@@ -63,7 +64,6 @@ export interface ChangeRequest extends Omit<Ticket, 'status'> {
   assessmentAnswers: RiskAssessmentAnswer[];
   implementationPlan: string;
   rollbackPlan: string;
-  category?: ChangeCategory;
   closureReason?: ClosureReason;
   approverRoles?: ApproverRole[];
   approvedBy?: string;

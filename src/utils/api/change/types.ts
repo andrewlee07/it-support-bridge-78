@@ -7,7 +7,8 @@ import {
   PaginatedResponse,
   ChangeStatus,
   RiskLevel,
-  RiskThreshold
+  RiskThreshold,
+  ChangeCategory
 } from '../../types';
 
 // Risk threshold configuration
