@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PaginatedResponse, Ticket } from '@/utils/types';
-import { api } from '@/utils/apiService';
+import { api } from '@/utils/api'; // Updated import path
 import TicketList from './TicketList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
