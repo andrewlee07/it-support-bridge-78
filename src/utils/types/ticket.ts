@@ -1,7 +1,7 @@
 
 // Base ticket types
 export type TicketStatus = 'open' | 'in-progress' | 'resolved' | 'closed' | 'approved' | 'fulfilled';
-export type TicketPriority = 'low' | 'medium' | 'high';
+export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4';
 export type TicketCategory = 'hardware' | 'software' | 'network' | 'access' | 'other';
 export type TicketType = 'incident' | 'service' | 'change';
 

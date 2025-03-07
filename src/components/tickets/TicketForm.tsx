@@ -35,7 +35,7 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
     title: '',
     description: '',
     category: '' as TicketCategory,
-    priority: 'medium' as TicketPriority,
+    priority: 'P3' as TicketPriority, // Default to P3 (medium priority)
     type: type,
   };
   
@@ -146,9 +146,10 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="P1">P1 - Critical</SelectItem>
+                    <SelectItem value="P2">P2 - High</SelectItem>
+                    <SelectItem value="P3">P3 - Medium</SelectItem>
+                    <SelectItem value="P4">P4 - Low</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>

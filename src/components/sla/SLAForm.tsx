@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { SLA, TicketPriority } from '@/utils/types';
+import { SLA, TicketPriority, TicketType } from '@/utils/types';
 import { toast } from 'sonner';
 
 interface SLAFormProps {
@@ -35,7 +35,8 @@ const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) =>
   const defaultValues = {
     name: initialData?.name || '',
     description: initialData?.description || '',
-    priorityLevel: initialData?.priorityLevel || 'medium' as TicketPriority,
+    ticketType: initialData?.ticketType || 'incident' as TicketType,
+    priorityLevel: initialData?.priorityLevel || 'P3' as TicketPriority,
     responseTimeHours: initialData?.responseTimeHours || 4,
     resolutionTimeHours: initialData?.resolutionTimeHours || 8,
     isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
@@ -67,7 +68,7 @@ const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) =>
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="e.g., High Priority SLA" 
+                  placeholder="e.g., P1 Incident SLA" 
                   {...field} 
                 />
               </FormControl>
@@ -101,7 +102,33 @@ const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) =>
           )}
         />
         
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="ticketType"
+            rules={{ required: 'Ticket type is required' }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ticket Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a ticket type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="incident">Incident</SelectItem>
+                    <SelectItem value="service">Service Request</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  The type of ticket this SLA applies to
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
           <FormField
             control={form.control}
             name="priorityLevel"
@@ -116,9 +143,10 @@ const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) =>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="P1">P1 - Critical</SelectItem>
+                    <SelectItem value="P2">P2 - High</SelectItem>
+                    <SelectItem value="P3">P3 - Medium</SelectItem>
+                    <SelectItem value="P4">P4 - Low</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>
@@ -128,13 +156,15 @@ const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) =>
               </FormItem>
             )}
           />
+        </div>
           
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="responseTimeHours"
             rules={{ 
               required: 'Response time is required',
-              min: { value: 1, message: 'Minimum response time is 1 hour' }
+              min: { value: 0.1, message: 'Minimum response time is 0.1 hours (6 minutes)' }
             }}
             render={({ field }) => (
               <FormItem>
@@ -142,9 +172,10 @@ const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) =>
                 <FormControl>
                   <Input 
                     type="number" 
-                    min="1"
+                    min="0.1"
+                    step="0.1"
                     {...field} 
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                   />
                 </FormControl>
                 <FormDescription>
@@ -160,7 +191,7 @@ const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) =>
             name="resolutionTimeHours"
             rules={{ 
               required: 'Resolution time is required',
-              min: { value: 1, message: 'Minimum resolution time is 1 hour' }
+              min: { value: 0.5, message: 'Minimum resolution time is 0.5 hours (30 minutes)' }
             }}
             render={({ field }) => (
               <FormItem>
@@ -168,9 +199,10 @@ const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) =>
                 <FormControl>
                   <Input 
                     type="number" 
-                    min="1"
+                    min="0.5"
+                    step="0.5"
                     {...field} 
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                   />
                 </FormControl>
                 <FormDescription>
