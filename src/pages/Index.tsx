@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -13,7 +12,7 @@ const Index = () => {
         <div className="max-w-screen-xl mx-auto flex justify-between items-center">
           <div className="flex items-center">
             <img 
-              src="/lovable-uploads/bf3633e2-5031-4a59-ab35-ffd5b863fbfc.png" 
+              src="/lovable-uploads/9f8e5267-ab6c-409e-99f0-0517f48fc1b8.png" 
               alt="We Are Group" 
               className="h-12 md:h-16"
             />
@@ -32,22 +31,14 @@ const Index = () => {
               className="md:w-1/2 mb-8 md:mb-0"
             >
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                A world where no one is left behind
+                IT Service Management System
               </h1>
-              <p className="text-xl md:text-2xl mb-8">
-                Delivering Training, Advice and Guidance services that empower people to live better lives.
-              </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button size="lg" className="text-base bg-[#42284e] hover:bg-[#42284e]/90 text-white" asChild>
-                  <Link to="/dashboard">
-                    Go to Dashboard
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" className="text-base border-white text-white hover:bg-white hover:text-[#b047c9]" asChild>
                   <Link to="/login">
                     Login
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               </div>
@@ -148,7 +139,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <img 
-                src="/lovable-uploads/bf3633e2-5031-4a59-ab35-ffd5b863fbfc.png" 
+                src="/lovable-uploads/9f8e5267-ab6c-409e-99f0-0517f48fc1b8.png" 
                 alt="We Are Group" 
                 className="h-12 mb-4"
               />
