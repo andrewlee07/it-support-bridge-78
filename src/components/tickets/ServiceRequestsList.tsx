@@ -1,8 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PaginatedResponse, Ticket } from '@/utils/types';
-import { api } from '@/utils/api'; // Updated import path
+import { ticketApi } from '@/utils/api'; // Updated import to use ticketApi directly
 import TicketList from './TicketList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -13,7 +13,7 @@ const ServiceRequestsList: React.FC = () => {
   
   const { data, isLoading, error } = useQuery<PaginatedResponse<Ticket>>({
     queryKey: ['serviceRequests', page],
-    queryFn: () => api.tickets.getTicketsByType('service', page, 10),
+    queryFn: () => ticketApi.getTicketsByType('service', page, 10), // Updated to use ticketApi directly
   });
   
   if (isLoading) {
