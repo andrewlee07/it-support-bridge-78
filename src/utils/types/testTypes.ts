@@ -1,10 +1,19 @@
 
 // Test Case Management Types
-export type TestStatus = 'not-run' | 'pass' | 'fail' | 'blocked' | 'passed' | 'failed';
+
+// Status types
+export type TestStatus = 'not-run' | 'pass' | 'fail' | 'blocked' | 'passed' | 'failed' | 'draft' | 'ready' | 'in_progress';
 export type BugSeverity = 'critical' | 'high' | 'medium' | 'low';
 export type BugPriority = 'urgent' | 'high' | 'medium' | 'low';
-export type BugStatus = 'new' | 'in-progress' | 'fixed' | 'verified' | 'closed' | 'open' | 'in_progress' | 'resolved';
-export type TestCycleStatus = 'planned' | 'in_progress' | 'completed' | 'aborted' | 'in-progress';
+export type BugStatus = 
+  'new' | 'in-progress' | 'fixed' | 'verified' | 'closed' | 
+  'open' | 'in_progress' | 'resolved'; // Including all values used in the codebase
+export type TestCycleStatus = 'planned' | 'in-progress' | 'in_progress' | 'completed' | 'aborted';
+
+// For backwards compatibility with testData.ts
+export type TestCaseStatus = TestStatus;
+export type TestPriority = BugPriority;
+export type TestType = 'integration' | 'unit' | 'e2e' | 'performance' | 'security';
 
 export interface TestCase {
   id: string;
@@ -17,6 +26,13 @@ export interface TestCase {
   relatedRequirement?: string;
   createdAt: Date;
   updatedAt: Date;
+  // Legacy fields
+  preConditions?: string;
+  steps?: string[];
+  expectedResult?: string;
+  priority?: TestPriority;
+  type?: TestType;
+  createdBy?: string;
 }
 
 export interface Bug {
@@ -34,19 +50,21 @@ export interface Bug {
   updatedAt: Date;
   createdBy: string; // User ID
   reportedBy?: string; // Backward compatibility
+  // For compatibility with testData
+  assignedTo?: string;
 }
 
 export interface TestExecution {
   id: string;
   testCaseId: string;
-  executionDate: Date;
+  testCycleId: string;
   status: TestStatus;
-  comments: string;
+  comments?: string;
   executedBy: string; // User ID
-  linkedBugs: string[]; // Bug IDs
-  testCycleId?: string; // For compatibility with testData
-  notes?: string; // For compatibility with testData
+  linkedBugs?: string[]; // Bug IDs
+  executionDate?: Date; // Either executionDate or executedAt must be present
   executedAt?: Date; // For compatibility with testData
+  notes?: string; // For compatibility with testData
 }
 
 export interface TestCycle {
@@ -101,6 +119,7 @@ export const mapTestStatus = (status: string): TestStatus => {
     case 'passed': return 'pass';
     case 'failed': return 'fail';
     case 'draft': return 'not-run';
+    case 'ready': return 'not-run';
     default: return status as TestStatus;
   }
 };

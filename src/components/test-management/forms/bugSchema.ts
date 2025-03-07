@@ -3,8 +3,10 @@ import * as z from 'zod';
 
 // Convert enum-like types to zod enum schemas
 const bugSeverityEnum = z.enum(['critical', 'high', 'medium', 'low'] as const);
-const bugPriorityEnum = z.enum(['high', 'medium', 'low'] as const);
-const bugStatusEnum = z.enum(['open', 'in_progress', 'resolved', 'closed', 'fixed', 'verified'] as const);
+const bugPriorityEnum = z.enum(['high', 'medium', 'low', 'urgent'] as const);
+const bugStatusEnum = z.enum([
+  'open', 'in_progress', 'resolved', 'closed', 'fixed', 'verified', 'new', 'in-progress'
+] as const);
 
 // Form schema for bug report
 export const bugSchema = z.object({

@@ -38,24 +38,21 @@ export const useTestCaseSubmit = ({ initialData, onSuccess }: UseTestCaseSubmitP
         };
       }
 
-      // Map status values to be compatible with TestCaseStatus
-      let apiStatus = data.status;
-      if (data.status === 'not-run') apiStatus = 'draft';
-      if (data.status === 'pass') apiStatus = 'passed';
-      if (data.status === 'fail') apiStatus = 'failed';
-
-      // Convert to the format expected by the testData API
-      const testCaseData = {
+      // Create the test case data with both new and legacy fields for compatibility
+      const testCaseData: Partial<TestCase> = {
         title: data.title,
         description: data.description,
-        status: apiStatus,
-        preConditions: "",
+        status: data.status,
+        stepsToReproduce: filteredSteps,
+        expectedResults: data.expectedResults,
+        // Legacy fields for backwards compatibility
         steps: filteredSteps,
         expectedResult: data.expectedResults,
+        preConditions: "",
         priority: "medium",
         type: "e2e",
         createdBy: user.id,
-        assignedTo: data.assignedTester,
+        assignedTester: data.assignedTester,
       };
 
       let result;
@@ -64,7 +61,7 @@ export const useTestCaseSubmit = ({ initialData, onSuccess }: UseTestCaseSubmitP
         result = await updateTestCase(initialData.id, testCaseData);
       } else {
         // Create new test case
-        result = await createTestCase(testCaseData);
+        result = await createTestCase(testCaseData as Omit<TestCase, 'id' | 'createdAt' | 'updatedAt'>);
       }
 
       if (result.success) {
@@ -72,24 +69,7 @@ export const useTestCaseSubmit = ({ initialData, onSuccess }: UseTestCaseSubmitP
           title: `Test case ${initialData?.id ? 'updated' : 'created'} successfully`,
           description: `Test case "${data.title}" has been ${initialData?.id ? 'updated' : 'created'}.`,
         });
-        if (onSuccess) {
-          // Convert the API response format to TestCase format before passing to onSuccess
-          const testCase: TestCase = {
-            id: result.data.id,
-            title: result.data.title,
-            description: result.data.description,
-            stepsToReproduce: result.data.steps || [],
-            expectedResults: result.data.expectedResult || '',
-            status: result.data.status === 'passed' ? 'pass' : 
-                    result.data.status === 'failed' ? 'fail' : 
-                    result.data.status === 'draft' ? 'not-run' : result.data.status,
-            assignedTester: result.data.assignedTo || result.data.createdBy,
-            relatedRequirement: '',
-            createdAt: result.data.createdAt,
-            updatedAt: result.data.updatedAt,
-          };
-          onSuccess(testCase);
-        }
+        if (onSuccess) onSuccess(result.data as TestCase);
         return { success: true };
       } else {
         toast({

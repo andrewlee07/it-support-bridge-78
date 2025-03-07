@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from './apiHelpers';
 import { ApiResponse } from '../types';
-import { TestCase, TestCaseStatus, TestPriority, TestType } from '../types/testTypes';
+import { TestCase, TestStatus, TestPriority, TestType } from '../types/testTypes';
 
 // Mock Test Cases data
 export let testCases: TestCase[] = [
@@ -13,7 +13,9 @@ export let testCases: TestCase[] = [
     preConditions: 'User must have an existing account',
     steps: ['Open login page', 'Enter username', 'Enter password', 'Click login button'],
     expectedResult: 'User should be logged in successfully',
-    status: 'ready',
+    stepsToReproduce: ['Open login page', 'Enter username', 'Enter password', 'Click login button'],
+    expectedResults: 'User should be logged in successfully',
+    status: 'ready' as TestStatus,
     priority: 'high',
     type: 'e2e',
     createdBy: 'user-1',
@@ -27,7 +29,9 @@ export let testCases: TestCase[] = [
     preConditions: 'User must have an existing account',
     steps: ['Open password reset page', 'Enter email', 'Click reset button'],
     expectedResult: 'User should receive a password reset email',
-    status: 'ready',
+    stepsToReproduce: ['Open password reset page', 'Enter email', 'Click reset button'],
+    expectedResults: 'User should receive a password reset email',
+    status: 'ready' as TestStatus,
     priority: 'medium',
     type: 'e2e',
     createdBy: 'user-1',
@@ -57,12 +61,17 @@ export const fetchTestCaseById = async (id: string): Promise<ApiResponse<TestCas
 
 export const createTestCase = async (testCase: Omit<TestCase, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<TestCase>> => {
   await delay(500);
+  
+  // Ensure the required fields are present
   const newTestCase: TestCase = {
     id: uuidv4(),
     ...testCase,
+    stepsToReproduce: testCase.stepsToReproduce || testCase.steps || [],
+    expectedResults: testCase.expectedResults || testCase.expectedResult || '',
     createdAt: new Date(),
     updatedAt: new Date(),
   };
+  
   testCases.push(newTestCase);
   return createApiSuccessResponse(newTestCase);
 };
@@ -73,6 +82,15 @@ export const updateTestCase = async (id: string, updates: Partial<TestCase>): Pr
   if (index === -1) {
     return createApiErrorResponse<TestCase | null>('Test case not found', 404);
   }
+  
+  // Ensure backward compatibility with stepsToReproduce vs steps
+  if (updates.steps && !updates.stepsToReproduce) {
+    updates.stepsToReproduce = updates.steps;
+  }
+  if (updates.expectedResult && !updates.expectedResults) {
+    updates.expectedResults = updates.expectedResult;
+  }
+  
   testCases[index] = { ...testCases[index], ...updates, updatedAt: new Date() };
   return createApiSuccessResponse(testCases[index]);
 };

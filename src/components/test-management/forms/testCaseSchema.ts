@@ -9,7 +9,7 @@ export const testCaseSchema = z.object({
     message: 'At least one non-empty step is required.',
   }),
   expectedResults: z.string().min(5, { message: 'Expected results must be at least 5 characters.' }),
-  status: z.enum(['not-run', 'pass', 'fail', 'blocked']),
+  status: z.enum(['not-run', 'pass', 'fail', 'blocked', 'passed', 'failed', 'draft', 'ready']),
   assignedTester: z.string().optional(), // Optional but should default to the current user
   relatedRequirement: z.string().optional(),
 });
