@@ -13,7 +13,7 @@ import { useTestCaseManagement } from './hooks/useTestCaseManagement';
 import { useTestCases } from './hooks/useTestCases';
 
 const TestCaseList: React.FC = () => {
-  const { testCasesData, isError, refetch } = useTestCases();
+  const { testCasesData, isLoadingTestCases, isError, refetch } = useTestCases();
   
   const {
     selectedTestCase,
@@ -39,7 +39,7 @@ const TestCaseList: React.FC = () => {
   return (
     <div className="w-full">
       <TestCaseTable 
-        testCases={testCasesData?.data}
+        testCases={testCasesData}
         onView={viewTestCase}
         onEdit={editTestCase}
         onDelete={handleDelete}

@@ -4,7 +4,7 @@ import { fetchTestCases } from '@/utils/mockData/testData';
 
 export const useTestCases = (options?: { enabled?: boolean, testCycleId?: string }) => {
   const { 
-    data: testCasesData, 
+    data, 
     isLoading: isLoadingTestCases,
     isError,
     refetch
@@ -15,7 +15,7 @@ export const useTestCases = (options?: { enabled?: boolean, testCycleId?: string
   });
 
   return {
-    testCasesData: testCasesData?.data || [],
+    testCasesData: data?.data || [],
     isLoadingTestCases,
     isError,
     refetch
