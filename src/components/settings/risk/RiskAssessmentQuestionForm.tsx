@@ -3,15 +3,13 @@ import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { RiskAssessmentQuestion, RiskAssessmentQuestionOption } from '@/utils/types';
+import { RiskAssessmentQuestion } from '@/utils/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { X, Plus } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import QuestionField from './QuestionField';
+import AnswerOptionsSection from './AnswerOptionsSection';
 
 // Schema for the question form
 const questionFormSchema = z.object({
@@ -61,7 +59,7 @@ const RiskAssessmentQuestionForm: React.FC<RiskAssessmentQuestionFormProps> = ({
   });
 
   // Use useFieldArray to handle dynamic fields
-  const { fields, append, remove } = useFieldArray({
+  const answersFieldArray = useFieldArray({
     control: form.control,
     name: "answers"
   });
@@ -97,131 +95,8 @@ const RiskAssessmentQuestionForm: React.FC<RiskAssessmentQuestionFormProps> = ({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           <CardContent className="space-y-6">
-            <FormField
-              control={form.control}
-              name="question"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Question</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Enter question text" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="weight"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Weight (0.1 - 1.0)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      min="0.1"
-                      max="1.0"
-                      {...field}
-                      onChange={e => field.onChange(parseFloat(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Importance weight of this question (0.1 being least important, 1.0 being most important)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="isRequired"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <input
-                      type="checkbox"
-                      checked={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormLabel>Required Question</FormLabel>
-                </FormItem>
-              )}
-            />
-
-            <div>
-              <h3 className="font-medium mb-2">Answer Options</h3>
-              <p className="text-muted-foreground text-sm mb-4">
-                Each answer must have a value between 1-5 (1 being lowest risk, 5 being highest risk)
-              </p>
-              
-              <div className="space-y-4">
-                {fields.map((field, index) => (
-                  <div key={field.id} className="flex items-start space-x-3">
-                    <div className="flex-1 space-y-2">
-                      <FormField
-                        control={form.control}
-                        name={`answers.${index}.text`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="sr-only">Answer Text</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Answer text" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name={`answers.${index}.value`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="sr-only">Value</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder="Value (1-5)"
-                                min={1}
-                                max={5}
-                                {...field}
-                                onChange={e => field.onChange(parseInt(e.target.value))}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => remove(index)}
-                      disabled={fields.length <= 1}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => append({ text: '', value: 1 })}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Answer Option
-                </Button>
-              </div>
-            </div>
+            <QuestionField form={form} />
+            <AnswerOptionsSection form={form} fieldArray={answersFieldArray} />
           </CardContent>
           
           <CardFooter className="flex justify-between">
