@@ -223,3 +223,20 @@ export const refreshJWTToken = (user: User, currentRefreshToken: string): { toke
   // Generate new tokens
   return generateJWTToken(user);
 };
+
+// Function to check if a user session is valid
+export const isSessionValid = (user: User): boolean => {
+  if (!user.tokenExpiry) return false;
+  
+  const tokenExpiry = new Date(user.tokenExpiry);
+  const now = new Date();
+  
+  return tokenExpiry > now;
+};
+
+// Function to get the client's IP address (mock implementation)
+export const getClientIPAddress = (): string => {
+  // In a real application, this would be implemented differently
+  // This is just a mock implementation for development
+  return '127.0.0.1';
+};
