@@ -4,11 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import PageTransition from '@/components/shared/PageTransition';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { fetchBacklogItems, updateBacklogItem } from '@/utils/api/backlogApi';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
-import BacklogItemForm from '@/components/backlog/BacklogItemForm';
 import BacklogKanbanHeader from '@/components/backlog/kanban/BacklogKanbanHeader';
 
 const BacklogKanban: React.FC = () => {
@@ -93,11 +91,10 @@ const BacklogKanban: React.FC = () => {
 
   const handleAddBucket = () => {
     // This is a pass-through function that will be handled by the KanbanBoard component
-    // The board manages its own configuration
-    const kanbanBoardRef = document.querySelector('[data-add-bucket]');
-    if (kanbanBoardRef) {
-      kanbanBoardRef.dispatchEvent(new Event('addBucket'));
-    }
+    // The bucket creation logic is now in the KanbanBoard component
+    const kanbanBoardComponent = document.querySelector('[data-kanban-board]');
+    const event = new CustomEvent('add-bucket');
+    kanbanBoardComponent?.dispatchEvent(event);
   };
 
   return (
@@ -115,41 +112,16 @@ const BacklogKanban: React.FC = () => {
           onAddBucket={handleAddBucket}
         />
         
-        <KanbanBoard 
-          backlogItems={backlogItems}
-          isLoading={isLoading}
-          onDragEnd={handleDragEnd}
-          onEditItem={handleEditItem}
-          onQuickStatusChange={handleQuickStatusChange}
-          columnSize={columnSize}
-        />
-
-        <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
-          <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Edit Backlog Item</DialogTitle>
-            </DialogHeader>
-            {editingItem && (
-              <BacklogItemForm
-                initialData={editingItem}
-                onSuccess={handleFormSuccess}
-                onCancel={handleFormCancel}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={newItemDialogOpen} onOpenChange={setNewItemDialogOpen}>
-          <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Create New Backlog Item</DialogTitle>
-            </DialogHeader>
-            <BacklogItemForm
-              onSuccess={handleFormSuccess}
-              onCancel={handleFormCancel}
-            />
-          </DialogContent>
-        </Dialog>
+        <div data-kanban-board>
+          <KanbanBoard 
+            backlogItems={backlogItems}
+            isLoading={isLoading}
+            onDragEnd={handleDragEnd}
+            onEditItem={handleEditItem}
+            onQuickStatusChange={handleQuickStatusChange}
+            columnSize={columnSize}
+          />
+        </div>
       </div>
     </PageTransition>
   );
