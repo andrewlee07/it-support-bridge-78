@@ -8,22 +8,34 @@ import { BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { ReleaseStatus } from '@/utils/types/release';
 import { ArrowRightLeft, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { StatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
 
-interface StatusMappingTableProps {
+export interface StatusMappingTableProps {
   mappings: Record<ReleaseStatus, BacklogItemStatus>;
   bugMappings: Record<ReleaseStatus, string>;
   onUpdate: (mappings: Record<ReleaseStatus, BacklogItemStatus>, bugMappings: Record<ReleaseStatus, string>) => void;
   isLoading?: boolean;
+  // For backward compatibility
+  settings?: StatusSynchronizationSettings;
+  updateSettings?: (newSettings: StatusSynchronizationSettings) => void;
+  isDisabled?: boolean;
 }
 
 export const StatusMappingTable: React.FC<StatusMappingTableProps> = ({
   mappings,
   bugMappings,
   onUpdate,
-  isLoading = false
+  isLoading = false,
+  settings,
+  updateSettings,
+  isDisabled = false
 }) => {
-  const [tempMappings, setTempMappings] = useState<Record<ReleaseStatus, BacklogItemStatus>>(mappings);
-  const [tempBugMappings, setTempBugMappings] = useState<Record<ReleaseStatus, string>>(bugMappings);
+  // If settings is provided, use the mappings from settings
+  const actualMappings = settings?.releaseToBacklogMapping || mappings;
+  const actualBugMappings = settings?.releaseToBugMapping || bugMappings;
+  
+  const [tempMappings, setTempMappings] = useState<Record<ReleaseStatus, BacklogItemStatus>>(actualMappings);
+  const [tempBugMappings, setTempBugMappings] = useState<Record<ReleaseStatus, string>>(actualBugMappings);
   const [hasChanges, setHasChanges] = useState(false);
 
   const backlogStatuses: BacklogItemStatus[] = ['open', 'in-progress', 'ready', 'blocked', 'completed', 'deferred'];
@@ -47,13 +59,21 @@ export const StatusMappingTable: React.FC<StatusMappingTableProps> = ({
   };
 
   const handleSave = () => {
-    onUpdate(tempMappings, tempBugMappings);
+    if (updateSettings && settings) {
+      updateSettings({
+        ...settings,
+        releaseToBacklogMapping: tempMappings,
+        releaseToBugMapping: tempBugMappings
+      });
+    } else {
+      onUpdate(tempMappings, tempBugMappings);
+    }
     setHasChanges(false);
   };
 
   const handleReset = () => {
-    setTempMappings(mappings);
-    setTempBugMappings(bugMappings);
+    setTempMappings(actualMappings);
+    setTempBugMappings(actualBugMappings);
     setHasChanges(false);
   };
 
@@ -102,6 +122,7 @@ export const StatusMappingTable: React.FC<StatusMappingTableProps> = ({
                       onValueChange={(value: BacklogItemStatus) => 
                         handleBacklogMappingChange(releaseStatus, value)
                       }
+                      disabled={isDisabled}
                     >
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Select status" />
@@ -121,6 +142,7 @@ export const StatusMappingTable: React.FC<StatusMappingTableProps> = ({
                       onValueChange={(value) => 
                         handleBugMappingChange(releaseStatus, value)
                       }
+                      disabled={isDisabled}
                     >
                       <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Select status" />
@@ -140,10 +162,10 @@ export const StatusMappingTable: React.FC<StatusMappingTableProps> = ({
           </Table>
           
           <div className="mt-4 flex justify-end gap-2">
-            <Button variant="outline" onClick={handleReset} disabled={!hasChanges || isLoading}>
+            <Button variant="outline" onClick={handleReset} disabled={!hasChanges || isLoading || isDisabled}>
               Reset
             </Button>
-            <Button onClick={handleSave} disabled={!hasChanges || isLoading}>
+            <Button onClick={handleSave} disabled={!hasChanges || isLoading || isDisabled}>
               Save Mappings
             </Button>
           </div>

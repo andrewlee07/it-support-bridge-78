@@ -35,6 +35,14 @@ const StatusSynchronizationConfig = () => {
     });
   };
 
+  const handleUpdateMappings = (releaseToBacklogMapping, releaseToBugMapping) => {
+    updateSettings({
+      ...settings,
+      releaseToBacklogMapping,
+      releaseToBugMapping
+    });
+  };
+
   const breadcrumbItems = [
     { label: 'Admin Settings', path: '/admin-settings' },
     { label: 'Status Synchronization' }
@@ -119,9 +127,11 @@ const StatusSynchronizationConfig = () => {
             <div className="pt-4">
               <h3 className="text-lg font-medium mb-4">Status Mappings</h3>
               <StatusMappingTable 
-                settings={settings} 
-                updateSettings={updateSettings} 
-                isDisabled={!settings.enableCascadingUpdates} 
+                mappings={settings.releaseToBacklogMapping}
+                bugMappings={settings.releaseToBugMapping}
+                onUpdate={handleUpdateMappings}
+                isLoading={isLoading}
+                isDisabled={!settings.enableCascadingUpdates}
               />
             </div>
             

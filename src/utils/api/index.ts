@@ -1,50 +1,30 @@
 
-// Re-export all API functions for easier imports
-import * as assetApi from './assetApi';
-import * as ticketApi from './ticketApi';
-import * as userApi from './userApi';
-import * as changeApi from './changeApi';
-import * as releaseApi from './releaseApi';
-import * as slaApi from './slaApi';
-import * as emailApi from './emailApi';
-import * as dashboardApi from './dashboardApi';
-import * as testCaseApi from './test-integration';
-import * as testReleaseApi from './test-release';
-import * as backlogApi from './backlogApi';
-import * as testBacklogApi from './testBacklogIntegrationApi';
-import * as dropdownApi from './dropdownConfigurationApi';
-
-// Export everything
-export {
-  assetApi,
-  ticketApi,
-  userApi,
-  changeApi,
-  releaseApi,
-  slaApi,
-  emailApi,
-  dashboardApi,
-  testCaseApi,
-  testReleaseApi,
-  backlogApi,
-  testBacklogApi,
-  dropdownApi
-};
-
-// Export each API module individually under a namespace
+// Re-export API functions from various modules for convenient importing
 export * from './assetApi';
-export * from './ticketApi';
-export * from './userApi';
+export * from './backlogApi';
+export * from './bugApi';
 export * from './changeApi';
+export * from './dashboardApi';
+export * from './emailApi';
+export * from './dropdownConfigurationApi';
 export * from './releaseApi';
 export * from './slaApi';
-export * from './emailApi';
-export * from './dashboardApi';
-export * from './test-integration';
-export * from './test-release';
+export * from './ticketApi';
+export * from './userApi';
 
-// Don't export backlogApi directly to avoid naming conflicts
-// Instead, import from ./backlogApi directly when needed
+// Test Integration APIs
+// Explicitly re-export to avoid ambiguity with duplicate exports
+export {
+  linkTestCaseToBacklogItem,
+  unlinkTestCaseFromBacklogItem,
+  getLinkedTestCases,
+  getBacklogItemCoverage,
+  getUnlinkedTestCases,
+  // Avoid re-exporting getTraceabilityMatrix from here since it's also exported from testBacklogIntegrationApi
+} from './test-integration';
 
 export * from './testBacklogIntegrationApi';
-export * from './dropdownConfigurationApi';
+export * from './testReleaseApi';
+
+// Email notification API
+export * from './emailNotificationApi';

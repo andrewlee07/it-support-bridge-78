@@ -1,215 +1,173 @@
-
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchBacklogItems } from '@/utils/api/backlogApi';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Search, Link as LinkIcon, Plus, AlertTriangle } from 'lucide-react';
-import { format } from 'date-fns';
-import { linkTestCaseToBacklogItem, getLinkedBacklogItems } from '@/utils/api/testBacklogIntegrationApi';
+import { Search, Plus, LinkIcon } from 'lucide-react';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 import { TestCase } from '@/utils/types/test/testCase';
+import { useQuery } from '@tanstack/react-query';
+import { 
+  getBacklogItemsAffectedByBug, 
+  getBacklogItemCoverage 
+} from '@/utils/api/testBacklogIntegrationApi';
+import { fetchBacklogItems } from '@/utils/api/backlogApi';
 
-interface BacklogItemLinkingProps {
+export interface BacklogItemLinkingProps {
   testCaseId: string;
-  onBacklogItemsLinked?: () => void;
+  testCase?: TestCase;
+  onLinkBacklogItem?: () => void;
 }
 
 const BacklogItemLinkingSection: React.FC<BacklogItemLinkingProps> = ({ 
   testCaseId,
-  onBacklogItemsLinked
+  testCase,
+  onLinkBacklogItem
 }) => {
-  const [allBacklogItems, setAllBacklogItems] = useState<BacklogItem[]>([]);
-  const [linkedBacklogItems, setLinkedBacklogItems] = useState<BacklogItem[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [isLinking, setIsLinking] = useState(false);
-  const [selectedBacklogItems, setSelectedBacklogItems] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [displayedItems, setDisplayedItems] = useState<BacklogItem[]>([]);
   
+  // Fetch backlog items that could be linked
+  const { data: backlogItemsResponse, isLoading: isLoadingBacklogItems } = useQuery({
+    queryKey: ['backlogItems'],
+    queryFn: () => fetchBacklogItems()
+  });
+  
+  // Get linked backlog items
+  const { data: linkedBacklogData, isLoading: isLoadingLinkedItems } = useQuery({
+    queryKey: ['linkedBacklogItems', testCaseId],
+    queryFn: async () => {
+      // If testCase has relatedBacklogItemIds, use that data
+      if (testCase?.relatedBacklogItemIds) {
+        const items = (backlogItemsResponse?.data || [])
+          .filter(item => testCase.relatedBacklogItemIds?.includes(item.id));
+        return { success: true, data: items };
+      }
+      
+      // Otherwise fetch all backlog items and filter later
+      return { success: true, data: [] };
+    },
+    enabled: !!testCaseId
+  });
+  
+  const linkedBacklogItems = linkedBacklogData?.data || [];
+  
+  // Filter backlog items based on search
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch all backlog items
-        const backlogItemsResponse = await fetchBacklogItems();
-        if (backlogItemsResponse.data) {
-          setAllBacklogItems(backlogItemsResponse.data);
-        }
-        
-        // Fetch linked backlog items
-        const linkedItemsResponse = await getLinkedBacklogItems(testCaseId);
-        if (linkedItemsResponse.success) {
-          setLinkedBacklogItems(linkedItemsResponse.data);
-        }
-      } catch (error) {
-        console.error('Error fetching backlog items:', error);
-      } finally {
-        setLoading(false);
+    if (backlogItemsResponse?.data) {
+      let items = [...backlogItemsResponse.data];
+      
+      // Filter out already linked items
+      const linkedIds = linkedBacklogItems.map(item => item.id);
+      items = items.filter(item => !linkedIds.includes(item.id));
+      
+      // Apply search filter if there is a query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        items = items.filter(
+          item => 
+            item.title.toLowerCase().includes(query) || 
+            (item.description && item.description.toLowerCase().includes(query))
+        );
       }
-    };
+      
+      // Limit to top 5 results
+      setDisplayedItems(items.slice(0, 5));
+    }
+  }, [searchQuery, backlogItemsResponse?.data, linkedBacklogItems]);
+  
+  // Handle linking a backlog item
+  const handleLinkBacklogItem = async (backlogItemId: string) => {
+    // Implementation would call API to link the test case to backlog item
+    console.log(`Linking test case ${testCaseId} to backlog item ${backlogItemId}`);
     
-    fetchData();
-  }, [testCaseId]);
-  
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-  
-  const toggleBacklogItemSelection = (backlogItemId: string) => {
-    if (selectedBacklogItems.includes(backlogItemId)) {
-      setSelectedBacklogItems(selectedBacklogItems.filter(id => id !== backlogItemId));
-    } else {
-      setSelectedBacklogItems([...selectedBacklogItems, backlogItemId]);
+    // Trigger refetch or update callback
+    if (onLinkBacklogItem) {
+      onLinkBacklogItem();
     }
   };
   
-  const handleStartLinking = () => {
-    setIsLinking(true);
-    setSelectedBacklogItems([]);
-  };
-  
-  const handleCancelLinking = () => {
-    setIsLinking(false);
-    setSelectedBacklogItems([]);
-  };
-  
-  const handleLinkItems = async () => {
-    try {
-      // Link each selected backlog item to this test case
-      for (const backlogItemId of selectedBacklogItems) {
-        await linkTestCaseToBacklogItem(testCaseId, backlogItemId);
-      }
-      
-      // Refresh the linked items list
-      const linkedItemsResponse = await getLinkedBacklogItems(testCaseId);
-      if (linkedItemsResponse.success) {
-        setLinkedBacklogItems(linkedItemsResponse.data);
-      }
-      
-      setIsLinking(false);
-      setSelectedBacklogItems([]);
-      
-      if (onBacklogItemsLinked) {
-        onBacklogItemsLinked();
-      }
-    } catch (error) {
-      console.error('Error linking backlog items:', error);
-    }
-  };
-  
-  // Filter backlog items based on search term
-  const filteredBacklogItems = allBacklogItems.filter(item => 
-    item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !linkedBacklogItems.some(linkedItem => linkedItem.id === item.id)
-  );
-  
-  const renderBacklogItem = (item: BacklogItem) => {
-    return (
-      <div key={item.id} className="flex items-center justify-between border-b py-2 last:border-0">
-        <div className="flex-1 min-w-0">
-          <div className="font-medium truncate">{item.title}</div>
-          <div className="flex items-center text-xs text-muted-foreground mt-1">
-            <Badge variant="outline" className="mr-2 capitalize">{item.status}</Badge>
-            <span className="flex items-center">
-              <Calendar className="h-3 w-3 mr-1" />
-              {item.dueDate ? format(new Date(item.dueDate), 'MMM d, yyyy') : 'No due date'}
-            </span>
-          </div>
-        </div>
-        {isLinking && (
-          <Button
-            variant={selectedBacklogItems.includes(item.id) ? "default" : "outline"}
-            size="sm"
-            onClick={() => toggleBacklogItemSelection(item.id)}
-          >
-            {selectedBacklogItems.includes(item.id) ? 'Selected' : 'Select'}
-          </Button>
-        )}
-      </div>
-    );
-  };
-  
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Linked Backlog Items</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8">
-            <div className="animate-spin h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full"></div>
-            <p className="mt-2 text-muted-foreground">Loading backlog items...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Linked Backlog Items</CardTitle>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <LinkIcon className="h-5 w-5" /> 
+          Backlog Item Linking
+        </CardTitle>
         <CardDescription>
-          {linkedBacklogItems.length === 0 
-            ? "This test case isn't linked to any backlog items yet." 
-            : `This test case is linked to ${linkedBacklogItems.length} backlog item${linkedBacklogItems.length !== 1 ? 's' : ''}.`}
+          Link this test case to backlog items for traceability
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        {linkedBacklogItems.length > 0 ? (
-          <div className="space-y-2 mb-4">
-            {linkedBacklogItems.map(renderBacklogItem)}
+      <CardContent className="space-y-4">
+        {/* Search input */}
+        <div>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search backlog items..."
+              value={searchQuery}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+              className="pl-8"
+            />
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertTriangle className="h-10 w-10 text-muted-foreground mb-2" />
-            <h3 className="text-lg font-medium">No linked items</h3>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">
-              Link this test case to backlog items to establish traceability.
-            </p>
-          </div>
-        )}
+        </div>
         
-        {isLinking ? (
-          <>
-            <div className="mb-4">
-              <Input
-                placeholder="Search backlog items..."
-                value={searchTerm}
-                onChange={handleSearch}
-                leftIcon={<Search className="h-4 w-4" />}
-              />
+        {/* Linked backlog items */}
+        <div>
+          <h4 className="text-sm font-medium mb-2">Linked Backlog Items</h4>
+          {isLoadingLinkedItems ? (
+            <div className="animate-pulse p-4 rounded-lg border">Loading...</div>
+          ) : linkedBacklogItems.length === 0 ? (
+            <div className="text-sm text-muted-foreground border rounded-lg p-4 text-center">
+              No backlog items linked to this test case
             </div>
-            
-            <div className="max-h-60 overflow-y-auto border rounded-md p-2 mb-4">
-              {filteredBacklogItems.length > 0 ? (
-                filteredBacklogItems.map(renderBacklogItem)
-              ) : (
-                <div className="py-4 text-center text-muted-foreground">
-                  No matching backlog items found
+          ) : (
+            <div className="space-y-2">
+              {linkedBacklogItems.map((item) => (
+                <div key={item.id} className="border rounded-lg p-3 text-sm">
+                  <div className="font-medium">{item.title}</div>
+                  <div className="text-muted-foreground text-xs mt-1">
+                    {item.type} · {item.status}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-            
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={handleCancelLinking}>Cancel</Button>
-              <Button 
-                onClick={handleLinkItems} 
-                disabled={selectedBacklogItems.length === 0}
-              >
-                <LinkIcon className="h-4 w-4 mr-2" />
-                Link Selected Items
-              </Button>
-            </div>
-          </>
-        ) : (
-          <Button onClick={handleStartLinking}>
-            <Plus className="h-4 w-4 mr-2" />
-            Link Backlog Items
-          </Button>
-        )}
+          )}
+        </div>
+        
+        {/* Available backlog items to link */}
+        {searchQuery || displayedItems.length > 0 ? (
+          <div>
+            <h4 className="text-sm font-medium mb-2">Available Items</h4>
+            {isLoadingBacklogItems ? (
+              <div className="animate-pulse p-4 rounded-lg border">Loading...</div>
+            ) : displayedItems.length === 0 ? (
+              <div className="text-sm text-muted-foreground border rounded-lg p-4 text-center">
+                No matching backlog items found
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {displayedItems.map((item) => (
+                  <div key={item.id} className="border rounded-lg p-3 text-sm flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">{item.title}</div>
+                      <div className="text-muted-foreground text-xs mt-1">
+                        {item.type} · {item.status}
+                      </div>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      onClick={() => handleLinkBacklogItem(item.id)}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Link
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );
