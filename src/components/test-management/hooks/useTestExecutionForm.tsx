@@ -1,121 +1,69 @@
 
 import { useState } from 'react';
-import { TestCase, TestStatus } from '@/utils/types/testTypes';
 import { useToast } from '@/hooks/use-toast';
-import type { Bug } from '@/utils/types/test';
-import type { BacklogItem } from '@/utils/types/backlogTypes';
-import { 
-  createBugFromTestExecution, 
-  createBacklogItemFromBug 
-} from '@/utils/api/testBacklogIntegrationApi';
+import { TestCase } from '@/utils/types/test/testCase';
+import { TestStatus } from '@/utils/types/testTypes';
+import { Bug } from '@/utils/types/test/bug';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 
 interface UseTestExecutionFormProps {
   testCase: TestCase;
-  onExecute: (testCaseId: string, status: TestStatus, comments: string) => Promise<{ success: boolean }>;
-  onLinkBug?: (testCaseId: string) => void;
-  onBugCreated?: (bug: Bug, backlogItem?: BacklogItem) => void;
+  onExecute: (testCaseId: string, status: TestStatus, comments: string) => void;
 }
 
-export const useTestExecutionForm = ({
-  testCase,
-  onExecute,
-  onLinkBug,
-  onBugCreated
-}: UseTestExecutionFormProps) => {
+export const useTestExecutionForm = ({ testCase, onExecute }: UseTestExecutionFormProps) => {
   const [comments, setComments] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
-  const [isCreatingBacklogItem, setIsCreatingBacklogItem] = useState(false);
+  const [showBugDialog, setShowBugDialog] = useState(false);
+  const [selectedTestCase, setSelectedTestCase] = useState<TestCase | null>(null);
   const { toast } = useToast();
 
   const handleExecute = async (status: TestStatus) => {
     setIsSubmitting(true);
     try {
-      const result = await onExecute(testCase.id, status, comments);
+      await onExecute(testCase.id, status, comments);
       
-      // If the test fails, offer to create a bug
-      if (result.success && status === 'fail' && !isBugDialogOpen) {
-        setIsBugDialogOpen(true);
-      }
-      
-      if (result.success) {
-        toast({
-          title: "Test executed",
-          description: `The test has been marked as ${status}.`,
-        });
-      }
+      toast({
+        title: 'Test executed',
+        description: `Test case ${testCase.title} has been marked as ${status}.`,
+      });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to execute test case.',
+        variant: 'destructive',
       });
+      console.error('Test execution error:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCreateBug = async (bugData: any) => {
-    setIsSubmitting(true);
-    try {
-      const result = await createBugFromTestExecution(testCase.id, bugData);
-      if (result.success) {
-        toast({
-          title: "Bug created",
-          description: `Bug "${result.data.title}" has been created.`,
-        });
-        
-        // Create backlog item if requested
-        let backlogItem = undefined;
-        if (isCreatingBacklogItem) {
-          const backlogResult = await createBacklogItemFromBug(result.data.id);
-          if (backlogResult.success) {
-            backlogItem = backlogResult.data;
-            toast({
-              title: "Backlog item created",
-              description: `Backlog item "${backlogResult.data.title}" has been created.`,
-            });
-          }
-        }
-        
-        if (onBugCreated) {
-          onBugCreated(result.data, backlogItem);
-        }
-        
-        setIsBugDialogOpen(false);
-        return { success: true, bug: result.data, backlogItem };
-      }
-      return { success: false };
-    } catch (error) {
-      toast({
-        title: "Error creating bug",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
-      });
-      return { success: false };
-    } finally {
-      setIsSubmitting(false);
-      setIsCreatingBacklogItem(false);
-    }
+  const handleCreateBug = () => {
+    setSelectedTestCase(testCase);
+    setShowBugDialog(true);
   };
 
-  const handleBugCreated = (bug: Bug, backlogItem?: BacklogItem) => {
-    if (onBugCreated) {
-      onBugCreated(bug, backlogItem);
-    }
+  const handleBugSuccess = (bug: Bug, backlogItem?: BacklogItem) => {
+    toast({
+      title: 'Bug created',
+      description: backlogItem 
+        ? `Bug and backlog item created successfully.` 
+        : `Bug created successfully.`,
+    });
+    
+    setShowBugDialog(false);
   };
 
   return {
     comments,
     setComments,
     isSubmitting,
-    isBugDialogOpen,
-    setIsBugDialogOpen,
-    isCreatingBacklogItem,
-    setIsCreatingBacklogItem,
+    selectedTestCase,
+    showBugDialog,
+    setShowBugDialog,
     handleExecute,
     handleCreateBug,
-    handleBugCreated,
-    handleLinkBug: onLinkBug
+    handleBugSuccess,
   };
 };

@@ -1,82 +1,77 @@
 
 import React from 'react';
-import {
-  Card,
-  CardFooter,
-} from '@/components/ui/card';
-import { TestCase } from '@/utils/types/testTypes';
-import { BacklogItem } from '@/utils/types/backlogTypes';
-import BugCreationDialog from './BugCreationDialog';
-import type { Bug as BugType } from '@/utils/types/test';
-import TestCaseInformation from './components/TestCaseInformation';
-import ExecutionCommentsField from './components/ExecutionCommentsField';
-import ExecutionActionButtons from './components/ExecutionActionButtons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { TestCase } from '@/utils/types/test/testCase';
+import { TestStatus } from '@/utils/types/testTypes';
 import { useTestExecutionForm } from './hooks/useTestExecutionForm';
-import { TestStatus } from '@/utils/types/test';
+import TestCaseInformation from './components/TestCaseInformation';
+import ExecutionActionButtons from './components/ExecutionActionButtons';
+import ExecutionCommentsField from './components/ExecutionCommentsField';
+import BugCreationDialog from './BugCreationDialog';
 
 interface TestExecutionFormProps {
   testCase: TestCase;
-  onExecute: (testCaseId: string, status: TestStatus, comments: string) => Promise<{ success: boolean }>;
-  onLinkBug?: (testCaseId: string) => void;
-  onBugCreated?: (bug: BugType, backlogItem?: BacklogItem) => void;
-  onCancel?: () => void; // Added onCancel prop
+  onExecute: (testCaseId: string, status: TestStatus, comments: string) => void;
+  onCancel?: () => void;
 }
 
-const TestExecutionForm: React.FC<TestExecutionFormProps> = ({ 
-  testCase, 
+const TestExecutionForm: React.FC<TestExecutionFormProps> = ({
+  testCase,
   onExecute,
-  onLinkBug,
-  onBugCreated,
   onCancel
 }) => {
   const {
     comments,
     setComments,
     isSubmitting,
-    isBugDialogOpen,
-    setIsBugDialogOpen,
+    selectedTestCase,
+    showBugDialog,
+    setShowBugDialog,
     handleExecute,
-    handleBugCreated,
-    handleLinkBug
+    handleCreateBug,
+    handleBugSuccess
   } = useTestExecutionForm({
     testCase,
-    onExecute,
-    onLinkBug,
-    onBugCreated
+    onExecute
   });
 
   return (
-    <Card className="w-full">
-      {/* Test Case Information - Title, Steps, Expected Results */}
-      <TestCaseInformation testCase={testCase} />
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Execute Test Case: {testCase.title}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <TestCaseInformation testCase={testCase} />
+          
+          <Separator />
+          
+          <ExecutionCommentsField
+            comments={comments}
+            onChange={setComments}
+            isDisabled={isSubmitting}
+          />
+          
+          <ExecutionActionButtons
+            testCaseId={testCase.id}
+            onCreateBug={handleCreateBug}
+            onExecute={(status) => handleExecute(status)}
+            isSubmitting={isSubmitting}
+            testCase={testCase}
+          />
+        </CardContent>
+      </Card>
       
-      {/* Execution Comments Section */}
-      <div className="px-6 pb-6">
-        <ExecutionCommentsField 
-          value={comments}
-          onChange={setComments}
+      {showBugDialog && selectedTestCase && (
+        <BugCreationDialog
+          testCase={selectedTestCase}
+          isOpen={showBugDialog}
+          onClose={() => setShowBugDialog(false)}
+          onSuccess={handleBugSuccess}
         />
-      </div>
-      
-      {/* Execution Buttons */}
-      <CardFooter className="flex justify-between">
-        <ExecutionActionButtons
-          onLinkBug={handleLinkBug}
-          onCreateBug={() => setIsBugDialogOpen(true)}
-          onExecute={handleExecute}
-          testCaseId={testCase.id}
-          isSubmitting={isSubmitting}
-        />
-      </CardFooter>
-
-      {/* Bug Creation Dialog */}
-      <BugCreationDialog
-        testCase={testCase}
-        isOpen={isBugDialogOpen}
-        onClose={() => setIsBugDialogOpen(false)}
-        onSuccess={handleBugCreated}
-      />
-    </Card>
+      )}
+    </div>
   );
 };
 

@@ -3,15 +3,17 @@ import React, { useState } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AssetList from '@/components/assets/AssetList';
 import AssetSearchBar from '@/components/assets/AssetSearchBar';
 import { sampleAssets } from '@/components/assets/sampleAssetData';
+import { useToast } from '@/hooks/use-toast';
 
 const Assets = () => {
-  const navigate = useNavigate();
   const [assets] = useState(sampleAssets);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAssetForm, setShowAssetForm] = useState(false);
+  const { toast } = useToast();
   
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -27,8 +29,14 @@ const Assets = () => {
   const handleViewAsset = (assetId: string) => {
     // In a real app, this would navigate to the asset detail page
     console.log(`Viewing asset: ${assetId}`);
-    // Placeholder navigation - in a real app would go to actual asset page
-    // navigate(`/assets/${assetId}`);
+  };
+
+  const handleAssetFormSuccess = () => {
+    setShowAssetForm(false);
+    toast({
+      title: "Asset created",
+      description: "The asset has been created successfully."
+    });
   };
 
   return (
@@ -41,7 +49,7 @@ const Assets = () => {
               Track and manage hardware and software assets
             </p>
           </div>
-          <Button className="shrink-0">
+          <Button className="shrink-0" onClick={() => setShowAssetForm(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
             New Asset
           </Button>
@@ -53,6 +61,27 @@ const Assets = () => {
           assets={assets} 
           onViewAsset={handleViewAsset} 
         />
+
+        <Dialog open={showAssetForm} onOpenChange={setShowAssetForm}>
+          <DialogContent className="sm:max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Create New Asset</DialogTitle>
+            </DialogHeader>
+            <div className="py-6">
+              <p className="text-center text-muted-foreground">
+                Asset form would be implemented here. This is a placeholder.
+              </p>
+              <div className="flex justify-end space-x-2 mt-6">
+                <Button variant="outline" onClick={() => setShowAssetForm(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAssetFormSuccess}>
+                  Create Asset
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </PageTransition>
   );
