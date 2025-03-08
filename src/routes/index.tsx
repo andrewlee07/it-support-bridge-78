@@ -18,13 +18,13 @@ export const AppRoutes: React.FC = () => {
       <Route path="/login" element={<Login />} />
       
       {/* Group all protected routes */}
-      <DashboardRoutes />
       <TicketRoutes />
       <ChangeRoutes />
       <AssetRoutes />
       <TestManagementRoutes />
       <OtherRoutes />
       <AdminRoutes />
+      <DashboardRoutes />
       
       {/* Default route */}
       <Route path="/" element={<Navigate to="/dashboard" />} />

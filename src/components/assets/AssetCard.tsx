@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Laptop, Monitor, Server, Smartphone } from 'lucide-react';
@@ -19,6 +20,8 @@ interface AssetCardProps {
 }
 
 const AssetCard: React.FC<AssetCardProps> = ({ asset, onView }) => {
+  const navigate = useNavigate();
+  
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'in-use':
@@ -54,6 +57,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset, onView }) => {
   };
 
   const handleClick = () => {
+    navigate(`/assets/${asset.id}`);
     onView(asset.id);
   };
 
