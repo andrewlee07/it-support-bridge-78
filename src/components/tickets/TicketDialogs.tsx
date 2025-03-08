@@ -22,7 +22,7 @@ interface TicketDialogsProps {
   onTicketUpdate: (data: UpdateTicketValues) => void;
   onTicketClose: (data: CloseTicketValues) => void;
   onAddNote?: (note: string) => void;
-  onReopenTicket?: () => void;
+  onReopenTicket?: (reason: string) => void; // Updated to accept a string parameter
 }
 
 const TicketDialogs: React.FC<TicketDialogsProps> = ({
