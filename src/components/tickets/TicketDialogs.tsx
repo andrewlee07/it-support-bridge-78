@@ -48,7 +48,7 @@ const TicketDialogs: React.FC<TicketDialogsProps> = ({
 
       {/* View Ticket Dialog */}
       <Dialog open={isViewingTicket && !!selectedTicket} onOpenChange={onViewDialogClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl w-full min-h-[500px] max-h-[90vh] overflow-y-auto">
           {selectedTicket && (
             <TicketDetailView 
               ticket={selectedTicket}
