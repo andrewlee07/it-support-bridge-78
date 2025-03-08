@@ -1,25 +1,42 @@
 
 // Re-export all backlog-related mock data functions and constants
 import { backlogItems, generateBacklogItemId } from './backlogItems';
+
+// Import from core operations
 import {
   fetchBacklogItems,
   fetchBacklogItemById,
   createBacklogItem,
   updateBacklogItem,
-  assignToRelease,
-  removeFromRelease,
+  getBacklogItemsByReleaseId,
   getBacklogStats,
   deleteBacklogItem
-} from './backlogOperations';
+} from './backlogCoreOperations';
+
+// Import from release operations
+import {
+  assignToRelease,
+  removeFromRelease
+} from './backlogReleaseOperations';
+
+// Import from attachment operations
 import {
   addAttachment,
-  removeAttachment,
+  removeAttachment
+} from './backlogAttachmentOperations';
+
+// Import from comment operations
+import {
   addComment,
   updateComment,
-  deleteComment,
+  deleteComment
+} from './backlogCommentOperations';
+
+// Import from watcher operations
+import {
   addWatcher,
   removeWatcher
-} from './enhancedFeatures';
+} from './backlogWatcherOperations';
 
 // Export all functionality
 export {
@@ -35,6 +52,7 @@ export {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
+  getBacklogItemsByReleaseId,
   deleteBacklogItem,
   
   // Enhanced feature operations
@@ -58,6 +76,7 @@ export default {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
+  getBacklogItemsByReleaseId,
   deleteBacklogItem,
   addAttachment,
   removeAttachment,
