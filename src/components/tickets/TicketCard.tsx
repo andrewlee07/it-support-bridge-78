@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CalendarClock, User } from 'lucide-react';
@@ -65,14 +65,16 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
     return '/incidents';
   };
   
-  const handleCardClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleCardClick = () => {
     const baseRoute = getRouteForTicket(ticket.type);
     navigate(`${baseRoute}/${ticket.id}`);
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer" onClick={handleCardClick}>
+    <Card 
+      className="overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer" 
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <Badge variant="outline" className={cn("mb-2 capitalize", getStatusBadgeClass(ticket.status))}>

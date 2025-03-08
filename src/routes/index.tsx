@@ -54,7 +54,29 @@ export const AppRoutes: React.FC = () => {
       />
       
       <Route
+        path="/incidents/:id"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Incidents />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
         path="/service-requests"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ServiceRequests />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/service-requests/:id"
         element={
           <ProtectedRoute>
             <MainLayout>
@@ -77,7 +99,29 @@ export const AppRoutes: React.FC = () => {
       />
       
       <Route
+        path="/changes/:id"
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Changes />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
         path="/releases"
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Releases />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/releases/:id"
         element={
           <ProtectedRoute requiredRoles={['admin', 'manager']}>
             <MainLayout>
@@ -90,6 +134,17 @@ export const AppRoutes: React.FC = () => {
       {/* Asset Management route */}
       <Route
         path="/assets"
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Assets />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/assets/:id"
         element={
           <ProtectedRoute requiredRoles={['admin', 'manager']}>
             <MainLayout>

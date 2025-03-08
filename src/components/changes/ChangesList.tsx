@@ -35,6 +35,8 @@ const ChangesList: React.FC<ChangesListProps> = ({
   searchQuery,
   viewType
 }) => {
+  const navigate = useNavigate();
+  
   // Utility functions for status and priority colors
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -68,6 +70,10 @@ const ChangesList: React.FC<ChangesListProps> = ({
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100';
     }
+  };
+
+  const handleCardClick = (changeId: string) => {
+    navigate(`/changes/${changeId}`);
   };
 
   if (isLoading) {
@@ -131,7 +137,7 @@ const ChangesList: React.FC<ChangesListProps> = ({
         <Card 
           key={change.id} 
           className="shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-          onClick={() => onViewChange(change.id)}
+          onClick={() => handleCardClick(change.id)}
         >
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
@@ -171,10 +177,10 @@ const ChangesList: React.FC<ChangesListProps> = ({
             </div>
             {change.status === 'submitted' && userRole === 'admin' && (
               <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                <Button size="sm" variant="outline" onClick={() => onReject(change.id)}>
+                <Button size="sm" variant="outline" onClick={(e) => {e.stopPropagation(); onReject(change.id);}}>
                   Reject
                 </Button>
-                <Button size="sm" onClick={() => onApprove(change.id)}>
+                <Button size="sm" onClick={(e) => {e.stopPropagation(); onApprove(change.id);}}>
                   Approve
                 </Button>
               </div>

@@ -53,11 +53,15 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset, onView }) => {
     }
   };
 
+  const handleClick = () => {
+    onView(asset.id);
+  };
+
   return (
     <Card 
       key={asset.id} 
       className="shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-      onClick={() => onView(asset.id)}
+      onClick={handleClick}
     >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
