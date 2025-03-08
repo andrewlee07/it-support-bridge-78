@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Cpu, HardDrive, Info, Server, Smartphone, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getUserNameById } from '@/utils/userUtils';
+import { getAssetStatusColor } from '@/utils/assetUtils';
 
 interface AssetCardProps {
   asset: Asset;
@@ -13,22 +14,6 @@ interface AssetCardProps {
 }
 
 const AssetCard: React.FC<AssetCardProps> = ({ asset, onClick }) => {
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'active':
-      case 'available':
-      case 'in-use':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'inactive':
-      case 'retired':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
-      case 'maintenance':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      default:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-    }
-  };
-
   const getAssetIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'server':
@@ -62,7 +47,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset, onClick }) => {
               <h3 className="text-base font-semibold">{asset.name}</h3>
             </div>
           </div>
-          <Badge className={getStatusColor(asset.status)}>
+          <Badge className={getAssetStatusColor(asset.status)}>
             {asset.status}
           </Badge>
         </div>
