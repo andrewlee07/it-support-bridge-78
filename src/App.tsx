@@ -1,53 +1,52 @@
+
 import { Suspense, useEffect, useState } from "react";
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
   Outlet,
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 
-import Layout from "@/components/layout";
-import Dashboard from "@/pages/Dashboard";
-import Login from "@/pages/auth/Login";
-import Register from "@/pages/auth/Register";
-import Errors from "@/pages/Errors";
-import Settings from "@/pages/Settings";
-import Releases from "@/pages/Releases";
-import Assets from "@/pages/Assets";
-import NewRelease from "@/pages/NewRelease";
-import ReleaseDetail from "@/pages/ReleaseDetail";
-import ErrorBoundary from "@/components/errors/ErrorBoundary";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import AuthLayout from "@/components/auth/AuthLayout";
-import Backlog from "@/pages/Backlog";
-import BacklogKanban from "@/pages/BacklogKanban";
-import Changes from "@/pages/Changes";
-import NewChange from "@/pages/NewChange";
-import RiskAssessmentConfiguration from "@/pages/admin/RiskAssessmentConfiguration";
-import ChangeDropdowns from "@/pages/admin/ChangeDropdowns";
-import ErrorLogs from "@/pages/admin/ErrorLogs";
-import SLAConfiguration from "@/pages/admin/SLAConfiguration";
-import SecuritySettings from "@/pages/admin/SecuritySettings";
-import StatusSynchronizationSettings from "@/pages/StatusSynchronizationSettings";
+import Layout from "./components/layout";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import Errors from "./pages/Errors";
+import Settings from "./pages/Settings";
+import Releases from "./pages/Releases";
+import Assets from "./pages/Assets";
+import NewRelease from "./pages/NewRelease";
+import ReleaseDetail from "./pages/ReleaseDetail";
+import ErrorBoundary from "./components/errors/ErrorBoundary";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AuthLayout from "./components/auth/AuthLayout";
+import Backlog from "./pages/Backlog";
+import BacklogKanban from "./pages/BacklogKanban";
+import Changes from "./pages/Changes";
+import NewChange from "./pages/NewChange";
+import RiskAssessmentConfiguration from "./pages/admin/RiskAssessmentConfiguration";
+import ChangeDropdowns from "./pages/admin/ChangeDropdowns";
+import ErrorLogs from "./pages/admin/ErrorLogs";
+import SLAConfiguration from "./pages/admin/SLAConfiguration";
+import SecuritySettings from "./pages/admin/SecuritySettings";
+import StatusSynchronizationSettings from "./pages/StatusSynchronizationSettings";
 import testManagementRoutes from "./routes/testManagementRoutes";
 import testCoverageRoutes from "./routes/testCoverageRoutes";
+import dashboardRoutes from "./routes/dashboardRoutes";
 
-import BugDetail from "@/pages/BugDetail";
-import { useSessionTimeout } from "@/hooks/useSessionTimeout";
-import { useAuth } from "@/contexts/AuthContext";
+import BugDetail from "./pages/BugDetail";
+import { useSessionTimeout } from "./hooks/useSessionTimeout";
+import { useAuth } from "./contexts/AuthContext";
 import { Toaster } from "sonner";
 
 function App() {
   const { initializeSessionTimeout } = useSessionTimeout();
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (authState.isAuthenticated) {
+    if (isAuthenticated) {
       initializeSessionTimeout();
     }
-  }, [authState.isAuthenticated, initializeSessionTimeout]);
+  }, [isAuthenticated, initializeSessionTimeout]);
 
   const router = createBrowserRouter([
     {
@@ -107,6 +106,7 @@ function App() {
         },
         ...testManagementRoutes,
         ...testCoverageRoutes,
+        ...dashboardRoutes,
         {
           path: "admin",
           children: [
@@ -153,9 +153,6 @@ function App() {
       ],
     },
   ]);
-
-  // Check if authState is available before accessing isAuthenticated
-  const isAuthenticated = authState ? authState.isAuthenticated : false;
 
   return (
     <>

@@ -1,11 +1,11 @@
 
 import { TestCoverage } from './test/testCoverage';
-import { TestStatus, BugStatus } from './test/testStatus';
+import { TestStatus, BugStatus, TestCycleStatus } from './test/testStatus';
 import { TestCase } from './test/testCase';
 import { Bug } from './test/bug';
 
 // Re-export test-related types for backward compatibility
-export type { TestStatus, BugStatus, TestCase, Bug, TestCoverage };
+export type { TestStatus, BugStatus, TestCase, Bug, TestCoverage, TestCycleStatus };
 
 // Test execution for release
 export interface TestExecutionForRelease {
@@ -26,7 +26,7 @@ export interface TestCycle {
   startDate: Date;
   endDate: Date;
   testCases: string[];
-  status: 'planned' | 'in_progress' | 'completed' | 'aborted';
+  status: TestCycleStatus;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;

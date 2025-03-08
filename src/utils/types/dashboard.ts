@@ -1,6 +1,7 @@
 
 // Dashboard stats
 import { Ticket } from './ticket';
+import { CrossSystemDashboardData, ReleaseRiskScore, BacklogProgressItem, TestMetricsData, RelationshipData } from './dashboard/crossSystemDashboard';
 
 export interface DashboardStats {
   openIncidents: number;
@@ -20,3 +21,12 @@ export interface DashboardStats {
     count: number;
   }[];
 }
+
+// Export the cross-system dashboard types for use elsewhere
+export type { 
+  CrossSystemDashboardData, 
+  ReleaseRiskScore, 
+  BacklogProgressItem, 
+  TestMetricsData,
+  RelationshipData
+};
