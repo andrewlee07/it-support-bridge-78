@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { KanbanColumnConfig } from '@/utils/types/kanbanTypes';
 
 interface KanbanColumnProps {
-  status: BacklogItemStatus;
+  columnConfig: KanbanColumnConfig;
   items: BacklogItem[];
   isCollapsed: boolean;
   onToggleCollapse: () => void;
@@ -19,7 +20,7 @@ interface KanbanColumnProps {
 }
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
-  status,
+  columnConfig,
   items,
   isCollapsed,
   onToggleCollapse,
@@ -27,40 +28,15 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   onQuickStatusChange,
   columnSize,
 }) => {
-  // Format the status for display
-  const formatStatus = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ');
-  };
-
-  // Get the column background color based on status
-  const getColumnColor = (status: string) => {
-    switch (status) {
-      case 'open':
-        return 'bg-blue-50 dark:bg-blue-950';
-      case 'in-progress':
-        return 'bg-yellow-50 dark:bg-yellow-950';
-      case 'ready':
-        return 'bg-green-50 dark:bg-green-950';
-      case 'blocked':
-        return 'bg-red-50 dark:bg-red-950';
-      case 'completed':
-        return 'bg-purple-50 dark:bg-purple-950';
-      case 'deferred':
-        return 'bg-gray-50 dark:bg-gray-950';
-      default:
-        return 'bg-gray-50 dark:bg-gray-950';
-    }
-  };
-
   return (
     <Card className={cn(
       "h-full flex flex-col border",
-      getColumnColor(status),
+      columnConfig.color,
       columnSize === 'compact' ? "min-h-[400px]" : "min-h-[600px]"
     )}>
       <CardHeader className="p-3 pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
-          {formatStatus(status)}
+          {columnConfig.displayName}
           <span className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs">
             {items.length}
           </span>
@@ -72,14 +48,14 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       
       {!isCollapsed && (
         <CardContent className="p-2 flex-grow overflow-y-auto">
-          <Droppable droppableId={status}>
+          <Droppable droppableId={columnConfig.statusValue}>
             {(provided, snapshot) => (
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 className={cn(
                   "min-h-[200px] transition-colors duration-200 rounded p-1",
-                  snapshot.isDraggingOver ? "bg-muted" : "transparent"
+                  snapshot.isDraggingOver ? "bg-muted/50" : "transparent"
                 )}
               >
                 {items.map((item, index) => (

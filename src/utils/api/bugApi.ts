@@ -1,114 +1,170 @@
 
-import { Bug, ApiResponse, BugStatus } from '@/utils/types';
-import { delay, createApiSuccessResponse, createApiErrorResponse } from '@/utils/mockData/apiHelpers';
-import { mockBugs } from '@/utils/mockData/bugs';
+import { Bug, BugStatus } from '@/utils/types/test/bug';
+import { ApiResponse, PaginatedResponse } from '@/utils/types/api';
+import { bugs } from '@/utils/mockData/bugs';
+
+// Export the mock bugs
+export const mockBugs = bugs;
 
 // Get all bugs
-export const getAllBugs = async (): Promise<ApiResponse<Bug[]>> => {
-  await delay();
-  return createApiSuccessResponse(mockBugs);
+export const fetchBugs = async (
+  filters?: Partial<Bug>
+): Promise<PaginatedResponse<Bug>> => {
+  let filteredBugs = [...bugs];
+  
+  if (filters) {
+    Object.keys(filters).forEach(key => {
+      const filterKey = key as keyof Bug;
+      const filterValue = filters[filterKey];
+      
+      if (filterValue !== undefined) {
+        filteredBugs = filteredBugs.filter(bug => bug[filterKey] === filterValue);
+      }
+    });
+  }
+  
+  return {
+    data: filteredBugs,
+    pagination: {
+      total: filteredBugs.length,
+      page: 1,
+      pageSize: filteredBugs.length,
+      totalPages: 1
+    }
+  };
 };
 
 // Get bug by ID
-export const getBugById = async (id: string): Promise<ApiResponse<Bug>> => {
-  await delay();
-  const bug = mockBugs.find(b => b.id === id);
+export const fetchBugById = async (bugId: string): Promise<ApiResponse<Bug>> => {
+  const bug = bugs.find(b => b.id === bugId);
   
   if (!bug) {
-    return createApiErrorResponse("Bug not found", 404);
+    return {
+      success: false,
+      error: 'Bug not found',
+      status: 404,
+      data: null
+    };
   }
   
-  return createApiSuccessResponse(bug);
+  return {
+    success: true,
+    data: bug,
+    status: 200
+  };
 };
 
-// Create new bug
-export const createBug = async (bugData: Omit<Bug, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Bug>> => {
-  await delay();
+// Update bug status
+export const updateBugStatus = async (
+  bugId: string, 
+  newStatus: BugStatus
+): Promise<ApiResponse<Bug>> => {
+  const bugIndex = bugs.findIndex(b => b.id === bugId);
   
+  if (bugIndex === -1) {
+    return {
+      success: false,
+      error: 'Bug not found',
+      status: 404,
+      data: null
+    };
+  }
+  
+  const updatedBug = {
+    ...bugs[bugIndex],
+    status: newStatus,
+    updatedAt: new Date()
+  };
+  
+  bugs[bugIndex] = updatedBug;
+  
+  return {
+    success: true,
+    data: updatedBug,
+    status: 200
+  };
+};
+
+// Get bugs by release ID
+export const getBugsByReleaseId = async (
+  releaseId: string
+): Promise<ApiResponse<Bug[]>> => {
+  const releaseBugs = bugs.filter(bug => bug.releaseId === releaseId);
+  
+  return {
+    success: true,
+    data: releaseBugs,
+    status: 200
+  };
+};
+
+// Create a new bug
+export const createBug = async (bugData: Omit<Bug, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Bug>> => {
   const newBug: Bug = {
-    id: `BUG-${mockBugs.length + 1001}`,
+    id: `BUG-${bugs.length + 1}`,
     ...bugData,
     createdAt: new Date(),
     updatedAt: new Date()
   };
   
-  mockBugs.push(newBug);
+  bugs.push(newBug);
   
-  return createApiSuccessResponse(newBug);
-};
-
-// Update bug status
-export const updateBugStatus = async (id: string, status: BugStatus): Promise<ApiResponse<Bug>> => {
-  await delay();
-  
-  const bugIndex = mockBugs.findIndex(b => b.id === id);
-  
-  if (bugIndex === -1) {
-    return createApiErrorResponse("Bug not found", 404);
-  }
-  
-  const updatedBug = {
-    ...mockBugs[bugIndex],
-    status,
-    updatedAt: new Date()
+  return {
+    success: true,
+    data: newBug,
+    status: 201
   };
-  
-  mockBugs[bugIndex] = updatedBug;
-  
-  return createApiSuccessResponse(updatedBug);
 };
 
-// Update bug
-export const updateBug = async (id: string, bugData: Partial<Bug>): Promise<ApiResponse<Bug>> => {
-  await delay();
-  
-  const bugIndex = mockBugs.findIndex(b => b.id === id);
+// Update a bug
+export const updateBug = async (
+  bugId: string,
+  bugData: Partial<Bug>
+): Promise<ApiResponse<Bug>> => {
+  const bugIndex = bugs.findIndex(b => b.id === bugId);
   
   if (bugIndex === -1) {
-    return createApiErrorResponse("Bug not found", 404);
+    return {
+      success: false,
+      error: 'Bug not found',
+      status: 404,
+      data: null
+    };
   }
   
   const updatedBug = {
-    ...mockBugs[bugIndex],
+    ...bugs[bugIndex],
     ...bugData,
     updatedAt: new Date()
   };
   
-  mockBugs[bugIndex] = updatedBug;
+  bugs[bugIndex] = updatedBug;
   
-  return createApiSuccessResponse(updatedBug);
+  return {
+    success: true,
+    data: updatedBug,
+    status: 200
+  };
 };
 
-// Get bugs by release ID
-export const getBugsByReleaseId = async (releaseId: string): Promise<ApiResponse<Bug[]>> => {
-  await delay();
-  
-  const bugs = mockBugs.filter(b => b.releaseId === releaseId);
-  
-  return createApiSuccessResponse(bugs);
-};
-
-// Delete bug
-export const deleteBug = async (id: string): Promise<ApiResponse<void>> => {
-  await delay();
-  
-  const bugIndex = mockBugs.findIndex(b => b.id === id);
+// Delete a bug
+export const deleteBug = async (bugId: string): Promise<ApiResponse<boolean>> => {
+  const bugIndex = bugs.findIndex(b => b.id === bugId);
   
   if (bugIndex === -1) {
-    return createApiErrorResponse("Bug not found", 404);
+    return {
+      success: false,
+      error: 'Bug not found',
+      status: 404,
+      data: false
+    };
   }
   
-  mockBugs.splice(bugIndex, 1);
+  bugs.splice(bugIndex, 1);
   
-  return createApiSuccessResponse(undefined);
-};
-
-export default {
-  getAllBugs,
-  getBugById,
-  createBug,
-  updateBugStatus,
-  updateBug,
-  getBugsByReleaseId,
-  deleteBug
+  return {
+    success: true,
+    data: true,
+    status: 200
+  };
 };

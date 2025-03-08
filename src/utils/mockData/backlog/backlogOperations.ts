@@ -1,193 +1,435 @@
 import { BacklogItem, BacklogItemStatus, BacklogStats } from '@/utils/types/backlogTypes';
-import { ApiResponse } from '@/utils/types';
-import { delay, createApiSuccessResponse, createApiErrorResponse } from '../apiHelpers';
-import { backlogItems, generateBacklogItemId } from './backlogItems';
-import { mockReleases } from '@/utils/api/release/mockData';
+import { backlogItems } from './backlogItems';
+import { ApiResponse, PaginatedResponse } from '@/utils/types/api';
+import { v4 as uuidv4 } from 'uuid';
 
-// Backlog Item API functions
-export const fetchBacklogItems = async (
+// Get all backlog items
+export const fetchBacklogItems = (
+  status?: BacklogItemStatus | BacklogItemStatus[],
   releaseId?: string,
-  status?: BacklogItemStatus[],
   searchQuery?: string
-): Promise<ApiResponse<BacklogItem[]>> => {
-  await delay(500);
-  
+): PaginatedResponse<BacklogItem> => {
   let filteredItems = [...backlogItems];
   
-  if (releaseId) {
-    filteredItems = filteredItems.filter(item => 
-      releaseId === 'unassigned' 
-        ? !item.releaseId 
-        : item.releaseId === releaseId
-    );
+  if (status) {
+    if (Array.isArray(status)) {
+      filteredItems = filteredItems.filter(item => status.includes(item.status));
+    } else {
+      filteredItems = filteredItems.filter(item => item.status === status);
+    }
   }
   
-  if (status && status.length > 0) {
-    filteredItems = filteredItems.filter(item => status.includes(item.status));
+  if (releaseId) {
+    filteredItems = filteredItems.filter(item => item.releaseId === releaseId);
   }
   
   if (searchQuery) {
     const query = searchQuery.toLowerCase();
     filteredItems = filteredItems.filter(item => 
       item.title.toLowerCase().includes(query) || 
-      item.description.toLowerCase().includes(query) ||
-      item.labels.some(label => label.toLowerCase().includes(query))
+      item.description.toLowerCase().includes(query) || 
+      item.id.toLowerCase().includes(query)
     );
   }
   
-  return createApiSuccessResponse(filteredItems);
+  return {
+    data: filteredItems,
+    pagination: {
+      total: filteredItems.length,
+      page: 1,
+      pageSize: filteredItems.length,
+      totalPages: 1
+    }
+  };
 };
 
-export const fetchBacklogItemById = async (id: string): Promise<ApiResponse<BacklogItem | null>> => {
-  await delay(500);
-  const item = backlogItems.find(b => b.id === id);
+// Get backlog items by release ID
+export const getBacklogItemsByReleaseId = (
+  releaseId: string
+): ApiResponse<BacklogItem[]> => {
+  const items = backlogItems.filter(item => item.releaseId === releaseId);
+  
+  return {
+    success: true,
+    data: items,
+    status: 200
+  };
+};
+
+// Get backlog item by ID
+export const fetchBacklogItemById = (
+  id: string
+): ApiResponse<BacklogItem> => {
+  const item = backlogItems.find(item => item.id === id);
+  
   if (!item) {
-    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
   }
-  return createApiSuccessResponse(item);
+  
+  return {
+    success: true,
+    data: item,
+    status: 200
+  };
 };
 
-export const createBacklogItem = async (
+// Create a new backlog item
+export const createBacklogItem = (
   item: Omit<BacklogItem, 'id' | 'createdAt' | 'updatedAt'>
-): Promise<ApiResponse<BacklogItem>> => {
-  await delay(500);
+): ApiResponse<BacklogItem> => {
   const newItem: BacklogItem = {
-    id: generateBacklogItemId(),
+    id: uuidv4(),
     ...item,
     createdAt: new Date(),
-    updatedAt: new Date(),
-    // Initialize enhanced feature fields if not provided
-    attachments: item.attachments || [],
-    comments: item.comments || [],
-    watchers: item.watchers || [],
-    history: item.history || []
+    updatedAt: new Date()
   };
+  
   backlogItems.push(newItem);
-  return createApiSuccessResponse(newItem);
+  
+  return {
+    success: true,
+    data: newItem,
+    status: 201
+  };
 };
 
-export const updateBacklogItem = async (
-  id: string, 
+// Update an existing backlog item
+export const updateBacklogItem = (
+  id: string,
   updates: Partial<BacklogItem>
-): Promise<ApiResponse<BacklogItem | null>> => {
-  await delay(500);
-  const index = backlogItems.findIndex(b => b.id === id);
-  if (index === -1) {
-    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === id);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
   }
-  backlogItems[index] = { 
-    ...backlogItems[index], 
-    ...updates, 
-    updatedAt: new Date() 
+  
+  const updatedItem: BacklogItem = {
+    ...backlogItems[itemIndex],
+    ...updates,
+    updatedAt: new Date()
   };
-  return createApiSuccessResponse(backlogItems[index]);
+  
+  backlogItems[itemIndex] = updatedItem;
+  
+  return {
+    success: true,
+    data: updatedItem,
+    status: 200
+  };
 };
 
-export const assignToRelease = async (
-  backlogItemId: string, 
+// Delete a backlog item
+export const deleteBacklogItem = (id: string): ApiResponse<boolean> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === id);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: false
+    };
+  }
+  
+  backlogItems.splice(itemIndex, 1);
+  
+  return {
+    success: true,
+    data: true,
+    status: 200
+  };
+};
+
+// Assign a backlog item to a release
+export const assignToRelease = (
+  itemId: string,
   releaseId: string
-): Promise<ApiResponse<BacklogItem | null>> => {
-  await delay(500);
-  const index = backlogItems.findIndex(b => b.id === backlogItemId);
-  if (index === -1) {
-    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
   }
   
-  // Check if the release exists
-  const releaseExists = mockReleases.some(r => r.id === releaseId);
-  if (!releaseExists) {
-    return createApiErrorResponse<BacklogItem | null>('Release not found', 404);
-  }
+  backlogItems[itemIndex].releaseId = releaseId;
   
-  backlogItems[index] = { 
-    ...backlogItems[index], 
-    releaseId, 
-    updatedAt: new Date() 
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
   };
-  return createApiSuccessResponse(backlogItems[index]);
 };
 
-export const removeFromRelease = async (
-  backlogItemId: string
-): Promise<ApiResponse<BacklogItem | null>> => {
-  await delay(500);
-  const index = backlogItems.findIndex(b => b.id === backlogItemId);
-  if (index === -1) {
-    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+// Remove a backlog item from a release
+export const removeFromRelease = (itemId: string): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
   }
   
-  backlogItems[index] = { 
-    ...backlogItems[index], 
-    releaseId: undefined, 
-    updatedAt: new Date() 
+  delete backlogItems[itemIndex].releaseId;
+  
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
   };
-  return createApiSuccessResponse(backlogItems[index]);
 };
 
-export const getBacklogStats = async (): Promise<ApiResponse<BacklogStats>> => {
-  await delay(500);
-  
-  // Group by release
-  const releaseGroups = backlogItems.reduce((acc, item) => {
-    const releaseId = item.releaseId || 'unassigned';
-    if (!acc[releaseId]) {
-      acc[releaseId] = {
-        itemCount: 0,
-        completedCount: 0,
-        releaseName: releaseId === 'unassigned' 
-          ? 'Unassigned' 
-          : mockReleases.find(r => r.id === releaseId)?.title || 'Unknown Release'
-      };
-    }
-    acc[releaseId].itemCount++;
-    if (item.status === 'completed') {
-      acc[releaseId].completedCount++;
-    }
-    return acc;
-  }, {} as Record<string, { itemCount: number, completedCount: number, releaseName: string }>);
-  
-  // Group by assignee
-  const assigneeGroups = backlogItems.reduce((acc, item) => {
-    const assigneeId = item.assignee || 'unassigned';
-    if (!acc[assigneeId]) {
-      acc[assigneeId] = {
-        itemCount: 0,
-        assigneeName: assigneeId === 'unassigned' ? 'Unassigned' : assigneeId
-      };
-    }
-    acc[assigneeId].itemCount++;
-    return acc;
-  }, {} as Record<string, { itemCount: number, assigneeName: string }>);
+// Get backlog stats
+export const getBacklogStats = (): ApiResponse<BacklogStats> => {
+  const totalItems = backlogItems.length;
+  const openItems = backlogItems.filter(item => item.status === 'open').length;
+  const inProgressItems = backlogItems.filter(item => item.status === 'in-progress').length;
+  const completedItems = backlogItems.filter(item => item.status === 'completed').length;
   
   const stats: BacklogStats = {
-    totalItems: backlogItems.length,
-    openItems: backlogItems.filter(item => item.status === 'open' || item.status === 'in-progress').length,
-    completedItems: backlogItems.filter(item => item.status === 'completed').length,
-    blockedItems: backlogItems.filter(item => item.status === 'blocked').length,
-    byRelease: Object.entries(releaseGroups).map(([releaseId, data]) => ({
-      releaseId,
-      releaseName: data.releaseName,
-      itemCount: data.itemCount,
-      completedCount: data.completedCount
-    })),
-    byAssignee: Object.entries(assigneeGroups).map(([assigneeId, data]) => ({
-      assigneeId,
-      assigneeName: data.assigneeName,
-      itemCount: data.itemCount
-    }))
+    totalItems,
+    openItems,
+    inProgressItems,
+    completedItems
   };
   
-  return createApiSuccessResponse(stats);
+  return {
+    success: true,
+    data: stats,
+    status: 200
+  };
 };
 
-export const deleteBacklogItem = async (id: string): Promise<ApiResponse<boolean>> => {
-  await delay(500);
-  const index = backlogItems.findIndex(b => b.id === id);
-  if (index === -1) {
-    return createApiErrorResponse<boolean>('Backlog item not found', 404);
+// Add an attachment to a backlog item
+export const addAttachment = (
+  itemId: string,
+  attachment: { name: string; url: string }
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
   }
   
-  // Remove the item from the array
-  backlogItems.splice(index, 1);
-  return createApiSuccessResponse(true);
+  if (!backlogItems[itemIndex].attachments) {
+    backlogItems[itemIndex].attachments = [];
+  }
+  
+  backlogItems[itemIndex].attachments!.push(attachment);
+  
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
+  };
+};
+
+// Remove an attachment from a backlog item
+export const removeAttachment = (
+  itemId: string,
+  attachmentUrl: string
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
+  }
+  
+  backlogItems[itemIndex].attachments = backlogItems[itemIndex].attachments?.filter(
+    attachment => attachment.url !== attachmentUrl
+  );
+  
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
+  };
+};
+
+// Add a comment to a backlog item
+export const addComment = (
+  itemId: string,
+  comment: { text: string; author: string }
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
+  }
+  
+  if (!backlogItems[itemIndex].comments) {
+    backlogItems[itemIndex].comments = [];
+  }
+  
+  const newComment = {
+    id: uuidv4(),
+    ...comment,
+    createdAt: new Date()
+  };
+  
+  backlogItems[itemIndex].comments!.push(newComment);
+  
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
+  };
+};
+
+// Update a comment on a backlog item
+export const updateComment = (
+  itemId: string,
+  commentId: string,
+  text: string
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
+  }
+  
+  const commentIndex = backlogItems[itemIndex].comments?.findIndex(
+    comment => comment.id === commentId
+  );
+  
+  if (commentIndex === undefined || commentIndex === -1) {
+    return {
+      success: false,
+      error: 'Comment not found',
+      status: 404,
+      data: null
+    };
+  }
+  
+  backlogItems[itemIndex].comments![commentIndex].text = text;
+  
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
+  };
+};
+
+// Delete a comment from a backlog item
+export const deleteComment = (
+  itemId: string,
+  commentId: string
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
+  }
+  
+  backlogItems[itemIndex].comments = backlogItems[itemIndex].comments?.filter(
+    comment => comment.id !== commentId
+  );
+  
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
+  };
+};
+
+// Add a watcher to a backlog item
+export const addWatcher = (
+  itemId: string,
+  userId: string
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
+  }
+  
+  if (!backlogItems[itemIndex].watchers) {
+    backlogItems[itemIndex].watchers = [];
+  }
+  
+  if (!backlogItems[itemIndex].watchers?.includes(userId)) {
+    backlogItems[itemIndex].watchers!.push(userId);
+  }
+  
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
+  };
+};
+
+// Remove a watcher from a backlog item
+export const removeWatcher = (
+  itemId: string,
+  userId: string
+): ApiResponse<BacklogItem> => {
+  const itemIndex = backlogItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    return {
+      success: false,
+      error: 'Backlog item not found',
+      status: 404,
+      data: null
+    };
+  }
+  
+  backlogItems[itemIndex].watchers = backlogItems[itemIndex].watchers?.filter(
+    watcher => watcher !== userId
+  );
+  
+  return {
+    success: true,
+    data: backlogItems[itemIndex],
+    status: 200
+  };
 };

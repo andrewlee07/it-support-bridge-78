@@ -1,9 +1,13 @@
 
-import React, { useState } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import React, { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import KanbanColumn from './KanbanColumn';
 import { cn } from '@/lib/utils';
+import { defaultKanbanConfig, KanbanBoardConfig, KanbanColumnConfig } from '@/utils/types/kanbanTypes';
+import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
+import KanbanConfigDialog from './KanbanConfigDialog';
 
 interface KanbanBoardProps {
   backlogItems: BacklogItem[];
@@ -23,15 +27,25 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   columnSize,
 }) => {
   const [collapsedColumns, setCollapsedColumns] = useState<string[]>([]);
+  const [boardConfig, setBoardConfig] = useState<KanbanBoardConfig>(defaultKanbanConfig);
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
 
-  // All possible statuses for backlog items
-  const statuses: BacklogItemStatus[] = ['open', 'in-progress', 'ready', 'blocked', 'completed', 'deferred'];
-  
-  // Group items by status
-  const itemsByStatus = statuses.reduce((acc, status) => {
-    acc[status] = backlogItems.filter(item => item.status === status);
-    return acc;
-  }, {} as Record<BacklogItemStatus, BacklogItem[]>);
+  // Load configuration from localStorage if available
+  useEffect(() => {
+    const savedConfig = localStorage.getItem('kanbanBoardConfig');
+    if (savedConfig) {
+      try {
+        setBoardConfig(JSON.parse(savedConfig));
+      } catch (e) {
+        console.error('Failed to parse saved kanban config:', e);
+      }
+    }
+  }, []);
+
+  // Save configuration to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('kanbanBoardConfig', JSON.stringify(boardConfig));
+  }, [boardConfig]);
 
   const toggleColumn = (status: string) => {
     setCollapsedColumns(prev => 
@@ -40,6 +54,22 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         : [...prev, status]
     );
   };
+
+  const updateBoardConfig = (newConfig: KanbanBoardConfig) => {
+    setBoardConfig(newConfig);
+    setIsConfigOpen(false);
+  };
+
+  // Group items by status
+  const itemsByStatus = boardConfig.columns.reduce((acc, column) => {
+    acc[column.statusValue as BacklogItemStatus] = backlogItems.filter(
+      item => item.status === column.statusValue
+    );
+    return acc;
+  }, {} as Record<BacklogItemStatus, BacklogItem[]>);
+
+  // Sort columns by order
+  const sortedColumns = [...boardConfig.columns].sort((a, b) => a.order - b.order);
 
   if (isLoading) {
     return (
@@ -50,27 +80,50 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className={cn(
-        "grid gap-4 overflow-x-auto pb-4",
-        columnSize === 'compact' 
-          ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-6" 
-          : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-      )}>
-        {statuses.map((status) => (
-          <KanbanColumn
-            key={status}
-            status={status}
-            items={itemsByStatus[status] || []}
-            isCollapsed={collapsedColumns.includes(status)}
-            onToggleCollapse={() => toggleColumn(status)}
-            onEditItem={onEditItem}
-            onQuickStatusChange={onQuickStatusChange}
-            columnSize={columnSize}
-          />
-        ))}
+    <>
+      <div className="flex justify-end mb-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => setIsConfigOpen(true)}
+          className="flex items-center gap-1"
+        >
+          <Settings className="h-4 w-4" />
+          Configure Board
+        </Button>
       </div>
-    </DragDropContext>
+
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className={cn(
+          "grid gap-4 overflow-x-auto pb-4",
+          boardConfig.layout === 'horizontal' 
+            ? "grid-flow-col auto-cols-fr" 
+            : columnSize === 'compact' 
+              ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-6" 
+              : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        )}>
+          {sortedColumns.map((column) => (
+            <KanbanColumn
+              key={column.id}
+              columnConfig={column}
+              items={itemsByStatus[column.statusValue as BacklogItemStatus] || []}
+              isCollapsed={collapsedColumns.includes(column.id)}
+              onToggleCollapse={() => toggleColumn(column.id)}
+              onEditItem={onEditItem}
+              onQuickStatusChange={onQuickStatusChange}
+              columnSize={columnSize}
+            />
+          ))}
+        </div>
+      </DragDropContext>
+
+      <KanbanConfigDialog
+        isOpen={isConfigOpen}
+        onClose={() => setIsConfigOpen(false)}
+        currentConfig={boardConfig}
+        onSave={updateBoardConfig}
+      />
+    </>
   );
 };
 

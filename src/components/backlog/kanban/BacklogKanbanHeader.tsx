@@ -7,16 +7,10 @@ import {
   List, 
   Search, 
   Plus, 
-  LayoutDashboard, 
   Maximize, 
-  Minimize 
+  Minimize,
+  Settings
 } from 'lucide-react';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 
 interface BacklogKanbanHeaderProps {
   searchQuery: string;
