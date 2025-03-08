@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { BugIcon } from 'lucide-react';
+import { BugIcon, Link2Icon } from 'lucide-react';
 import { TestStatus } from '@/utils/types/testTypes';
 import { StatusButtonGroup } from './StatusButtonGroup';
 
@@ -29,7 +29,7 @@ const ExecutionActionButtons: React.FC<ExecutionActionButtonsProps> = ({
             onClick={() => onLinkBug(testCaseId)}
             disabled={isSubmitting}
           >
-            <BugIcon className="h-4 w-4 mr-2" />
+            <Link2Icon className="h-4 w-4 mr-2" />
             Link Bug
           </Button>
         )}
@@ -39,7 +39,7 @@ const ExecutionActionButtons: React.FC<ExecutionActionButtonsProps> = ({
           disabled={isSubmitting}
         >
           <BugIcon className="h-4 w-4 mr-2" />
-          Create Bug
+          New Bug
         </Button>
       </div>
       

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -10,10 +10,23 @@ import {
 import { Button } from "@/components/ui/button";
 import TestCaseList from './TestCaseList';
 import { useTestCases } from './hooks/useTestCases';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, X } from 'lucide-react';
+import TestCaseForm from './TestCaseForm';
+import { useToast } from '@/hooks/use-toast';
 
 const TestCasesTab = () => {
-  const { isLoadingTestCases } = useTestCases();
+  const [showForm, setShowForm] = useState(false);
+  const { isLoadingTestCases, refetch } = useTestCases();
+  const { toast } = useToast();
+
+  const handleTestCaseSuccess = () => {
+    setShowForm(false);
+    refetch();
+    toast({
+      title: "Test case created",
+      description: "The test case has been created successfully.",
+    });
+  };
 
   return (
     <Card>
@@ -22,13 +35,24 @@ const TestCasesTab = () => {
           <CardTitle>Test Cases</CardTitle>
           <CardDescription>Manage your test cases</CardDescription>
         </div>
-        <Button size="sm">
-          <PlusCircle className="h-4 w-4 mr-2" />
-          Add Test Case
+        <Button size="sm" onClick={() => setShowForm(!showForm)}>
+          {showForm ? (
+            <>
+              <X className="h-4 w-4 mr-2" />
+              Cancel
+            </>
+          ) : (
+            <>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              New Test Case
+            </>
+          )}
         </Button>
       </CardHeader>
       <CardContent>
-        {isLoadingTestCases ? (
+        {showForm ? (
+          <TestCaseForm onSuccess={handleTestCaseSuccess} onCancel={() => setShowForm(false)} />
+        ) : isLoadingTestCases ? (
           <div className="animate-pulse py-10 text-center">Loading test cases...</div>
         ) : (
           <TestCaseList />

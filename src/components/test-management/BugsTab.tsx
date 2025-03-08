@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBugs } from '@/utils/mockData/testData';
 import BugList from './BugList';
@@ -13,10 +13,15 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
+import BugForm from './BugForm';
+import { useToast } from '@/hooks/use-toast';
 
 const BugsTab = () => {
+  const [showBugForm, setShowBugForm] = useState(false);
+  const { toast } = useToast();
+  
   // Fetch bugs
-  const { data: bugsData, isLoading: isLoadingBugs } = useQuery({
+  const { data: bugsData, isLoading: isLoadingBugs, refetch } = useQuery({
     queryKey: ['bugs'],
     queryFn: fetchBugs,
   });
@@ -48,6 +53,15 @@ const BugsTab = () => {
     ? convertApiBugsToBugs(bugsData.data) 
     : [];
 
+  const handleBugFormSuccess = () => {
+    setShowBugForm(false);
+    refetch();
+    toast({
+      title: "Bug reported",
+      description: "The bug has been reported successfully.",
+    });
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -55,13 +69,15 @@ const BugsTab = () => {
           <CardTitle>Bugs</CardTitle>
           <CardDescription>Track and manage bugs</CardDescription>
         </div>
-        <Button size="sm">
+        <Button size="sm" onClick={() => setShowBugForm(!showBugForm)}>
           <PlusCircle className="h-4 w-4 mr-2" />
-          Add Bug
+          {showBugForm ? "Cancel" : "New Bug"}
         </Button>
       </CardHeader>
       <CardContent>
-        {isLoadingBugs ? (
+        {showBugForm ? (
+          <BugForm onSuccess={handleBugFormSuccess} onCancel={() => setShowBugForm(false)} />
+        ) : isLoadingBugs ? (
           <div className="animate-pulse p-4 rounded-lg border">Loading bugs...</div>
         ) : (
           <BugList bugs={typedBugs} />

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { PlusCircle, Upload, Download } from 'lucide-react';
 
 const TestTrackingHeader = () => {
   return (
@@ -13,13 +14,16 @@ const TestTrackingHeader = () => {
       </div>
       <div className="mt-4 md:mt-0 space-x-2">
         <Button variant="outline">
+          <Upload className="h-4 w-4 mr-2" />
           Import
         </Button>
         <Button variant="outline">
+          <Download className="h-4 w-4 mr-2" />
           Export
         </Button>
         <Button>
-          Create Test Case
+          <PlusCircle className="h-4 w-4 mr-2" />
+          New Test Case
         </Button>
       </div>
     </div>
