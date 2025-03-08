@@ -74,6 +74,7 @@ const ChangesList: React.FC<ChangesListProps> = ({
 
   const handleCardClick = (changeId: string) => {
     navigate(`/changes/${changeId}`);
+    onViewChange(changeId);
   };
 
   if (isLoading) {
