@@ -31,14 +31,16 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
 }) => {
   return (
     <Card className={cn(
-      "h-full flex flex-col border",
-      columnConfig.color,
+      "h-full flex flex-col border-2 border-slate-200 dark:border-slate-700 bg-background",
       columnSize === 'compact' ? "min-h-[400px]" : "min-h-[600px]"
     )}>
-      <CardHeader className="p-3 pb-2 flex flex-row items-center justify-between">
+      <CardHeader className={cn(
+        "p-3 pb-2 flex flex-row items-center justify-between",
+        "border-b border-slate-200 dark:border-slate-700"
+      )}>
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           {columnConfig.displayName}
-          <span className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs">
+          <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
             {items.length}
           </span>
         </CardTitle>

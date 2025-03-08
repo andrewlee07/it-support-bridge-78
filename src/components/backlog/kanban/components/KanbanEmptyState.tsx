@@ -9,7 +9,7 @@ interface KanbanEmptyStateProps {
 
 const KanbanEmptyState: React.FC<KanbanEmptyStateProps> = ({ onCreateItem }) => {
   return (
-    <div className="flex flex-col items-center justify-center h-64 p-6 border border-dashed rounded-lg">
+    <div className="flex flex-col items-center justify-center h-64 p-6 border-2 border-slate-200 dark:border-slate-700 rounded-lg bg-background">
       <h3 className="text-lg font-medium mb-2">No items to display</h3>
       <p className="text-muted-foreground text-sm mb-4 text-center">
         Create your first backlog item to get started with the kanban board.

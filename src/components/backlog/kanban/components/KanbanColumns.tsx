@@ -42,9 +42,9 @@ const KanbanColumns: React.FC<KanbanColumnsProps> = ({
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="relative w-full overflow-hidden">
-        <ScrollArea className="w-full h-full">
+        <ScrollArea className="w-full h-full" orientation="horizontal">
           <div className={cn(
-            "grid gap-4 pb-4 min-w-max",
+            "grid gap-4 pb-4 min-w-max pr-4",
             boardConfig.layout === 'horizontal'
               ? "grid-flow-col auto-cols-[300px]"
               : columnSize === 'compact'
