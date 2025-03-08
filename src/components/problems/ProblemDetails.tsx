@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Problem } from '@/utils/types/problem';
 import { formatRelative } from 'date-fns';
 import RelatedItemsList from '@/components/tickets/detail/RelatedItemsList';
+import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
 
 interface ProblemDetailsProps {
   problem: Problem;
@@ -18,6 +18,13 @@ const ProblemDetails: React.FC<ProblemDetailsProps> = ({ problem }) => {
 
   return (
     <div className="space-y-6">
+      <DetailBreadcrumb 
+        entityName="Problem"
+        entityId={problem.id}
+        parentRoute="/problems"
+        parentName="Problems"
+      />
+      
       <Card>
         <CardHeader>
           <CardTitle className="text-xl">Problem Details</CardTitle>

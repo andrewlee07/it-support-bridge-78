@@ -5,6 +5,7 @@ import PriorityBadge from './detail/PriorityBadge';
 import StatusBadge from './detail/StatusBadge';
 import TicketDetailsGrid from './detail/TicketDetailsGrid';
 import RelatedItemsList from './detail/RelatedItemsList';
+import DetailBreadcrumb from './detail/DetailBreadcrumb';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
@@ -32,6 +33,13 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
   
   return (
     <div className="space-y-6">
+      <DetailBreadcrumb 
+        entityName={isServiceRequest ? "Service Request" : "Incident"}
+        entityId={ticket.id}
+        parentRoute={isServiceRequest ? "/service-requests" : "/incidents"}
+        parentName={isServiceRequest ? "Service Requests" : "Incidents"}
+      />
+      
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold text-foreground">{ticket.title}</h1>

@@ -13,6 +13,7 @@ import { ArrowLeft, Edit, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge, SeverityBadge } from '@/components/test-management/ui/BugBadges';
 import { Badge } from '@/components/ui/badge';
+import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
 
 const BugDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -76,6 +77,13 @@ const BugDetail = () => {
   return (
     <PageTransition>
       <div className="space-y-6">
+        <DetailBreadcrumb 
+          entityName="Bug"
+          entityId={bugData.id}
+          parentRoute="/bugs"
+          parentName="Bugs"
+        />
+
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate('/bugs')} className="gap-2">
             <ArrowLeft className="h-4 w-4" />

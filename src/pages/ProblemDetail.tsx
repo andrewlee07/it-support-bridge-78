@@ -6,6 +6,7 @@ import { getProblemById } from '@/utils/mockData/problems';
 import ProblemDetailView from '@/components/problems/ProblemDetailView';
 import ProblemDetailError from '@/components/problems/ProblemDetailError';
 import { useProblemDetail } from '@/hooks/useProblemDetail';
+import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
 
 const ProblemDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,15 @@ const ProblemDetail = () => {
   
   return (
     <PageTransition>
+      {!loading && !error && problem && (
+        <DetailBreadcrumb 
+          entityName="Problem"
+          entityId={problem.id}
+          parentRoute="/problems"
+          parentName="Problems"
+        />
+      )}
+      
       <ProblemDetailError
         loading={loading}
         error={error}

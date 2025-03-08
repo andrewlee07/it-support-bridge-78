@@ -4,6 +4,7 @@ import PageTransition from '@/components/shared/PageTransition';
 import ReleaseDetailContent from '@/components/releases/detail/ReleaseDetailContent';
 import ReleaseDetailDialogs from '@/components/releases/detail/ReleaseDetailDialogs';
 import useReleaseDetail from '@/hooks/useReleaseDetail';
+import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
 
 const ReleaseDetailPage = () => {
   const {
@@ -34,6 +35,15 @@ const ReleaseDetailPage = () => {
   return (
     <PageTransition>
       <div className="container py-6 space-y-6">
+        {!isLoading && release && (
+          <DetailBreadcrumb 
+            entityName="Release"
+            entityId={release.id}
+            parentRoute="/releases"
+            parentName="Releases"
+          />
+        )}
+        
         {isLoading ? (
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-1/3" />

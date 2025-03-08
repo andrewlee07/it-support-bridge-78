@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AssetList from '@/components/assets/AssetList';
@@ -9,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Cpu, HardDrive, Info, Server, Smartphone } from 'lucide-react';
 import { format } from 'date-fns';
+import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
 
 const Assets: React.FC = () => {
   const navigate = useNavigate();
@@ -92,6 +92,13 @@ const Assets: React.FC = () => {
           </DialogHeader>
           {selectedAsset && (
             <div className="space-y-6">
+              <DetailBreadcrumb 
+                entityName="Asset"
+                entityId={selectedAsset.id}
+                parentRoute="/assets"
+                parentName="Assets"
+              />
+              
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-primary/10 text-primary">
                   {getAssetIcon(selectedAsset.type)}

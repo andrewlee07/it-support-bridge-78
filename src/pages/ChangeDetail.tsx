@@ -7,6 +7,7 @@ import { ChangeRequest } from '@/utils/types/change';
 import ChangeRequestDetail from '@/components/changes/ChangeRequestDetail';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
 
 const ChangeDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -83,6 +84,13 @@ const ChangeDetail = () => {
   return (
     <PageTransition>
       <div className="space-y-6">
+        <DetailBreadcrumb 
+          entityName="Change Request"
+          entityId={changeRequest.id}
+          parentRoute="/changes"
+          parentName="Changes"
+        />
+        
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
