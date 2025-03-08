@@ -17,6 +17,7 @@ export const mockTickets: Ticket[] = [
     createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
     updatedAt: new Date(),
     audit: createAuditEntries('INC00001', 'ticket', 'user-3'),
+    relatedProblems: ['PRB00001', 'PRB00005'],
   },
   {
     id: 'SR00001',
@@ -45,6 +46,7 @@ export const mockTickets: Ticket[] = [
     updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
     resolvedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
     audit: createAuditEntries('INC00002', 'ticket', 'user-5'),
+    relatedProblems: ['PRB00002'],
   },
   {
     id: 'SR00002',
@@ -71,6 +73,15 @@ export const mockTickets: Ticket[] = [
     createdAt: new Date(),
     updatedAt: new Date(),
     audit: createAuditEntries('INC00003', 'ticket', 'user-4'),
+    relatedProblems: ['PRB00001', 'PRB00003'],
+    relatedItems: [
+      {
+        id: 'BUG001',
+        title: 'VPN Client crashes on connection attempt',
+        type: 'bug',
+        status: 'open'
+      }
+    ]
   },
   {
     id: 'SR00003',
@@ -85,6 +96,14 @@ export const mockTickets: Ticket[] = [
     createdAt: new Date(new Date().setDate(new Date().getDate() - 4)),
     updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
     audit: createAuditEntries('SR00003', 'ticket', 'user-5'),
+    relatedItems: [
+      {
+        id: 'BKL001',
+        title: 'Create standard software installation package',
+        type: 'backlog',
+        status: 'in-progress'
+      }
+    ]
   },
 ];
 

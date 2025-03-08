@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Link as LinkIcon } from 'lucide-react';
+import { AlertCircle, Bug, ListChecks, Link as LinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTicketById } from '@/utils/mockData/tickets';
+import { getProblemById } from '@/utils/mockData/problems';
 
 interface RelatedItem {
   id: string;
@@ -14,7 +15,7 @@ interface RelatedItem {
 
 interface RelatedItemsListProps {
   items: RelatedItem[];
-  type: 'incident' | 'service';
+  type?: 'incident' | 'service' | 'problem';
 }
 
 const RelatedItemsList: React.FC<RelatedItemsListProps> = ({ items, type }) => {
@@ -40,20 +41,39 @@ const RelatedItemsList: React.FC<RelatedItemsListProps> = ({ items, type }) => {
   const getItemTitle = (item: RelatedItem) => {
     if (item.title) return item.title;
     
-    // If no title provided and it's an incident or service request, try to fetch it
+    // If no title provided, try to fetch it based on type
     if (item.type.toLowerCase() === 'incident' || item.type.toLowerCase() === 'service') {
       const ticket = getTicketById(item.id);
       return ticket ? ticket.title : item.id;
+    } else if (item.type.toLowerCase() === 'problem') {
+      const problem = getProblemById(item.id);
+      return problem ? problem.title : item.id;
     }
     
     return item.id;
+  };
+
+  // Helper function to get the appropriate icon based on item type
+  const getItemIcon = (itemType: string) => {
+    switch (itemType.toLowerCase()) {
+      case 'bug':
+        return <Bug className="h-4 w-4 text-red-500 flex-shrink-0" />;
+      case 'backlog':
+        return <ListChecks className="h-4 w-4 text-blue-500 flex-shrink-0" />;
+      case 'problem':
+        return <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0" />;
+      case 'incident':
+      case 'service':
+      default:
+        return <LinkIcon className="h-4 w-4 text-primary flex-shrink-0" />;
+    }
   };
   
   return (
     <div className="space-y-2">
       {items.map((item) => (
         <div key={item.id} className="flex items-center gap-2 p-2 border rounded-md">
-          <LinkIcon className="h-4 w-4 text-primary flex-shrink-0" />
+          {getItemIcon(item.type)}
           <div className="flex flex-col min-w-0">
             <Link 
               to={getItemPath(item)}
@@ -65,7 +85,7 @@ const RelatedItemsList: React.FC<RelatedItemsListProps> = ({ items, type }) => {
               <span className={cn(
                 "text-xs",
                 item.status.toLowerCase().includes('closed') ? "text-green-600" : 
-                item.status.toLowerCase().includes('in progress') ? "text-amber-600" : 
+                item.status.toLowerCase().includes('in progress') || item.status.toLowerCase().includes('under') ? "text-amber-600" : 
                 "text-gray-500"
               )}>
                 {item.status}

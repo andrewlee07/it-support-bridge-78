@@ -22,6 +22,14 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
   const isServiceRequest = type === 'service';
   const isResolved = ['closed', 'resolved', 'fulfilled'].includes(ticket.status);
   
+  // Create related problems items array if it exists
+  const relatedProblems = ticket.relatedProblems 
+    ? ticket.relatedProblems.map(id => ({
+        id,
+        type: 'problem'
+      }))
+    : [];
+  
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -35,6 +43,20 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
       </div>
       
       <TicketDetailsGrid ticket={ticket} isServiceRequest={isServiceRequest} />
+      
+      {/* Show related problems section if there are any */}
+      {relatedProblems.length > 0 && (
+        <div className="space-y-4 mt-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-md font-medium">Related Problems</h3>
+          </div>
+          
+          <RelatedItemsList 
+            items={relatedProblems} 
+            type={type}
+          />
+        </div>
+      )}
       
       {/* Show related items section */}
       <div className="space-y-4 mt-6">
