@@ -1,48 +1,36 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 
-interface TicketLoadingErrorProps {
-  loading: boolean;
-  error: string | null;
+export interface TicketLoadingErrorProps {
   returnPath: string;
-  ticketType: string;
+  entityName: string;
 }
 
 const TicketLoadingError: React.FC<TicketLoadingErrorProps> = ({
-  loading,
-  error,
   returnPath,
-  ticketType
+  entityName
 }) => {
   const navigate = useNavigate();
-  
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <h2 className="text-xl font-semibold mb-2">{ticketType} Not Found</h2>
-        <p className="text-muted-foreground mb-4">
-          The {ticketType.toLowerCase()} you're looking for doesn't exist or you don't have permission to view it.
-        </p>
-        <button 
-          className="btn-primary"
-          onClick={() => navigate(returnPath)}
-        >
-          Return to {ticketType}s
-        </button>
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+      <div className="rounded-full bg-amber-100 p-3 mb-4">
+        <AlertTriangle className="h-6 w-6 text-amber-600" />
       </div>
-    );
-  }
-
-  return null;
+      <h2 className="text-xl font-bold mb-2">
+        {entityName} Not Found
+      </h2>
+      <p className="text-muted-foreground mb-6">
+        The {entityName.toLowerCase()} you're looking for could not be found or may have been deleted.
+      </p>
+      <Button onClick={() => navigate(returnPath)}>
+        Return to {entityName} List
+      </Button>
+    </div>
+  );
 };
 
 export default TicketLoadingError;

@@ -44,7 +44,7 @@ const GenericTicketDetail: React.FC<GenericTicketDetailProps> = ({
     return (
       <TicketLoadingError
         returnPath={returnPath}
-        entityType={ticketType}
+        entityName={ticketType}
       />
     );
   }
