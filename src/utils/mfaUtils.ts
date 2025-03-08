@@ -1,5 +1,6 @@
 
 import { User, MFAMethod } from './types/user';
+import { logSecurityEvent, isSessionExpired, isIPAllowed, generateJWTToken } from './securityUtils';
 
 // Mock function to generate TOTP code (in a real app would use a library like otplib)
 export const generateTOTPCode = (): string => {
@@ -116,4 +117,74 @@ export const isAccountLocked = (user: User): boolean => {
   if (!user.lockedUntil) return false;
   
   return new Date() < user.lockedUntil;
+};
+
+// Get client IP address (mock function)
+export const getClientIPAddress = (): string => {
+  // In a real app, this would come from the request headers
+  return '192.168.1.1';
+};
+
+// Initialize a user session
+export const initializeUserSession = (user: User): User => {
+  const ipAddress = getClientIPAddress();
+  const { token, refreshToken, expiry } = generateJWTToken(user);
+  
+  // Log session start
+  logSecurityEvent({
+    userId: user.id,
+    eventType: 'login',
+    ipAddress,
+    userAgent: navigator.userAgent,
+    details: 'User session initialized',
+    severity: 'info'
+  });
+  
+  return {
+    ...user,
+    sessionStartTime: new Date(),
+    lastIPAddress: ipAddress,
+    jwtToken: token,
+    refreshToken,
+    tokenExpiry: expiry
+  };
+};
+
+// Check if a user session is valid
+export const isSessionValid = (user: User): boolean => {
+  if (!user) return false;
+  
+  // Check session timeout
+  if (isSessionExpired(user)) {
+    logSecurityEvent({
+      userId: user.id,
+      eventType: 'logout',
+      ipAddress: getClientIPAddress(),
+      userAgent: navigator.userAgent,
+      details: 'Session expired',
+      severity: 'info'
+    });
+    return false;
+  }
+  
+  // Check IP address
+  if (!isIPAllowed(user, getClientIPAddress())) {
+    logSecurityEvent({
+      userId: user.id,
+      eventType: 'failed_login',
+      ipAddress: getClientIPAddress(),
+      userAgent: navigator.userAgent,
+      details: 'Login attempt from unauthorized IP address',
+      severity: 'warning'
+    });
+    return false;
+  }
+  
+  // Check JWT token expiry
+  if (user.tokenExpiry && new Date() > user.tokenExpiry) {
+    // Token has expired
+    return false;
+  }
+  
+  return true;
 };

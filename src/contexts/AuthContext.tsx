@@ -1,6 +1,6 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockUsers } from '@/utils/mockData/users';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { mockUsers, updateUser, getUserByEmail } from '@/utils/mockData/users';
 import { User, UserRole, MFAMethod } from '@/utils/types/user';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -10,8 +10,18 @@ import {
   shouldLockAccount, 
   resetLoginAttempts,
   incrementLoginAttempts,
-  isAccountLocked
+  isAccountLocked,
+  initializeUserSession,
+  isSessionValid,
+  getClientIPAddress
 } from '@/utils/mfaUtils';
+import { 
+  logSecurityEvent,
+  hasPermission,
+  canPerformAction,
+  generateJWTToken,
+  refreshJWTToken
+} from '@/utils/securityUtils';
 
 interface AuthContextType {
   user: User | null;
@@ -23,30 +33,76 @@ interface AuthContextType {
   verifyMFA: (code: string) => Promise<boolean>;
   resendMFACode: () => Promise<boolean>;
   cancelMFA: () => void;
+  checkSessionValidity: () => boolean;
+  refreshSession: () => boolean;
+  userHasPermission: (permissionName: string) => boolean;
+  userCanPerformAction: (resource: string, action: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Session checker interval in milliseconds (5 minutes)
+const SESSION_CHECK_INTERVAL = 5 * 60 * 1000;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [pendingUser, setPendingUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const { toast } = useToast();
-
+  
+  // Session checking
   useEffect(() => {
-    // Check for saved user in localStorage
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        // In a real app, we'd verify the session token here
-        setUser(parsedUser as User);
-      } catch (error) {
-        console.error('Failed to parse saved user', error);
-        localStorage.removeItem('currentUser');
-      }
+    let sessionCheckInterval: number;
+    
+    if (user) {
+      // Check session validity periodically
+      sessionCheckInterval = window.setInterval(() => {
+        if (!checkSessionValidity()) {
+          logout();
+          toast({
+            title: "Session expired",
+            description: "Your session has expired. Please log in again.",
+            variant: "destructive",
+          });
+        }
+      }, SESSION_CHECK_INTERVAL);
     }
-    setLoading(false);
+    
+    return () => {
+      if (sessionCheckInterval) {
+        clearInterval(sessionCheckInterval);
+      }
+    };
+  }, [user]);
+
+  // Check for saved user in localStorage on mount
+  useEffect(() => {
+    const checkSavedUser = async () => {
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        try {
+          const parsedUser = JSON.parse(savedUser) as User;
+          
+          // Verify token and session validity
+          if (isSessionValid(parsedUser)) {
+            setUser(parsedUser);
+          } else {
+            // Invalid session, clear it
+            localStorage.removeItem('currentUser');
+            toast({
+              title: "Session expired",
+              description: "Your previous session has expired. Please log in again.",
+            });
+          }
+        } catch (error) {
+          console.error('Failed to parse saved user', error);
+          localStorage.removeItem('currentUser');
+        }
+      }
+      setLoading(false);
+    };
+    
+    checkSavedUser();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -58,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Find user with matching email (in real app, would verify password too)
-    const foundUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const foundUser = getUserByEmail(email);
     
     if (!foundUser) {
       toast({
@@ -72,11 +128,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check if account is locked
     if (isAccountLocked(foundUser)) {
+      const lockEndTime = foundUser.lockedUntil ? new Date(foundUser.lockedUntil).toLocaleTimeString() : 'unknown';
+      
       toast({
         title: "Account locked",
-        description: "Too many failed login attempts. Please try again later.",
+        description: `Too many failed login attempts. Account locked until ${lockEndTime}.`,
         variant: "destructive",
       });
+      
+      // Log security event
+      logSecurityEvent({
+        userId: foundUser.id,
+        eventType: 'failed_login',
+        ipAddress: getClientIPAddress(),
+        userAgent: navigator.userAgent,
+        details: 'Login attempt on locked account',
+        severity: 'warning'
+      });
+      
+      setLoading(false);
+      return false;
+    }
+
+    // Check if user needs to change password
+    if (foundUser.requirePasswordChange) {
+      toast({
+        title: "Password change required",
+        description: "You need to change your password before continuing.",
+        variant: "destructive",
+      });
+      // In a real app, redirect to password change page
       setLoading(false);
       return false;
     }
@@ -119,21 +200,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const completeLogin = (userToLogin: User) => {
-    // Update last login time and ensure it's a valid User object
-    const userWithUpdatedLogin: User = {
-      ...userToLogin,
+    // Initialize user session
+    const userWithSession = initializeUserSession(userToLogin);
+    
+    // Update user with reset login attempts and updated session
+    const updatedUser = {
+      ...resetLoginAttempts(userWithSession),
       lastLogin: new Date(),
-      loginAttempts: 0, // Reset login attempts on successful login
-      lockedUntil: undefined
     };
     
-    setUser(userWithUpdatedLogin);
+    // Update in mock database
+    updateUser(updatedUser);
+    
+    // Update local state
+    setUser(updatedUser);
     setPendingUser(null);
-    localStorage.setItem('currentUser', JSON.stringify(userWithUpdatedLogin));
+    
+    // Save to localStorage
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    
     toast({
       title: "Logged in successfully",
-      description: `Welcome back, ${userWithUpdatedLogin.name}!`,
+      description: `Welcome back, ${updatedUser.name}!`,
     });
+    
     setLoading(false);
   };
 
@@ -157,13 +247,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isValid) {
       // MFA verification successful
       completeLogin(pendingUser);
+      
+      // Log successful verification
+      logSecurityEvent({
+        userId: pendingUser.id,
+        eventType: 'login',
+        ipAddress: getClientIPAddress(),
+        userAgent: navigator.userAgent,
+        details: 'MFA verification successful',
+        severity: 'info'
+      });
+      
       return true;
     } else {
-      toast({
-        title: "Verification failed",
-        description: "Invalid or expired code",
-        variant: "destructive",
-      });
+      // Failed verification - increment login attempts
+      const updatedUser = incrementLoginAttempts(pendingUser);
+      setPendingUser(updatedUser);
+      
+      // Check if we need to lock the account
+      if (shouldLockAccount(updatedUser)) {
+        toast({
+          title: "Account locked",
+          description: "Too many failed verification attempts. Your account has been temporarily locked.",
+          variant: "destructive",
+        });
+        
+        // Log account locked
+        logSecurityEvent({
+          userId: pendingUser.id,
+          eventType: 'account_locked',
+          ipAddress: getClientIPAddress(),
+          userAgent: navigator.userAgent,
+          details: 'Account locked due to too many failed MFA attempts',
+          severity: 'warning'
+        });
+        
+        // Update in mock database
+        updateUser(updatedUser);
+        
+        // Clear pending user
+        setPendingUser(null);
+      } else {
+        toast({
+          title: "Verification failed",
+          description: "Invalid or expired code",
+          variant: "destructive",
+        });
+        
+        // Log failed attempt
+        logSecurityEvent({
+          userId: pendingUser.id,
+          eventType: 'failed_login',
+          ipAddress: getClientIPAddress(),
+          userAgent: navigator.userAgent,
+          details: 'Failed MFA verification attempt',
+          severity: 'warning'
+        });
+      }
+      
       setLoading(false);
       return false;
     }
@@ -208,19 +349,96 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    if (user) {
+      // Log security event
+      logSecurityEvent({
+        userId: user.id,
+        eventType: 'logout',
+        ipAddress: getClientIPAddress(),
+        userAgent: navigator.userAgent,
+        details: 'User logged out',
+        severity: 'info'
+      });
+    }
+    
     setUser(null);
     setPendingUser(null);
     localStorage.removeItem('currentUser');
+    
     toast({
       title: "Logged out",
       description: "You have been logged out successfully",
     });
   };
 
-  const hasPermission = (requiredRoles: UserRole[]): boolean => {
+  const checkSessionValidity = useCallback((): boolean => {
+    if (!user) return false;
+    
+    const valid = isSessionValid(user);
+    
+    if (!valid && user) {
+      // Log invalid session
+      logSecurityEvent({
+        userId: user.id,
+        eventType: 'logout',
+        ipAddress: getClientIPAddress(),
+        userAgent: navigator.userAgent,
+        details: 'Session expired',
+        severity: 'info'
+      });
+    }
+    
+    return valid;
+  }, [user]);
+
+  const refreshSession = useCallback((): boolean => {
+    if (!user || !user.refreshToken) return false;
+    
+    try {
+      const tokens = refreshJWTToken(user, user.refreshToken);
+      
+      if (tokens) {
+        // Update user with new tokens
+        const updatedUser = {
+          ...user,
+          jwtToken: tokens.token,
+          refreshToken: tokens.refreshToken,
+          tokenExpiry: tokens.expiry,
+          sessionStartTime: new Date() // Reset session timeout
+        };
+        
+        // Update in mock database
+        updateUser(updatedUser);
+        
+        // Update local state
+        setUser(updatedUser);
+        
+        // Save to localStorage
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        
+        return true;
+      }
+    } catch (error) {
+      console.error('Failed to refresh token', error);
+    }
+    
+    return false;
+  }, [user]);
+
+  const hasPermissionByRole = (requiredRoles: UserRole[]): boolean => {
     if (!user) return false;
     return requiredRoles.includes(user.role);
   };
+
+  const userHasPermission = useCallback((permissionName: string): boolean => {
+    if (!user) return false;
+    return hasPermission(user, permissionName);
+  }, [user]);
+
+  const userCanPerformAction = useCallback((resource: string, action: string): boolean => {
+    if (!user) return false;
+    return canPerformAction(user, resource, action as any);
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ 
@@ -229,10 +447,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loading, 
       login, 
       logout, 
-      hasPermission, 
+      hasPermission: hasPermissionByRole,
       verifyMFA, 
       resendMFACode, 
-      cancelMFA 
+      cancelMFA,
+      checkSessionValidity,
+      refreshSession,
+      userHasPermission,
+      userCanPerformAction
     }}>
       {children}
     </AuthContext.Provider>

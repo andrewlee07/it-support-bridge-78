@@ -1,18 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
-import { ArrowRight, Loader2, Shield } from 'lucide-react';
+import { ArrowRight, Loader2, Shield, Info } from 'lucide-react';
+import { isPasswordValid, DEFAULT_PASSWORD_POLICY } from '@/utils/securityUtils';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const { login, user, pendingUser } = useAuth();
   const navigate = useNavigate();
 
@@ -28,8 +30,30 @@ const Login = () => {
     }
   }, [pendingUser, navigate]);
 
+  const validatePassword = (value: string) => {
+    if (!value) {
+      setPasswordError(null);
+      return;
+    }
+    
+    const result = isPasswordValid(value);
+    if (!result.valid) {
+      setPasswordError(result.reason || 'Invalid password');
+    } else {
+      setPasswordError(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Final password validation before submission
+    const passwordValidation = isPasswordValid(password);
+    if (!passwordValidation.valid) {
+      setPasswordError(passwordValidation.reason || 'Invalid password');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -94,14 +118,27 @@ const Login = () => {
                     type="password"
                     placeholder="••••••••"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      validatePassword(e.target.value);
+                    }}
                     required
-                    className="border-[#b047c9]/20 focus-visible:ring-[#b047c9]"
+                    className={`border-[#b047c9]/20 focus-visible:ring-[#b047c9] ${passwordError ? 'border-red-500' : ''}`}
                   />
+                  {passwordError && (
+                    <p className="text-sm text-red-500">{passwordError}</p>
+                  )}
                 </div>
-                <div className="text-sm text-right">
-                  <Button variant="link" type="button" className="px-0 text-[#b047c9]">
-                    Forgot password?
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center">
+                    <Info className="h-4 w-4 mr-1 text-[#b047c9]" />
+                    <span className="text-xs text-muted-foreground">
+                      Password requires {DEFAULT_PASSWORD_POLICY.minLength}+ chars, uppercase, lowercase, 
+                      numbers, and special characters
+                    </span>
+                  </div>
+                  <Button variant="link" type="button" className="px-0 text-[#b047c9]" asChild>
+                    <Link to="/security-recovery">Forgot password?</Link>
                   </Button>
                 </div>
               </CardContent>
