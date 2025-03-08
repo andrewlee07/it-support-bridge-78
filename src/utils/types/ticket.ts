@@ -2,9 +2,9 @@
 import { AuditEntry } from './audit';
 
 export type TicketCategory = 'hardware' | 'software' | 'network' | 'access' | 'other';
-export type TicketType = 'incident' | 'service';
-export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4';
-export type TicketStatus = 'new' | 'in-progress' | 'on-hold' | 'resolved' | 'closed' | 'pending';
+export type TicketType = 'incident' | 'service' | 'change';
+export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4' | 'medium';
+export type TicketStatus = 'new' | 'in-progress' | 'on-hold' | 'resolved' | 'closed' | 'pending' | 'open' | 'approved' | 'fulfilled';
 export type PendingSubStatus = 'customer-info' | 'customer-testing' | 'third-party';
 
 export interface Ticket {
@@ -30,6 +30,7 @@ export interface Ticket {
   relatedAssets?: string[];
   relatedProblems?: string[];
   relatedChanges?: string[];
+  relatedItems?: RelatedItem[];
   parentTicketId?: string;
   
   // On-hold and pending status reason
@@ -41,6 +42,9 @@ export interface Ticket {
   reopenReason?: string;
   reopenedAt?: Date;
   previousStatus?: TicketStatus;
+  
+  // Notes information
+  notes?: TicketNote[];
 }
 
 export interface TicketNote {
@@ -60,5 +64,23 @@ export interface RelatedItem {
   id: string;
   title: string;
   type: string;
+  status: string;
+  createdAt?: Date;
+}
+
+export interface TicketFilter {
+  status?: string[];
+  priority?: string[];
+  assignedTo?: string[];
+  category?: string[];
+  type?: string[];
+}
+
+export interface TestCoverageRelationship {
+  id: string;
+  backlogItemId: string;
+  testCaseId: string;
+  createdAt: Date;
+  updatedAt: Date;
   status: string;
 }
