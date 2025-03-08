@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import Users from '@/pages/Users';
 import Reports from '@/pages/Reports';
@@ -11,7 +11,7 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 export const OtherRoutes: React.FC = () => {
   return (
-    <>
+    <Routes>
       {/* User Management route */}
       <Route
         path="/users"
@@ -71,6 +71,6 @@ export const OtherRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
-    </>
+    </Routes>
   );
 };

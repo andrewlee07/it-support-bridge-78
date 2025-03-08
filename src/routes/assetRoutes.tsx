@@ -1,16 +1,16 @@
 
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import Assets from '@/pages/Assets';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 export const AssetRoutes: React.FC = () => {
   return (
-    <>
+    <Routes>
       {/* Asset Management routes */}
       <Route
-        path="/assets"
+        path="/"
         element={
           <ProtectedRoute requiredRoles={['admin', 'manager']}>
             <MainLayout>
@@ -21,7 +21,7 @@ export const AssetRoutes: React.FC = () => {
       />
       
       <Route
-        path="/assets/:id"
+        path="/:id"
         element={
           <ProtectedRoute requiredRoles={['admin', 'manager']}>
             <MainLayout>
@@ -30,6 +30,6 @@ export const AssetRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
-    </>
+    </Routes>
   );
 };

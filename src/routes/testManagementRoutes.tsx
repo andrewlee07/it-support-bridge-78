@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import TestTracking from '@/pages/TestTracking';
 import TestExecution from '@/pages/TestExecution';
@@ -9,7 +9,7 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 export const TestManagementRoutes: React.FC = () => {
   return (
-    <>
+    <Routes>
       {/* Test Management routes */}
       <Route
         path="/test-tracking"
@@ -43,6 +43,6 @@ export const TestManagementRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
-    </>
+    </Routes>
   );
 };

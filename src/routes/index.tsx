@@ -17,14 +17,24 @@ export const AppRoutes: React.FC = () => {
       {/* Authentication routes */}
       <Route path="/login" element={<Login />} />
       
-      {/* Group all protected routes */}
-      <TicketRoutes />
-      <ChangeRoutes />
-      <AssetRoutes />
-      <TestManagementRoutes />
-      <OtherRoutes />
-      <AdminRoutes />
-      <DashboardRoutes />
+      {/* Include all route groups */}
+      <Route>
+        <Route path="/dashboard/*" element={<DashboardRoutes />} />
+        <Route path="/incidents/*" element={<TicketRoutes />} />
+        <Route path="/service-requests/*" element={<TicketRoutes />} />
+        <Route path="/changes/*" element={<ChangeRoutes />} />
+        <Route path="/releases/*" element={<ChangeRoutes />} />
+        <Route path="/assets/*" element={<AssetRoutes />} />
+        <Route path="/test-*/*" element={<TestManagementRoutes />} />
+        <Route path="/bugs/*" element={<TestManagementRoutes />} />
+        <Route path="/users/*" element={<OtherRoutes />} />
+        <Route path="/reports/*" element={<OtherRoutes />} />
+        <Route path="/problem-management/*" element={<OtherRoutes />} />
+        <Route path="/calendar/*" element={<OtherRoutes />} />
+        <Route path="/backlog/*" element={<OtherRoutes />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/settings/*" element={<AdminRoutes />} />
+      </Route>
       
       {/* Default route */}
       <Route path="/" element={<Navigate to="/dashboard" />} />

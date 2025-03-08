@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import Incidents from '@/pages/Incidents';
 import ServiceRequests from '@/pages/ServiceRequests';
@@ -8,10 +8,10 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 export const TicketRoutes: React.FC = () => {
   return (
-    <>
+    <Routes>
       {/* Incident Management routes */}
       <Route
-        path="/incidents"
+        path="/"
         element={
           <ProtectedRoute>
             <MainLayout>
@@ -22,7 +22,7 @@ export const TicketRoutes: React.FC = () => {
       />
       
       <Route
-        path="/incidents/:id"
+        path="/:id"
         element={
           <ProtectedRoute>
             <MainLayout>
@@ -53,6 +53,6 @@ export const TicketRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
-    </>
+    </Routes>
   );
 };

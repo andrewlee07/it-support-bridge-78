@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
 import AdminSettings from '@/pages/AdminSettings';
 import SLASettings from '@/pages/SLASettings';
@@ -11,7 +11,7 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 export const AdminRoutes: React.FC = () => {
   return (
-    <>
+    <Routes>
       {/* Settings routes */}
       <Route
         path="/settings/sla"
@@ -68,6 +68,6 @@ export const AdminRoutes: React.FC = () => {
           </ProtectedRoute>
         } 
       />
-    </>
+    </Routes>
   );
 };
