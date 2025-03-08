@@ -1,139 +1,171 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import PageTransition from '@/components/shared/PageTransition';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from 'lucide-react';
-import { getReleases } from '@/utils/api/releaseApi';
-import ReleaseSummaryCards from '@/components/dashboard/cross-system/ReleaseSummaryCards';
-import BacklogProgressChart from '@/components/dashboard/cross-system/BacklogProgressChart';
-import TestMetricsSection from '@/components/dashboard/cross-system/TestMetricsSection';
-import RelationshipsDiagram from '@/components/dashboard/cross-system/RelationshipsDiagram';
-import { fetchDashboardData } from '@/utils/api/dashboardApi';
 import { Button } from '@/components/ui/button';
-import ReportingControls from '@/components/dashboard/cross-system/ReportingControls';
+import { Calendar, ChevronDown, Download, Filter, RefreshCw } from 'lucide-react';
+import { createApiSuccessResponse } from '@/utils/mockData/apiHelpers';
+import { CrossSystemDashboardData } from '@/utils/types/dashboard';
+import { RelationshipsDiagram } from '@/components/dashboard/cross-system/RelationshipsDiagram';
+import { ReleaseSummaryCards } from '@/components/dashboard/cross-system/ReleaseSummaryCards';
+import { BacklogProgressChart } from '@/components/dashboard/cross-system/BacklogProgressChart';
+import { TestMetricsSection } from '@/components/dashboard/cross-system/TestMetricsSection';
+import { ReportingControls } from '@/components/dashboard/cross-system/ReportingControls';
 
-const IntegratedDashboard = () => {
-  const [selectedReleaseId, setSelectedReleaseId] = useState<string>('all');
-  const [timeRange, setTimeRange] = useState<string>('30d');
+// Mock data for dashboard
+const mockCrossSystemData: CrossSystemDashboardData = {
+  releaseSummary: {
+    totalReleases: 8,
+    upcomingReleases: 3,
+    releaseRiskScores: [
+      { releaseId: 'rel-1', title: 'Release 1.0', version: '1.0.0', riskScore: 25, status: 'In Progress' },
+      { releaseId: 'rel-2', title: 'Release 1.1', version: '1.1.0', riskScore: 65, status: 'Planned' },
+      { releaseId: 'rel-3', title: 'Release 1.2', version: '1.2.0', riskScore: 15, status: 'Planned' },
+    ],
+    completionRate: 78
+  },
+  backlogProgress: [
+    { releaseId: 'rel-1', title: 'Release 1.0', completed: 45, inProgress: 20, notStarted: 15 },
+    { releaseId: 'rel-2', title: 'Release 1.1', completed: 10, inProgress: 35, notStarted: 45 },
+    { releaseId: 'rel-3', title: 'Release 1.2', completed: 0, inProgress: 5, notStarted: 60 },
+  ],
+  testMetrics: {
+    testCoverage: [
+      { releaseId: 'rel-1', title: 'Release 1.0', coverage: 85 },
+      { releaseId: 'rel-2', title: 'Release 1.1', coverage: 42 },
+      { releaseId: 'rel-3', title: 'Release 1.2', coverage: 12 },
+    ],
+    bugsByRelease: [
+      { releaseId: 'rel-1', title: 'Release 1.0', open: 8, fixed: 42 },
+      { releaseId: 'rel-2', title: 'Release 1.1', open: 16, fixed: 4 },
+      { releaseId: 'rel-3', title: 'Release 1.2', open: 3, fixed: 0 },
+    ],
+    testEffectiveness: 82,
+    bugFixVelocity: 3.5,
+  },
+  relationships: {
+    nodes: [
+      { id: '1', label: 'Release 1.0', value: 10 },
+      { id: '2', label: 'Backlog', value: 25 },
+      { id: '3', label: 'Tests', value: 15 },
+      { id: '4', label: 'Bugs', value: 8 },
+      { id: '5', label: 'Release 1.1', value: 12 },
+    ],
+    links: [
+      { source: '1', target: '2', value: 5 },
+      { source: '1', target: '3', value: 8 },
+      { source: '2', target: '3', value: 10 },
+      { source: '3', target: '4', value: 7 },
+      { source: '1', target: '4', value: 3 },
+      { source: '2', target: '5', value: 8 },
+    ]
+  }
+};
+
+// Mock API function to fetch dashboard data
+const fetchCrossSystemDashboard = async () => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return createApiSuccessResponse(mockCrossSystemData);
+};
+
+const IntegratedDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
-
-  // Fetch all releases for the filter dropdown
-  const { data: releasesResponse, isLoading: isLoadingReleases } = useQuery({
-    queryKey: ['releases'],
-    queryFn: getReleases,
+  
+  // Fetch dashboard data
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['crossSystemDashboard'],
+    queryFn: fetchCrossSystemDashboard
   });
 
-  // Fetch dashboard data based on selected filters
-  const { data: dashboardData, isLoading: isLoadingDashboard } = useQuery({
-    queryKey: ['dashboardData', selectedReleaseId, timeRange],
-    queryFn: () => fetchDashboardData(selectedReleaseId, timeRange),
-  });
-
-  const releases = releasesResponse?.data || [];
-  const isLoading = isLoadingReleases || isLoadingDashboard;
+  const dashboardData = data?.data || mockCrossSystemData;
 
   return (
-    <PageTransition>
-      <div className="container mx-auto py-6 space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Cross-System Dashboard</h1>
-            <p className="text-muted-foreground mt-1">
-              Unified view across releases, backlog items, and test management
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-            <Select value={selectedReleaseId} onValueChange={setSelectedReleaseId}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Select Release" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Releases</SelectItem>
-                {isLoadingReleases ? (
-                  <SelectItem value="loading" disabled>
-                    Loading releases...
-                  </SelectItem>
-                ) : (
-                  releases.map(release => (
-                    <SelectItem key={release.id} value={release.id}>
-                      {release.title}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-            
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Time Range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7d">Last 7 Days</SelectItem>
-                <SelectItem value="30d">Last 30 Days</SelectItem>
-                <SelectItem value="90d">Last 90 Days</SelectItem>
-                <SelectItem value="all">All Time</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="container mx-auto p-4 space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Integrated Dashboard</h1>
+          <p className="text-muted-foreground">Cross-system view of releases, backlog, and tests</p>
         </div>
-
-        <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-4 w-full md:w-[600px]">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="releases">Releases</TabsTrigger>
-            <TabsTrigger value="backlog">Backlog</TabsTrigger>
-            <TabsTrigger value="testing">Testing</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            {isLoading ? (
-              <div className="h-[500px] flex items-center justify-center">
-                <div className="animate-pulse text-muted-foreground">Loading dashboard data...</div>
-              </div>
-            ) : !dashboardData ? (
-              <div className="text-center py-12">
-                <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">No data available for the selected filters</p>
-              </div>
-            ) : (
-              <>
-                <ReleaseSummaryCards data={dashboardData.releaseSummary} />
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <BacklogProgressChart data={dashboardData.backlogProgress} />
-                  <TestMetricsSection data={dashboardData.testMetrics} />
-                </div>
-                <RelationshipsDiagram data={dashboardData.relationships} />
-                <ReportingControls />
-              </>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="releases" className="space-y-6">
-            {/* Releases-specific content will be implemented here */}
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Detailed release metrics will be available soon</p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="backlog" className="space-y-6">
-            {/* Backlog-specific content will be implemented here */}
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Detailed backlog metrics will be available soon</p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="testing" className="space-y-6">
-            {/* Testing-specific content will be implemented here */}
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Detailed testing metrics will be available soon</p>
-            </div>
-          </TabsContent>
-        </Tabs>
+        
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => refetch()}>
+            <RefreshCw className="mr-1 h-4 w-4" />
+            Refresh
+          </Button>
+          <Button variant="outline" size="sm">
+            <Calendar className="mr-1 h-4 w-4" />
+            Select Date Range
+          </Button>
+          <Button variant="outline" size="sm">
+            <Filter className="mr-1 h-4 w-4" />
+            Filter
+          </Button>
+          <Button variant="outline" size="sm">
+            <Download className="mr-1 h-4 w-4" />
+            Export
+          </Button>
+        </div>
       </div>
-    </PageTransition>
+
+      <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-4 w-full max-w-lg">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="releases">Releases</TabsTrigger>
+          <TabsTrigger value="backlog">Backlog</TabsTrigger>
+          <TabsTrigger value="tests">Tests</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <ReleaseSummaryCards data={dashboardData.releaseSummary} />
+          </div>
+          
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+            <BacklogProgressChart data={dashboardData.backlogProgress} />
+            <TestMetricsSection data={dashboardData.testMetrics} />
+          </div>
+          
+          <RelationshipsDiagram data={dashboardData.relationships} />
+        </TabsContent>
+        
+        <TabsContent value="releases" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Release Health</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Detailed release metrics and health indicators</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="backlog" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Backlog Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Backlog completion trends and item distribution</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="tests" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Test Coverage Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Test effectiveness metrics and bug correlations</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      
+      <ReportingControls />
+    </div>
   );
 };
 

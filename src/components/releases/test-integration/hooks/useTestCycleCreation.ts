@@ -28,7 +28,7 @@ export const useTestCycleCreation = ({ releaseId, onSuccess, onClose }: UseTestC
         endDate: data.endDate,
         status: 'planned',
         testCases: [],
-        createdBy: user.id
+        createdBy: user.id || 'unknown-user' // Provide default value as fallback
       });
       
       if (!response.success) {

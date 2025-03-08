@@ -27,7 +27,7 @@ export interface TestCycle {
   testCases: string[]; // Test Case IDs
   createdAt: Date;
   updatedAt: Date;
-  createdBy?: string; // For compatibility with testData
+  createdBy: string; // For compatibility with testData and consistency
 }
 
 // New interfaces for Release test coverage - renamed to avoid conflicts

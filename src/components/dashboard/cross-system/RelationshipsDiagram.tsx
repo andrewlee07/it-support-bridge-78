@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RelationshipData } from '@/utils/types/dashboard';
-import { Relationship } from 'lucide-react';
+import { Network } from 'lucide-react';
 
 interface RelationshipsDiagramProps {
   data: RelationshipData;
@@ -13,7 +13,7 @@ const RelationshipsDiagram: React.FC<RelationshipsDiagramProps> = ({ data }) => 
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Relationship className="h-5 w-5" />
+          <Network className="h-5 w-5" />
           <span>Cross-Domain Relationships</span>
         </CardTitle>
       </CardHeader>

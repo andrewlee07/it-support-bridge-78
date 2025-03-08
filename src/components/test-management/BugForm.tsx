@@ -40,7 +40,7 @@ const BugForm: React.FC<BugFormProps> = ({
       stepsToReproduce: initialData?.stepsToReproduce || [''],
       severity: initialData?.severity || 'medium',
       priority: initialData?.priority || 'medium',
-      status: initialData?.status || 'new',
+      status: initialData?.status || 'open',
       assignedDeveloper: initialData?.assignedDeveloper || '',
       relatedTestCase: initialData?.relatedTestCase || 'none',
       attachment: initialData?.attachment || '',
