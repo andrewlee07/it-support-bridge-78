@@ -20,7 +20,7 @@ const Login: React.FC = () => {
         <CardHeader className="space-y-1 bg-[#42284e]/5 rounded-t-lg border-b border-[#b047c9]/10">
           <CardTitle className="text-2xl text-center text-[#42284e]">Login</CardTitle>
           <CardDescription className="text-center text-[#42284e]/80">
-            Enter your credentials to access your account
+            Enter any email and password to login
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6 bg-white rounded-b-lg">
@@ -30,7 +30,7 @@ const Login: React.FC = () => {
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="Enter your email"
+                placeholder="Enter any email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
@@ -42,7 +42,7 @@ const Login: React.FC = () => {
               <Input 
                 id="password" 
                 type="password" 
-                placeholder="Enter your password"
+                placeholder="Enter any password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
@@ -58,9 +58,9 @@ const Login: React.FC = () => {
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">
-            <p className="text-[#42284e]/60">Internal Application</p>
-            <p className="mt-2 text-[#b047c9]/70">
-              <small>Use any email/password combination to log in</small>
+            <p className="text-[#42284e]/60">Test Application</p>
+            <p className="mt-2 text-[#b047c9]/70 font-semibold">
+              <small>Use any email and password to log in</small>
             </p>
           </div>
         </CardContent>

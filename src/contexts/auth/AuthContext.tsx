@@ -43,26 +43,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    console.log("AuthContext: Starting login process");
+    console.log("AuthContext: Starting login process for:", email);
     try {
       setLoading(true);
       
-      // Validate inputs
+      // Basic validation
       if (!email || !email.trim()) {
-        console.log("Login failed: Email is empty");
+        console.error("Login failed: Email is empty");
         setLoading(false);
         return false;
       }
       
       if (!password) {
-        console.log("Login failed: Password is empty");
+        console.error("Login failed: Password is empty");
         setLoading(false);
         return false;
       }
       
-      console.log(`AuthContext: Attempting login with email: ${email}`);
+      // Clean up email
+      const cleanEmail = email.trim().toLowerCase();
+      console.log(`AuthContext: Attempting login with clean email: ${cleanEmail}`);
       
-      const authenticatedUser = authenticateUser(email, password);
+      const authenticatedUser = authenticateUser(cleanEmail, password);
       
       if (authenticatedUser) {
         setUser(authenticatedUser);
@@ -71,7 +73,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log("Login successful, user set in state and localStorage");
         return true;
       } else {
-        console.log("Authentication failed");
+        console.log("Authentication failed - no user returned from authenticateUser");
         return false;
       }
     } catch (error) {

@@ -3,6 +3,8 @@ import { getUserByEmail } from '@/utils/mockData/users';
 import { AuthUser } from './types';
 
 export const authenticateUser = (email: string, password: string): AuthUser | null => {
+  console.log("Starting authentication process", { email, passwordProvided: !!password });
+  
   if (!email || !password) {
     console.log("Authentication failed: Email or password is empty");
     return null;
@@ -19,7 +21,12 @@ export const authenticateUser = (email: string, password: string): AuthUser | nu
       // For demo purposes, we'll accept any non-empty password for valid users
       
       const authenticatedUser = {
-        ...existingUser,
+        id: existingUser.id,
+        name: existingUser.name,
+        email: existingUser.email,
+        role: existingUser.role,
+        department: existingUser.department,
+        sessionTimeout: existingUser.sessionTimeout || 30,
         sessionStartTime: new Date(),
       };
       
@@ -27,13 +34,14 @@ export const authenticateUser = (email: string, password: string): AuthUser | nu
       return authenticatedUser;
     } else {
       // For testing/demo - allow login with any email/password
-      // This is intentional to make testing easier without requiring specific accounts
-      console.log("User not found in mock data, creating generic admin user");
+      // Create a generic user with a random ID
+      console.log("User not found in mock data, creating generic user");
       
+      const randomId = Math.random().toString(36).substring(2, 15);
       const mockUser: AuthUser = {
-        id: '1',
+        id: randomId,
         name: 'Test User',
-        email,
+        email: email,
         role: 'admin',
         department: 'IT',
         sessionTimeout: 30,

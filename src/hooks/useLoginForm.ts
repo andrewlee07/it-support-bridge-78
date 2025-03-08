@@ -14,6 +14,7 @@ export const useLoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Login form submitted with:", { email, passwordProvided: !!password });
     
     if (!email.trim()) {
       toast({
@@ -37,7 +38,8 @@ export const useLoginForm = () => {
     
     try {
       console.log("Login hook: Attempting login with:", email);
-      const success = await login(email, password);
+      // Use trimmed email to prevent whitespace issues
+      const success = await login(email.trim(), password);
       console.log("Login hook: Login result:", success ? "success" : "failed");
       
       if (success) {
@@ -54,7 +56,7 @@ export const useLoginForm = () => {
       } else {
         toast({
           title: "Login Failed",
-          description: "Invalid credentials. For testing, you can use any email and password.",
+          description: "Please try again with any email and password combination.",
           variant: "destructive"
         });
       }
