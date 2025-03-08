@@ -1,11 +1,25 @@
 
 import * as z from 'zod';
-import { BugSeverity, BugPriority } from '@/utils/types/test';
+
+// Define the enums as values first
+const BugSeverityEnum = {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low'
+} as const;
+
+const BugPriorityEnum = {
+  urgent: 'urgent',
+  high: 'high',
+  medium: 'medium',
+  low: 'low'
+} as const;
 
 export const bugCreationSchema = z.object({
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
-  severity: z.nativeEnum(BugSeverity as any),
-  priority: z.nativeEnum(BugPriority as any),
+  severity: z.enum(['critical', 'high', 'medium', 'low']),
+  priority: z.enum(['urgent', 'high', 'medium', 'low']),
   createBacklogItem: z.boolean().default(true)
 });
 

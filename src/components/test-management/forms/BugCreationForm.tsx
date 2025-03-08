@@ -1,18 +1,31 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { TestCase, BugSeverity, BugPriority } from '@/utils/types/test';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { TestCase } from '@/utils/types/testTypes';
 import { bugCreationSchema, BugCreationFormValues } from '../schemas/bugCreationSchema';
 
 interface BugCreationFormProps {
   testCase: TestCase;
-  onSubmit: (description: string, severity: string, priority: string, createBacklogItem: boolean) => void;
+  onSubmit: (values: BugCreationFormValues) => void;
   onCancel: () => void;
   isSubmitting: boolean;
 }
@@ -21,110 +34,138 @@ const BugCreationForm: React.FC<BugCreationFormProps> = ({
   testCase,
   onSubmit,
   onCancel,
-  isSubmitting
+  isSubmitting,
 }) => {
   const form = useForm<BugCreationFormValues>({
     resolver: zodResolver(bugCreationSchema),
     defaultValues: {
-      description: '',
-      severity: 'medium' as BugSeverity,
-      priority: 'medium' as BugPriority,
-      createBacklogItem: true
-    }
+      description: `Bug found during test execution of "${testCase.title}"`,
+      severity: 'medium',
+      priority: 'medium',
+      createBacklogItem: true,
+    },
   });
 
-  const handleSubmit = (data: BugCreationFormValues) => {
-    onSubmit(
-      data.description,
-      data.severity,
-      data.priority,
-      data.createBacklogItem
-    );
+  const handleSubmit = (values: BugCreationFormValues) => {
+    onSubmit(values);
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)}>
-      <div className="space-y-4 py-4">
-        <div className="space-y-2">
-          <Label htmlFor="testCase">Test Case</Label>
-          <div className="p-3 border rounded-md bg-muted/30">
-            <div className="font-medium">{testCase.title}</div>
-            <div className="text-sm text-muted-foreground mt-1">{testCase.id}</div>
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="description">Bug Description</Label>
-          <Textarea
-            id="description"
-            placeholder="Describe the bug..."
-            className="min-h-[100px]"
-            {...form.register('description')}
-          />
-          {form.formState.errors.description && (
-            <p className="text-sm text-destructive">{form.formState.errors.description.message}</p>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Describe the bug..."
+                  className="min-h-[100px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        </div>
-        
+        />
+
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="severity">Severity</Label>
-            <Select
-              onValueChange={(value) => form.setValue('severity', value as BugSeverity)}
-              defaultValue={form.getValues('severity')}
-            >
-              <SelectTrigger id="severity">
-                <SelectValue placeholder="Select severity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="priority">Priority</Label>
-            <Select
-              onValueChange={(value) => form.setValue('priority', value as BugPriority)}
-              defaultValue={form.getValues('priority')}
-            >
-              <SelectTrigger id="priority">
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="urgent">Urgent</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-2 pt-2">
-          <Checkbox
-            id="createBacklogItem"
-            checked={form.getValues('createBacklogItem')}
-            onCheckedChange={(checked) => form.setValue('createBacklogItem', !!checked)}
+          <FormField
+            control={form.control}
+            name="severity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Severity</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={isSubmitting}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select severity" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="critical">Critical</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          <Label htmlFor="createBacklogItem" className="cursor-pointer">
-            Automatically create backlog item from this bug
-          </Label>
+
+          <FormField
+            control={form.control}
+            name="priority"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Priority</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={isSubmitting}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-      </div>
-      
-      <div className="flex justify-end space-x-2">
-        <Button variant="outline" onClick={onCancel} disabled={isSubmitting} type="button">
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create Bug"}
-        </Button>
-      </div>
-    </form>
+
+        <FormField
+          control={form.control}
+          name="createBacklogItem"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Create backlog item</FormLabel>
+                <p className="text-sm text-muted-foreground">
+                  Automatically create a backlog item for this bug
+                </p>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Creating...' : 'Create Bug'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 

@@ -7,6 +7,7 @@ import {
 } from '@/utils/api/testBacklogIntegrationApi';
 import { TestCase, Bug } from '@/utils/types/test';
 import { BacklogItem } from '@/utils/types/backlogTypes';
+import { BugCreationFormValues } from '../schemas/bugCreationSchema';
 
 interface UseBugCreationProps {
   testCase: TestCase;
@@ -18,12 +19,9 @@ export const useBugCreation = ({ testCase, onSuccess, onClose }: UseBugCreationP
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submitBug = async (
-    description: string,
-    severity: string,
-    priority: string,
-    createBacklogItem: boolean
-  ) => {
+  const submitBug = async (values: BugCreationFormValues) => {
+    const { description, severity, priority, createBacklogItem } = values;
+    
     if (!description) {
       toast({
         title: "Description required",
