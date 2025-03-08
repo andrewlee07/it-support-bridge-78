@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router,
@@ -18,15 +19,15 @@ import Users from '@/pages/Users';
 import Reports from '@/pages/Reports';
 import AdminSettings from '@/pages/AdminSettings';
 import SLASettings from '@/pages/SLASettings';
-import DropdownConfigurations from '@/pages/DropdownConfigurations';
-import RiskAssessment from '@/pages/RiskAssessment';
+import DropdownConfigurations from '@/pages/settings/DropdownConfigurations';
+import RiskAssessment from '@/pages/settings/RiskAssessmentSettings';
 import TestTracking from '@/pages/TestTracking';
 import TestExecution from '@/pages/TestExecution';
 import Bugs from '@/pages/Bugs';
 import ProblemManagement from '@/pages/ProblemManagement';
 import Calendar from '@/pages/Calendar';
 import Backlog from '@/pages/Backlog';
-import MainLayout from '@/components/shared/MainLayout';
+import MainLayout from '@/layouts/MainLayout';
 import { mockUsers } from '@/utils/mockData/users';
 import { updateUser } from '@/utils/mockData/users';
 import { User } from '@/utils/types/user';

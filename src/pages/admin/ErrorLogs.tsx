@@ -112,7 +112,7 @@ const ErrorLogs: React.FC = () => {
       case 'error':
         return <Badge variant="destructive">Error</Badge>;
       case 'warning':
-        return <Badge variant="warning" className="bg-yellow-500">Warning</Badge>;
+        return <Badge variant="secondary" className="bg-yellow-500">Warning</Badge>;
       case 'info':
         return <Badge variant="secondary">Info</Badge>;
       default:
