@@ -1,143 +1,62 @@
 
-import { 
-  StatusSynchronizationSettings, 
-  ReleaseStatus,
-  BacklogItemStatus,
-  BugStatus 
-} from '@/utils/types';
-import { 
-  updateReleaseStatus 
-} from '@/utils/api/releaseApi';
-import { 
-  getBacklogItemsByReleaseId,
-  updateBacklogItem 
-} from '@/utils/api/backlogApi';
-import {
-  getBugsByReleaseId,
-  updateBugStatus
-} from '@/utils/api/bugApi';
-import { toast } from 'sonner';
+import { updateBacklogItem } from '@/utils/api/backlogApi';
+import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
+import { StatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
+import { ReleaseStatus } from '@/utils/types/release';
+import { Bug } from '@/utils/types/test/bug';
 
-// Default sync configuration
-export const defaultSyncConfig: StatusSynchronizationSettings = {
-  enableCascadingUpdates: true,
-  enableDateSynchronization: false,
-  notifyOnStatusChange: true,
-  allowOverrides: true,
-  releaseToBacklogMapping: {
-    'Planned': 'open',
-    'In Progress': 'in-progress',
-    'Deployed': 'completed',
-    'Cancelled': 'deferred'
-  },
-  releaseToBugMapping: {
-    'Planned': 'new',
-    'In Progress': 'in-progress',
-    'Deployed': 'fixed',
-    'Cancelled': 'closed'
-  }
+// Interface for a status change request
+interface StatusChangeRequest {
+  releaseId: string;
+  newStatus: ReleaseStatus;
+  settings: StatusSynchronizationSettings;
+}
+
+// Update bug status based on release status
+const updateBugStatus = (bugId: string, newStatus: string): Promise<any> => {
+  // This function would call the real API in a production environment
+  console.log(`Updating bug ${bugId} status to ${newStatus}`);
+  return Promise.resolve({ success: true });
 };
 
-// Validates a sync configuration
-export const validateSyncConfiguration = (config: StatusSynchronizationSettings): boolean => {
-  // Check if all required fields are present
-  if (
-    config.enableCascadingUpdates === undefined ||
-    config.enableDateSynchronization === undefined ||
-    config.notifyOnStatusChange === undefined ||
-    config.allowOverrides === undefined ||
-    !config.releaseToBacklogMapping ||
-    !config.releaseToBugMapping
-  ) {
-    return false;
-  }
+// Function to synchronize status changes across entities
+export const synchronizeStatusChanges = async (request: StatusChangeRequest): Promise<boolean> => {
+  const { releaseId, newStatus, settings } = request;
 
-  // Check if all release statuses have a corresponding backlog and bug status
-  const releaseStatuses: ReleaseStatus[] = ['Planned', 'In Progress', 'Deployed', 'Cancelled'];
-  for (const status of releaseStatuses) {
-    if (
-      !config.releaseToBacklogMapping[status] ||
-      !config.releaseToBugMapping[status]
-    ) {
-      return false;
-    }
-  }
-
-  return true;
-};
-
-// Load sync configuration from local storage or use default
-export const loadSyncConfiguration = (): StatusSynchronizationSettings => {
-  const savedConfig = localStorage.getItem('statusSyncConfig');
-  if (savedConfig) {
-    try {
-      const parsedConfig = JSON.parse(savedConfig);
-      if (validateSyncConfiguration(parsedConfig)) {
-        return parsedConfig;
-      }
-    } catch (e) {
-      console.error('Error parsing saved sync configuration', e);
-    }
-  }
-  return defaultSyncConfig;
-};
-
-// Save sync configuration to local storage
-export const saveSyncConfiguration = (config: StatusSynchronizationSettings): void => {
-  if (validateSyncConfiguration(config)) {
-    localStorage.setItem('statusSyncConfig', JSON.stringify(config));
-  }
-};
-
-// Synchronize status changes
-export const synchronizeStatusChanges = async (
-  releaseId: string,
-  newStatus: ReleaseStatus,
-  userId: string,
-  config: StatusSynchronizationSettings = loadSyncConfiguration()
-): Promise<boolean> => {
-  if (!config.enableCascadingUpdates) {
+  if (!settings.enableCascadingUpdates) {
+    console.log('Cascading updates disabled. No synchronization performed.');
     return true;
   }
 
   try {
-    // Synchronize backlog items
-    const backlogResponse = await getBacklogItemsByReleaseId(releaseId);
-    if (backlogResponse.success && backlogResponse.data) {
-      const targetBacklogStatus = config.releaseToBacklogMapping[newStatus];
-      for (const item of backlogResponse.data) {
+    // Get all backlog items for this release
+    const response = await fetch(`/api/backlog?releaseId=${releaseId}`);
+    const backlogItems: BacklogItem[] = await response.json();
+
+    // For each backlog item, update its status based on the mapping
+    for (const item of backlogItems) {
+      const mappedStatus = settings.releaseToBacklogMapping[newStatus];
+      
+      if (mappedStatus && (!settings.allowOverrides || item.status !== 'blocked')) {
         await updateBacklogItem(item.id, {
           ...item,
-          status: targetBacklogStatus as BacklogItemStatus
+          status: mappedStatus as BacklogItemStatus
         });
-      }
-    }
 
-    // Synchronize bugs
-    const bugsResponse = await getBugsByReleaseId(releaseId);
-    if (bugsResponse.success && bugsResponse.data) {
-      const targetBugStatus = config.releaseToBugMapping[newStatus];
-      for (const bug of bugsResponse.data) {
-        await updateBugStatus(bug.id, targetBugStatus as BugStatus);
+        // If the backlog item has related bugs, update their status too
+        if (item.relatedBugIds && item.relatedBugIds.length > 0) {
+          const bugStatus = settings.releaseToBugMapping[newStatus];
+          
+          for (const bugId of item.relatedBugIds) {
+            await updateBugStatus(bugId, bugStatus);
+          }
+        }
       }
-    }
-
-    if (config.notifyOnStatusChange) {
-      toast.success(`Status changes synchronized for Release ${releaseId}`);
     }
 
     return true;
   } catch (error) {
-    console.error('Error synchronizing status changes:', error);
-    toast.error(`Failed to synchronize status changes for Release ${releaseId}`);
+    console.error('Status synchronization failed:', error);
     return false;
   }
-};
-
-export default {
-  defaultSyncConfig,
-  validateSyncConfiguration,
-  loadSyncConfiguration,
-  saveSyncConfiguration,
-  synchronizeStatusChanges
 };

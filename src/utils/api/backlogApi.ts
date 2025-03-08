@@ -8,7 +8,6 @@ import {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
-  getBacklogItemsByReleaseId,
   addAttachment,
   removeAttachment,
   addComment,
@@ -21,6 +20,17 @@ import {
 
 import { BacklogItem, BacklogItemStatus, BacklogStats } from '../types/backlogTypes';
 import { ApiResponse } from '../types';
+
+// Function to get backlog items by release ID
+const getBacklogItemsByReleaseId = (releaseId: string): ApiResponse<BacklogItem[]> => {
+  const items = backlogItems.filter(item => item.releaseId === releaseId);
+  return {
+    success: true,
+    data: items,
+    status: 200,
+    statusCode: 200
+  };
+};
 
 // Re-export all functionality
 export {
@@ -35,7 +45,7 @@ export {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
-  getBacklogItemsByReleaseId, // Export this function
+  getBacklogItemsByReleaseId,
   deleteBacklogItem,
   
   // Enhanced feature operations
@@ -58,7 +68,7 @@ export default {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
-  getBacklogItemsByReleaseId, // Add to default export
+  getBacklogItemsByReleaseId,
   deleteBacklogItem,
   addAttachment,
   removeAttachment,

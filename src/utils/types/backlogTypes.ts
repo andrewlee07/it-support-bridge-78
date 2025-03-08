@@ -1,3 +1,4 @@
+
 // Backlog Item Management Types
 
 // Status types
@@ -88,13 +89,14 @@ export interface BacklogStats {
   openItems: number;
   completedItems: number;
   blockedItems: number;
-  byRelease: {
+  inProgressItems?: number; // Add this for backward compatibility
+  byRelease?: {
     releaseId: string;
     releaseName: string;
     itemCount: number;
     completedCount: number;
   }[];
-  byAssignee: {
+  byAssignee?: {
     assigneeId: string;
     assigneeName: string;
     itemCount: number;
