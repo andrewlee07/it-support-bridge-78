@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLoginForm } from '@/hooks/useLoginForm';
+import { AlertCircle } from 'lucide-react';
 
 const Login: React.FC = () => {
   const { email, setEmail, password, setPassword, isLoading, handleSubmit } = useLoginForm();
@@ -20,16 +21,24 @@ const Login: React.FC = () => {
         <CardHeader className="space-y-1 bg-[#42284e]/5 rounded-t-lg border-b border-[#b047c9]/10">
           <CardTitle className="text-2xl text-center text-[#42284e]">Login</CardTitle>
           <CardDescription className="text-center text-[#42284e]/80">
-            Enter any email and password to login
+            Enter any email to login (password is optional)
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6 bg-white rounded-b-lg">
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-md flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-700">
+              <strong>Demo App:</strong> Type any email address and click Sign In. 
+              No password is required for this demo.
+            </p>
+          </div>
+          
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="email" className="text-[#42284e]">Email</Label>
               <Input 
                 id="email" 
-                type="email" 
+                type="text" 
                 placeholder="Enter any email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -42,7 +51,7 @@ const Login: React.FC = () => {
               <Input 
                 id="password" 
                 type="password" 
-                placeholder="Enter any password"
+                placeholder="Password (optional)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
@@ -60,7 +69,7 @@ const Login: React.FC = () => {
           <div className="mt-6 text-center text-sm">
             <p className="text-[#42284e]/60">Test Application</p>
             <p className="mt-2 text-[#b047c9]/70 font-semibold">
-              <small>Use any email and password to log in</small>
+              <small>Just type any email and click Sign In</small>
             </p>
           </div>
         </CardContent>

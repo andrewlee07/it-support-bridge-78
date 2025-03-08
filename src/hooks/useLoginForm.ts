@@ -14,21 +14,13 @@ export const useLoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login form submitted with:", { email, passwordProvided: !!password });
+    console.log("Form submitted with email:", email);
     
-    if (!email.trim()) {
+    // Simple form validation
+    if (!email) {
       toast({
         title: "Error",
-        description: "Please enter your email",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (!password) {
-      toast({
-        title: "Error",
-        description: "Please enter your password",
+        description: "Please enter an email",
         variant: "destructive"
       });
       return;
@@ -37,26 +29,20 @@ export const useLoginForm = () => {
     setIsLoading(true);
     
     try {
-      console.log("Login hook: Attempting login with:", email);
-      // Use trimmed email to prevent whitespace issues
-      const success = await login(email.trim(), password);
-      console.log("Login hook: Login result:", success ? "success" : "failed");
+      // Simplified login call
+      const success = await login(email, password || "password"); // Use a default password if empty
+      console.log("Login result:", success ? "Success" : "Failed");
       
       if (success) {
         toast({
           title: "Success",
           description: "You have successfully logged in"
         });
-        
-        // Check if there's a redirect path stored
-        const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
-        localStorage.removeItem('redirectAfterLogin'); // Clear it
-        
-        navigate(redirectPath);
+        navigate('/');
       } else {
         toast({
           title: "Login Failed",
-          description: "Please try again with any email and password combination.",
+          description: "Please try again with any email",
           variant: "destructive"
         });
       }
@@ -64,7 +50,7 @@ export const useLoginForm = () => {
       console.error("Login error:", error);
       toast({
         title: "Error",
-        description: "An error occurred. Please try again.",
+        description: "An error occurred during login",
         variant: "destructive"
       });
     } finally {

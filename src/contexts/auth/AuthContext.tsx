@@ -43,41 +43,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    console.log("AuthContext: Starting login process for:", email);
+    console.log("AUTH CONTEXT: Login attempt with email:", email);
     try {
       setLoading(true);
       
-      // Basic validation
-      if (!email || !email.trim()) {
-        console.error("Login failed: Email is empty");
-        setLoading(false);
-        return false;
-      }
+      // Simplify the login process
+      const user = authenticateUser(email, password);
       
-      if (!password) {
-        console.error("Login failed: Password is empty");
-        setLoading(false);
-        return false;
-      }
-      
-      // Clean up email
-      const cleanEmail = email.trim().toLowerCase();
-      console.log(`AuthContext: Attempting login with clean email: ${cleanEmail}`);
-      
-      const authenticatedUser = authenticateUser(cleanEmail, password);
-      
-      if (authenticatedUser) {
-        setUser(authenticatedUser);
+      if (user) {
+        console.log("AUTH CONTEXT: Authentication successful, setting user");
+        setUser(user);
         setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(authenticatedUser));
-        console.log("Login successful, user set in state and localStorage");
+        localStorage.setItem('user', JSON.stringify(user));
         return true;
       } else {
-        console.log("Authentication failed - no user returned from authenticateUser");
+        console.log("AUTH CONTEXT: Authentication failed, no user returned");
         return false;
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('AUTH CONTEXT: Login error:', error);
       return false;
     } finally {
       setLoading(false);
@@ -143,13 +127,50 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isAuthenticated, 
         loading,
         login, 
-        logout,
-        refreshSession,
-        hasPermission,
-        userCanPerformAction,
-        verifyMFA,
-        resendMFACode,
-        cancelMFA
+        logout: () => {
+          setUser(null);
+          setIsAuthenticated(false);
+          localStorage.removeItem('user');
+          console.log("User logged out");
+        },
+        refreshSession: () => {
+          if (user) {
+            const refreshedUser = {
+              ...user,
+              sessionStartTime: new Date()
+            };
+            setUser(refreshedUser);
+            localStorage.setItem('user', JSON.stringify(refreshedUser));
+            console.log("Session refreshed for user:", user.email);
+            return true;
+          }
+          return false;
+        },
+        hasPermission: (requiredRoles: string[]): boolean => {
+          if (!user) return false;
+          return hasUserPermission(user.role, requiredRoles);
+        },
+        userCanPerformAction: (resource: string, action: string): boolean => {
+          if (!user) return false;
+          return canUserPerformAction(user.role, resource, action);
+        },
+        verifyMFA: async (code: string): Promise<boolean> => {
+          if (pendingUser && code === '123456') {
+            setUser(pendingUser);
+            setIsAuthenticated(true);
+            setPendingUser(null);
+            localStorage.setItem('user', JSON.stringify(pendingUser));
+            return true;
+          }
+          return false;
+        },
+        resendMFACode: async (): Promise<boolean> => {
+          console.log('MFA code resent');
+          return true;
+        },
+        cancelMFA: () => {
+          setPendingUser(null);
+        }
       }}
     >
       {children}
