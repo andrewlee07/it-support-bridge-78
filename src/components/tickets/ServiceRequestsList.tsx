@@ -44,7 +44,7 @@ const ServiceRequestsList: React.FC = () => {
   return (
     <div>
       {data && data.items.length > 0 ? (
-        <TicketList tickets={data.items} type="service" />
+        <TicketList type="service" />
       ) : (
         <div className="text-center py-12">
           <h3 className="text-lg font-medium text-muted-foreground">No service requests found</h3>
