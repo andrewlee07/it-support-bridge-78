@@ -1,185 +1,82 @@
+
 import {
-  HomeIcon,
-  AlertCircleIcon,
-  MessageSquareIcon,
+  BarChart3,
+  Gauge,
+  ShieldAlert,
+  MessageSquare,
+  Clock3,
+  BoxesIcon,
+  AlertCircle,
   PanelRightIcon,
-  UserIcon,
-  SettingsIcon,
-  BarChart2Icon,
-  BoxIcon,
-  FileTextIcon,
-  PackageIcon,
-  ClipboardListIcon,
-  BugIcon,
-  InboxIcon,
-  OctagonAlertIcon,
-  CalendarIcon,
-  PlayIcon,
-  AlertTriangleIcon,
-  WrenchIcon,
-  CogIcon,
-  FolderCogIcon,
-  ServerCogIcon,
-  Settings2Icon,
-} from "lucide-react";
-import { NavigationItem } from './types';
+  Users2,
+  OctagonAlert,
+  Headphones,
+  FileSpreadsheet,
+  CalendarDays,
+  FlaskConical,
+  LayoutDashboard,
+  Settings2,
+  BookText,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 
-export const navigationItems: NavigationItem[] = [
-  {
-    name: "Dashboard",
-    path: "/dashboard",
-    href: "/dashboard",
-    icon: HomeIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Incidents",
-    path: "/incidents",
-    href: "/incidents",
-    icon: AlertCircleIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Service Requests",
-    path: "/service-requests",
-    href: "/service-requests",
-    icon: MessageSquareIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Changes",
-    path: "/changes",
-    href: "/changes",
-    icon: PanelRightIcon,
-    allowedRoles: ['admin', 'manager']
-  },
-  {
-    name: "Releases",
-    path: "/releases",
-    href: "/releases",
-    icon: PackageIcon,
-    allowedRoles: ['admin', 'manager']
-  },
-  {
-    name: "Backlog",
-    path: "/backlog",
-    href: "/backlog",
-    icon: InboxIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Assets",
-    path: "/assets",
-    href: "/assets",
-    icon: BoxIcon,
-    allowedRoles: ['admin', 'manager']
-  },
-  {
-    name: "Test Cases",
-    path: "/test-tracking",
-    href: "/test-tracking",
-    icon: FileTextIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Test Execution",
-    path: "/test-execution",
-    href: "/test-execution",
-    icon: PlayIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Bugs",
-    path: "/bugs",
-    href: "/bugs",
-    icon: BugIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Problem Management",
-    path: "/problem-management",
-    href: "/problem-management",
-    icon: OctagonAlertIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Calendar",
-    path: "/calendar",
-    href: "/calendar",
-    icon: CalendarIcon,
-    allowedRoles: ['admin', 'manager', 'user']
-  },
-  {
-    name: "Users",
-    path: "/users",
-    href: "/users",
-    icon: UserIcon,
-    allowedRoles: ['admin']
-  },
-  {
-    name: "Reports",
-    path: "/reports",
-    href: "/reports",
-    icon: BarChart2Icon,
-    allowedRoles: ['admin', 'manager']
-  },
-  {
-    name: "Admin",
-    path: "/admin",
-    href: "/admin",
-    icon: SettingsIcon,
-    allowedRoles: ['admin']
-  }
-];
+import { NavItem } from './types';
 
-export const settingsItems = [
+export const navigationItems: NavItem[] = [
   {
-    name: "System Configuration",
-    path: "/admin/system-configuration",
-    href: "/admin/system-configuration",
-    icon: ServerCogIcon,
-    allowedRoles: ['admin']
+    title: 'Dashboard',
+    icon: LayoutDashboard,
+    href: '/dashboard',
   },
   {
-    name: "Incident Configuration",
-    path: "/admin/incident-configuration",
-    href: "/admin/incident-configuration",
-    icon: AlertCircleIcon,
-    allowedRoles: ['admin']
+    title: 'Incidents',
+    icon: AlertCircle,
+    href: '/incidents',
   },
   {
-    name: "Service Request Configuration",
-    path: "/admin/service-request-configuration",
-    href: "/admin/service-request-configuration",
-    icon: MessageSquareIcon,
-    allowedRoles: ['admin']
+    title: 'Service Requests',
+    icon: Headphones,
+    href: '/service-requests',
   },
   {
-    name: "Change Configuration",
-    path: "/admin/change-configuration",
-    href: "/admin/change-configuration",
+    title: 'Changes',
     icon: PanelRightIcon,
-    allowedRoles: ['admin']
+    href: '/changes',
   },
   {
-    name: "Problem Configuration",
-    path: "/admin/problem-configuration",
-    href: "/admin/problem-configuration",
-    icon: OctagonAlertIcon,
-    allowedRoles: ['admin']
+    title: 'Problems',
+    icon: OctagonAlert,
+    href: '/problems',
   },
   {
-    name: "Asset Configuration",
-    path: "/admin/asset-configuration",
-    href: "/admin/asset-configuration",
-    icon: BoxIcon,
-    allowedRoles: ['admin']
+    title: 'Assets',
+    icon: BoxesIcon,
+    href: '/assets',
   },
   {
-    name: "Error Logs",
-    path: "/admin/error-logs",
-    href: "/admin/error-logs",
-    icon: AlertTriangleIcon,
-    allowedRoles: ['admin']
+    title: 'Reports',
+    icon: FileSpreadsheet,
+    href: '/reports',
+  },
+  {
+    title: 'Calendar',
+    icon: CalendarDays,
+    href: '/calendar',
+  },
+  {
+    title: 'Testing',
+    icon: FlaskConical,
+    href: '/tests',
+  },
+  {
+    title: 'User Management',
+    icon: Users2,
+    href: '/user-management',
+  },
+  {
+    title: 'Admin Settings',
+    icon: Settings2,
+    href: '/admin-settings',
   },
 ];
