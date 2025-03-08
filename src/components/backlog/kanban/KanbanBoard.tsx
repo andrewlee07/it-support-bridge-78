@@ -118,7 +118,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="relative w-full overflow-hidden">
-          <ScrollArea className="w-full h-full" orientation="horizontal">
+          <ScrollArea className="w-full h-full">
             <div className={cn(
               "grid gap-4 pb-4 min-w-max",
               boardConfig.layout === 'horizontal' 
