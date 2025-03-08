@@ -8,8 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
 
 interface OptionsListProps {
-  configId: string;
-  entityType: ConfigurableEntityType;
+  configId?: string;
+  entityType?: ConfigurableEntityType;
   options?: DropdownOption[];
   onToggleActive?: (id: string, isActive: boolean) => void;
   onDelete?: (id: string) => void;
@@ -29,8 +29,8 @@ const OptionsList: React.FC<OptionsListProps> = ({
   // Fetch options if not provided as props
   const { data, isLoading } = useQuery({
     queryKey: ['dropdownConfiguration', configId],
-    queryFn: () => dropdownConfigurationApi.getDropdownConfigurationById(configId),
-    enabled: !propOptions,
+    queryFn: () => dropdownConfigurationApi.getDropdownConfigurationById(configId!),
+    enabled: !!configId && !propOptions,
   });
 
   const options = propOptions || (data?.success ? data.data.options : []);
