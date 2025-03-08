@@ -1,69 +1,65 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { CheckCircle, XCircle, AlertCircle, Clock } from 'lucide-react';
 import { TestStatus } from '@/utils/types/test/testStatus';
-import { cn } from '@/lib/utils';
 
 interface StatusBadgeProps {
   status: TestStatus;
+  size?: 'xs' | 'sm' | 'md';
 }
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  // Normalize status to handle different formats
-  const normalizedStatus = status?.toString().toLowerCase().replace('_', '-') || 'unknown';
+const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' }) => {
+  // Map status values to normalized ones
+  let normalizedStatus = status;
+  if (status === 'passed') normalizedStatus = 'pass';
+  if (status === 'failed') normalizedStatus = 'fail';
+  if (status === 'in_progress' || status === 'in-progress') normalizedStatus = 'not-run';
   
-  // Badge styling based on status
-  const getBadgeStyle = () => {
-    switch (normalizedStatus) {
-      case 'pass':
-      case 'passed':
-        return 'bg-green-500 hover:bg-green-600';
-      case 'fail':
-      case 'failed':
-        return 'bg-red-500 hover:bg-red-600';
-      case 'blocked':
-        return 'bg-yellow-500 hover:bg-yellow-600';
-      case 'not-run':
-      case 'draft':
-        return 'bg-gray-500 hover:bg-gray-600';
-      case 'ready':
-        return 'bg-blue-500 hover:bg-blue-600';
-      case 'in-progress':
-        return 'bg-purple-500 hover:bg-purple-600';
-      default:
-        return 'bg-gray-500 hover:bg-gray-600';
-    }
-  };
+  // Set icon size based on the size prop
+  const iconSize = size === 'xs' ? 'h-3 w-3' : size === 'sm' ? 'h-4 w-4' : 'h-5 w-5';
+  
+  // Base styles for the badge
+  let className = 'gap-1 ';
+  
+  // Font size based on size prop
+  className += size === 'xs' ? 'text-xs px-1.5 py-0.5 ' : 
+               size === 'sm' ? 'text-sm px-2 py-1 ' : 
+               'px-2.5 py-1.5 ';
 
-  // Status display text
-  const getStatusText = () => {
-    switch (normalizedStatus) {
-      case 'pass':
-      case 'passed':
-        return 'Passed';
-      case 'fail':
-      case 'failed':
-        return 'Failed';
-      case 'blocked':
-        return 'Blocked';
-      case 'not-run':
-        return 'Not Run';
-      case 'draft':
-        return 'Draft';
-      case 'ready':
-        return 'Ready';
-      case 'in-progress':
-        return 'In Progress';
-      default:
-        return status || 'Unknown';
-    }
-  };
-
-  return (
-    <Badge className={getBadgeStyle()}>
-      {getStatusText()}
-    </Badge>
-  );
+  switch (normalizedStatus) {
+    case 'pass':
+      return (
+        <Badge variant="outline" className={`${className} bg-green-50 text-green-700 border-green-200`}>
+          <CheckCircle className={iconSize} />
+          Passed
+        </Badge>
+      );
+    case 'fail':
+      return (
+        <Badge variant="outline" className={`${className} bg-red-50 text-red-700 border-red-200`}>
+          <XCircle className={iconSize} />
+          Failed
+        </Badge>
+      );
+    case 'blocked':
+      return (
+        <Badge variant="outline" className={`${className} bg-yellow-50 text-yellow-700 border-yellow-200`}>
+          <AlertCircle className={iconSize} />
+          Blocked
+        </Badge>
+      );
+    case 'draft':
+    case 'not-run':
+    case 'ready':
+    default:
+      return (
+        <Badge variant="outline" className={`${className} bg-gray-50 text-gray-700 border-gray-200`}>
+          <Clock className={iconSize} />
+          Not Run
+        </Badge>
+      );
+  }
 };
 
 export default StatusBadge;

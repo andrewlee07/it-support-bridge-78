@@ -7,6 +7,7 @@ import { useTestReleaseCoverage } from '@/hooks/useTestReleaseCoverage';
 
 import ReleaseTestCoverage from './ReleaseTestCoverage';
 import ReleaseTestProgress from './ReleaseTestProgress';
+import ReleaseReadinessScore from './ReleaseReadinessScore';
 import CreateTestCycleDialog from './CreateTestCycleDialog';
 import TestsTabHeader from './TestsTabHeader';
 import TestsLoadingState from './TestsLoadingState';
@@ -63,9 +64,10 @@ const ReleaseTestsTab: React.FC<ReleaseTestsTabProps> = ({ releaseId }) => {
         onRefresh={refetchAll} 
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <ReleaseTestCoverage coverage={testCoverage} />
         <ReleaseTestProgress progressData={testProgress} />
+        <ReleaseReadinessScore testCoverage={testCoverage} />
       </div>
       
       <Button 

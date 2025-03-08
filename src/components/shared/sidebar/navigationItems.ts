@@ -23,6 +23,7 @@ import {
   Settings,
   Sliders,
   ArrowRightLeft,
+  Link2,
 } from 'lucide-react';
 
 import { NavItem } from './types';
@@ -72,6 +73,11 @@ export const navigationItems: NavItem[] = [
     name: 'Testing',
     icon: FlaskConical,
     path: '/test-tracking',
+  },
+  {
+    name: 'Test Traceability',
+    icon: Link2,
+    path: '/test-traceability',
   },
   {
     name: 'Bugs',

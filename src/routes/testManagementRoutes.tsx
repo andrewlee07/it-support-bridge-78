@@ -2,6 +2,7 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import TestTracking from '@/pages/TestTracking';
+import TestTraceability from '@/pages/TestTraceability';
 import Bugs from '@/pages/Bugs';
 import BugDetail from '@/pages/BugDetail';
 import Backlog from '@/pages/Backlog';
@@ -11,6 +12,10 @@ const testManagementRoutes: RouteObject[] = [
   {
     path: 'test-tracking',
     element: <TestTracking />,
+  },
+  {
+    path: 'test-traceability',
+    element: <TestTraceability />,
   },
   {
     path: 'bugs',
