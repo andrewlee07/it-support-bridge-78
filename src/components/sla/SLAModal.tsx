@@ -9,6 +9,7 @@ export interface SLAModalProps {
   onClose: () => void;
   onSave: (slaData: Partial<SLA>) => void;
   sla?: SLA;
+  slaId?: string | null;
   entityType?: 'incident' | 'service-request';
 }
 
@@ -17,13 +18,14 @@ export const SLAModal: React.FC<SLAModalProps> = ({
   onClose, 
   onSave, 
   sla,
+  slaId,
   entityType
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{sla ? 'Edit SLA' : 'Create New SLA'}</DialogTitle>
+          <DialogTitle>{slaId ? 'Edit SLA' : 'Create New SLA'}</DialogTitle>
         </DialogHeader>
         <SLAForm 
           defaultValues={sla} 

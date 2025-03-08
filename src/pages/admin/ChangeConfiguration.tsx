@@ -11,8 +11,8 @@ import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigFo
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useRiskThresholdsForm } from '@/hooks/useRiskThresholdsForm';
-import { RiskThresholdsForm } from '@/components/settings/risk/RiskThresholdsForm';
-import { RiskAssessmentQuestionForm } from '@/components/settings/risk/RiskAssessmentQuestionForm';
+import RiskThresholdsForm from '@/components/settings/risk/RiskThresholdsForm';
+import RiskAssessmentQuestionForm from '@/components/settings/risk/RiskAssessmentQuestionForm';
 import { useState as useStateCustom } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 

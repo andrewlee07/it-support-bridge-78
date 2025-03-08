@@ -3,7 +3,7 @@ import React from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SLAList from '@/components/sla/SLAList';
-import SLAModal from '@/components/sla/SLAModal';
+import { SLAModal } from '@/components/sla/SLAModal';
 import { useState } from 'react';
 
 const SLASettings = () => {
@@ -25,6 +25,11 @@ const SLASettings = () => {
     setCurrentEntityType(value as 'incident' | 'service-request');
   };
 
+  const handleSave = (slaData: any) => {
+    console.log('Saving SLA:', slaData);
+    setIsModalOpen(false);
+  };
+
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -44,16 +49,14 @@ const SLASettings = () => {
           <TabsContent value="incident" className="space-y-4">
             <SLAList
               entityType="incident"
-              onCreateNew={() => handleOpenModal()}
-              onEdit={id => handleOpenModal(id)}
+              showActive={true}
             />
           </TabsContent>
 
           <TabsContent value="service-request" className="space-y-4">
             <SLAList
               entityType="service-request"
-              onCreateNew={() => handleOpenModal()}
-              onEdit={id => handleOpenModal(id)}
+              showActive={true}
             />
           </TabsContent>
         </Tabs>
@@ -61,6 +64,7 @@ const SLASettings = () => {
         <SLAModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
+          onSave={handleSave}
           slaId={selectedSlaId}
           entityType={currentEntityType}
         />
