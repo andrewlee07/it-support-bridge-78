@@ -1,6 +1,10 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { getTestCoverageByReleaseId, getTestExecutionProgressByReleaseId, getTestCyclesByReleaseId } from '@/utils/api/testReleaseApi';
+import { 
+  getTestCoverageByReleaseId, 
+  getTestExecutionProgressByReleaseId, 
+  getTestCyclesByReleaseId 
+} from '@/utils/api/test-release';
 
 export const useTestReleaseCoverage = (releaseId: string | undefined) => {
   // Get test coverage metrics
