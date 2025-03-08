@@ -12,20 +12,22 @@ import TestCaseInformation from './components/TestCaseInformation';
 import ExecutionCommentsField from './components/ExecutionCommentsField';
 import ExecutionActionButtons from './components/ExecutionActionButtons';
 import { useTestExecutionForm } from './hooks/useTestExecutionForm';
-import { TestStatus } from '@/utils/types/test'; // Fix the import
+import { TestStatus } from '@/utils/types/test';
 
 interface TestExecutionFormProps {
   testCase: TestCase;
   onExecute: (testCaseId: string, status: TestStatus, comments: string) => Promise<{ success: boolean }>;
   onLinkBug?: (testCaseId: string) => void;
   onBugCreated?: (bug: BugType, backlogItem?: BacklogItem) => void;
+  onCancel?: () => void; // Added onCancel prop
 }
 
 const TestExecutionForm: React.FC<TestExecutionFormProps> = ({ 
   testCase, 
   onExecute,
   onLinkBug,
-  onBugCreated
+  onBugCreated,
+  onCancel
 }) => {
   const {
     comments,

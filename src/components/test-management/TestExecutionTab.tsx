@@ -13,6 +13,7 @@ import TestCaseSelectionTable from './TestCaseSelectionTable';
 import TestExecutionForm from './TestExecutionForm';
 import { AlertCircle, Play } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { TestCase } from '@/utils/types/testTypes';
 
 const TestExecutionTab = () => {
   const [selectedTestCaseId, setSelectedTestCaseId] = useState<string | null>(null);
@@ -21,11 +22,14 @@ const TestExecutionTab = () => {
     isLoadingTestCases,
     selectedTestCases, 
     toggleTestCaseSelection,
+    selectAllTestCases,
+    clearSelections,
     executeTestCase
   } = useTestExecution();
 
-  const handleExecuteTest = (testCaseId: string) => {
-    setSelectedTestCaseId(testCaseId);
+  // Updated to accept TestCase object instead of just ID
+  const handleExecuteTest = (testCase: TestCase) => {
+    setSelectedTestCaseId(testCase.id);
   };
 
   const handleCloseForm = () => {
@@ -71,7 +75,9 @@ const TestExecutionTab = () => {
           <TestCaseSelectionTable 
             testCases={testCasesData}
             selectedTestCases={selectedTestCases}
-            onToggleSelect={toggleTestCaseSelection}
+            onToggleSelection={toggleTestCaseSelection}
+            onSelectAll={selectAllTestCases}
+            onClearAll={clearSelections}
             onExecute={handleExecuteTest}
           />
         )}
