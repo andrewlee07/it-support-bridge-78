@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -25,8 +26,8 @@ const Sidebar = () => {
       const newIsMobile = window.innerWidth < 768;
       setIsMobile(newIsMobile);
       
-      // Auto-collapse on mobile
-      if (newIsMobile && !collapsed) {
+      // Auto-collapse on mobile, but ensure sidebar is always visible
+      if (newIsMobile) {
         setCollapsed(true);
       }
     };
@@ -37,7 +38,7 @@ const Sidebar = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [collapsed]);
+  }, []);
   
   const isActiveRoute = (path: string | undefined): boolean => {
     if (!path) return false;
@@ -56,6 +57,7 @@ const Sidebar = () => {
 
   return (
     <>
+      {/* Sidebar - always visible, even in collapsed state */}
       <div 
         className={cn(
           "fixed top-0 left-0 bg-sidebar border-r border-border/40 h-screen z-50 transition-all duration-300 ease-in-out",
