@@ -36,7 +36,7 @@ const webhookFormSchema = z.object({
 
 type WebhookFormValues = z.infer<typeof webhookFormSchema>;
 
-interface WebhookConfigFormProps {
+export interface WebhookConfigFormProps {
   initialData?: WebhookConfig;
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -50,8 +50,14 @@ const mapEventTypesToFormValues = (eventTypes: EventType[] = []): string[] => {
 // Convert form values back to webhook configuration
 const mapFormValuesToWebhook = (values: WebhookFormValues): Omit<WebhookConfig, 'id'> => {
   return {
-    ...values,
+    name: values.name,
+    url: values.url,
+    isActive: values.isActive,
     eventTypes: values.eventTypes as EventType[],
+    authType: values.authType,
+    authCredentials: values.authCredentials,
+    retryCount: values.retryCount,
+    retryInterval: values.retryInterval,
   };
 };
 

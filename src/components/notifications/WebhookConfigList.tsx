@@ -98,8 +98,9 @@ const WebhookConfigList: React.FC<WebhookConfigListProps> = ({ className }) => {
 
       {isFormOpen && (
         <WebhookConfigForm
-          webhook={selectedWebhook}
-          onClose={handleCloseForm}
+          initialData={selectedWebhook}
+          onCancel={handleCloseForm}
+          onSuccess={handleCloseForm}
         />
       )}
     </div>
