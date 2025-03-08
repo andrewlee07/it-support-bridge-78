@@ -64,17 +64,8 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {type === 'incident' ? (
-                      <>
-                        <SelectItem value="resolved">Resolved</SelectItem>
-                        <SelectItem value="closed">Closed</SelectItem>
-                      </>
-                    ) : (
-                      <>
-                        <SelectItem value="fulfilled">Fulfilled</SelectItem>
-                        <SelectItem value="closed">Closed</SelectItem>
-                      </>
-                    )}
+                    <SelectItem value="resolved">Resolved</SelectItem>
+                    <SelectItem value="closed">Closed</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

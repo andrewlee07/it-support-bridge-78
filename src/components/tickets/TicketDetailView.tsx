@@ -111,7 +111,7 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
             <TabsContent value="resolve">
               <TicketCloseForm
                 defaultValues={{
-                  status: type === 'incident' ? 'resolved' : 'fulfilled',
+                  status: 'resolved', // Always use 'resolved' for both types
                   notes: '',
                   rootCause: '',
                   closureReason: ''
