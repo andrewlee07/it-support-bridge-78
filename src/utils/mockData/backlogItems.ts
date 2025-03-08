@@ -1,9 +1,92 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { BacklogItem, BacklogItemStatus, BacklogItemPriority, BacklogItemType, BacklogStats } from '../types/backlogTypes';
+import { BacklogItem, BacklogItemStatus, BacklogItemPriority, BacklogItemType, BacklogStats, Attachment, Comment, HistoryEntry } from '../types/backlogTypes';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from './apiHelpers';
 import { ApiResponse } from '../types';
 import { mockReleases } from '../api/release/mockData';
+import { createAuditEntry } from './auditHelpers';
+
+// Sample attachments for demo items
+const sampleAttachments: Attachment[] = [
+  {
+    id: 'att-1',
+    fileName: 'requirements.pdf',
+    fileUrl: '/files/requirements.pdf',
+    fileType: 'application/pdf',
+    fileSize: 2453000,
+    uploadedBy: 'user-1',
+    uploadedAt: new Date('2023-10-02'),
+  },
+  {
+    id: 'att-2',
+    fileName: 'mockup.png',
+    fileUrl: '/files/mockup.png',
+    fileType: 'image/png',
+    fileSize: 1250000,
+    uploadedBy: 'user-2',
+    uploadedAt: new Date('2023-10-03'),
+  },
+  {
+    id: 'att-3',
+    fileName: 'api-specs.json',
+    fileUrl: '/files/api-specs.json',
+    fileType: 'application/json',
+    fileSize: 15200,
+    uploadedBy: 'user-3',
+    uploadedAt: new Date('2023-10-04'),
+  }
+];
+
+// Sample comments for demo items
+const sampleComments: Comment[] = [
+  {
+    id: 'comment-1',
+    content: 'We need to consider mobile responsiveness for this feature.',
+    author: 'user-1',
+    createdAt: new Date('2023-10-02T10:30:00'),
+  },
+  {
+    id: 'comment-2',
+    content: 'I agree. Let me check with the design team.',
+    author: 'user-2',
+    createdAt: new Date('2023-10-02T11:15:00'),
+    parentId: 'comment-1'
+  },
+  {
+    id: 'comment-3',
+    content: 'The design team confirmed they will provide mobile mockups by tomorrow.',
+    author: 'user-2',
+    createdAt: new Date('2023-10-03T09:45:00'),
+  }
+];
+
+// Sample history entries
+const sampleHistoryEntries: HistoryEntry[] = [
+  {
+    id: 'history-1',
+    field: 'status',
+    previousValue: 'open',
+    newValue: 'in-progress',
+    changedBy: 'user-2',
+    changedAt: new Date('2023-10-01T14:20:00')
+  },
+  {
+    id: 'history-2',
+    field: 'priority',
+    previousValue: 'medium',
+    newValue: 'high',
+    changedBy: 'user-1',
+    changedAt: new Date('2023-10-03T10:15:00')
+  },
+  {
+    id: 'history-3',
+    field: 'assignee',
+    previousValue: null,
+    newValue: 'user-2',
+    changedBy: 'user-1',
+    changedAt: new Date('2023-10-04T16:30:00')
+  }
+];
 
 // Mock Backlog Items data
 export let backlogItems: BacklogItem[] = [
@@ -21,6 +104,11 @@ export let backlogItems: BacklogItem[] = [
     labels: ['authentication', 'security'],
     createdAt: new Date('2023-10-01'),
     updatedAt: new Date('2023-10-05'),
+    // Enhanced features
+    attachments: [sampleAttachments[0]],
+    comments: [sampleComments[0], sampleComments[1]],
+    watchers: ['user-1', 'user-3'],
+    history: [sampleHistoryEntries[0], sampleHistoryEntries[2]]
   },
   {
     id: 'BLGI-1002',
@@ -36,6 +124,11 @@ export let backlogItems: BacklogItem[] = [
     labels: ['ui', 'mobile'],
     createdAt: new Date('2023-10-03'),
     updatedAt: new Date('2023-10-03'),
+    // Enhanced features
+    attachments: [sampleAttachments[1]],
+    comments: [sampleComments[2]],
+    watchers: ['user-2'],
+    history: [sampleHistoryEntries[1]]
   },
   {
     id: 'BLGI-1003',
@@ -49,6 +142,8 @@ export let backlogItems: BacklogItem[] = [
     labels: ['ui', 'performance'],
     createdAt: new Date('2023-10-04'),
     updatedAt: new Date('2023-10-04'),
+    // Enhanced features
+    watchers: ['user-1', 'user-2', 'user-3']
   },
   {
     id: 'BLGI-1004',
@@ -64,6 +159,9 @@ export let backlogItems: BacklogItem[] = [
     labels: ['api', 'quality'],
     createdAt: new Date('2023-10-05'),
     updatedAt: new Date('2023-10-05'),
+    // Enhanced features
+    attachments: [sampleAttachments[2]],
+    history: [sampleHistoryEntries[0]]
   },
 ];
 
@@ -127,6 +225,11 @@ export const createBacklogItem = async (
     ...item,
     createdAt: new Date(),
     updatedAt: new Date(),
+    // Initialize enhanced feature fields if not provided
+    attachments: item.attachments || [],
+    comments: item.comments || [],
+    watchers: item.watchers || [],
+    history: item.history || []
   };
   backlogItems.push(newItem);
   return createApiSuccessResponse(newItem);
@@ -244,4 +347,167 @@ export const getBacklogStats = async (): Promise<ApiResponse<BacklogStats>> => {
   };
   
   return createApiSuccessResponse(stats);
+};
+
+// New functions for enhanced features
+export const addAttachment = async (
+  backlogItemId: string,
+  attachment: Attachment
+): Promise<ApiResponse<BacklogItem | null>> => {
+  await delay(300);
+  const index = backlogItems.findIndex(b => b.id === backlogItemId);
+  if (index === -1) {
+    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+  }
+  
+  const attachments = backlogItems[index].attachments || [];
+  
+  backlogItems[index] = {
+    ...backlogItems[index],
+    attachments: [...attachments, attachment],
+    updatedAt: new Date()
+  };
+  
+  return createApiSuccessResponse(backlogItems[index]);
+};
+
+export const removeAttachment = async (
+  backlogItemId: string,
+  attachmentId: string
+): Promise<ApiResponse<BacklogItem | null>> => {
+  await delay(300);
+  const index = backlogItems.findIndex(b => b.id === backlogItemId);
+  if (index === -1) {
+    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+  }
+  
+  const attachments = backlogItems[index].attachments || [];
+  
+  backlogItems[index] = {
+    ...backlogItems[index],
+    attachments: attachments.filter(a => a.id !== attachmentId),
+    updatedAt: new Date()
+  };
+  
+  return createApiSuccessResponse(backlogItems[index]);
+};
+
+export const addComment = async (
+  backlogItemId: string,
+  comment: Comment
+): Promise<ApiResponse<BacklogItem | null>> => {
+  await delay(300);
+  const index = backlogItems.findIndex(b => b.id === backlogItemId);
+  if (index === -1) {
+    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+  }
+  
+  const comments = backlogItems[index].comments || [];
+  
+  backlogItems[index] = {
+    ...backlogItems[index],
+    comments: [...comments, comment],
+    updatedAt: new Date()
+  };
+  
+  return createApiSuccessResponse(backlogItems[index]);
+};
+
+export const updateComment = async (
+  backlogItemId: string,
+  commentId: string,
+  content: string
+): Promise<ApiResponse<BacklogItem | null>> => {
+  await delay(300);
+  const index = backlogItems.findIndex(b => b.id === backlogItemId);
+  if (index === -1) {
+    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+  }
+  
+  const comments = backlogItems[index].comments || [];
+  const commentIndex = comments.findIndex(c => c.id === commentId);
+  
+  if (commentIndex === -1) {
+    return createApiErrorResponse<BacklogItem | null>('Comment not found', 404);
+  }
+  
+  comments[commentIndex] = {
+    ...comments[commentIndex],
+    content,
+    updatedAt: new Date()
+  };
+  
+  backlogItems[index] = {
+    ...backlogItems[index],
+    comments,
+    updatedAt: new Date()
+  };
+  
+  return createApiSuccessResponse(backlogItems[index]);
+};
+
+export const deleteComment = async (
+  backlogItemId: string,
+  commentId: string
+): Promise<ApiResponse<BacklogItem | null>> => {
+  await delay(300);
+  const index = backlogItems.findIndex(b => b.id === backlogItemId);
+  if (index === -1) {
+    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+  }
+  
+  const comments = backlogItems[index].comments || [];
+  
+  backlogItems[index] = {
+    ...backlogItems[index],
+    comments: comments.filter(c => c.id !== commentId),
+    updatedAt: new Date()
+  };
+  
+  return createApiSuccessResponse(backlogItems[index]);
+};
+
+export const addWatcher = async (
+  backlogItemId: string,
+  userId: string
+): Promise<ApiResponse<BacklogItem | null>> => {
+  await delay(300);
+  const index = backlogItems.findIndex(b => b.id === backlogItemId);
+  if (index === -1) {
+    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+  }
+  
+  const watchers = backlogItems[index].watchers || [];
+  
+  // Only add if not already watching
+  if (!watchers.includes(userId)) {
+    backlogItems[index] = {
+      ...backlogItems[index],
+      watchers: [...watchers, userId],
+      updatedAt: new Date()
+    };
+  }
+  
+  return createApiSuccessResponse(backlogItems[index]);
+};
+
+export const removeWatcher = async (
+  backlogItemId: string,
+  userId: string
+): Promise<ApiResponse<BacklogItem | null>> => {
+  await delay(300);
+  const index = backlogItems.findIndex(b => b.id === backlogItemId);
+  if (index === -1) {
+    return createApiErrorResponse<BacklogItem | null>('Backlog item not found', 404);
+  }
+  
+  const watchers = backlogItems[index].watchers || [];
+  
+  backlogItems[index] = {
+    ...backlogItems[index],
+    watchers: watchers.filter(id => id !== userId),
+    updatedAt: new Date()
+  };
+  
+  return createApiSuccessResponse(backlogItems[index]);
 };

@@ -6,7 +6,9 @@ import BacklogItemList from '@/components/backlog/BacklogItemList';
 import BacklogItemForm from '@/components/backlog/BacklogItemForm';
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import { updateBacklogItem } from '@/utils/api/backlogApi';
+import { v4 as uuidv4 } from 'uuid';
 
 const Backlog: React.FC = () => {
   const { user } = useAuth();
@@ -19,6 +21,16 @@ const Backlog: React.FC = () => {
 
   const handleEditItem = (item: BacklogItem) => {
     setEditingItem(item);
+  };
+
+  const handleUpdateItem = async (updatedItem: BacklogItem) => {
+    try {
+      await updateBacklogItem(updatedItem.id, updatedItem);
+      toast.success('Backlog item updated successfully');
+    } catch (error) {
+      console.error('Error updating backlog item:', error);
+      toast.error('Failed to update backlog item');
+    }
   };
 
   const handleFormSuccess = (item: BacklogItem) => {
@@ -40,7 +52,8 @@ const Backlog: React.FC = () => {
       <div className="container py-6">
         <BacklogItemList 
           onCreateItem={handleCreateItem} 
-          onEditItem={handleEditItem} 
+          onEditItem={handleEditItem}
+          onUpdateItem={handleUpdateItem}
         />
 
         <Dialog open={isCreating} onOpenChange={setIsCreating}>

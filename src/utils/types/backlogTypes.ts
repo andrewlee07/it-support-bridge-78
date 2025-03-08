@@ -28,6 +28,41 @@ export interface BacklogItem {
   testCoverage?: BacklogTestCoverage;
   relatedTestCaseIds?: string[]; // IDs of associated test cases
   relatedBugIds?: string[]; // IDs of associated bugs
+  // New fields for enhanced features
+  attachments?: Attachment[];
+  comments?: Comment[];
+  watchers?: string[]; // Array of user IDs watching this item
+  history?: HistoryEntry[];
+}
+
+// New types for enhanced features
+export interface Attachment {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize: number;
+  uploadedBy: string;
+  uploadedAt: Date;
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  author: string; // User ID
+  createdAt: Date;
+  updatedAt?: Date;
+  parentId?: string; // For threaded comments
+  mentions?: string[]; // User IDs mentioned in the comment
+}
+
+export interface HistoryEntry {
+  id: string;
+  field: string;
+  previousValue: any;
+  newValue: any;
+  changedBy: string; // User ID
+  changedAt: Date;
 }
 
 // Test coverage metrics for backlog items
