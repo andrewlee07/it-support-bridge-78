@@ -4,22 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { BacklogItem, Attachment, Comment, HistoryEntry } from '@/utils/types/backlogTypes';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 import { format } from 'date-fns';
-import { getReleases } from '@/utils/api/release/releaseQueries';
+import { getReleases } from '@/utils/api/release';
 import { Paperclip, MessageSquare, History, Users, Clock } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { createAuditEntry } from '@/utils/auditUtils';
-import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
-import { getAllUsers } from '@/utils/mockData/users';
+import { toast } from 'sonner';
 
-// Import our new components
+// Import refactored components
 import AttachmentList from './attachments/AttachmentList';
 import AttachmentUpload from './attachments/AttachmentUpload';
 import CommentsList from './comments/CommentsList';
 import HistoryList from './history/HistoryList';
 import WatchersList from './watchers/WatchersList';
+import BacklogItemBasicDetails from './detail/BacklogItemBasicDetails';
+import ItemHeaderWithStatus from './detail/ItemHeaderWithStatus';
 
 interface BacklogItemDetailProps {
   item: BacklogItem;
@@ -34,22 +33,18 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   onDelete,
   onUpdate
 }) => {
-  const { user } = useAuth();
   const [releaseName, setReleaseName] = useState<string>('None');
   const [activeTab, setActiveTab] = useState<string>('details');
   
   // States for each feature
-  const [attachments, setAttachments] = useState<Attachment[]>(item.attachments || []);
-  const [comments, setComments] = useState<Comment[]>(item.comments || []);
-  const [history, setHistory] = useState<HistoryEntry[]>(item.history || []);
-  const [watchers, setWatchers] = useState<string[]>(item.watchers || []);
+  const [attachments, setAttachments] = useState(item.attachments || []);
+  const [comments, setComments] = useState(item.comments || []);
+  const [history, setHistory] = useState(item.history || []);
+  const [watchers, setWatchers] = useState(item.watchers || []);
   const [availableUsers, setAvailableUsers] = useState<any[]>([]);
   
-  // Check if current user is watching
-  const isCurrentUserWatching = user ? watchers.includes(user.id) : false;
-
+  // Get release name and available users
   useEffect(() => {
-    // If the item has a releaseId, fetch the release name
     const fetchReleaseName = async () => {
       if (item.releaseId) {
         try {
@@ -64,9 +59,9 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
       }
     };
 
-    // Get available users for watchers
     const getUsers = async () => {
       try {
+        const { getAllUsers } = await import('@/utils/mockData/users');
         const users = await getAllUsers();
         setAvailableUsers(users);
       } catch (error) {
@@ -84,75 +79,36 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     setWatchers(item.watchers || []);
   }, [item]);
 
-  const handleAddAttachment = (attachment: Attachment) => {
+  // Handlers for attachments
+  const handleAddAttachment = (attachment) => {
     const updatedAttachments = [...attachments, attachment];
     setAttachments(updatedAttachments);
-    
-    // Update the backlog item
-    if (onUpdate && user) {
-      const updatedItem = {
-        ...item,
-        attachments: updatedAttachments,
-        updatedAt: new Date()
-      };
-      
-      // Add history entry
-      const historyEntry: HistoryEntry = {
-        id: uuidv4(),
-        field: 'attachments',
-        previousValue: `${attachments.length} files`,
-        newValue: `${updatedAttachments.length} files`,
-        changedBy: user.id,
-        changedAt: new Date()
-      };
-      
-      const updatedHistory = [...history, historyEntry];
-      updatedItem.history = updatedHistory;
-      
-      onUpdate(updatedItem);
-      setActiveTab('attachments');
-    }
+    updateItemWithHistory('attachments', `${attachments.length} files`, `${updatedAttachments.length} files`);
+    setActiveTab('attachments');
   };
   
-  const handleDeleteAttachment = (id: string) => {
+  const handleDeleteAttachment = (id) => {
+    const deletedAttachment = attachments.find(a => a.id === id);
     const updatedAttachments = attachments.filter(a => a.id !== id);
     setAttachments(updatedAttachments);
     
-    // Update the backlog item
-    if (onUpdate && user) {
-      const deletedAttachment = attachments.find(a => a.id === id);
-      
-      const updatedItem = {
-        ...item,
-        attachments: updatedAttachments,
-        updatedAt: new Date()
-      };
-      
-      // Add history entry
-      const historyEntry: HistoryEntry = {
-        id: uuidv4(),
-        field: 'attachments',
-        previousValue: `Attachment: ${deletedAttachment?.fileName || 'file'}`,
-        newValue: 'Removed',
-        changedBy: user.id,
-        changedAt: new Date()
-      };
-      
-      const updatedHistory = [...history, historyEntry];
-      updatedItem.history = updatedHistory;
-      
-      onUpdate(updatedItem);
-      toast.success('Attachment deleted');
-    }
+    updateItemWithHistory(
+      'attachments', 
+      `Attachment: ${deletedAttachment?.fileName || 'file'}`, 
+      'Removed'
+    );
+    toast.success('Attachment deleted');
   };
   
-  const handleAddComment = (content: string, parentId?: string) => {
-    if (!user) return;
+  // Handlers for comments
+  const handleAddComment = (content, parentId) => {
+    if (!item.creator) return;
     
-    const newComment: Comment = {
+    const { user } = require('@/contexts/AuthContext');
+    const newComment = {
       id: uuidv4(),
       content,
-      author: user.id,
+      author: user?.id,
       createdAt: new Date(),
       parentId
     };
@@ -160,7 +116,6 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     const updatedComments = [...comments, newComment];
     setComments(updatedComments);
     
-    // Update the backlog item
     if (onUpdate) {
       const updatedItem = {
         ...item,
@@ -173,7 +128,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     }
   };
   
-  const handleEditComment = (id: string, content: string) => {
+  const handleEditComment = (id, content) => {
     const updatedComments = comments.map(comment => 
       comment.id === id 
         ? { ...comment, content, updatedAt: new Date() } 
@@ -181,45 +136,26 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     );
     
     setComments(updatedComments);
-    
-    // Update the backlog item
-    if (onUpdate) {
-      const updatedItem = {
-        ...item,
-        comments: updatedComments,
-        updatedAt: new Date()
-      };
-      
-      onUpdate(updatedItem);
-      toast.success('Comment updated');
-    }
+    updateItem({ comments: updatedComments });
+    toast.success('Comment updated');
   };
   
-  const handleDeleteComment = (id: string) => {
-    // Filter out the deleted comment and any replies to it
+  const handleDeleteComment = (id) => {
     const updatedComments = comments.filter(
       comment => comment.id !== id && comment.parentId !== id
     );
     
     setComments(updatedComments);
-    
-    // Update the backlog item
-    if (onUpdate) {
-      const updatedItem = {
-        ...item,
-        comments: updatedComments,
-        updatedAt: new Date()
-      };
-      
-      onUpdate(updatedItem);
-      toast.success('Comment deleted');
-    }
+    updateItem({ comments: updatedComments });
+    toast.success('Comment deleted');
   };
   
-  const handleToggleWatch = (isWatching: boolean) => {
+  // Handlers for watchers
+  const handleToggleWatch = (isWatching) => {
+    const { user } = require('@/contexts/AuthContext');
     if (!user) return;
     
-    let updatedWatchers: string[];
+    let updatedWatchers;
     
     if (isWatching) {
       updatedWatchers = [...watchers, user.id];
@@ -228,121 +164,84 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     }
     
     setWatchers(updatedWatchers);
+    updateItemWithHistory(
+      'watchers',
+      isWatching ? 'Not watching' : 'Watching',
+      isWatching ? 'Watching' : 'Not watching'
+    );
     
-    // Update the backlog item
-    if (onUpdate) {
-      const updatedItem = {
-        ...item,
-        watchers: updatedWatchers,
-        updatedAt: new Date()
-      };
-      
-      // Add history entry
-      const historyEntry: HistoryEntry = {
-        id: uuidv4(),
-        field: 'watchers',
-        previousValue: isWatching ? 'Not watching' : 'Watching',
-        newValue: isWatching ? 'Watching' : 'Not watching',
-        changedBy: user.id,
-        changedAt: new Date()
-      };
-      
-      const updatedHistory = [...history, historyEntry];
-      updatedItem.history = updatedHistory;
-      
-      onUpdate(updatedItem);
-      toast.success(isWatching ? 'Now watching this item' : 'No longer watching this item');
-    }
+    toast.success(isWatching ? 'Now watching this item' : 'No longer watching this item');
   };
   
-  const handleAddWatcher = (userId: string) => {
+  const handleAddWatcher = (userId) => {
     if (watchers.includes(userId)) return;
     
     const updatedWatchers = [...watchers, userId];
     setWatchers(updatedWatchers);
     
-    // Update the backlog item
-    if (onUpdate && user) {
-      const updatedItem = {
-        ...item,
-        watchers: updatedWatchers,
-        updatedAt: new Date()
-      };
-      
-      // Add history entry if the current user made the change
-      const historyEntry: HistoryEntry = {
-        id: uuidv4(),
-        field: 'watchers',
-        previousValue: watchers.length.toString(),
-        newValue: updatedWatchers.length.toString(),
-        changedBy: user.id,
-        changedAt: new Date()
-      };
-      
-      const updatedHistory = [...history, historyEntry];
-      updatedItem.history = updatedHistory;
-      
-      onUpdate(updatedItem);
-      toast.success('Watcher added');
-    }
+    updateItemWithHistory('watchers', watchers.length.toString(), updatedWatchers.length.toString());
+    toast.success('Watcher added');
   };
   
-  const handleRemoveWatcher = (userId: string) => {
+  const handleRemoveWatcher = (userId) => {
     const updatedWatchers = watchers.filter(id => id !== userId);
     setWatchers(updatedWatchers);
     
-    // Update the backlog item
-    if (onUpdate && user) {
+    updateItemWithHistory('watchers', watchers.length.toString(), updatedWatchers.length.toString());
+    toast.success('Watcher removed');
+  };
+  
+  // Helper functions
+  const updateItem = (partialUpdate) => {
+    if (onUpdate) {
       const updatedItem = {
         ...item,
-        watchers: updatedWatchers,
+        ...partialUpdate,
         updatedAt: new Date()
       };
       
-      // Add history entry
-      const historyEntry: HistoryEntry = {
-        id: uuidv4(),
-        field: 'watchers',
-        previousValue: watchers.length.toString(),
-        newValue: updatedWatchers.length.toString(),
-        changedBy: user.id,
-        changedAt: new Date()
-      };
-      
-      const updatedHistory = [...history, historyEntry];
-      updatedItem.history = updatedHistory;
-      
       onUpdate(updatedItem);
-      toast.success('Watcher removed');
     }
   };
   
+  const updateItemWithHistory = (field, previousValue, newValue) => {
+    const { user } = require('@/contexts/AuthContext');
+    if (!user || !onUpdate) return;
+    
+    const historyEntry = {
+      id: uuidv4(),
+      field,
+      previousValue,
+      newValue,
+      changedBy: user.id,
+      changedAt: new Date()
+    };
+    
+    const updatedHistory = [...history, historyEntry];
+    setHistory(updatedHistory);
+    
+    const updates = {
+      [field]: field === 'watchers' ? watchers : attachments,
+      history: updatedHistory,
+      updatedAt: new Date()
+    };
+    
+    updateItem(updates);
+  };
+  
+  // Check if current user is watching
+  const { useAuth } = require('@/contexts/AuthContext');
+  const { user } = useAuth();
+  const isCurrentUserWatching = user ? watchers.includes(user.id) : false;
+  
+  // Counters for badges
   const commentsCount = comments.length;
   const attachmentsCount = attachments.length;
   const watchersCount = watchers.length;
 
   return (
     <Card className="w-full shadow-sm">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-xl font-semibold">{item.title}</CardTitle>
-          <div className="flex space-x-2">
-            <Badge variant={item.priority === 'critical' ? 'destructive' : 
-                          item.priority === 'high' ? 'default' : 
-                          item.priority === 'medium' ? 'secondary' : 'outline'}>
-              {item.priority}
-            </Badge>
-            <Badge variant="outline">{item.type}</Badge>
-            <Badge variant={
-              item.status === 'completed' ? 'default' : 
-              item.status === 'in-progress' ? 'secondary' : 
-              item.status === 'blocked' ? 'destructive' : 'outline'
-            }>
-              {item.status}
-            </Badge>
-          </div>
-        </div>
-      </CardHeader>
+      <ItemHeaderWithStatus item={item} />
       
       <CardContent className="pt-0">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -382,47 +281,10 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
           </TabsList>
           
           <TabsContent value="details" className="m-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <p className="font-semibold text-muted-foreground mb-1">Assignee</p>
-                <p>{item.assignee || 'Unassigned'}</p>
-              </div>
-              <div>
-                <p className="font-semibold text-muted-foreground mb-1">Release</p>
-                <p>{releaseName}</p>
-              </div>
-              <div>
-                <p className="font-semibold text-muted-foreground mb-1">Story Points</p>
-                <p>{item.storyPoints || 'Not estimated'}</p>
-              </div>
-              <div>
-                <p className="font-semibold text-muted-foreground mb-1">Due Date</p>
-                <p>{item.dueDate ? format(new Date(item.dueDate), 'MMM d, yyyy') : 'No due date'}</p>
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <p className="font-semibold text-muted-foreground mb-1">Description</p>
-              <p className="whitespace-pre-line">{item.description}</p>
-            </div>
-            
-            {item.labels && item.labels.length > 0 && (
-              <div className="mt-4">
-                <p className="font-semibold text-muted-foreground mb-1">Labels</p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {item.labels.map((label, index) => (
-                    <Badge key={index} variant="outline">{label}</Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            <div className="mt-4 flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock className="h-3.5 w-3.5" />
-              <span>Created: {format(new Date(item.createdAt), 'MMM d, yyyy')}</span>
-              <span>•</span>
-              <span>Last updated: {format(new Date(item.updatedAt), 'MMM d, yyyy')}</span>
-            </div>
+            <BacklogItemBasicDetails 
+              item={item}
+              releaseName={releaseName}
+            />
           </TabsContent>
           
           <TabsContent value="attachments" className="m-0">
