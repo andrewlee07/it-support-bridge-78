@@ -1,103 +1,89 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Asset } from '@/utils/types/asset';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Laptop, Monitor, Server, Smartphone } from 'lucide-react';
+import { CalendarDays, Cpu, HardDrive, Info, Server, Smartphone } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 interface AssetCardProps {
-  asset: {
-    id: string;
-    name: string;
-    type: string;
-    status: string;
-    assignedTo: string;
-    purchaseDate: string;
-    warranty: string;
-    location: string;
-  };
-  onView: (assetId: string) => void;
+  asset: Asset;
+  onClick?: () => void;
 }
 
-const AssetCard: React.FC<AssetCardProps> = ({ asset, onView }) => {
-  const navigate = useNavigate();
-  
+const AssetCard: React.FC<AssetCardProps> = ({ asset, onClick }) => {
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'in-use':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
-      case 'available':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100';
-      case 'in-repair':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100';
-      case 'retired':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100';
+    switch (status.toLowerCase()) {
       case 'active':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+      case 'maintenance':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'retired':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
     }
   };
 
   const getAssetIcon = (type: string) => {
-    switch (type) {
-      case 'laptop':
-        return <Laptop className="h-8 w-8" />;
-      case 'mobile':
-        return <Smartphone className="h-8 w-8" />;
+    switch (type.toLowerCase()) {
       case 'server':
-        return <Server className="h-8 w-8" />;
-      case 'monitor':
-        return <Monitor className="h-8 w-8" />;
-      case 'network':
-        return <Server className="h-8 w-8" />;
+        return <Server className="h-5 w-5" />;
+      case 'desktop':
+        return <Cpu className="h-5 w-5" />;
+      case 'laptop':
+        return <HardDrive className="h-5 w-5" />;
+      case 'mobile':
+        return <Smartphone className="h-5 w-5" />;
       default:
-        return <Monitor className="h-8 w-8" />;
+        return <Info className="h-5 w-5" />;
     }
-  };
-
-  const handleClick = () => {
-    navigate(`/assets/${asset.id}`);
-    onView(asset.id);
   };
 
   return (
     <Card 
-      key={asset.id} 
-      className="shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-      onClick={handleClick}
+      className="shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer" 
+      onClick={onClick}
     >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-medium">{asset.name}</CardTitle>
+          <div>
+            <div className="text-xs text-muted-foreground mb-1">{asset.id}</div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">
+                {getAssetIcon(asset.type)}
+              </span>
+              <h3 className="text-base font-semibold">{asset.name}</h3>
+            </div>
+          </div>
           <Badge className={getStatusColor(asset.status)}>
-            {asset.status.replace('-', ' ').charAt(0).toUpperCase() + asset.status.replace('-', ' ').slice(1)}
+            {asset.status}
           </Badge>
         </div>
-        <div className="text-sm text-muted-foreground">{asset.id}</div>
       </CardHeader>
-      <CardContent>
-        <div className="flex items-start">
-          <div className="mr-4 p-2 bg-background rounded-md border">
-            {getAssetIcon(asset.type)}
+      <CardContent className="pb-2">
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {asset.description}
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div>
+            <div className="text-xs text-muted-foreground">Model</div>
+            <div className="text-sm font-medium">{asset.model}</div>
           </div>
-          <div className="flex flex-col text-sm">
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-              <span className="text-muted-foreground">Assigned to:</span>
-              <span>{asset.assignedTo}</span>
-              
-              <span className="text-muted-foreground">Location:</span>
-              <span>{asset.location}</span>
-              
-              <span className="text-muted-foreground">Purchased:</span>
-              <span>{asset.purchaseDate}</span>
-              
-              <span className="text-muted-foreground">Warranty:</span>
-              <span>{asset.warranty}</span>
-            </div>
+          <div>
+            <div className="text-xs text-muted-foreground">Serial</div>
+            <div className="text-sm font-medium truncate">{asset.serialNumber}</div>
           </div>
         </div>
       </CardContent>
+      <CardFooter className="pt-0">
+        <div className="flex items-center text-xs text-muted-foreground">
+          <CalendarDays className="h-3 w-3 mr-1" />
+          Purchased: {formatDistanceToNow(new Date(asset.purchaseDate), { addSuffix: true })}
+        </div>
+      </CardFooter>
     </Card>
   );
 };

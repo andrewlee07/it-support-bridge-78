@@ -1,89 +1,166 @@
 
-import React, { useState } from 'react';
-import PageTransition from '@/components/shared/PageTransition';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import AssetList from '@/components/assets/AssetList';
-import AssetSearchBar from '@/components/assets/AssetSearchBar';
-import { sampleAssets } from '@/components/assets/sampleAssetData';
-import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Asset } from '@/utils/types/asset';
+import { fetchAssets, fetchAssetById } from '@/utils/api/assetApi';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { CalendarDays, Cpu, HardDrive, Info, Server, Smartphone } from 'lucide-react';
+import { format } from 'date-fns';
 
-const Assets = () => {
-  const [assets] = useState(sampleAssets);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showAssetForm, setShowAssetForm] = useState(false);
-  const { toast } = useToast();
-  
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    // In a real app, this would filter the assets based on the search term
-    console.log(`Searching for: ${term}`);
-  };
-  
-  const handleFilter = () => {
-    // In a real app, this would open a filter dialog or panel
-    console.log('Opening filter options');
-  };
-  
-  const handleViewAsset = (assetId: string) => {
-    // In a real app, this would navigate to the asset detail page
-    console.log(`Viewing asset: ${assetId}`);
+const Assets: React.FC = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [isViewingAsset, setIsViewingAsset] = useState<boolean>(!!id);
+
+  useEffect(() => {
+    const loadAsset = async () => {
+      if (id) {
+        try {
+          const response = await fetchAssetById(id);
+          if (response.data) {
+            setSelectedAsset(response.data);
+            setIsViewingAsset(true);
+          }
+        } catch (error) {
+          console.error('Failed to fetch asset details:', error);
+          setIsViewingAsset(false);
+        }
+      } else {
+        setIsViewingAsset(false);
+        setSelectedAsset(null);
+      }
+    };
+
+    loadAsset();
+  }, [id]);
+
+  const handleAssetClick = (assetId: string) => {
+    navigate(`/assets/${assetId}`);
   };
 
-  const handleAssetFormSuccess = () => {
-    setShowAssetForm(false);
-    toast({
-      title: "Asset created",
-      description: "The asset has been created successfully."
-    });
+  const handleCloseDialog = () => {
+    navigate('/assets');
+  };
+
+  const getAssetIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'server':
+        return <Server className="h-5 w-5" />;
+      case 'desktop':
+        return <Cpu className="h-5 w-5" />;
+      case 'laptop':
+        return <HardDrive className="h-5 w-5" />;
+      case 'mobile':
+        return <Smartphone className="h-5 w-5" />;
+      default:
+        return <Info className="h-5 w-5" />;
+    }
   };
 
   return (
-    <PageTransition>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Asset Management</h1>
-            <p className="text-muted-foreground mt-1">
-              Track and manage hardware and software assets
-            </p>
-          </div>
-          <Button className="shrink-0" onClick={() => setShowAssetForm(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            New Asset
-          </Button>
-        </div>
+    <div className="space-y-6">
+      <AssetList onAssetClick={handleAssetClick} />
 
-        <AssetSearchBar onSearch={handleSearch} onFilter={handleFilter} />
-        
-        <AssetList 
-          assets={assets} 
-          onViewAsset={handleViewAsset} 
-        />
+      <Dialog open={isViewingAsset && !!selectedAsset} onOpenChange={handleCloseDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Asset Details</DialogTitle>
+          </DialogHeader>
+          {selectedAsset && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-primary/10 text-primary">
+                  {getAssetIcon(selectedAsset.type)}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">{selectedAsset.name}</h2>
+                  <p className="text-sm text-muted-foreground">{selectedAsset.id}</p>
+                </div>
+                <div className="ml-auto">
+                  <Badge
+                    className={
+                      selectedAsset.status === 'Active'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                        : selectedAsset.status === 'Maintenance'
+                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                        : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                    }
+                  >
+                    {selectedAsset.status}
+                  </Badge>
+                </div>
+              </div>
 
-        <Dialog open={showAssetForm} onOpenChange={setShowAssetForm}>
-          <DialogContent className="sm:max-w-3xl">
-            <DialogHeader>
-              <DialogTitle>Create New Asset</DialogTitle>
-            </DialogHeader>
-            <div className="py-6">
-              <p className="text-center text-muted-foreground">
-                Asset form would be implemented here. This is a placeholder.
-              </p>
-              <div className="flex justify-end space-x-2 mt-6">
-                <Button variant="outline" onClick={() => setShowAssetForm(false)}>
-                  Cancel
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium">Description</h3>
+                  <p className="mt-1 text-sm">{selectedAsset.description}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-medium">Type</h3>
+                    <p className="mt-1 text-sm">{selectedAsset.type}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium">Location</h3>
+                    <p className="mt-1 text-sm">{selectedAsset.location}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium">Model</h3>
+                    <p className="mt-1 text-sm">{selectedAsset.model}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium">Manufacturer</h3>
+                    <p className="mt-1 text-sm">{selectedAsset.manufacturer}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium">Serial Number</h3>
+                    <p className="mt-1 text-sm">{selectedAsset.serialNumber}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium">Assigned To</h3>
+                    <p className="mt-1 text-sm">{selectedAsset.assignedTo || 'Unassigned'}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium">Purchase Date</h3>
+                    <p className="mt-1 text-sm">
+                      {format(new Date(selectedAsset.purchaseDate), 'PPP')}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium">Warranty Expiry</h3>
+                    <p className="mt-1 text-sm">
+                      {selectedAsset.warrantyExpiry
+                        ? format(new Date(selectedAsset.warrantyExpiry), 'PPP')
+                        : 'No warranty'}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedAsset.notes && (
+                  <div>
+                    <h3 className="text-sm font-medium">Notes</h3>
+                    <p className="mt-1 text-sm">{selectedAsset.notes}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={handleCloseDialog}>
+                  Close
                 </Button>
-                <Button onClick={handleAssetFormSuccess}>
-                  Create Asset
-                </Button>
+                <Button>Edit Asset</Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </PageTransition>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

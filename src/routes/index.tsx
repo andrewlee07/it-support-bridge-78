@@ -1,14 +1,24 @@
+
 import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Login from '@/pages/Login';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
-import { TicketRoutes } from './ticketRoutes';
-import { ChangeRoutes } from './changeRoutes';
-import { AssetRoutes } from './assetRoutes';
-import { AdminRoutes } from './adminRoutes';
-import { TestManagementRoutes } from './testManagementRoutes';
-import { OtherRoutes } from './otherRoutes';
-import { DashboardRoutes } from './dashboardRoutes';
+import MainLayout from '@/layouts/MainLayout';
+import Dashboard from '@/pages/Dashboard';
+import Incidents from '@/pages/Incidents';
+import ServiceRequests from '@/pages/ServiceRequests';
+import Changes from '@/pages/Changes';
+import Releases from '@/pages/Releases';
+import Assets from '@/pages/Assets';
+import TestTracking from '@/pages/TestTracking';
+import TestExecution from '@/pages/TestExecution';
+import Bugs from '@/pages/Bugs';
+import Users from '@/pages/Users';
+import Reports from '@/pages/Reports';
+import ProblemManagement from '@/pages/ProblemManagement';
+import Calendar from '@/pages/Calendar';
+import Backlog from '@/pages/Backlog';
+import AdminSettings from '@/pages/AdminSettings';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -16,22 +26,241 @@ export const AppRoutes: React.FC = () => {
       {/* Authentication routes */}
       <Route path="/login" element={<Login />} />
       
-      {/* Include all route groups */}
-      <Route path="/dashboard/*" element={<DashboardRoutes />} />
-      <Route path="/incidents/*" element={<TicketRoutes type="incident" />} />
-      <Route path="/service-requests/*" element={<TicketRoutes type="service" />} />
-      <Route path="/changes/*" element={<ChangeRoutes />} />
-      <Route path="/releases/*" element={<ChangeRoutes />} />
-      <Route path="/assets/*" element={<AssetRoutes />} />
-      <Route path="/test-*/*" element={<TestManagementRoutes />} />
-      <Route path="/bugs/*" element={<TestManagementRoutes />} />
-      <Route path="/users/*" element={<OtherRoutes />} />
-      <Route path="/reports/*" element={<OtherRoutes />} />
-      <Route path="/problem-management/*" element={<OtherRoutes />} />
-      <Route path="/calendar/*" element={<OtherRoutes />} />
-      <Route path="/backlog/*" element={<OtherRoutes />} />
-      <Route path="/admin/*" element={<AdminRoutes />} />
-      <Route path="/settings/*" element={<AdminRoutes />} />
+      {/* Dashboard route */}
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Incident Management routes */}
+      <Route 
+        path="/incidents" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Incidents />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/incidents/:id" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Incidents />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Service Request routes */}
+      <Route 
+        path="/service-requests" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ServiceRequests />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/service-requests/:id" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ServiceRequests />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Change Management routes */}
+      <Route 
+        path="/changes" 
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Changes />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/changes/:id" 
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Changes />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Release Management routes */}
+      <Route 
+        path="/releases" 
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Releases />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/releases/:id" 
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Releases />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Asset Management routes */}
+      <Route 
+        path="/assets" 
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Assets />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/assets/:id" 
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Assets />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Test Management routes */}
+      <Route 
+        path="/test-tracking" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <TestTracking />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/test-execution" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <TestExecution />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/bugs" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Bugs />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* User Management route */}
+      <Route 
+        path="/users" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <Users />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Reporting route */}
+      <Route 
+        path="/reports" 
+        element={
+          <ProtectedRoute requiredRoles={['admin', 'manager']}>
+            <MainLayout>
+              <Reports />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Problem Management route */}
+      <Route 
+        path="/problem-management" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <ProblemManagement />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Calendar route */}
+      <Route 
+        path="/calendar" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Calendar />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Backlog route */}
+      <Route 
+        path="/backlog" 
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Backlog />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Admin routes */}
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <AdminSettings />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/settings" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <AdminSettings />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
       
       {/* Default route */}
       <Route path="/" element={<Navigate to="/dashboard" />} />
