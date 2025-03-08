@@ -60,7 +60,7 @@ const Login: React.FC = () => {
           <div className="mt-6 text-center text-sm">
             <p className="text-[#42284e]/60">Internal Application</p>
             <p className="mt-2 text-[#b047c9]/70">
-              <small>Try with any email/password or use mock users</small>
+              <small>Use any email/password combination to log in</small>
             </p>
           </div>
         </CardContent>

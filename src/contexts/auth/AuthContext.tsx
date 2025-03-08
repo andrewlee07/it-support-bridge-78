@@ -25,19 +25,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
+    // Try to restore user from localStorage
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
         setIsAuthenticated(true);
         console.log("User restored from localStorage:", parsedUser.email);
-      } catch (error) {
-        console.error("Error parsing stored user:", error);
-        localStorage.removeItem('user');
       }
+    } catch (error) {
+      console.error("Error parsing stored user:", error);
+      localStorage.removeItem('user');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -46,7 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       
       // Validate inputs
-      if (!email) {
+      if (!email || !email.trim()) {
         console.log("Login failed: Email is empty");
         setLoading(false);
         return false;
@@ -66,17 +68,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(authenticatedUser);
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(authenticatedUser));
-        setLoading(false);
+        console.log("Login successful, user set in state and localStorage");
         return true;
       } else {
         console.log("Authentication failed");
-        setLoading(false);
         return false;
       }
     } catch (error) {
       console.error('Login error:', error);
-      setLoading(false);
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,6 +86,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('user');
+    console.log("User logged out");
   };
 
   const refreshSession = (): boolean => {
@@ -94,6 +97,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
       setUser(refreshedUser);
       localStorage.setItem('user', JSON.stringify(refreshedUser));
+      console.log("Session refreshed for user:", user.email);
       return true;
     }
     return false;

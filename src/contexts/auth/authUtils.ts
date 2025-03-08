@@ -8,39 +8,44 @@ export const authenticateUser = (email: string, password: string): AuthUser | nu
     return null;
   }
   
-  // Check if the user exists in our mock data
-  const existingUser = getUserByEmail(email);
-  
-  if (existingUser) {
-    console.log("User found in mock data:", existingUser.name);
+  try {
+    // Check if the user exists in our mock data
+    const existingUser = getUserByEmail(email);
     
-    // In a real app, we would validate the password here
-    // For demo purposes, we'll accept any non-empty password for valid users
-    
-    const authenticatedUser = {
-      ...existingUser,
-      sessionStartTime: new Date(),
-    };
-    
-    console.log("Login successful for existing user");
-    return authenticatedUser;
-  } else {
-    // For testing/demo - allow login with any email/password
-    // This is intentional to make testing easier without requiring specific accounts
-    console.log("User not found in mock data, creating generic admin user");
-    
-    const mockUser: AuthUser = {
-      id: '1',
-      name: 'Test User',
-      email,
-      role: 'admin',
-      department: 'IT',
-      sessionTimeout: 30,
-      sessionStartTime: new Date(),
-    };
-    
-    console.log("Login successful with generic user");
-    return mockUser;
+    if (existingUser) {
+      console.log("User found in mock data:", existingUser.name);
+      
+      // In a real app, we would validate the password here
+      // For demo purposes, we'll accept any non-empty password for valid users
+      
+      const authenticatedUser = {
+        ...existingUser,
+        sessionStartTime: new Date(),
+      };
+      
+      console.log("Login successful for existing user");
+      return authenticatedUser;
+    } else {
+      // For testing/demo - allow login with any email/password
+      // This is intentional to make testing easier without requiring specific accounts
+      console.log("User not found in mock data, creating generic admin user");
+      
+      const mockUser: AuthUser = {
+        id: '1',
+        name: 'Test User',
+        email,
+        role: 'admin',
+        department: 'IT',
+        sessionTimeout: 30,
+        sessionStartTime: new Date(),
+      };
+      
+      console.log("Login successful with generic user");
+      return mockUser;
+    }
+  } catch (error) {
+    console.error("Authentication error:", error);
+    return null;
   }
 };
 

@@ -15,10 +15,19 @@ export const useLoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
+    if (!email.trim()) {
       toast({
         title: "Error",
-        description: "Please enter both email and password",
+        description: "Please enter your email",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!password) {
+      toast({
+        title: "Error",
+        description: "Please enter your password",
         variant: "destructive"
       });
       return;
@@ -27,7 +36,7 @@ export const useLoginForm = () => {
     setIsLoading(true);
     
     try {
-      console.log("Login hook: Attempting login with:", email, "and password length:", password.length);
+      console.log("Login hook: Attempting login with:", email);
       const success = await login(email, password);
       console.log("Login hook: Login result:", success ? "success" : "failed");
       
@@ -44,8 +53,8 @@ export const useLoginForm = () => {
         navigate(redirectPath);
       } else {
         toast({
-          title: "Error",
-          description: "Invalid credentials. Please try again.",
+          title: "Login Failed",
+          description: "Invalid credentials. For testing, you can use any email and password.",
           variant: "destructive"
         });
       }
