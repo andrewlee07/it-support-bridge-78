@@ -7,12 +7,12 @@ export function useAssetForm(asset?: Asset) {
     name: asset.name,
     type: asset.type,
     status: asset.status,
-    notes: asset.notes,
-    location: asset.location,
-    model: asset.model,
-    manufacturer: asset.manufacturer,
-    serialNumber: asset.serialNumber,
-    assignedTo: asset.assignedTo,
+    notes: asset.notes || '',
+    location: asset.location || '',
+    model: asset.model || '',
+    manufacturer: asset.manufacturer || '',
+    serialNumber: asset.serialNumber || '',
+    assignedTo: asset.assignedTo || '',
   } : {
     name: '',
     type: 'hardware' as AssetType,
@@ -22,6 +22,7 @@ export function useAssetForm(asset?: Asset) {
     model: '',
     manufacturer: '',
     serialNumber: '',
+    assignedTo: '',
   };
   
   const form = useForm<Partial<Asset>>({

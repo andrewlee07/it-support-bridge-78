@@ -56,11 +56,15 @@ const Assets: React.FC = () => {
     navigate(`/assets/${assetId}`);
   };
 
-  const handleCloseDialog = () => {
-    if (isAddingAsset) {
-      setIsAddingAsset(false);
-    } else {
+  const handleViewDialogChange = (open: boolean) => {
+    if (!open) {
       navigate('/assets');
+    }
+  };
+
+  const handleAddDialogChange = (open: boolean) => {
+    if (!open) {
+      setIsAddingAsset(false);
     }
   };
 
@@ -134,7 +138,7 @@ const Assets: React.FC = () => {
         onAddAssetClick={handleAddAssetClick}
       />
 
-      <Dialog open={isViewingAsset && !!selectedAsset} onOpenChange={handleCloseDialog}>
+      <Dialog open={isViewingAsset && !!selectedAsset} onOpenChange={handleViewDialogChange}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Asset Details</DialogTitle>
@@ -148,7 +152,7 @@ const Assets: React.FC = () => {
           {selectedAsset && !isEditingAsset && (
             <AssetDetailView 
               asset={selectedAsset} 
-              onClose={handleCloseDialog} 
+              onClose={() => navigate('/assets')} 
               onEditClick={handleEditClick} 
             />
           )}
@@ -164,7 +168,7 @@ const Assets: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isAddingAsset} onOpenChange={handleCloseDialog}>
+      <Dialog open={isAddingAsset} onOpenChange={handleAddDialogChange}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add New Asset</DialogTitle>
