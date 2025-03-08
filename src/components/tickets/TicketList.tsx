@@ -17,6 +17,7 @@ import TicketCard from './TicketCard';
 import { PlusCircle, Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import TicketForm from './TicketForm';
+import { getTicketsByType } from '@/utils/mockData/tickets';
 
 interface TicketListProps {
   type: 'incident' | 'service';
@@ -52,15 +53,14 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
     }
   }, [id, tickets]);
 
-  const loadTickets = async () => {
+  const loadTickets = () => {
     setLoading(true);
     try {
-      // Mock implementation, replace with actual API call later
-      setTimeout(() => {
-        setTickets([]);
-        setFilteredTickets([]);
-        setLoading(false);
-      }, 1000);
+      // Get tickets from mockData based on type
+      const ticketsData = getTicketsByType(type);
+      setTickets(ticketsData);
+      setFilteredTickets(ticketsData);
+      setLoading(false);
     } catch (error) {
       console.error('Failed to fetch tickets:', error);
       setLoading(false);
