@@ -7,11 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Calendar, ChevronDown, Download, Filter, RefreshCw } from 'lucide-react';
 import { createApiSuccessResponse } from '@/utils/mockData/apiHelpers';
 import { CrossSystemDashboardData } from '@/utils/types/dashboard';
-import { RelationshipsDiagram } from '@/components/dashboard/cross-system/RelationshipsDiagram';
-import { ReleaseSummaryCards } from '@/components/dashboard/cross-system/ReleaseSummaryCards';
-import { BacklogProgressChart } from '@/components/dashboard/cross-system/BacklogProgressChart';
-import { TestMetricsSection } from '@/components/dashboard/cross-system/TestMetricsSection';
-import { ReportingControls } from '@/components/dashboard/cross-system/ReportingControls';
+import RelationshipsDiagram from '@/components/dashboard/cross-system/RelationshipsDiagram';
+import ReleaseSummaryCards from '@/components/dashboard/cross-system/ReleaseSummaryCards';
+import BacklogProgressChart from '@/components/dashboard/cross-system/BacklogProgressChart';
+import TestMetricsSection from '@/components/dashboard/cross-system/TestMetricsSection';
+import ReportingControls from '@/components/dashboard/cross-system/ReportingControls';
 
 // Mock data for dashboard
 const mockCrossSystemData: CrossSystemDashboardData = {

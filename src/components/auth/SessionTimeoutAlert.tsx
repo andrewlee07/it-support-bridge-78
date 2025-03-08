@@ -60,10 +60,10 @@ const SessionTimeoutAlert = () => {
 
   // Countdown timer for warning dialog
   useEffect(() => {
-    let timer: number;
+    let timer: NodeJS.Timeout;
     
     if (showWarning && remainingTime > 0) {
-      timer = window.setInterval(() => {
+      timer = setInterval(() => {
         setRemainingTime(prev => {
           if (prev <= 1) {
             clearInterval(timer);
@@ -79,7 +79,7 @@ const SessionTimeoutAlert = () => {
     };
   }, [showWarning, remainingTime]);
 
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setIsRefreshing(true);
     
     const success = refreshSession();

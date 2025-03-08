@@ -1,5 +1,5 @@
 
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const useSessionTimeout = () => {
@@ -35,3 +35,5 @@ export const useSessionTimeout = () => {
 
   return { initializeSessionTimeout };
 };
+
+export default useSessionTimeout;
