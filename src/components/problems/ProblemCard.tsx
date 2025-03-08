@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Problem } from '@/utils/types/problem';
+import { Problem, ProblemStatus } from '@/utils/types/problem';
 import { formatDistanceToNow } from 'date-fns';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

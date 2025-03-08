@@ -37,6 +37,8 @@ export interface Problem {
   
   // Pending status fields
   pendingSubStatus?: PendingSubStatus;
+  reopenReason?: string;
+  reopenedAt?: Date;
 }
 
 export interface RelatedIncident {

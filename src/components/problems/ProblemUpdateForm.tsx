@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Problem, ProblemStatus } from '@/utils/types/problem';
+import { PendingSubStatus } from '@/utils/types/ticket';
 
 const updateSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters' }),
@@ -31,6 +32,7 @@ const updateSchema = z.object({
   assignedTo: z.string().optional(),
   resolutionPlan: z.string().optional(),
   relatedIncidents: z.string().optional(),
+  pendingSubStatus: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -57,9 +59,14 @@ const ProblemUpdateForm: React.FC<ProblemUpdateFormProps> = ({
       assignedTo: problem.assignedTo || '',
       resolutionPlan: problem.resolutionPlan || '',
       relatedIncidents: problem.relatedIncidents?.join(', ') || '',
+      pendingSubStatus: problem.pendingSubStatus || '',
       notes: '',
     },
   });
+
+  // Watch status to conditionally show pendingSubStatus field
+  const watchStatus = form.watch('status');
+  const showPendingSubStatus = watchStatus === 'pending';
 
   return (
     <div className="border p-4 rounded-md bg-muted/30">
@@ -97,6 +104,10 @@ const ProblemUpdateForm: React.FC<ProblemUpdateFormProps> = ({
                       <SelectItem value="new">New</SelectItem>
                       <SelectItem value="under-investigation">Under Investigation</SelectItem>
                       <SelectItem value="root-cause-identified">Root Cause Identified</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="known-error">Known Error</SelectItem>
+                      <SelectItem value="resolved">Resolved</SelectItem>
+                      <SelectItem value="closed">Closed</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -152,6 +163,31 @@ const ProblemUpdateForm: React.FC<ProblemUpdateFormProps> = ({
               )}
             />
           </div>
+
+          {showPendingSubStatus && (
+            <FormField
+              control={form.control}
+              name="pendingSubStatus"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pending Sub-Status <span className="text-red-500">*</span></FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select pending sub-status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="customer-info">Customer Info</SelectItem>
+                      <SelectItem value="customer-testing">Customer Testing</SelectItem>
+                      <SelectItem value="third-party">Third Party</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
