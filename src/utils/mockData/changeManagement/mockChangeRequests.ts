@@ -5,7 +5,7 @@ import { createAuditEntries } from '../auditHelpers';
 // Mock change requests
 export const mockChangeRequests: ChangeRequest[] = [
   {
-    id: 'change-1',
+    id: 'CHG00001',
     title: 'Network Router Upgrade',
     description: 'Upgrade all office routers to new firmware version.',
     status: 'approved',
@@ -30,10 +30,10 @@ export const mockChangeRequests: ChangeRequest[] = [
     rollbackPlan: 'Restore from firmware backup if issues arise.',
     approvedBy: 'user-1',
     approvedAt: new Date(new Date().setDate(new Date().getDate() - 2)),
-    audit: createAuditEntries('change-1', 'change', 'user-2'),
+    audit: createAuditEntries('CHG00001', 'change', 'user-2'),
   },
   {
-    id: 'change-2',
+    id: 'CHG00002',
     title: 'Email Server Migration',
     description: 'Migrate email server to new cloud infrastructure.',
     status: 'submitted',
@@ -55,10 +55,10 @@ export const mockChangeRequests: ChangeRequest[] = [
     ],
     implementationPlan: 'Phase migration over weekend with IT team monitoring.',
     rollbackPlan: 'Revert to old server if not completed successfully.',
-    audit: createAuditEntries('change-2', 'change', 'user-2'),
+    audit: createAuditEntries('CHG00002', 'change', 'user-2'),
   },
   {
-    id: 'change-3',
+    id: 'CHG00003',
     title: 'Windows Update Deployment',
     description: 'Deploy latest Windows security updates to all workstations.',
     status: 'completed',
@@ -83,7 +83,7 @@ export const mockChangeRequests: ChangeRequest[] = [
     rollbackPlan: 'Use system restore points if issues occur.',
     approvedBy: 'user-1',
     approvedAt: new Date(new Date().setDate(new Date().getDate() - 7)),
-    audit: createAuditEntries('change-3', 'change', 'user-2'),
+    audit: createAuditEntries('CHG00003', 'change', 'user-2'),
   }
 ];
 

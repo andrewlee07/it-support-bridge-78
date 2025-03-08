@@ -32,6 +32,12 @@ import ProblemConfiguration from '@/pages/admin/ProblemConfiguration';
 import AssetConfiguration from '@/pages/admin/AssetConfiguration';
 import SLASettings from '@/pages/admin/SLASettings';
 import SecurityAuditLog from '@/pages/SecurityAuditLog';
+import SecuritySettings from '@/pages/admin/SecuritySettings';
+
+// Detail pages for tickets and changes
+import IncidentDetail from '@/pages/IncidentDetail';
+import ServiceRequestDetail from '@/pages/ServiceRequestDetail';
+import ChangeDetail from '@/pages/ChangeDetail';
 
 // Layout
 import MainLayout from '@/layouts/MainLayout';
@@ -70,12 +76,24 @@ const routes: RouteObject[] = [
         element: <Incidents />,
       },
       {
+        path: 'incidents/:id',
+        element: <IncidentDetail />,
+      },
+      {
         path: 'service-requests',
         element: <ServiceRequests />,
       },
       {
+        path: 'service-requests/:id',
+        element: <ServiceRequestDetail />,
+      },
+      {
         path: 'changes',
         element: <Changes />,
+      },
+      {
+        path: 'changes/:id',
+        element: <ChangeDetail />,
       },
       {
         path: 'problems',
@@ -144,6 +162,10 @@ const routes: RouteObject[] = [
       {
         path: 'admin/security-audit-log',
         element: <SecurityAuditLog />,
+      },
+      {
+        path: 'admin/security-settings',
+        element: <SecuritySettings />,
       },
     ],
   },

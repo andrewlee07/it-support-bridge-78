@@ -21,6 +21,11 @@ const UserTabsContent: React.FC<UserTabsContentProps> = ({
   onToggleStatus,
   onEditUser
 }) => {
+  // Filter users by their role
+  const adminUsers = users.filter(user => user.role === 'admin');
+  const itUsers = users.filter(user => user.role === 'it');
+  const endUsers = users.filter(user => user.role === 'user');
+
   return (
     <>
       <TabsContent value="all" className="mt-0">
@@ -36,7 +41,7 @@ const UserTabsContent: React.FC<UserTabsContentProps> = ({
       
       <TabsContent value="admin" className="mt-0">
         <UserList 
-          users={users} 
+          users={adminUsers} 
           onViewUser={onViewUser} 
           onRemoveUser={onRemoveUser}
           onChangeRole={onChangeRole}
@@ -47,7 +52,7 @@ const UserTabsContent: React.FC<UserTabsContentProps> = ({
       
       <TabsContent value="it" className="mt-0">
         <UserList 
-          users={users} 
+          users={itUsers} 
           onViewUser={onViewUser} 
           onRemoveUser={onRemoveUser}
           onChangeRole={onChangeRole}
@@ -58,7 +63,7 @@ const UserTabsContent: React.FC<UserTabsContentProps> = ({
       
       <TabsContent value="user" className="mt-0">
         <UserList 
-          users={users} 
+          users={endUsers} 
           onViewUser={onViewUser} 
           onRemoveUser={onRemoveUser}
           onChangeRole={onChangeRole}
