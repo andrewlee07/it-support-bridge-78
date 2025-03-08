@@ -9,7 +9,7 @@ import {
 import { 
   getDropdownConfigurations, 
   setDropdownConfigurations,
-  getDropdownConfigurationById,
+  getDropdownConfigurationById as getConfigById,
   getDropdownConfigurationsByEntityType
 } from '../../mockData/dropdownConfigurations';
 import { 
@@ -41,13 +41,13 @@ export const getDropdownConfigurationsByEntity = async (
 export const getDropdownConfigurationById = async (
   id: string
 ): Promise<ApiResponse<ConfigurableDropdown>> => {
-  const configuration = getDropdownConfigurationById(id);
+  const configuration = getConfigById(id);
   
   if (!configuration) {
     return createApiErrorResponse('Dropdown configuration not found', 404);
   }
   
-  return simulateApiResponse(configuration);
+  return createApiSuccessResponse(configuration);
 };
 
 // Create a new dropdown configuration
@@ -93,7 +93,7 @@ export const createDropdownConfiguration = async (
   const updatedConfigurations = [...configurations, newConfiguration];
   setDropdownConfigurations(updatedConfigurations);
   
-  return simulateApiResponse(newConfiguration);
+  return createApiSuccessResponse(newConfiguration);
 };
 
 // Update an existing dropdown configuration
@@ -115,5 +115,5 @@ export const updateDropdownConfiguration = async (
   
   updateConfigurations(configurations, configIndex, updatedConfiguration);
   
-  return simulateApiResponse(updatedConfiguration);
+  return createApiSuccessResponse(updatedConfiguration);
 };
