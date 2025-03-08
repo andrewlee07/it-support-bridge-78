@@ -1,4 +1,6 @@
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { getUserByEmail } from '@/utils/mockData/users';
 
 type User = {
   id: string;
@@ -58,23 +60,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true);
-      const mockUser: User = {
-        id: '1',
-        name: 'Test User',
-        email,
-        role: 'admin',
-        department: 'IT',
-        sessionTimeout: 30,
-        sessionStartTime: new Date(),
-      };
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // First check if the user exists in our mock data
+      const existingUser = getUserByEmail(email);
       
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      setLoading(false);
-      return true;
+      if (existingUser) {
+        // Use the existing user data
+        const authenticatedUser = {
+          ...existingUser,
+          sessionStartTime: new Date(),
+        };
+        
+        setUser(authenticatedUser);
+        setIsAuthenticated(true);
+        localStorage.setItem('user', JSON.stringify(authenticatedUser));
+        setLoading(false);
+        return true;
+      } else {
+        // Fallback to the mock user if the email doesn't match any existing user
+        const mockUser: User = {
+          id: '1',
+          name: 'Test User',
+          email,
+          role: 'admin',
+          department: 'IT',
+          sessionTimeout: 30,
+          sessionStartTime: new Date(),
+        };
+        
+        setUser(mockUser);
+        setIsAuthenticated(true);
+        localStorage.setItem('user', JSON.stringify(mockUser));
+        setLoading(false);
+        return true;
+      }
     } catch (error) {
       console.error('Login error:', error);
       setLoading(false);
