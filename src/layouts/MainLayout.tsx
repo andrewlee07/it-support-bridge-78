@@ -45,7 +45,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     <div className="min-h-screen w-full bg-background">
       <Sidebar />
       
-      <div className="pl-16 md:pl-64 min-h-screen">
+      <div className={cn(
+        "pl-16 md:pl-64 min-h-screen",
+        sidebarCollapsed ? "pl-16" : "pl-16 md:pl-64"
+      )}>
         <Navbar toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
         
         <main className={cn(
