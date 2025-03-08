@@ -1,12 +1,12 @@
-
 export interface AuditEntry {
   id: string;
   entityId: string;
-  entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release' | 'problem';
-  message: string;
-  performedBy: string;
+  entityType: AuditEntityType;
   timestamp: Date;
+  userId: string;
+  userName: string;
+  action: string;
   details?: string;
-  oldValue?: string;
-  newValue?: string;
 }
+
+export type AuditEntityType = 'change' | 'ticket' | 'user' | 'asset' | 'release' | 'problem';

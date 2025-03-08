@@ -6,13 +6,7 @@ import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
 import { toast } from 'sonner';
 
 interface TicketWithNotes extends Ticket {
-  notes?: Array<{
-    id: string;
-    text: string;
-    createdAt: Date;
-    createdBy: string;
-    isInternal: boolean;
-  }>;
+  notes: TicketNote[];
 }
 
 export const useTicketDetail = (id: string | undefined) => {
