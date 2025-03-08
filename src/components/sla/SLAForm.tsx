@@ -24,25 +24,26 @@ import { SLA, TicketPriority, TicketType } from '@/utils/types';
 import { toast } from 'sonner';
 
 interface SLAFormProps {
-  initialData?: SLA;
+  defaultValues?: SLA;
   onSubmit: (data: Partial<SLA>) => void;
   onCancel: () => void;
+  entityType?: 'incident' | 'service-request';
 }
 
-const SLAForm: React.FC<SLAFormProps> = ({ initialData, onSubmit, onCancel }) => {
-  const isEditing = !!initialData;
+const SLAForm: React.FC<SLAFormProps> = ({ defaultValues, onSubmit, onCancel, entityType }) => {
+  const isEditing = !!defaultValues;
   
-  const defaultValues = {
-    name: initialData?.name || '',
-    description: initialData?.description || '',
-    ticketType: initialData?.ticketType || 'incident' as TicketType,
-    priorityLevel: initialData?.priorityLevel || 'P3' as TicketPriority,
-    responseTimeHours: initialData?.responseTimeHours || 4,
-    resolutionTimeHours: initialData?.resolutionTimeHours || 8,
-    isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
+  const formValues = {
+    name: defaultValues?.name || '',
+    description: defaultValues?.description || '',
+    ticketType: defaultValues?.ticketType || (entityType === 'service-request' ? 'service' : 'incident') as TicketType,
+    priorityLevel: defaultValues?.priorityLevel || 'P3' as TicketPriority,
+    responseTimeHours: defaultValues?.responseTimeHours || 4,
+    resolutionTimeHours: defaultValues?.resolutionTimeHours || 8,
+    isActive: defaultValues?.isActive !== undefined ? defaultValues.isActive : true,
   };
 
-  const form = useForm({ defaultValues });
+  const form = useForm({ defaultValues: formValues });
   
   const handleSubmit = async (data: Partial<SLA>) => {
     try {

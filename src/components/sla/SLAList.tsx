@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,9 +11,10 @@ import { slaApi } from "@/utils/api/slaApi";
 
 type SLAListProps = {
   entityType?: string;
+  showActive?: boolean;
 };
 
-const SLAList = ({ entityType }: SLAListProps) => {
+const SLAList = ({ entityType, showActive }: SLAListProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -44,11 +44,17 @@ const SLAList = ({ entityType }: SLAListProps) => {
     queryClient.invalidateQueries({ queryKey: ['slas'] });
   };
 
-  // Filter SLAs based on entityType if provided
+  // Filter SLAs based on entityType and active status
   const filteredSLAs = slas.filter(sla => {
+    // Filter by active status if showActive is defined
+    if (showActive !== undefined && sla.isActive !== showActive) {
+      return false;
+    }
+    
+    // Filter by entity type if provided
     if (!entityType) return true;
     if (entityType === 'incident' && sla.ticketType === 'incident') return true;
-    if (entityType === 'service-request' && sla.ticketType === 'service_request') return true;
+    if (entityType === 'service-request' && sla.ticketType === 'service') return true;
     return false;
   });
 

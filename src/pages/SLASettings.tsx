@@ -5,12 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Plus, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SLAList from '@/components/sla/SLAList';
-import SLAForm from '@/components/sla/SLAForm';
 import { useDisclosure } from '@/hooks/useDisclosure';
 import { SLAModal } from '@/components/sla/SLAModal';
+import { SLA } from '@/utils/types/sla';
 
 const SLASettings = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  
+  const handleSaveSLA = (slaData: Partial<SLA>) => {
+    // Handle saving the SLA
+    onClose();
+  };
   
   return (
     <PageTransition>
@@ -43,7 +48,11 @@ const SLASettings = () => {
           </TabsContent>
         </Tabs>
         
-        <SLAModal isOpen={isOpen} onClose={onClose} />
+        <SLAModal 
+          isOpen={isOpen} 
+          onClose={onClose} 
+          onSave={handleSaveSLA}
+        />
       </div>
     </PageTransition>
   );
