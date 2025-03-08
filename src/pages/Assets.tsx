@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AssetList from '@/components/assets/AssetList';
@@ -16,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
+import { getUserNameById } from '@/utils/userUtils';
+import { getAllUsers } from '@/utils/mockData/users';
 
 const Assets: React.FC = () => {
   const navigate = useNavigate();
@@ -141,6 +142,8 @@ const Assets: React.FC = () => {
     }
   };
 
+  const allUsers = getAllUsers();
+
   if (loading && !isEditingAsset) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -220,7 +223,7 @@ const Assets: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="text-sm font-medium">Assigned To</h3>
-                    <p className="mt-1 text-sm">{selectedAsset.assignedTo || 'Unassigned'}</p>
+                    <p className="mt-1 text-sm">{getUserNameById(selectedAsset.assignedTo)}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium">Purchase Date</h3>
@@ -352,9 +355,24 @@ const Assets: React.FC = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Assigned To</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value || ""}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Assign to user" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="">Unassigned</SelectItem>
+                              {allUsers.map(user => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}

@@ -3,8 +3,9 @@ import React from 'react';
 import { Asset } from '@/utils/types/asset';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Cpu, HardDrive, Info, Server, Smartphone } from 'lucide-react';
+import { CalendarDays, Cpu, HardDrive, Info, Server, Smartphone, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { getUserNameById } from '@/utils/userUtils';
 
 interface AssetCardProps {
   asset: Asset;
@@ -80,6 +81,12 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset, onClick }) => {
             <div className="text-sm font-medium truncate">{asset.serialNumber || "N/A"}</div>
           </div>
         </div>
+        {asset.assignedTo && (
+          <div className="mt-2 flex items-center gap-1 text-sm">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
+            <span>{getUserNameById(asset.assignedTo)}</span>
+          </div>
+        )}
       </CardContent>
       <CardFooter className="pt-0">
         <div className="flex items-center text-xs text-muted-foreground">
