@@ -162,7 +162,7 @@ const StatusSynchronizationConfig = () => {
             <div className="pt-4 flex justify-end">
               <Button 
                 variant="outline" 
-                onClick={() => refresh()}
+                onClick={refresh}
                 disabled={isLoading}
               >
                 Reset to Defaults

@@ -7,7 +7,8 @@ import {
   getStatusSynchronizationSettings, 
   updateStatusSynchronizationSettings,
   getMandatoryFieldsConfig,
-  updateMandatoryFieldsConfig
+  updateMandatoryFieldsConfig,
+  synchronizeReleaseStatus
 } from '@/api/statusSynchronization';
 
 export const useStatusSynchronization = () => {
@@ -107,6 +108,21 @@ export const useStatusSynchronization = () => {
     fetchSettings();
   };
 
+  // Add the missing handleStatusChange function
+  const handleStatusChange = async (releaseId: string, status: string) => {
+    if (!settings.enableCascadingUpdates) {
+      return { updatedItems: 0 };
+    }
+    
+    try {
+      const result = await synchronizeReleaseStatus(releaseId, status);
+      return result;
+    } catch (error) {
+      console.error('Error synchronizing status:', error);
+      throw error;
+    }
+  };
+
   return {
     settings,
     updateSettings,
@@ -116,5 +132,6 @@ export const useStatusSynchronization = () => {
     error,
     validateConfiguration,
     refresh,
+    handleStatusChange,
   };
 };

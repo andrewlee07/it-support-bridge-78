@@ -1,6 +1,7 @@
 
 import { StatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
 import { MandatoryFieldConfig, ConfigurableEntityType } from '@/utils/types/configuration';
+import { synchronizeBacklogItemsForRelease } from '@/utils/mockData/backlog/backlogReleaseOperations';
 
 // Simulate API delay
 const apiDelay = () => new Promise(resolve => setTimeout(resolve, 500));
@@ -96,4 +97,29 @@ export const updateMandatoryFieldsConfig = async (
   await apiDelay();
   mandatoryFieldsConfig[entityType] = [...fields];
   return [...fields];
+};
+
+// Synchronize release status with related items
+export const synchronizeReleaseStatus = async (
+  releaseId: string, 
+  status: string
+): Promise<{ updatedItems: number }> => {
+  await apiDelay();
+  
+  // Only proceed if cascading updates are enabled
+  if (!statusSynchronizationSettings.enableCascadingUpdates) {
+    return { updatedItems: 0 };
+  }
+  
+  try {
+    // Synchronize backlog items
+    const updatedCount = await synchronizeBacklogItemsForRelease(releaseId);
+    
+    // In a real implementation, we'd also synchronize bugs here
+    
+    return { updatedItems: updatedCount };
+  } catch (error) {
+    console.error('Error synchronizing release status:', error);
+    return { updatedItems: 0 };
+  }
 };

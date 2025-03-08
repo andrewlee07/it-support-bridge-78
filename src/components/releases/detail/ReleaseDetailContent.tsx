@@ -49,7 +49,7 @@ const ReleaseDetailContent: React.FC<ReleaseDetailContentProps> = ({
     // Then trigger synchronization if enabled
     if (settings.enableCascadingUpdates) {
       try {
-        const result = await handleStatusChange(releaseId, status as any);
+        const result = await handleStatusChange(releaseId, status);
         if (result.updatedItems > 0 && settings.notifyOnStatusChange) {
           toast.info(
             <div className="flex flex-col space-y-1">

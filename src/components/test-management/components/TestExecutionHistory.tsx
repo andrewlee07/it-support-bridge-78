@@ -1,149 +1,141 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { History, Bug } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { formatDistanceToNow } from 'date-fns';
 import { TestExecution } from '@/utils/types/test/testExecution';
+import { Bug } from '@/utils/types/test/bug';
 import { TestStatus } from '@/utils/types/test/testStatus';
-import StatusBadge from '../ui/StatusBadge';
-import { Bug as BugType } from '@/utils/types/test/bug';
 
-// Mock function to get test executions for a test case
-const getTestExecutions = async (testCaseId: string): Promise<TestExecution[]> => {
-  // This would be replaced with an actual API call
-  console.log(`Fetching executions for test case ${testCaseId}`);
-  
-  // Mock data
-  return [
-    {
-      id: '1',
-      testCaseId,
-      status: 'pass',
-      executedBy: 'John Doe',
-      executedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
-      comments: 'All steps passed successfully',
-      environment: 'Production',
-      duration: 120, // seconds
-    },
-    {
-      id: '2',
-      testCaseId,
-      status: 'fail',
-      executedBy: 'Jane Smith',
-      executedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), // 5 days ago
-      comments: 'Step 3 failed, could not complete the operation',
-      environment: 'Staging',
-      duration: 95, // seconds
-      bugId: 'bug-123'
-    }
-  ];
-};
-
-// Mock function to get a bug by ID
-const getBugById = async (bugId: string): Promise<BugType | null> => {
-  // This would be replaced with an actual API call
-  console.log(`Fetching bug ${bugId}`);
-  
-  // Mock data
-  return {
-    id: bugId,
-    title: 'Cannot complete operation in step 3',
-    description: 'When attempting to submit the form, an error is displayed',
-    status: 'open',
-    severity: 'medium',
-    priority: 'high',
-    stepsToReproduce: [
-      'Go to the form page',
-      'Fill in all required fields',
-      'Click submit'
-    ],
-    expectedResults: 'Form should be submitted successfully',
-    actualResults: 'Error is displayed: "Operation failed"',
-    assignedTo: 'dev-user',
-    createdBy: 'Jane Smith',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
-    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2)
-  };
-};
-
-export interface TestExecutionHistoryProps {
+interface TestExecutionHistoryProps {
   testCaseId: string;
 }
 
-const TestExecutionHistory: React.FC<TestExecutionHistoryProps> = ({ testCaseId }) => {
-  // Fetch test execution history
-  const { data: executions, isLoading } = useQuery({
-    queryKey: ['testExecutions', testCaseId],
-    queryFn: () => getTestExecutions(testCaseId),
-    enabled: !!testCaseId
-  });
+// Mock data for demonstration purposes
+const mockTestExecutions: TestExecution[] = [
+  {
+    id: 'exec-1',
+    testCaseId: 'test-1',
+    testCycleId: 'cycle-1',
+    status: 'pass',
+    comments: 'Test passed successfully',
+    executedBy: 'user-1',
+    executionDate: new Date(2023, 5, 15),
+    linkedBugs: []
+  },
+  {
+    id: 'exec-2',
+    testCaseId: 'test-1',
+    testCycleId: 'cycle-2',
+    status: 'fail',
+    comments: 'Test failed due to login issue',
+    executedBy: 'user-2',
+    executionDate: new Date(2023, 6, 20),
+    linkedBugs: ['bug-1']
+  }
+];
+
+// Mock bug data
+const mockBugs: Bug[] = [
+  {
+    id: 'bug-1',
+    title: 'Login failure',
+    description: 'Users unable to login with correct credentials',
+    stepsToReproduce: ['Navigate to login page', 'Enter credentials', 'Click login button'],
+    severity: 'critical',
+    priority: 'high',
+    status: 'open',
+    createdAt: new Date(2023, 6, 20),
+    updatedAt: new Date(2023, 6, 21),
+    createdBy: 'user-2'
+  }
+];
+
+const getStatusBadgeVariant = (status: TestStatus) => {
+  switch (status) {
+    case 'pass':
+    case 'passed':
+      return 'success';
+    case 'fail':
+    case 'failed':
+      return 'destructive';
+    case 'blocked':
+      return 'warning';
+    default:
+      return 'outline';
+  }
+};
+
+export const TestExecutionHistory: React.FC<TestExecutionHistoryProps> = ({ testCaseId }) => {
+  // In a real app, fetch these based on the testCaseId
+  const executions = mockTestExecutions.filter(exec => exec.testCaseId === testCaseId);
   
-  // Get bug details for any executions with bugs
-  const bugsToFetch = executions?.filter(exec => exec.bugId) || [];
-  
-  const getBugDetails = async (bugId: string) => {
-    if (!bugId) return null;
-    return getBugById(bugId);
-  };
-  
+  if (executions.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Execution History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">No execution history available for this test case.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg flex items-center gap-2">
-          <History className="h-5 w-5" />
-          Execution History
-        </CardTitle>
-        <CardDescription>
-          Past test executions and results
-        </CardDescription>
+        <CardTitle>Execution History</CardTitle>
       </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="animate-pulse p-4 rounded-lg border">Loading execution history...</div>
-        ) : !executions || executions.length === 0 ? (
-          <div className="text-center p-4 border rounded-lg text-muted-foreground">
-            No execution history available for this test case
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {executions.map((execution) => (
-              <div key={execution.id} className="border rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <StatusBadge status={execution.status as TestStatus} size="sm" />
-                      <span className="text-muted-foreground text-sm">
-                        {format(new Date(execution.executedAt), 'MMM d, yyyy h:mm a')}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-sm font-medium">
-                      Executed by: {execution.executedBy}
-                    </div>
+      <CardContent className="space-y-4">
+        {executions.map((execution) => {
+          // Find linked bugs for this execution
+          const linkedBugs = execution.linkedBugs?.map(bugId => 
+            mockBugs.find(bug => bug.id === bugId)
+          ).filter(Boolean) as Bug[];
+          
+          return (
+            <div key={execution.id} className="border rounded-md p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge variant={getStatusBadgeVariant(execution.status)}>
+                      {execution.status.toUpperCase()}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      {execution.executionDate ? formatDistanceToNow(new Date(execution.executionDate), { addSuffix: true }) : 'Unknown date'}
+                    </span>
                   </div>
-                  {execution.bugId && (
-                    <div className="flex items-center text-sm text-red-500">
-                      <Bug className="h-4 w-4 mr-1" />
-                      Bug reported
-                    </div>
-                  )}
+                  <p className="text-sm">{execution.comments}</p>
                 </div>
-                
-                {execution.comments && (
-                  <div className="mt-2 text-sm border-t pt-2">
-                    <div className="font-medium mb-1">Comments:</div>
-                    <div className="text-muted-foreground">{execution.comments}</div>
-                  </div>
-                )}
-                
-                <div className="mt-2 flex text-xs text-muted-foreground">
-                  <div className="mr-4">Environment: {execution.environment}</div>
-                  <div>Duration: {execution.duration} seconds</div>
+                <div className="text-sm text-right">
+                  <p>Executed by: User {execution.executedBy}</p>
+                  <p>Cycle: {execution.testCycleId}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+              
+              {linkedBugs.length > 0 && (
+                <>
+                  <Separator className="my-3" />
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Linked Bugs:</h4>
+                    {linkedBugs.map(bug => (
+                      <div key={bug.id} className="bg-muted p-2 rounded-sm mb-2">
+                        <div className="flex justify-between">
+                          <span className="font-medium">{bug.title}</span>
+                          <Badge>{bug.status}</Badge>
+                        </div>
+                        <p className="text-sm mt-1">{bug.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );

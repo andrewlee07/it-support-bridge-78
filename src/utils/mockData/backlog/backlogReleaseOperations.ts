@@ -94,9 +94,9 @@ export const removeFromRelease = (itemId: string): ApiResponse<BacklogItem> => {
 const updateItemStatusBasedOnRelease = async (itemIndex: number, releaseId: string) => {
   try {
     // Get synchronization settings
-    const settingsResponse = await getStatusSynchronizationSettings();
+    const settings = await getStatusSynchronizationSettings();
     
-    if (!settingsResponse.success || !settingsResponse.data.enableCascadingUpdates) {
+    if (!settings.enableCascadingUpdates) {
       return;
     }
     
@@ -108,7 +108,6 @@ const updateItemStatusBasedOnRelease = async (itemIndex: number, releaseId: stri
     }
     
     const release = releaseResponse.data;
-    const settings = settingsResponse.data;
     
     // Get the mapped status for the release status
     const newStatus = settings.releaseToBacklogMapping[release.status];

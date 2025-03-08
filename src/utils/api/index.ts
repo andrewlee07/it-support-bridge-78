@@ -1,30 +1,83 @@
 
-// Re-export API functions from various modules for convenient importing
-export * from './assetApi';
-export * from './backlogApi';
-export * from './bugApi';
-export * from './changeApi';
-export * from './dashboardApi';
-export * from './emailApi';
-export * from './dropdownConfigurationApi';
-export * from './releaseApi';
-export * from './slaApi';
-export * from './ticketApi';
-export * from './userApi';
+// Import and re-export all API functionality from separate modules
+import * as releaseApi from './releaseApi';
+import * as testApi from './testApi';
+import * as ticketApi from './ticketApi';
+import * as userApi from './userApi';
+import * as configApi from './configApi';
+import * as searchApi from './searchApi';
+import * as testIntegration from './test-integration';
 
-// Test Integration APIs
-// Explicitly re-export to avoid ambiguity with duplicate exports
+// Re-export namespaces
+export { releaseApi, testApi, ticketApi, userApi, configApi, searchApi, testIntegration };
+
+// Import backlog API with explicit named imports to avoid conflicts
+import {
+  backlogItems,
+  fetchBacklogItems,
+  fetchBacklogItemById,
+  createBacklogItem,
+  updateBacklogItem,
+  assignToRelease,
+  removeFromRelease,
+  getBacklogStats,
+  getBacklogItemsByReleaseId,
+  deleteBacklogItem,
+  addAttachment,
+  removeAttachment,
+  addComment as addBacklogComment,
+  updateComment,
+  deleteComment,
+  addWatcher,
+  removeWatcher
+} from './backlogApi';
+
+// Re-export backlog functions with renamed comment function
 export {
-  linkTestCaseToBacklogItem,
-  unlinkTestCaseFromBacklogItem,
-  getLinkedTestCases,
-  getBacklogItemCoverage,
-  getUnlinkedTestCases,
-  // Avoid re-exporting getTraceabilityMatrix from here since it's also exported from testBacklogIntegrationApi
-} from './test-integration';
+  backlogItems,
+  fetchBacklogItems,
+  fetchBacklogItemById,
+  createBacklogItem,
+  updateBacklogItem,
+  assignToRelease,
+  removeFromRelease,
+  getBacklogStats,
+  getBacklogItemsByReleaseId,
+  deleteBacklogItem,
+  addAttachment,
+  removeAttachment,
+  addBacklogComment,
+  updateComment,
+  deleteComment,
+  addWatcher,
+  removeWatcher
+};
 
-export * from './testBacklogIntegrationApi';
-export * from './testReleaseApi';
-
-// Email notification API
-export * from './emailNotificationApi';
+// For backward compatibility
+export default {
+  release: releaseApi,
+  test: testApi,
+  ticket: ticketApi,
+  user: userApi,
+  config: configApi,
+  search: searchApi,
+  backlog: {
+    backlogItems,
+    fetchBacklogItems,
+    fetchBacklogItemById,
+    createBacklogItem,
+    updateBacklogItem,
+    assignToRelease,
+    removeFromRelease,
+    getBacklogStats,
+    getBacklogItemsByReleaseId,
+    deleteBacklogItem,
+    addAttachment,
+    removeAttachment,
+    addComment: addBacklogComment,
+    updateComment,
+    deleteComment,
+    addWatcher,
+    removeWatcher
+  }
+};
