@@ -3,12 +3,9 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import Navbar from '@/components/shared/Navbar';
 import Sidebar from '@/components/shared/Sidebar';
 import { cn } from '@/lib/utils';
+import { Outlet } from 'react-router-dom';
 
-interface MainLayoutProps {
-  children: ReactNode;
-}
-
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
@@ -55,7 +52,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           "px-4 py-6 md:px-6 md:py-8 min-h-[calc(100vh-4rem)]",
           "transition-all duration-300 ease-in-out"
         )}>
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>

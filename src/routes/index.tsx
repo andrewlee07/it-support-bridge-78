@@ -51,18 +51,16 @@ const routes: RouteObject[] = [
   },
   {
     path: '/',
+    element: <Index />,
+  },
+  {
+    path: '/',
     element: (
       <ProtectedRoute>
-        <MainLayout>
-          <Index />
-        </MainLayout>
+        <MainLayout />
       </ProtectedRoute>
     ),
     children: [
-      {
-        index: true,
-        element: <Index />,
-      },
       {
         path: 'dashboard',
         element: <Dashboard />,
