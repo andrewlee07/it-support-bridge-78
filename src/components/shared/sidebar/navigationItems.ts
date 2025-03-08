@@ -139,7 +139,7 @@ export const settingsItems = [
     name: "Risk Assessment",
     path: "/settings/risk-assessment",
     href: "/settings/risk-assessment",
-    icon: BarChartIcon,
+    icon: BarChart2Icon,
     allowedRoles: ['admin']
   },
 ];
