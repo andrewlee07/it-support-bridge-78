@@ -57,7 +57,7 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
   }, [isPendingStatus, form]);
 
   return (
-    <div className="border p-4 rounded-md bg-muted/30">
+    <div>
       <h3 className="text-md font-medium mb-3">Update {isServiceRequest ? 'Request' : 'Incident'}</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -113,7 +113,7 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
                 <FormLabel>Assign To</FormLabel>
                 <Select 
                   onValueChange={field.onChange} 
-                  defaultValue={field.value || ""}
+                  defaultValue={field.value || "unassigned"}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -121,7 +121,7 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">Unassigned</SelectItem>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
                     <SelectItem value="user-1">John Smith</SelectItem>
                     <SelectItem value="user-2">Alice Johnson</SelectItem>
                     <SelectItem value="user-3">Robert Chen</SelectItem>
