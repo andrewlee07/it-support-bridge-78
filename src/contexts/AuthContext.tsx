@@ -61,35 +61,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setLoading(true);
       
-      // In a real app, we would validate password against stored hash
-      // For demo purposes, we'll accept any non-empty password
+      // Validate inputs
       if (!email || !password) {
         console.log("Login failed: Email or password is empty");
         setLoading(false);
         return false;
       }
       
+      // For demo purposes - allow login with any of the mock users
+      // or create a generic admin user if the email is not found
+      console.log(`Attempting login with email: ${email} and password: ${password}`);
+      
       // Check if the user exists in our mock data
       const existingUser = getUserByEmail(email);
       
       if (existingUser) {
-        console.log("User found:", existingUser.name);
-        // In a real app, we would validate password here
-        // For demo purposes, any password is accepted for existing users
+        console.log("User found in mock data:", existingUser.name);
+        
+        // In a real app, we would validate the password here
+        // For demo purposes, we'll accept any non-empty password for valid users
         
         const authenticatedUser = {
           ...existingUser,
           sessionStartTime: new Date(),
         };
         
+        console.log("Login successful for existing user");
         setUser(authenticatedUser);
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(authenticatedUser));
         setLoading(false);
         return true;
       } else {
-        console.log("User not found in mock data, using generic admin user");
-        // For testing/demo only - allowing login with any email/password
+        // For testing/demo - allow login with any email/password
+        // This is intentional to make testing easier without requiring specific accounts
+        console.log("User not found in mock data, creating generic admin user");
+        
         const mockUser: User = {
           id: '1',
           name: 'Test User',
@@ -100,6 +107,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           sessionStartTime: new Date(),
         };
         
+        console.log("Login successful with generic user");
         setUser(mockUser);
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(mockUser));
