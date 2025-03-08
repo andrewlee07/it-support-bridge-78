@@ -5,6 +5,7 @@ import TestTracking from '@/pages/TestTracking';
 import Bugs from '@/pages/Bugs';
 import BugDetail from '@/pages/BugDetail';
 import Backlog from '@/pages/Backlog';
+import BacklogKanban from '@/pages/BacklogKanban';
 
 const testManagementRoutes: RouteObject[] = [
   {
@@ -22,6 +23,10 @@ const testManagementRoutes: RouteObject[] = [
   {
     path: 'backlog',
     element: <Backlog />,
+  },
+  {
+    path: 'backlog/kanban',
+    element: <BacklogKanban />,
   },
 ];
 
