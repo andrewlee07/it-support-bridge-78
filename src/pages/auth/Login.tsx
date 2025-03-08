@@ -31,8 +31,9 @@ const Login: React.FC = () => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting login with:", email, "and password:", password ? "provided" : "empty");
+      console.log("Login component: Attempting login with:", email, "and password length:", password.length);
       const success = await login(email, password);
+      console.log("Login component: Login result:", success ? "success" : "failed");
       
       if (success) {
         toast({
@@ -114,6 +115,9 @@ const Login: React.FC = () => {
           </form>
           <div className="mt-6 text-center text-sm">
             <p className="text-[#42284e]/60">Internal Application</p>
+            <p className="mt-2 text-[#b047c9]/70">
+              <small>Try with any email/password or use mock users</small>
+            </p>
           </div>
         </CardContent>
       </Card>

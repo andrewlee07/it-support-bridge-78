@@ -51,26 +51,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+        console.log("User restored from localStorage:", parsedUser.email);
+      } catch (error) {
+        console.error("Error parsing stored user:", error);
+        localStorage.removeItem('user');
+      }
     }
     setLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    console.log("AuthContext: Starting login process");
     try {
       setLoading(true);
       
       // Validate inputs
-      if (!email || !password) {
-        console.log("Login failed: Email or password is empty");
+      if (!email) {
+        console.log("Login failed: Email is empty");
         setLoading(false);
         return false;
       }
       
-      // For demo purposes - allow login with any of the mock users
-      // or create a generic admin user if the email is not found
-      console.log(`Attempting login with email: ${email} and password: ${password}`);
+      if (!password) {
+        console.log("Login failed: Password is empty");
+        setLoading(false);
+        return false;
+      }
+      
+      console.log(`AuthContext: Attempting login with email: ${email}`);
       
       // Check if the user exists in our mock data
       const existingUser = getUserByEmail(email);
