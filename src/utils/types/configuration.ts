@@ -65,6 +65,7 @@ export interface MandatoryFieldConfig {
   isRequired: boolean;
   entityType: ConfigurableEntityType;
   description?: string;
+  isResolutionField?: boolean; // Flag to identify resolution-related fields
 }
 
 // Updated module configuration to include mandatory fields

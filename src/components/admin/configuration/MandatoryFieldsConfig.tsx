@@ -5,9 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { MandatoryFieldConfig, ConfigurableEntityType } from '@/utils/types/configuration';
-import { AlertTriangle, Save } from 'lucide-react';
+import { AlertTriangle, Save, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 interface MandatoryFieldsConfigProps {
   entityType: ConfigurableEntityType;
@@ -50,6 +51,16 @@ const MandatoryFieldsConfig: React.FC<MandatoryFieldsConfigProps> = ({
     setHasChanges(false);
   };
 
+  // Count how many resolution fields are required
+  const requiredResolutionFieldsCount = mandatoryFields.filter(
+    field => field.isResolutionField && field.isRequired
+  ).length;
+  
+  // Count total resolution fields
+  const totalResolutionFieldsCount = mandatoryFields.filter(
+    field => field.isResolutionField
+  ).length;
+
   return (
     <Card>
       <CardHeader>
@@ -67,6 +78,18 @@ const MandatoryFieldsConfig: React.FC<MandatoryFieldsConfigProps> = ({
           </AlertDescription>
         </Alert>
 
+        {totalResolutionFieldsCount > 0 && (
+          <Alert className="bg-blue-50 border-blue-200">
+            <CheckCircle2 className="h-4 w-4 text-blue-500" />
+            <AlertDescription className="flex items-center">
+              <span>Resolution fields: {requiredResolutionFieldsCount} of {totalResolutionFieldsCount} required</span>
+              <span className="ml-2 text-xs text-muted-foreground">
+                (These fields are needed for proper case resolution)
+              </span>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Table>
           <TableHeader>
             <TableRow>
@@ -77,8 +100,15 @@ const MandatoryFieldsConfig: React.FC<MandatoryFieldsConfigProps> = ({
           </TableHeader>
           <TableBody>
             {mandatoryFields.map((field) => (
-              <TableRow key={field.fieldName}>
-                <TableCell className="font-medium">{field.displayName}</TableCell>
+              <TableRow key={field.fieldName} className={field.isResolutionField ? "bg-blue-50" : ""}>
+                <TableCell className="font-medium">
+                  {field.displayName}
+                  {field.isResolutionField && (
+                    <Badge variant="outline" className="ml-2 bg-blue-100 text-blue-800 border-blue-200">
+                      Resolution
+                    </Badge>
+                  )}
+                </TableCell>
                 <TableCell className="text-muted-foreground">{field.description || 'No description'}</TableCell>
                 <TableCell className="text-center">
                   <Switch

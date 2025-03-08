@@ -13,7 +13,8 @@ const closeSchema = z.object({
   status: z.enum(['resolved', 'closed', 'fulfilled'] as const),
   notes: z.string().min(1, "Notes are required"),
   rootCause: z.string().min(1, "Root cause is required"),
-  closureReason: z.string().optional(),
+  closureReason: z.string().min(1, "Closure reason is required"),
+  resolution: z.string().min(1, "Resolution details are required"),
 });
 
 export interface CloseTicketValues {
@@ -21,6 +22,7 @@ export interface CloseTicketValues {
   notes: string;
   rootCause: string;
   closureReason: string;
+  resolution: string;
 }
 
 interface TicketCloseFormProps {
@@ -94,6 +96,24 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
                     placeholder={isServiceRequest 
                       ? "Describe how the request was fulfilled" 
                       : "What was the root cause of this incident?"}
+                    className="min-h-[80px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="resolution"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{isServiceRequest ? 'Resolution Details' : 'Resolution Details'}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Provide detailed information about the resolution"
                     className="min-h-[80px]"
                     {...field}
                   />

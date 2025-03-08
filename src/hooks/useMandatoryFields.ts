@@ -14,7 +14,16 @@ export const useMandatoryFields = (entityType: ConfigurableEntityType) => {
     setIsLoading(true);
     try {
       const fields = await getMandatoryFieldsConfig(entityType);
-      setMandatoryFields(fields);
+      // Group regular fields first, then resolution fields
+      const sortedFields = [...fields].sort((a, b) => {
+        // First by resolution field (non-resolution first)
+        if ((a.isResolutionField || false) !== (b.isResolutionField || false)) {
+          return (a.isResolutionField || false) ? 1 : -1;
+        }
+        // Then by display name
+        return a.displayName.localeCompare(b.displayName);
+      });
+      setMandatoryFields(sortedFields);
       setError(null);
     } catch (err) {
       setError('Failed to load mandatory fields');

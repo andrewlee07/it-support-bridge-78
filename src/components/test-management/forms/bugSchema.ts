@@ -19,6 +19,10 @@ export const bugSchema = z.object({
   assignedDeveloper: z.string().optional(),
   relatedTestCase: z.string().optional(),
   attachment: z.string().optional(),
+  // Resolution fields
+  resolution: z.string().optional().or(z.string().min(10, { message: 'Resolution must be at least 10 characters.' })),
+  rootCause: z.string().optional().or(z.string().min(5, { message: 'Root cause must be at least 5 characters.' })),
+  fixDetails: z.string().optional(),
 });
 
 export type BugFormValues = z.infer<typeof bugSchema>;

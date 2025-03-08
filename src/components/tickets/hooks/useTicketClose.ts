@@ -27,14 +27,17 @@ export const useTicketClose = ({
       const updatedTickets = tickets.map(ticket => {
         if (ticket.id === selectedTicket.id) {
           const auditMessage = type === 'service'
-            ? `Request ${status}: ${data.rootCause}`
-            : `Ticket ${status}: ${data.closureReason} - Root cause: ${data.rootCause}`;
+            ? `Request ${status}: ${data.rootCause}\nResolution: ${data.resolution}`
+            : `Ticket ${status}: ${data.closureReason}\nRoot cause: ${data.rootCause}\nResolution: ${data.resolution}`;
             
           const updatedTicket = {
             ...ticket,
             status,
             updatedAt: new Date(),
             resolvedAt: new Date(),
+            resolution: data.resolution,
+            rootCause: data.rootCause,
+            closureReason: data.closureReason,
             audit: addAuditEntry(
               ticket.audit,
               ticket.id,
