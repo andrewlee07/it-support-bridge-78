@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { getUserByEmail } from '@/utils/mockData/users';
+import { getUserByEmail, mockUsers } from '@/utils/mockData/users';
 
 type User = {
   id: string;
@@ -61,11 +61,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setLoading(true);
       
-      // First check if the user exists in our mock data
+      // In a real app, we would validate password against stored hash
+      // For demo purposes, we'll accept any non-empty password
+      if (!email || !password) {
+        console.log("Login failed: Email or password is empty");
+        setLoading(false);
+        return false;
+      }
+      
+      // Check if the user exists in our mock data
       const existingUser = getUserByEmail(email);
       
       if (existingUser) {
-        // Use the existing user data
+        console.log("User found:", existingUser.name);
+        // In a real app, we would validate password here
+        // For demo purposes, any password is accepted for existing users
+        
         const authenticatedUser = {
           ...existingUser,
           sessionStartTime: new Date(),
@@ -77,7 +88,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setLoading(false);
         return true;
       } else {
-        // For demo purposes, allow login with any credentials
+        console.log("User not found in mock data, using generic admin user");
+        // For testing/demo only - allowing login with any email/password
         const mockUser: User = {
           id: '1',
           name: 'Test User',

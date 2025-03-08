@@ -31,6 +31,7 @@ const Login: React.FC = () => {
     setIsLoading(true);
     
     try {
+      console.log("Attempting login with:", email);
       const success = await login(email, password);
       
       if (success) {
@@ -52,6 +53,7 @@ const Login: React.FC = () => {
         });
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Error",
         description: "An error occurred. Please try again.",
