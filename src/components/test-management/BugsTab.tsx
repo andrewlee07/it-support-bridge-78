@@ -4,6 +4,15 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchBugs } from '@/utils/mockData/testData';
 import BugList from './BugList';
 import { Bug } from '@/utils/types/testTypes';
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription 
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
 
 const BugsTab = () => {
   // Fetch bugs
@@ -40,13 +49,25 @@ const BugsTab = () => {
     : [];
 
   return (
-    <div className="space-y-4">
-      {isLoadingBugs ? (
-        <div className="animate-pulse p-4 rounded-lg border">Loading bugs...</div>
-      ) : (
-        <BugList bugs={typedBugs} />
-      )}
-    </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Bugs</CardTitle>
+          <CardDescription>Track and manage bugs</CardDescription>
+        </div>
+        <Button size="sm">
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Add Bug
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {isLoadingBugs ? (
+          <div className="animate-pulse p-4 rounded-lg border">Loading bugs...</div>
+        ) : (
+          <BugList bugs={typedBugs} />
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

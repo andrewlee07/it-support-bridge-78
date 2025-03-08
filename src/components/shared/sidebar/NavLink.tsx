@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NavigationItem } from './types';
 
@@ -11,6 +11,8 @@ interface NavLinkProps {
 }
 
 const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
+  const location = useLocation();
+  
   // Skip rendering if item has no path or href
   if (!item.href && !item.path) return null;
   

@@ -41,7 +41,7 @@ const Sidebar = () => {
   
   const isActiveRoute = (path: string | undefined): boolean => {
     if (!path) return false;
-    return location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
+    return location.pathname === path || location.pathname.startsWith(path);
   };
   
   // Function to check if user has permission for the menu item
