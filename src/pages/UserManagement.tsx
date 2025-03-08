@@ -10,6 +10,7 @@ import AddUserDialog from '@/components/users/AddUserDialog';
 import RemoveUserDialog from '@/components/users/RemoveUserDialog';
 import ChangeRoleDialog from '@/components/users/ChangeRoleDialog';
 import ImportUsersDialog from '@/components/users/ImportUsersDialog';
+import EditUserDialog from '@/components/users/EditUserDialog';
 import { useAuth } from '@/contexts/AuthContext';
 
 const UserManagement = () => {
@@ -26,6 +27,7 @@ const UserManagement = () => {
     handleViewUser,
     handleAddUser,
     handleRemoveUser,
+    handleUpdateUser,
     handleChangeRole,
     handleToggleUserStatus,
     handleImportUsers,
@@ -39,6 +41,10 @@ const UserManagement = () => {
   const [removeUserDialogOpen, setRemoveUserDialogOpen] = useState(false);
   const [changeRoleDialogOpen, setChangeRoleDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
+
+  // Get selected user for editing
+  const selectedUser = selectedUserId ? users.find(u => u.id === selectedUserId) || null : null;
 
   return (
     <PageTransition>
@@ -78,6 +84,10 @@ const UserManagement = () => {
                 setChangeRoleDialogOpen(true);
               }}
               onToggleStatus={handleToggleUserStatus}
+              onEditUser={(id) => {
+                setSelectedUserId(id);
+                setEditUserDialogOpen(true);
+              }}
             />
           </TabsContent>
           
@@ -98,6 +108,10 @@ const UserManagement = () => {
                 setChangeRoleDialogOpen(true);
               }}
               onToggleStatus={handleToggleUserStatus}
+              onEditUser={(id) => {
+                setSelectedUserId(id);
+                setEditUserDialogOpen(true);
+              }}
             />
           </TabsContent>
           
@@ -118,6 +132,10 @@ const UserManagement = () => {
                 setChangeRoleDialogOpen(true);
               }}
               onToggleStatus={handleToggleUserStatus}
+              onEditUser={(id) => {
+                setSelectedUserId(id);
+                setEditUserDialogOpen(true);
+              }}
             />
           </TabsContent>
           
@@ -138,6 +156,10 @@ const UserManagement = () => {
                 setChangeRoleDialogOpen(true);
               }}
               onToggleStatus={handleToggleUserStatus}
+              onEditUser={(id) => {
+                setSelectedUserId(id);
+                setEditUserDialogOpen(true);
+              }}
             />
           </TabsContent>
         </Tabs>
@@ -179,6 +201,13 @@ const UserManagement = () => {
         open={importDialogOpen}
         onOpenChange={setImportDialogOpen}
         onImportUsers={handleImportUsers}
+      />
+
+      <EditUserDialog
+        open={editUserDialogOpen}
+        onOpenChange={setEditUserDialogOpen}
+        user={selectedUser}
+        onUpdateUser={handleUpdateUser}
       />
     </PageTransition>
   );

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from '@/utils/types/user';
-import { Pencil, Trash2, UserCheck, UserX } from 'lucide-react';
+import { Pencil, Edit2, Trash2, UserCheck, UserX } from 'lucide-react';
 
 interface UserCardProps {
   user: User;
@@ -13,6 +13,7 @@ interface UserCardProps {
   onRemoveUser: (userId: string) => void;
   onChangeRole: (userId: string) => void;
   onToggleStatus: (userId: string) => void;
+  onEditUser: (userId: string) => void;
 }
 
 const UserCard: React.FC<UserCardProps> = ({ 
@@ -20,7 +21,8 @@ const UserCard: React.FC<UserCardProps> = ({
   onClick, 
   onRemoveUser, 
   onChangeRole,
-  onToggleStatus 
+  onToggleStatus,
+  onEditUser
 }) => {
   // Get the first letter of each name part
   const getInitials = (name: string) => {
@@ -94,7 +96,15 @@ const UserCard: React.FC<UserCardProps> = ({
         <p className="text-sm mt-1">Department: <span className="text-muted-foreground">{user.department}</span></p>
         {user.title && <p className="text-sm">Title: <span className="text-muted-foreground">{user.title}</span></p>}
       </div>
-      <div className="flex gap-2 mt-4 pt-3 border-t">
+      <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={(e) => handleActionClick(e, () => onEditUser(user.id))}
+          className="flex-1"
+        >
+          <Edit2 className="h-3.5 w-3.5 mr-1" /> Edit
+        </Button>
         <Button 
           variant="outline" 
           size="sm" 

@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 interface ImportUsersDialogProps {
   open: boolean;
@@ -21,16 +22,39 @@ const ImportUsersDialog: React.FC<ImportUsersDialogProps> = ({
     const file = event.target.files?.[0];
     if (!file) return;
     
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      const success = onImportUsers(content);
-      if (success) {
-        onOpenChange(false);
-      }
-    };
-    
-    reader.readAsText(file);
+    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+      // Handle Excel files
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = e.target?.result;
+          const workbook = XLSX.read(data, { type: 'binary' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          
+          const jsonString = JSON.stringify(jsonData);
+          const success = onImportUsers(jsonString);
+          if (success) {
+            onOpenChange(false);
+          }
+        } catch (error) {
+          console.error("Excel import error:", error);
+        }
+      };
+      reader.readAsBinaryString(file);
+    } else if (file.name.endsWith('.json')) {
+      // Handle JSON files
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        const success = onImportUsers(content);
+        if (success) {
+          onOpenChange(false);
+        }
+      };
+      reader.readAsText(file);
+    }
   };
 
   return (
@@ -39,7 +63,7 @@ const ImportUsersDialog: React.FC<ImportUsersDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Import Users</DialogTitle>
           <DialogDescription>
-            Upload a JSON file with user data
+            Upload an Excel (.xlsx) or JSON file with user data
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -56,12 +80,17 @@ const ImportUsersDialog: React.FC<ImportUsersDialogProps> = ({
                 type="file"
                 ref={fileInputRef}
                 className="hidden"
-                accept=".json"
+                accept=".xlsx,.xls,.json"
                 onChange={handleFileChange}
               />
             </div>
             <div className="text-sm text-muted-foreground">
               <p className="font-medium mb-1">Expected format:</p>
+              <p className="mb-1">For Excel files, ensure your spreadsheet has these columns:</p>
+              <pre className="bg-muted p-2 rounded-md overflow-x-auto text-xs">
+                name, email, role, department, title, active
+              </pre>
+              <p className="mt-2 mb-1">For JSON files:</p>
               <pre className="bg-muted p-2 rounded-md overflow-x-auto text-xs">
 {`[
   {

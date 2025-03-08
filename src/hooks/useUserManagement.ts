@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { mockUsers } from '@/utils/mockData/users';
 import { User, UserRole } from '@/utils/types/user';
 import { useToast } from '@/hooks/use-toast';
+import * as XLSX from 'xlsx';
 
 export const useUserManagement = () => {
   const [users, setUsers] = useState(mockUsers);
@@ -95,6 +96,25 @@ export const useUserManagement = () => {
     });
   };
 
+  const handleUpdateUser = (updatedUserData: Partial<User>) => {
+    if (!selectedUserId) return;
+    
+    // In a real app, this would make an API call
+    const updatedUsers = users.map(user => {
+      if (user.id === selectedUserId) {
+        return { ...user, ...updatedUserData };
+      }
+      return user;
+    });
+    
+    setUsers(updatedUsers);
+    
+    toast({
+      title: "User updated",
+      description: "User details have been updated successfully."
+    });
+  };
+
   const handleChangeRole = () => {
     if (!selectedUserId) return;
     
@@ -174,7 +194,7 @@ export const useUserManagement = () => {
       } else {
         toast({
           title: "Import failed",
-          description: "Invalid format. Please upload a valid JSON file.",
+          description: "Invalid format. Please upload a valid file.",
           variant: "destructive"
         });
       }
@@ -182,7 +202,7 @@ export const useUserManagement = () => {
       console.error("Import error:", error);
       toast({
         title: "Import failed",
-        description: "Could not parse the file. Please ensure it's valid JSON.",
+        description: "Could not parse the file. Please ensure it's valid.",
         variant: "destructive"
       });
     }
@@ -190,19 +210,36 @@ export const useUserManagement = () => {
   };
 
   const handleExportUsers = () => {
-    const dataStr = JSON.stringify(users, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const exportFileDefaultName = 'users-export.json';
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-    
-    toast({
-      title: "Users exported",
-      description: "User data has been exported successfully."
-    });
+    try {
+      // Create worksheet from the users data
+      const worksheet = XLSX.utils.json_to_sheet(users.map(user => ({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        title: user.title || '',
+        active: user.active
+      })));
+      
+      // Create workbook and add the worksheet
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+      
+      // Generate Excel file
+      XLSX.writeFile(workbook, 'users-export.xlsx');
+      
+      toast({
+        title: "Users exported",
+        description: "User data has been exported successfully."
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the users.",
+        variant: "destructive"
+      });
+    }
   };
 
   return {
@@ -219,6 +256,7 @@ export const useUserManagement = () => {
     handleViewUser,
     handleAddUser,
     handleRemoveUser,
+    handleUpdateUser,
     handleChangeRole,
     handleToggleUserStatus,
     handleImportUsers,

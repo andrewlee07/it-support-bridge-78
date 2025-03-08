@@ -1,31 +1,35 @@
 
 import React from 'react';
-import { User } from '@/utils/types/user';
 import UserCard from './UserCard';
+import { User } from '@/utils/types/user';
 
 interface UserListProps {
   users: User[];
   onViewUser: (userId: string) => void;
-  onRemoveUser?: (userId: string) => void;
-  onChangeRole?: (userId: string) => void;
-  onToggleStatus?: (userId: string) => void;
+  onRemoveUser: (userId: string) => void;
+  onChangeRole: (userId: string) => void;
+  onToggleStatus: (userId: string) => void;
+  onEditUser: (userId: string) => void;
 }
 
 const UserList: React.FC<UserListProps> = ({ 
   users, 
-  onViewUser,
-  onRemoveUser = () => {},
-  onChangeRole = () => {},
-  onToggleStatus = () => {}
+  onViewUser, 
+  onRemoveUser, 
+  onChangeRole, 
+  onToggleStatus,
+  onEditUser
 }) => {
+  if (users.length === 0) {
+    return (
+      <div className="text-center p-8 border rounded-md bg-muted/10">
+        <p className="text-muted-foreground">No users found</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {users.length === 0 && (
-        <div className="col-span-full py-10 text-center">
-          <p className="text-muted-foreground">No users found</p>
-        </div>
-      )}
-      
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {users.map(user => (
         <UserCard 
           key={user.id} 
@@ -34,6 +38,7 @@ const UserList: React.FC<UserListProps> = ({
           onRemoveUser={onRemoveUser}
           onChangeRole={onChangeRole}
           onToggleStatus={onToggleStatus}
+          onEditUser={onEditUser}
         />
       ))}
     </div>
