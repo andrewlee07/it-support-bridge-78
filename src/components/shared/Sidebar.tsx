@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import NavLink from './sidebar/NavLink';
@@ -11,7 +11,6 @@ import GlobalSearch from './search/GlobalSearch';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -26,12 +25,9 @@ const Sidebar = () => {
       const newIsMobile = window.innerWidth < 768;
       setIsMobile(newIsMobile);
       
-      // Auto-collapse on mobile, expand on desktop
+      // Auto-collapse on mobile
       if (newIsMobile && !collapsed) {
         setCollapsed(true);
-      } else if (!newIsMobile && collapsed && !mobileOpen) {
-        // Only auto-expand on desktop if it wasn't explicitly collapsed by user
-        setCollapsed(false);
       }
     };
     
@@ -41,14 +37,7 @@ const Sidebar = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [collapsed, mobileOpen]);
-  
-  // Close mobile sidebar when route changes
-  useEffect(() => {
-    if (isMobile) {
-      setMobileOpen(false);
-    }
-  }, [location.pathname, isMobile]);
+  }, [collapsed]);
   
   const isActiveRoute = (path: string | undefined): boolean => {
     if (!path) return false;
@@ -65,39 +54,12 @@ const Sidebar = () => {
   // Check if any settings items are accessible to the current user
   const hasSettingsAccess = settingsItems.some(item => hasPermission(item.allowedRoles));
 
-  // Toggle sidebar for mobile view
-  const toggleMobileSidebar = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
   return (
     <>
-      {/* Mobile menu toggle button - fixed to the top left */}
-      <div className="fixed top-4 left-4 z-50 md:hidden">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={toggleMobileSidebar}
-          className="h-10 w-10 rounded-full shadow-md bg-background"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
-      </div>
-      
-      {/* Overlay for mobile menu when open */}
-      {mobileOpen && isMobile && (
-        <div 
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
-          onClick={() => setMobileOpen(false)} 
-        />
-      )}
-      
       <div 
         className={cn(
           "fixed top-0 left-0 bg-sidebar border-r border-border/40 h-screen z-50 transition-all duration-300 ease-in-out",
           collapsed ? "w-16" : "w-64",
-          // On mobile, only show if mobileOpen is true, otherwise collapse to 0 width but keep visible on desktop
-          isMobile && !mobileOpen ? "-translate-x-full" : "translate-x-0"
         )}
       >
         <div className="flex h-16 items-center justify-between border-b border-border/40 px-4">
@@ -158,9 +120,7 @@ const Sidebar = () => {
       {/* Main content wrapper with proper padding to prevent content from being hidden under sidebar */}
       <div className={cn(
         "min-h-screen bg-background transition-all duration-300 ease-in-out",
-        // Always add padding for the sidebar (collapsed or expanded) on desktop
-        // On mobile, only add padding if the menu is visible
-        isMobile && !mobileOpen ? "pl-0" : collapsed ? "pl-16" : "pl-64"
+        collapsed ? "pl-16" : "pl-64"
       )}>
         {/* Content is inserted here */}
       </div>
