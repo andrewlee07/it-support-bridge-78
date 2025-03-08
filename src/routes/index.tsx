@@ -20,6 +20,8 @@ import SecurityQuestionRecovery from '@/pages/SecurityQuestionRecovery';
 import NotFound from '@/pages/NotFound';
 import Index from '@/pages/Index';
 import AdminSettings from '@/pages/AdminSettings';
+import Bugs from '@/pages/Bugs';
+import Backlog from '@/pages/Backlog';
 
 // Admin configuration pages
 import ErrorLogs from '@/pages/admin/ErrorLogs';
@@ -52,7 +54,7 @@ const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MainLayout>
-          <></>
+          <Index />
         </MainLayout>
       </ProtectedRoute>
     ),
@@ -84,6 +86,14 @@ const routes: RouteObject[] = [
       {
         path: 'assets',
         element: <Assets />,
+      },
+      {
+        path: 'backlog',
+        element: <Backlog />,
+      },
+      {
+        path: 'bugs',
+        element: <Bugs />,
       },
       {
         path: 'reports',

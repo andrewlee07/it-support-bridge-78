@@ -17,8 +17,8 @@ import {
   LayoutDashboard,
   Settings2,
   BookText,
-  ChevronDown,
-  ChevronRight,
+  Bug,
+  ListChecks,
 } from 'lucide-react';
 
 import { NavItem } from './types';
@@ -55,6 +55,21 @@ export const navigationItems: NavItem[] = [
     path: '/assets',
   },
   {
+    name: 'Backlog',
+    icon: ListChecks,
+    path: '/backlog',
+  },
+  {
+    name: 'Testing',
+    icon: FlaskConical,
+    path: '/tests',
+  },
+  {
+    name: 'Bugs',
+    icon: Bug,
+    path: '/bugs',
+  },
+  {
     name: 'Reports',
     icon: FileSpreadsheet,
     path: '/reports',
@@ -65,11 +80,6 @@ export const navigationItems: NavItem[] = [
     path: '/calendar',
   },
   {
-    name: 'Testing',
-    icon: FlaskConical,
-    path: '/tests',
-  },
-  {
     name: 'User Management',
     icon: Users2,
     path: '/user-management',
@@ -78,5 +88,6 @@ export const navigationItems: NavItem[] = [
     name: 'Admin Settings',
     icon: Settings2,
     path: '/admin-settings',
+    allowedRoles: ['admin'],
   },
 ];

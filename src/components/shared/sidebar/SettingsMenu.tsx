@@ -18,8 +18,8 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
   // Only show if user has admin permission
   if (!hasPermission(['admin'])) return null;
   
-  // Admin link path
-  const adminPath = '/admin';
+  // Admin link path - updated to admin-settings to match the route
+  const adminPath = '/admin-settings';
   
   // Check if current route is admin
   const isActive = locationPathname.startsWith(adminPath);
