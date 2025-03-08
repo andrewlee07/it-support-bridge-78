@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Upload, Download } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogHeader } from '@/components/ui/dialog';
 import TestCaseForm from './TestCaseForm';
 import { useToast } from '@/hooks/use-toast';
 
@@ -45,6 +45,9 @@ const TestTrackingHeader = () => {
 
       <Dialog open={showTestCaseForm} onOpenChange={setShowTestCaseForm}>
         <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Create New Test Case</DialogTitle>
+          </DialogHeader>
           <TestCaseForm 
             onSuccess={handleTestCaseSuccess} 
             onCancel={() => setShowTestCaseForm(false)} 
