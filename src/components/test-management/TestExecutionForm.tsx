@@ -7,11 +7,12 @@ import {
 import { TestCase } from '@/utils/types/testTypes';
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import BugCreationDialog from './BugCreationDialog';
-import type { Bug as BugType } from '@/utils/types/testTypes';
+import type { Bug as BugType } from '@/utils/types/test';
 import TestCaseInformation from './components/TestCaseInformation';
 import ExecutionCommentsField from './components/ExecutionCommentsField';
 import ExecutionActionButtons from './components/ExecutionActionButtons';
 import { useTestExecutionForm } from './hooks/useTestExecutionForm';
+import { TestStatus } from '@/utils/types/test'; // Fix the import
 
 interface TestExecutionFormProps {
   testCase: TestCase;

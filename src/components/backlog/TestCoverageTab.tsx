@@ -1,210 +1,196 @@
 
 import React, { useState } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Plus, RefreshCw } from 'lucide-react';
-import { TestCase } from '@/utils/types/test';
-import TestCoverageIndicator from './TestCoverageIndicator';
-import LinkTestCaseDialog from './LinkTestCaseDialog';
-import { BacklogTestCoverage } from '@/utils/types/backlogTypes';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { PlusIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { BacklogItem, BacklogTestCoverage } from '@/utils/types/backlogTypes';
 import { useBacklogTestCoverage } from '@/hooks/useBacklogTestCoverage';
-import { Skeleton } from '@/components/ui/skeleton';
+import LinkTestCaseDialog from './LinkTestCaseDialog';
+import TestCoverageIndicator from './TestCoverageIndicator';
+import LinkedTestCases from './LinkedTestCases';
 
-export interface TestCoverageTabProps {
-  backlogItemId: string;
-  onViewTestCase: (testCase: TestCase) => void;
+interface TestCoverageTabProps {
+  backlogItem: BacklogItem;
+  onRefresh?: () => void;
 }
 
 const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ 
-  backlogItemId,
-  onViewTestCase 
+  backlogItem,
+  onRefresh 
 }) => {
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
-  
-  // Use our custom hook to fetch all test coverage related data
-  const {
-    linkedTestCases,
-    coverage,
-    isLoading,
-    refetchAll
-  } = useBacklogTestCoverage(backlogItemId);
+  const { toast } = useToast();
+  const { 
+    linkedTestCases, 
+    isLoading, 
+    isFetching, 
+    unlinkTestCase,
+    refreshTestCases
+  } = useBacklogTestCoverage(backlogItem.id);
 
-  // Function to open the link test case dialog
-  const openLinkDialog = () => {
+  const testCaseCount = linkedTestCases?.length || 0;
+  const passedTestsCount = linkedTestCases?.filter(tc => tc.status === 'pass' || tc.status === 'passed').length || 0;
+  const failedTestsCount = linkedTestCases?.filter(tc => tc.status === 'fail' || tc.status === 'failed').length || 0;
+  const notExecutedCount = linkedTestCases?.filter(tc => 
+    tc.status === 'not-run' || tc.status === 'blocked' || tc.status === 'draft' || tc.status === 'ready'
+  ).length || 0;
+  
+  // Calculate coverage percentage
+  const coveragePercentage = testCaseCount > 0 
+    ? Math.round((passedTestsCount / testCaseCount) * 100) 
+    : 0;
+  
+  // Create a coverage object for the TestCoverageIndicator
+  const coverage: BacklogTestCoverage = {
+    totalTestCases: testCaseCount,
+    passedTests: passedTestsCount,
+    failedTests: failedTestsCount,
+    notExecutedTests: notExecutedCount,
+    coveragePercentage: coveragePercentage,
+    lastUpdated: new Date(),
+    // Add these properties for compatibility with TestCoverageIndicator
+    total: testCaseCount,
+    covered: passedTestsCount
+  };
+  
+  const handleOpenLinkDialog = () => {
     setIsLinkDialogOpen(true);
   };
   
-  // Function to close the link test case dialog
-  const closeLinkDialog = () => {
+  const handleCloseLinkDialog = () => {
     setIsLinkDialogOpen(false);
-    // Refresh data after dialog is closed
-    refetchAll();
+    refreshTestCases();
+    if (onRefresh) {
+      onRefresh();
+    }
   };
-
-  // Display loading state when data is being fetched
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-9 w-32" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32 col-span-2" />
-        </div>
-        <Skeleton className="h-10 w-full" />
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-32" />
-          <Skeleton className="h-80 w-full" />
-        </div>
-      </div>
-    );
-  }
+  
+  const handleUnlinkTestCase = async (testCaseId: string) => {
+    try {
+      const result = await unlinkTestCase(testCaseId);
+      if (result.success) {
+        toast({
+          title: "Test case unlinked",
+          description: "The test case has been successfully unlinked from this backlog item.",
+        });
+        refreshTestCases();
+        if (onRefresh) {
+          onRefresh();
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to unlink test case",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while unlinking the test case",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Test Coverage</h3>
-        <div className="space-x-2">
-          <Button onClick={refetchAll} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-          <Button onClick={openLinkDialog} size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Link Test Case
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Coverage Summary</CardTitle>
+            <CardTitle>Test Coverage</CardTitle>
+            <CardDescription>
+              Overall test coverage for this item
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex flex-col items-center justify-center mt-2">
-              {coverage ? (
-                <TestCoverageIndicator
-                  coverage={{
-                    total: coverage.totalTestCases,
-                    covered: coverage.passedTests + coverage.failedTests,
-                    passed: coverage.passedTests,
-                    failed: coverage.failedTests
-                  }}
-                  size="lg"
-                />
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  <p>No coverage data available</p>
-                </div>
-              )}
+          <CardContent className="flex justify-center items-center pt-4">
+            <TestCoverageIndicator 
+              coverage={{
+                total: testCaseCount,
+                covered: testCaseCount > 0 ? passedTestsCount : 0,
+                passed: passedTestsCount,
+                failed: failedTestsCount
+              }}
+              size="lg"
+            />
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Test Status</CardTitle>
+            <CardDescription>
+              Status of linked test cases
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div className="text-2xl font-bold text-green-500">{passedTestsCount}</div>
+                <div className="text-sm text-muted-foreground">Passed</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-500">{failedTestsCount}</div>
+                <div className="text-sm text-muted-foreground">Failed</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-500">{notExecutedCount}</div>
+                <div className="text-sm text-muted-foreground">Not Run</div>
+              </div>
             </div>
           </CardContent>
         </Card>
-
-        <Card className="col-span-2">
+        
+        <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Test Execution</CardTitle>
+            <CardTitle>Test Cases</CardTitle>
+            <CardDescription>
+              Linked test cases for verification
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-0">
-            {coverage ? (
-              <>
-                <div className="space-y-2 pt-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Tests Executed: {coverage.passedTests + coverage.failedTests}</span>
-                    <span>{coverage.coveragePercentage}% Coverage</span>
-                  </div>
-                  <Progress value={coverage.coveragePercentage} className="h-2" />
-                </div>
-                <div className="grid grid-cols-3 gap-4 mt-4 text-center">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total</p>
-                    <p className="text-2xl font-bold">{coverage.totalTestCases}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-green-600">Passed</p>
-                    <p className="text-2xl font-bold text-green-600">{coverage.passedTests}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-red-600">Failed</p>
-                    <p className="text-2xl font-bold text-red-600">{coverage.failedTests}</p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="h-full flex items-center justify-center py-6">
-                <p className="text-muted-foreground">No test execution data available</p>
-              </div>
-            )}
+          <CardContent className="pt-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold">{testCaseCount}</div>
+              <div className="text-sm text-muted-foreground mb-4">Total Test Cases</div>
+              
+              <Button onClick={handleOpenLinkDialog} className="w-full">
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Link Test Cases
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Linked test cases section */}
-      <div className="space-y-4">
-        <h4 className="text-md font-medium">Linked Test Cases ({linkedTestCases.length})</h4>
-
-        {linkedTestCases.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-6 text-center">
-              <p className="text-muted-foreground">No test cases linked to this backlog item</p>
-              <Button onClick={openLinkDialog} variant="outline" className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
-                Link Test Case
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="border rounded-md">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {linkedTestCases.map((testCase) => (
-                  <tr key={testCase.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{testCase.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{testCase.title}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${testCase.status === 'passed' ? 'bg-green-100 text-green-800' : 
-                          testCase.status === 'failed' ? 'bg-red-100 text-red-800' : 
-                          'bg-gray-100 text-gray-800'}`}>
-                        {testCase.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{testCase.type}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Button onClick={() => onViewTestCase(testCase)} variant="ghost" size="sm">View</Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Link Test Case dialog */}
+      
+      {/* Test Cases List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Linked Test Cases</CardTitle>
+          <CardDescription>
+            Test cases linked to this backlog item for verification
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <LinkedTestCases
+            testCases={linkedTestCases || []}
+            isLoading={isLoading || isFetching}
+            onUnlink={handleUnlinkTestCase}
+          />
+        </CardContent>
+      </Card>
+      
+      {/* Link Test Case Dialog */}
       <LinkTestCaseDialog
-        backlogItemId={backlogItemId}
-        isOpen={isLinkDialogOpen}
-        onClose={closeLinkDialog}
+        backlogItemId={backlogItem.id}
+        open={isLinkDialogOpen}
+        onClose={handleCloseLinkDialog}
       />
     </div>
   );

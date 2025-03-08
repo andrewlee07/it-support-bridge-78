@@ -1,4 +1,3 @@
-
 // Backlog Item Management Types
 
 // Status types
@@ -32,12 +31,15 @@ export interface BacklogItem {
 
 // Test coverage metrics for backlog items
 export interface BacklogTestCoverage {
-  totalTestCases: number;
+  totalTestCases: number; // Total number of test cases
   passedTests: number;
   failedTests: number;
   notExecutedTests: number;
   coveragePercentage: number;
   lastUpdated: Date;
+  // Additional properties for compatibility with TestCoverageIndicator
+  total?: number; // For backward compatibility with TestCoverageIndicator
+  covered?: number; // For backward compatibility with TestCoverageIndicator
 }
 
 // API response types for Backlog Management
