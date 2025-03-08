@@ -6,6 +6,7 @@ import IncidentDetail from '@/pages/IncidentDetail';
 import ServiceRequests from '@/pages/ServiceRequests';
 import ServiceRequestDetail from '@/pages/ServiceRequestDetail';
 import ProblemManagement from '@/pages/ProblemManagement';
+import ProblemDetail from '@/pages/ProblemDetail';
 
 const ticketRoutes: RouteObject[] = [
   {
@@ -27,6 +28,10 @@ const ticketRoutes: RouteObject[] = [
   {
     path: 'problems',
     element: <ProblemManagement />,
+  },
+  {
+    path: 'problems/:id',
+    element: <ProblemDetail />,
   },
 ];
 
