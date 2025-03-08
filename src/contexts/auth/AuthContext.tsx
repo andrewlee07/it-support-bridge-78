@@ -126,7 +126,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         pendingUser,
         isAuthenticated, 
         loading,
-        login, 
+        login,
         logout: () => {
           setUser(null);
           setIsAuthenticated(false);
