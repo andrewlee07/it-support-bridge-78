@@ -1,4 +1,3 @@
-
 import {
   BarChart3,
   Gauge,
@@ -20,6 +19,12 @@ import {
   Bug,
   ListChecks,
   GitPullRequest,
+  SquareArrowUpRight,
+  Rocket,
+  ClipboardList,
+  MonitorSmartphone,
+  CheckCircle2,
+  PieChart,
 } from 'lucide-react';
 
 import { NavItem } from './types';

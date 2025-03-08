@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Bug } from 'lucide-react';
+import { Bug, ChartPie } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTestReleaseCoverage } from '@/hooks/useTestReleaseCoverage';
 
@@ -29,6 +29,11 @@ const ReleaseTestsTab: React.FC<ReleaseTestsTabProps> = ({ releaseId }) => {
   const navigateToTestTracking = () => {
     // Navigate to test tracking page
     navigate('/test-tracking');
+  };
+  
+  const navigateToTestCoverage = () => {
+    // Navigate to test coverage page with this release pre-selected
+    navigate(`/test-coverage?releaseId=${releaseId}`);
   };
 
   if (isLoading) {
@@ -68,14 +73,25 @@ const ReleaseTestsTab: React.FC<ReleaseTestsTabProps> = ({ releaseId }) => {
         <ReleaseTestProgress progressData={testProgress} />
       </div>
       
-      <Button 
-        variant="outline" 
-        className="w-full"
-        onClick={navigateToTestTracking}
-      >
-        <Bug className="h-4 w-4 mr-2" />
-        View All Test Details
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Button 
+          variant="outline" 
+          className="flex-1"
+          onClick={navigateToTestTracking}
+        >
+          <Bug className="h-4 w-4 mr-2" />
+          View All Test Details
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          className="flex-1"
+          onClick={navigateToTestCoverage}
+        >
+          <ChartPie className="h-4 w-4 mr-2" />
+          Detailed Test Coverage & Traceability
+        </Button>
+      </div>
       
       <div className="space-y-4 mt-4">
         <h3 className="text-lg font-medium">Test Cycles ({testCycles.length})</h3>
