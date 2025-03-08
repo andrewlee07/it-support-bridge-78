@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NavigationItem } from './types';
 
@@ -11,6 +11,8 @@ interface NavLinkProps {
 }
 
 const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
+  const location = useLocation();
+  
   // Skip rendering if item has no path or href
   if (!item.href && !item.path && !item.items) return null;
   
@@ -35,6 +37,8 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
             if (!subItem.href && !subItem.path) return null;
             
             const subItemPath = getPath(subItem);
+            const isSubItemActive = location.pathname === subItemPath || 
+                                   (subItemPath !== '/' && location.pathname.startsWith(subItemPath));
             
             return (
               <Link
@@ -42,7 +46,7 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
                 to={subItemPath}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
-                  isActive && location.pathname === subItemPath && "bg-primary/10 text-primary font-medium"
+                  isSubItemActive && "bg-primary/10 text-primary font-medium"
                 )}
               >
                 {subItem.icon && <subItem.icon className="h-4 w-4 flex-shrink-0" />}

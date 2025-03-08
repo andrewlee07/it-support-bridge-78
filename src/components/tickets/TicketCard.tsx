@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,8 @@ interface TicketCardProps {
 }
 
 const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
+  const navigate = useNavigate();
+  
   const getStatusBadgeClass = (status: string): string => {
     switch (status) {
       case 'open':
@@ -54,9 +56,23 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
       day: 'numeric',
     });
   };
+  
+  // Handle click for the card to navigate to the ticket detail
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // For tickets, use the right route based on ticket type
+    let baseRoute = '/incidents'; 
+    if (ticket.type === 'service-request') {
+      baseRoute = '/service-requests';
+    } else if (ticket.type === 'change') {
+      baseRoute = '/changes';
+    }
+    
+    navigate(`${baseRoute}/${ticket.id}`);
+  };
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer" onClick={handleCardClick}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <Badge variant="outline" className={cn("mb-2 capitalize", getStatusBadgeClass(ticket.status))}>
@@ -89,8 +105,18 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
             <span className="text-muted-foreground">Unassigned</span>
           )}
         </div>
-        <Button variant="ghost" size="sm" className="text-xs" asChild>
-          <Link to={`/tickets/${ticket.id}`}>View Details</Link>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-xs" 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering the card click
+            const baseRoute = ticket.type === 'service-request' ? '/service-requests' : 
+                            ticket.type === 'change' ? '/changes' : '/incidents';
+            navigate(`${baseRoute}/${ticket.id}`);
+          }}
+        >
+          View Details
         </Button>
       </CardFooter>
     </Card>

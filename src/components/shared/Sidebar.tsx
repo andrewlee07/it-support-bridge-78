@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import NavLink from './sidebar/NavLink';
@@ -17,6 +17,27 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // Check if we're on mobile based on screen width
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  // Update isMobile state when window resizes
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      // Auto-collapse on mobile, expand on desktop
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Set initial state
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   
   // Close mobile sidebar when route changes
   useEffect(() => {
@@ -43,8 +64,6 @@ const Sidebar = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  console.log('Current pathname:', location.pathname);
-
   return (
     <>
       {/* Mobile menu toggle button - fixed to the top left */}
@@ -55,7 +74,7 @@ const Sidebar = () => {
           onClick={toggleMobileSidebar}
           className="h-10 w-10 rounded-full shadow-md bg-background"
         >
-          <Menu className="h-5 w-5" />
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </div>
       
@@ -69,7 +88,7 @@ const Sidebar = () => {
       
       <div 
         className={cn(
-          "fixed top-0 left-0 bg-sidebar border-r border-border/40 h-screen z-30 transition-all duration-300 ease-in-out",
+          "fixed top-0 left-0 bg-sidebar border-r border-border/40 h-screen z-50 transition-all duration-300 ease-in-out",
           collapsed ? "w-16" : "w-64",
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
@@ -129,12 +148,12 @@ const Sidebar = () => {
         </div>
       </div>
       
-      {/* Main content wrapper with padding to prevent content from being hidden behind sidebar */}
+      {/* Main content wrapper with proper padding to prevent content from being hidden under sidebar */}
       <div className={cn(
-        "min-h-screen transition-all duration-300 ease-in-out",
-        collapsed ? "pl-16" : "pl-0 md:pl-64"
+        "min-h-screen bg-background transition-all duration-300 ease-in-out",
+        collapsed ? "pl-16 md:pl-16" : "pl-0 md:pl-64"
       )}>
-        {/* This div creates space for the content */}
+        {/* Content is inserted here */}
       </div>
     </>
   );

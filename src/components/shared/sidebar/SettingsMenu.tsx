@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Settings, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -28,11 +28,14 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
   hasPermission,
   locationPathname 
 }) => {
+  const location = useLocation();
+  
   // Filter settings items based on user permissions
   const accessibleItems = settingsItems.filter(item => hasPermission(item.allowedRoles || []));
   
   if (accessibleItems.length === 0) return null;
   
+  // In collapsed mode, just show icon that links to first available settings page
   if (collapsed) {
     const defaultPath = accessibleItems.length > 0 ? 
       (accessibleItems[0].href || accessibleItems[0].path || '/settings/sla') : 
@@ -51,6 +54,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
     );
   }
   
+  // Full settings menu with dropdown in expanded mode
   return (
     <Collapsible
       open={settingsOpen}
@@ -78,13 +82,16 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
           if (!item.href && !item.path) return null;
           
           const itemPath = item.href || item.path || '#';
+          const isItemActive = location.pathname === itemPath || 
+                              (itemPath !== '/' && location.pathname.startsWith(itemPath));
+          
           return (
             <Link 
               key={item.path || item.name} 
               to={itemPath}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
-                isActiveRoute(item.path) && "bg-primary/10 text-primary font-medium"
+                isItemActive && "bg-primary/10 text-primary font-medium"
               )}
             >
               {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
