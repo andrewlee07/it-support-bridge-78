@@ -4,7 +4,6 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Form } from '@/components/ui/form';
 import { 
   StatusMappingConfiguration, 
   defaultStatusMappingConfiguration 
@@ -16,7 +15,7 @@ import BehaviorTab from './statusConfig/BehaviorTab';
 import NotificationsTab from './statusConfig/NotificationsTab';
 
 const StatusSynchronizationConfig: React.FC = () => {
-  const form = useForm<StatusMappingConfiguration>({
+  const methods = useForm<StatusMappingConfiguration>({
     defaultValues: defaultStatusMappingConfiguration
   });
 
@@ -47,26 +46,24 @@ const StatusSynchronizationConfig: React.FC = () => {
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
           
-          <FormProvider {...form}>
-            <Form>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <TabsContent value="mappings">
-                  <StatusMappingTab releaseStatuses={releaseStatuses} />
-                </TabsContent>
-                
-                <TabsContent value="behavior">
-                  <BehaviorTab />
-                </TabsContent>
-                
-                <TabsContent value="notifications">
-                  <NotificationsTab />
-                </TabsContent>
-                
-                <div className="flex justify-end mt-6">
-                  <Button type="submit">Save Configuration</Button>
-                </div>
-              </form>
-            </Form>
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <TabsContent value="mappings">
+                <StatusMappingTab releaseStatuses={releaseStatuses} />
+              </TabsContent>
+              
+              <TabsContent value="behavior">
+                <BehaviorTab />
+              </TabsContent>
+              
+              <TabsContent value="notifications">
+                <NotificationsTab />
+              </TabsContent>
+              
+              <div className="flex justify-end mt-6">
+                <Button type="submit">Save Configuration</Button>
+              </div>
+            </form>
           </FormProvider>
         </Tabs>
       </CardContent>
