@@ -1,13 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Navigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
-import { ArrowRight, Loader2, Shield, Info } from 'lucide-react';
-import { isPasswordValid, DEFAULT_PASSWORD_POLICY } from '@/utils/securityUtils';
+import { ArrowRight, Loader2, Shield } from 'lucide-react';
+import { isPasswordValid } from '@/utils/securityUtils';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -128,14 +129,7 @@ const Login = () => {
                     <p className="text-sm text-red-500">{passwordError}</p>
                   )}
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center">
-                    <Info className="h-4 w-4 mr-1 text-[#b047c9]" />
-                    <span className="text-xs text-muted-foreground">
-                      Password requires {DEFAULT_PASSWORD_POLICY.minLength}+ chars, uppercase, lowercase, 
-                      numbers, and special characters
-                    </span>
-                  </div>
+                <div className="flex items-center justify-end text-sm">
                   <Button variant="link" type="button" className="px-0 text-[#b047c9]" asChild>
                     <Link to="/security-recovery">Forgot password?</Link>
                   </Button>
@@ -173,14 +167,6 @@ const Login = () => {
               <p>Password: Use any text (not validated in demo)</p>
             </div>
           </Card>
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account? 
-              <Button variant="link" type="button" className="text-[#b047c9]">
-                Contact support
-              </Button>
-            </p>
-          </div>
         </motion.div>
       </div>
       
