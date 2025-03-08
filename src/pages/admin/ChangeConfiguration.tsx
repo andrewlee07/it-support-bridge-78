@@ -75,6 +75,18 @@ const ChangeConfiguration = () => {
     refetchQuestions();
   };
 
+  // Handle submitting question form
+  const handleQuestionSubmit = (questionData: any) => {
+    console.log('Saving question:', questionData);
+    handleQuestionFormClose();
+  };
+
+  // Handle submitting thresholds form
+  const handleThresholdsSubmit = (thresholds: any) => {
+    console.log('Saving thresholds:', thresholds);
+    // API call would go here
+  };
+
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -175,10 +187,10 @@ const ChangeConfiguration = () => {
                   <div className="md:col-span-2">
                     {(isAddingQuestion || selectedQuestionId) && (
                       <RiskAssessmentQuestionForm
-                        questionId={selectedQuestionId}
-                        isNew={isAddingQuestion}
-                        onClose={handleQuestionFormClose}
-                        userId={user?.id || ''}
+                        initialData={selectedQuestionId ? riskQuestions?.data?.find(q => q.id === selectedQuestionId) : undefined}
+                        onSubmit={handleQuestionSubmit}
+                        onCancel={handleQuestionFormClose}
+                        isSubmitting={false}
                       />
                     )}
                     {!isAddingQuestion && !selectedQuestionId && (
@@ -198,8 +210,9 @@ const ChangeConfiguration = () => {
               <TabsContent value="thresholds" className="space-y-4">
                 {!isLoadingThresholds && riskThresholds?.data && (
                   <RiskThresholdsForm 
-                    initialThresholds={riskThresholds.data}
-                    userId={user?.id || ''} 
+                    thresholds={riskThresholds.data}
+                    onSubmit={handleThresholdsSubmit}
+                    isSubmitting={false}
                   />
                 )}
                 {isLoadingThresholds && (
