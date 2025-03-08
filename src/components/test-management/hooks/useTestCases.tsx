@@ -3,7 +3,17 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchTestCases } from '@/utils/mockData/testData';
 import { TestCase } from '@/utils/types/test/testCase';
 
-export const useTestCases = (options?: { enabled?: boolean, testCycleId?: string }) => {
+export interface UseTestCasesOptions {
+  enabled?: boolean;
+  testCycleId?: string;
+}
+
+/**
+ * Hook for fetching and processing test cases data
+ * @param options Optional configuration including enabled flag and test cycle ID for filtering
+ * @returns Processed test cases data and query state
+ */
+export const useTestCases = (options?: UseTestCasesOptions) => {
   const { 
     data, 
     isLoading: isLoadingTestCases,

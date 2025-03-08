@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,7 +35,6 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
-// Form schema for test cycle - update to match all possible TestCycleStatus values
 const testCycleSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
@@ -64,17 +62,16 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  // Fetch test cases for the selection
   const { data: testCasesResponse } = useQuery({
     queryKey: ['testCases'],
-    queryFn: fetchTestCases,
+    queryFn: async () => {
+      return fetchTestCases();
+    },
   });
 
-  // Normalize the status value to handle both 'in-progress' and 'in_progress'
   const normalizeStatus = (status: string | undefined) => {
     if (!status) return 'planned';
     
-    // Normalize all variants of in-progress to a single format used in the UI
     if (status === 'in_progress' || status === 'in-progress') {
       return 'in-progress';
     }
@@ -82,7 +79,6 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
     return status;
   };
 
-  // Initialize form with default values
   const form = useForm<TestCycleFormValues>({
     resolver: zodResolver(testCycleSchema),
     defaultValues: {
@@ -106,7 +102,6 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
       return;
     }
 
-    // Validate dates
     if (data.endDate < data.startDate) {
       form.setError('endDate', {
         type: 'manual',
@@ -119,7 +114,6 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
     try {
       let result;
       if (initialData?.id) {
-        // Update logic would go here
         toast({
           title: 'Not implemented',
           description: 'Updating test cycles is not yet implemented.',
@@ -128,7 +122,6 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
         setLoading(false);
         return;
       } else {
-        // Create new test cycle with all required fields
         result = await createTestCycle({
           name: data.name,
           description: data.description,
@@ -164,12 +157,10 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({
     }
   };
 
-  // Helper to check if a test case is selected
   const isTestCaseSelected = (id: string) => {
     return form.watch('testCases').includes(id);
   };
 
-  // Toggle test case selection
   const toggleTestCase = (id: string) => {
     const currentTestCases = form.watch('testCases');
     if (currentTestCases.includes(id)) {
