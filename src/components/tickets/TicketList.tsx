@@ -11,6 +11,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface TicketListProps {
   tickets: Ticket[];
@@ -22,6 +23,7 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, type }) => {
   const [statusFilter, setStatusFilter] = useState<TicketStatus | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<TicketPriority | 'all'>('all');
   const [categoryFilter, setCategoryFilter] = useState<TicketCategory | 'all'>('all');
+  const navigate = useNavigate();
 
   const filteredTickets = tickets.filter((ticket) => {
     // Filter by type (incident or service)
@@ -43,6 +45,11 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, type }) => {
 
     return true;
   });
+
+  const handleCardClick = (ticketId: string) => {
+    const basePath = type === 'incident' ? '/incidents' : '/service-requests';
+    navigate(`${basePath}/${ticketId}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -82,9 +89,10 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, type }) => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Priorities</SelectItem>
-            <SelectItem value="low">Low</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="high">High</SelectItem>
+            <SelectItem value="P1">High</SelectItem>
+            <SelectItem value="P2">Medium</SelectItem>
+            <SelectItem value="P3">Low</SelectItem>
+            <SelectItem value="P4">Lowest</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -99,7 +107,9 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, type }) => {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredTickets.map((ticket) => (
-            <TicketCard key={ticket.id} ticket={ticket} />
+            <div key={ticket.id} onClick={() => handleCardClick(ticket.id)}>
+              <TicketCard ticket={ticket} />
+            </div>
           ))}
         </div>
       )}

@@ -1,111 +1,71 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CalendarClock, User } from 'lucide-react';
+import { CalendarClock, Clock } from 'lucide-react';
+import { format } from 'date-fns';
 import { Ticket } from '@/utils/types';
-import { getUserById } from '@/utils/mockData';
-import { cn } from '@/lib/utils';
 
 interface TicketCardProps {
   ticket: Ticket;
 }
 
 const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
-  const navigate = useNavigate();
-  
-  const getStatusBadgeClass = (status: string): string => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100';
       case 'in-progress':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100';
       case 'resolved':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
       case 'closed':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100';
     }
   };
 
-  const getPriorityBadgeClass = (priority: string): string => {
+  const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'P1':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100';
       case 'P2':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100';
       case 'P3':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100';
       case 'P4':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100';
     }
-  };
-
-  const creator = getUserById(ticket.createdBy);
-  const assignee = ticket.assignedTo ? getUserById(ticket.assignedTo) : null;
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-  
-  const getRouteForTicket = (ticketType: string): string => {
-    if (ticketType === 'service') {
-      return '/service-requests';
-    } else if (ticketType === 'change') {
-      return '/changes';
-    } 
-    return '/incidents';
-  };
-  
-  const handleCardClick = () => {
-    const baseRoute = getRouteForTicket(ticket.type);
-    navigate(`${baseRoute}/${ticket.id}`);
   };
 
   return (
-    <Card 
-      className="overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer" 
-      onClick={handleCardClick}
-    >
+    <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
       <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <Badge variant="outline" className={cn("mb-2 capitalize", getStatusBadgeClass(ticket.status))}>
-            {ticket.status.replace('-', ' ')}
-          </Badge>
-          <Badge variant="outline" className={cn("capitalize", getPriorityBadgeClass(ticket.priority))}>
-            {ticket.priority}
-          </Badge>
+        <div className="flex justify-between items-start gap-2">
+          <div>
+            <h3 className="font-medium">{ticket.title}</h3>
+            <p className="text-sm text-muted-foreground">{ticket.id}</p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <Badge className={getStatusColor(ticket.status)}>
+              {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+            </Badge>
+            <Badge className={getPriorityColor(ticket.priority)}>
+              {ticket.priority}
+            </Badge>
+          </div>
         </div>
-        <CardTitle className="text-lg font-medium line-clamp-1">{ticket.title}</CardTitle>
-        <CardDescription className="flex items-center gap-1 mt-1">
-          <User className="h-3 w-3" /> 
-          {creator?.name || 'Unknown User'}
-        </CardDescription>
       </CardHeader>
       <CardContent className="pb-2">
-        <p className="text-sm text-muted-foreground line-clamp-2">{ticket.description}</p>
-        <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground">
-          <CalendarClock className="h-3 w-3" /> 
-          Created on {formatDate(ticket.createdAt)}
-        </div>
+        <p className="text-sm line-clamp-2">{ticket.description}</p>
       </CardContent>
-      <CardFooter className="pt-2 flex justify-between">
-        <div className="text-xs">
-          {assignee ? (
-            <span className="text-muted-foreground">
-              Assigned to <span className="font-medium text-foreground">{assignee.name}</span>
-            </span>
-          ) : (
-            <span className="text-muted-foreground">Unassigned</span>
-          )}
+      <CardFooter className="pt-2 text-xs text-muted-foreground">
+        <div className="flex items-center">
+          <CalendarClock className="h-3 w-3 mr-1" />
+          <span>Created: {format(new Date(ticket.createdAt), 'MMM d, yyyy')}</span>
         </div>
       </CardFooter>
     </Card>

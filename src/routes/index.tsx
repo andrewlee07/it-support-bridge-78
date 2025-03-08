@@ -19,8 +19,8 @@ export const AppRoutes: React.FC = () => {
       
       {/* Include all route groups */}
       <Route path="/dashboard/*" element={<DashboardRoutes />} />
-      <Route path="/incidents/*" element={<TicketRoutes />} />
-      <Route path="/service-requests/*" element={<TicketRoutes />} />
+      <Route path="/incidents/*" element={<TicketRoutes type="incident" />} />
+      <Route path="/service-requests/*" element={<TicketRoutes type="service" />} />
       <Route path="/changes/*" element={<ChangeRoutes />} />
       <Route path="/releases/*" element={<ChangeRoutes />} />
       <Route path="/assets/*" element={<AssetRoutes />} />

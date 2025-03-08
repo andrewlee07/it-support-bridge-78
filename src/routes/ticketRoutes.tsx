@@ -6,53 +6,26 @@ import Incidents from '@/pages/Incidents';
 import ServiceRequests from '@/pages/ServiceRequests';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
-export const TicketRoutes: React.FC = () => {
+interface TicketRoutesProps {
+  type: 'incident' | 'service';
+}
+
+export const TicketRoutes: React.FC<TicketRoutesProps> = ({ type }) => {
   return (
-    <Routes>
-      {/* Incident Management routes */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <Incidents />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/:id"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <Incidents />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/service-requests"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <ServiceRequests />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/service-requests/:id"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <ServiceRequests />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <ProtectedRoute>
+      <MainLayout>
+        {type === 'incident' ? (
+          <Routes>
+            <Route path="/" element={<Incidents />} />
+            <Route path="/:id" element={<Incidents />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/" element={<ServiceRequests />} />
+            <Route path="/:id" element={<ServiceRequests />} />
+          </Routes>
+        )}
+      </MainLayout>
+    </ProtectedRoute>
   );
 };

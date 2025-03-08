@@ -7,18 +7,12 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 export const DashboardRoutes: React.FC = () => {
   return (
-    <Routes>
-      {/* Dashboard route */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <Dashboard />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <ProtectedRoute>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+        </Routes>
+      </MainLayout>
+    </ProtectedRoute>
   );
 };
