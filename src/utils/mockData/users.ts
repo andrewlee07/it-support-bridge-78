@@ -1,4 +1,3 @@
-
 import { User, UserRole, MFAMethod } from '../types/user';
 
 export const mockUsers: User[] = [
@@ -12,8 +11,7 @@ export const mockUsers: User[] = [
     active: true,
     lastActive: new Date('2023-05-10T12:30:00'),
     createdAt: new Date('2023-01-01T10:00:00'),
-    mfaEnabled: true,
-    mfaMethod: 'totp' as MFAMethod,
+    mfaEnabled: false,
     securityQuestions: [
       { question: "What was your first pet's name?", answer: "Rover" },
       { question: "What is your mother's maiden name?", answer: "Smith" }
@@ -97,17 +95,14 @@ export const getUserById = (userId: string): User | undefined => {
   return mockUsers.find(user => user.id === userId);
 };
 
-// Add the missing getAllUsers function
 export const getAllUsers = (): User[] => {
   return [...mockUsers];
 };
 
-// Get user by email
 export const getUserByEmail = (email: string): User | undefined => {
   return mockUsers.find(user => user.email.toLowerCase() === email.toLowerCase());
 };
 
-// Update a user
 export const updateUser = (updatedUser: User): User => {
   const index = mockUsers.findIndex(user => user.id === updatedUser.id);
   if (index !== -1) {
