@@ -10,8 +10,11 @@ export const authenticateUser = (email: string, password: string): AuthUser | nu
     return null;
   }
   
+  // Clean the email input
+  const cleanedEmail = email.trim();
+  
   // Check if the user exists in our mock data
-  const existingUser = getUserByEmail(email);
+  const existingUser = getUserByEmail(cleanedEmail);
   
   if (existingUser) {
     console.log("User found in mock data:", existingUser.name);
@@ -29,14 +32,14 @@ export const authenticateUser = (email: string, password: string): AuthUser | nu
     console.log("Login successful for existing user:", authenticatedUser);
     return authenticatedUser;
   } else {
-    // Create a generic user for demo purposes
+    // Create a generic user for demo purposes - this will always succeed
     console.log("User not found in mock data, creating generic user");
     
     const randomId = Math.random().toString(36).substring(2, 15);
     const genericUser: AuthUser = {
       id: randomId,
       name: 'Demo User',
-      email: email,
+      email: cleanedEmail,
       role: 'admin',
       department: 'IT',
       sessionTimeout: 30,

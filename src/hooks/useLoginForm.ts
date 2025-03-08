@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth';
@@ -17,7 +16,7 @@ export const useLoginForm = () => {
     console.log("Form submitted with email:", email);
     
     // Simple form validation
-    if (!email) {
+    if (!email.trim()) {
       toast({
         title: "Error",
         description: "Please enter an email",
@@ -29,8 +28,12 @@ export const useLoginForm = () => {
     setIsLoading(true);
     
     try {
-      // Simplified login call
-      const success = await login(email, password || "password"); // Use a default password if empty
+      // Clean input and attempt login
+      const cleanedEmail = email.trim();
+      console.log("Attempting login with cleaned email:", cleanedEmail);
+      
+      // Login should now always succeed
+      const success = await login(cleanedEmail, password || "demo-password");
       console.log("Login result:", success ? "Success" : "Failed");
       
       if (success) {
@@ -40,6 +43,7 @@ export const useLoginForm = () => {
         });
         navigate('/');
       } else {
+        // This should never happen now, but keeping as fallback
         toast({
           title: "Login Failed",
           description: "Please try again with any email",

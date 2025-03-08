@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { AuthContextType, AuthUser } from './types';
 import { authenticateUser, hasUserPermission, canUserPerformAction } from './authUtils';
@@ -47,8 +46,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setLoading(true);
       
-      // Simplify the login process
-      const user = authenticateUser(email, password);
+      // Get user from authenticateUser function (which now always returns a user)
+      const user = authenticateUser(email.trim(), password);
       
       if (user) {
         console.log("AUTH CONTEXT: Authentication successful, setting user");
@@ -57,6 +56,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.setItem('user', JSON.stringify(user));
         return true;
       } else {
+        // This should never happen now but keeping as fallback
         console.log("AUTH CONTEXT: Authentication failed, no user returned");
         return false;
       }
