@@ -8,6 +8,7 @@ import assetApi from '@/utils/api/assetApi';
 import TicketLoadingError from '@/components/tickets/TicketLoadingError';
 import AssetDetailView from '@/components/assets/detail/AssetDetailView';
 import AssetEditForm from '@/components/assets/form/AssetEditForm';
+import AssetAddForm from '@/components/assets/form/AssetAddForm';
 import AssetLoadingIndicator from '@/components/assets/detail/AssetLoadingIndicator';
 import { toast } from 'sonner';
 
@@ -17,6 +18,7 @@ const Assets: React.FC = () => {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [isViewingAsset, setIsViewingAsset] = useState<boolean>(false);
   const [isEditingAsset, setIsEditingAsset] = useState<boolean>(false);
+  const [isAddingAsset, setIsAddingAsset] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +57,11 @@ const Assets: React.FC = () => {
   };
 
   const handleCloseDialog = () => {
-    navigate('/assets');
+    if (isAddingAsset) {
+      setIsAddingAsset(false);
+    } else {
+      navigate('/assets');
+    }
   };
 
   const handleEditClick = () => {
@@ -64,6 +70,14 @@ const Assets: React.FC = () => {
 
   const handleCancelEdit = () => {
     setIsEditingAsset(false);
+  };
+
+  const handleAddAssetClick = () => {
+    setIsAddingAsset(true);
+  };
+
+  const handleCancelAddAsset = () => {
+    setIsAddingAsset(false);
   };
 
   const handleSaveAsset = async (data: Partial<Asset>) => {
@@ -88,13 +102,37 @@ const Assets: React.FC = () => {
     }
   };
 
-  if (loading && !isEditingAsset && !selectedAsset) {
+  const handleAddAsset = async (data: Omit<Asset, 'id' | 'createdAt' | 'updatedAt' | 'audit'>) => {
+    try {
+      setLoading(true);
+      const response = await assetApi.createAsset(data);
+      
+      if (response.success && response.data) {
+        setIsAddingAsset(false);
+        toast.success("Asset added successfully");
+        // Navigate to the newly created asset
+        navigate(`/assets/${response.data.id}`);
+      } else {
+        toast.error(response.message || "Failed to add asset");
+      }
+    } catch (error) {
+      console.error("Error adding asset:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading && !isEditingAsset && !selectedAsset && !isAddingAsset) {
     return <AssetLoadingIndicator />;
   }
 
   return (
     <div className="space-y-6">
-      <AssetList onAssetClick={handleAssetClick} />
+      <AssetList 
+        onAssetClick={handleAssetClick}
+        onAddAssetClick={handleAddAssetClick}
+      />
 
       <Dialog open={isViewingAsset && !!selectedAsset} onOpenChange={handleCloseDialog}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -123,6 +161,21 @@ const Assets: React.FC = () => {
               loading={loading} 
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAddingAsset} onOpenChange={handleCloseDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Asset</DialogTitle>
+            <DialogDescription>Enter the details for the new asset</DialogDescription>
+          </DialogHeader>
+          
+          <AssetAddForm 
+            onCancel={handleCancelAddAsset} 
+            onSave={handleAddAsset} 
+            loading={loading} 
+          />
         </DialogContent>
       </Dialog>
     </div>
