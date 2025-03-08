@@ -2,16 +2,18 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Breadcrumb from '@/components/shared/Breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { ArrowRightLeft } from 'lucide-react';
+import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
+import { useMandatoryFields } from '@/hooks/useMandatoryFields';
 
 const ReleaseConfiguration = () => {
   const breadcrumbItems = [
     { label: 'Admin Settings', path: '/admin-settings' },
     { label: 'Release Configuration' }
   ];
+
+  const { mandatoryFields, updateMandatoryFields, isLoading } = useMandatoryFields('release');
 
   return (
     <PageTransition>
@@ -21,57 +23,61 @@ const ReleaseConfiguration = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Release Configuration</h1>
           <p className="text-muted-foreground mt-1">
-            Configure release management settings and workflows
+            Configure settings for release management
           </p>
         </div>
 
-        <div className="mb-6">
-          <Button asChild variant="outline" className="gap-2">
-            <Link to="/admin/status-synchronization">
-              <ArrowRightLeft className="h-4 w-4" />
-              Status Synchronization Settings
-            </Link>
-          </Button>
-        </div>
-
-        <Tabs defaultValue="workflow">
+        <Tabs defaultValue="general">
           <TabsList className="mb-4">
-            <TabsTrigger value="workflow">Workflow Settings</TabsTrigger>
-            <TabsTrigger value="approval">Approval Process</TabsTrigger>
-            <TabsTrigger value="fields">Custom Fields</TabsTrigger>
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="workflow">Workflow</TabsTrigger>
+            <TabsTrigger value="approvals">Approval Process</TabsTrigger>
+            <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="workflow" className="space-y-4">
-            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-              <div className="text-center">
-                <h3 className="text-lg font-medium">Release Workflow Configuration</h3>
-                <p className="text-muted-foreground mt-1">
-                  Configure release workflow stages and transitions
-                </p>
-              </div>
-            </div>
+          
+          <TabsContent value="general">
+            <Card>
+              <CardHeader>
+                <CardTitle>General Settings</CardTitle>
+                <CardDescription>Configure general release management settings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* General settings content */}
+              </CardContent>
+            </Card>
           </TabsContent>
           
-          <TabsContent value="approval" className="space-y-4">
-            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-              <div className="text-center">
-                <h3 className="text-lg font-medium">Release Approval Process</h3>
-                <p className="text-muted-foreground mt-1">
-                  Configure release approval requirements and sign-offs
-                </p>
-              </div>
-            </div>
+          <TabsContent value="workflow">
+            <Card>
+              <CardHeader>
+                <CardTitle>Workflow Settings</CardTitle>
+                <CardDescription>Configure release workflow and statuses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Workflow settings content */}
+              </CardContent>
+            </Card>
           </TabsContent>
           
-          <TabsContent value="fields" className="space-y-4">
-            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-              <div className="text-center">
-                <h3 className="text-lg font-medium">Release Custom Fields</h3>
-                <p className="text-muted-foreground mt-1">
-                  Configure custom fields for release management
-                </p>
-              </div>
-            </div>
+          <TabsContent value="approvals">
+            <Card>
+              <CardHeader>
+                <CardTitle>Approval Process</CardTitle>
+                <CardDescription>Configure release approval process settings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Approval process settings content */}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="mandatoryfields">
+            <MandatoryFieldsConfig
+              entityType="release"
+              fields={mandatoryFields}
+              onSave={updateMandatoryFields}
+              isLoading={isLoading}
+            />
           </TabsContent>
         </Tabs>
       </div>

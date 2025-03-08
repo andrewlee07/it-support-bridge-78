@@ -5,58 +5,71 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Link } from 'react-router-dom';
 import { 
   AlertCircle, Headphones, PanelRightIcon, OctagonAlert, 
-  BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert 
+  BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert, 
+  Sliders, ArrowsUpDown
 } from 'lucide-react';
 
 const AdminSettings = () => {
   const configurationTiles = [
     {
       title: 'Incident Configuration',
-      description: 'Configure incident management settings, SLAs, fields, and workflows',
+      description: 'Configure incident settings, SLAs, mandatory fields, and workflows',
       icon: <AlertCircle className="h-8 w-8 text-primary/80" />,
       path: '/admin/incident-configuration'
     },
     {
       title: 'Service Request Configuration',
-      description: 'Configure service request settings, SLAs, fields, and workflows',
+      description: 'Configure service request settings, SLAs, mandatory fields, and workflows',
       icon: <Headphones className="h-8 w-8 text-primary/80" />,
       path: '/admin/service-request-configuration'
     },
     {
       title: 'Change Configuration',
-      description: 'Configure change management settings, risk assessments, and approval workflows',
+      description: 'Configure change management settings, risk assessments, and mandatory fields',
       icon: <PanelRightIcon className="h-8 w-8 text-primary/80" />,
       path: '/admin/change-configuration'
     },
     {
       title: 'Problem Configuration',
-      description: 'Configure problem management settings, workflows, and fields',
+      description: 'Configure problem management settings, workflows, and mandatory fields',
       icon: <OctagonAlert className="h-8 w-8 text-primary/80" />,
       path: '/admin/problem-configuration'
     },
     {
       title: 'Asset Configuration',
-      description: 'Configure asset management settings, lifecycle stages, and fields',
+      description: 'Configure asset management settings, lifecycle stages, and mandatory fields',
       icon: <BoxesIcon className="h-8 w-8 text-primary/80" />,
       path: '/admin/asset-configuration'
     },
     {
       title: 'Bug Configuration',
-      description: 'Configure bug severity levels, workflows, and fields',
+      description: 'Configure bug severity levels, workflows, and mandatory fields',
       icon: <Bug className="h-8 w-8 text-primary/80" />,
       path: '/admin/bug-configuration'
     },
     {
       title: 'Release Configuration',
-      description: 'Configure release management workflows and settings',
+      description: 'Configure release management workflows, approvals, and mandatory fields',
       icon: <GitPullRequest className="h-8 w-8 text-primary/80" />,
       path: '/admin/release-configuration'
     },
     {
       title: 'Test Configuration',
-      description: 'Configure test management settings and workflows',
+      description: 'Configure test management settings, workflows, and mandatory fields',
       icon: <FlaskConical className="h-8 w-8 text-primary/80" />,
       path: '/admin/test-configuration'
+    },
+    {
+      title: 'Status Synchronization',
+      description: 'Configure how statuses are synchronized between related items',
+      icon: <ArrowsUpDown className="h-8 w-8 text-primary/80" />,
+      path: '/admin/status-synchronization'
+    },
+    {
+      title: 'SLA Settings',
+      description: 'Configure service level agreements for all processes',
+      icon: <Sliders className="h-8 w-8 text-primary/80" />,
+      path: '/admin/sla-settings'
     },
     {
       title: 'Security Settings',

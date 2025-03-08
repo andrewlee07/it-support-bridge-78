@@ -7,12 +7,16 @@ import DropdownFieldsTab from '@/components/admin/change-configuration/DropdownF
 import RiskAssessmentTabs from '@/components/admin/change-configuration/RiskAssessmentTabs';
 import WorkflowSettingsTab from '@/components/admin/change-configuration/WorkflowSettingsTab';
 import Breadcrumb from '@/components/shared/Breadcrumb';
+import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
+import { useMandatoryFields } from '@/hooks/useMandatoryFields';
 
 const ChangeConfiguration = () => {
   const breadcrumbItems = [
     { label: 'Admin Settings', path: '/admin-settings' },
     { label: 'Change Configuration' }
   ];
+
+  const { mandatoryFields, updateMandatoryFields, isLoading } = useMandatoryFields('change');
 
   return (
     <PageTransition>
@@ -25,6 +29,7 @@ const ChangeConfiguration = () => {
             <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
             <TabsTrigger value="risk">Risk Assessment</TabsTrigger>
             <TabsTrigger value="workflow">Workflow Settings</TabsTrigger>
+            <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dropdowns" className="space-y-4">
@@ -37,6 +42,15 @@ const ChangeConfiguration = () => {
           
           <TabsContent value="workflow" className="space-y-4">
             <WorkflowSettingsTab />
+          </TabsContent>
+          
+          <TabsContent value="mandatoryfields">
+            <MandatoryFieldsConfig
+              entityType="change"
+              fields={mandatoryFields}
+              onSave={updateMandatoryFields}
+              isLoading={isLoading}
+            />
           </TabsContent>
         </Tabs>
       </div>

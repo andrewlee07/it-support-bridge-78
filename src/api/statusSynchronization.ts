@@ -52,18 +52,42 @@ let mandatoryFieldsConfig: Record<ConfigurableEntityType, MandatoryFieldConfig[]
     { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'incident', description: 'The title of the incident' },
     { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'incident', description: 'A detailed description of the incident' },
     { fieldName: 'priority', displayName: 'Priority', isRequired: true, entityType: 'incident', description: 'The priority level of the incident' },
-    { fieldName: 'impact', displayName: 'Impact', isRequired: false, entityType: 'incident', description: 'The impact of the incident' }
+    { fieldName: 'impact', displayName: 'Impact', isRequired: false, entityType: 'incident', description: 'The impact of the incident' },
+    { fieldName: 'category', displayName: 'Category', isRequired: false, entityType: 'incident', description: 'The category of the incident' },
+    { fieldName: 'affectedServices', displayName: 'Affected Services', isRequired: false, entityType: 'incident', description: 'Services affected by this incident' }
   ],
   'change': [
     { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'change', description: 'The title of the change request' },
     { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'change', description: 'A detailed description of the change request' },
     { fieldName: 'implementationPlan', displayName: 'Implementation Plan', isRequired: true, entityType: 'change', description: 'The plan for implementing the change' },
-    { fieldName: 'rollbackPlan', displayName: 'Rollback Plan', isRequired: true, entityType: 'change', description: 'The plan for rolling back the change if needed' }
+    { fieldName: 'rollbackPlan', displayName: 'Rollback Plan', isRequired: true, entityType: 'change', description: 'The plan for rolling back the change if needed' },
+    { fieldName: 'startDate', displayName: 'Start Date', isRequired: false, entityType: 'change', description: 'The planned start date for the change' },
+    { fieldName: 'endDate', displayName: 'End Date', isRequired: false, entityType: 'change', description: 'The planned end date for the change' },
+    { fieldName: 'approvers', displayName: 'Approvers', isRequired: false, entityType: 'change', description: 'People who need to approve this change' }
   ],
-  'asset': [],
-  'user': [],
-  'service-request': [],
-  'problem': [],
+  'service-request': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'service-request', description: 'The title of the service request' },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'service-request', description: 'A detailed description of the service request' },
+    { fieldName: 'requestedFor', displayName: 'Requested For', isRequired: false, entityType: 'service-request', description: 'The person this request is for' },
+    { fieldName: 'priority', displayName: 'Priority', isRequired: false, entityType: 'service-request', description: 'The priority level of the service request' },
+    { fieldName: 'dueDate', displayName: 'Due Date', isRequired: false, entityType: 'service-request', description: 'The date by which this request should be fulfilled' }
+  ],
+  'problem': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'problem', description: 'The title of the problem' },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'problem', description: 'A detailed description of the problem' },
+    { fieldName: 'rootCause', displayName: 'Root Cause', isRequired: false, entityType: 'problem', description: 'The root cause of the problem' },
+    { fieldName: 'workaround', displayName: 'Workaround', isRequired: false, entityType: 'problem', description: 'A workaround for the problem if available' },
+    { fieldName: 'priority', displayName: 'Priority', isRequired: false, entityType: 'problem', description: 'The priority level of the problem' },
+    { fieldName: 'affectedServices', displayName: 'Affected Services', isRequired: false, entityType: 'problem', description: 'Services affected by this problem' }
+  ],
+  'asset': [
+    { fieldName: 'name', displayName: 'Name', isRequired: true, entityType: 'asset', description: 'The name of the asset' },
+    { fieldName: 'assetType', displayName: 'Asset Type', isRequired: true, entityType: 'asset', description: 'The type of asset' },
+    { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'asset', description: 'The current status of the asset' },
+    { fieldName: 'location', displayName: 'Location', isRequired: false, entityType: 'asset', description: 'The location of the asset' },
+    { fieldName: 'assignedTo', displayName: 'Assigned To', isRequired: false, entityType: 'asset', description: 'The person this asset is assigned to' }
+  ],
+  'user': []
 };
 
 // Get status synchronization settings

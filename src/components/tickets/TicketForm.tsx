@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Form,
   FormControl,
@@ -22,6 +22,9 @@ import {
 } from '@/components/ui/select';
 import { Ticket, TicketPriority, TicketType, TicketCategory } from '@/utils/types';
 import { toast } from 'sonner';
+import { getMandatoryFieldsConfig } from '@/api/statusSynchronization';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface TicketFormProps {
   onSubmit: (data: Partial<Ticket>) => void;
@@ -30,6 +33,8 @@ interface TicketFormProps {
 
 const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mandatoryFields, setMandatoryFields] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const defaultValues = {
     title: '',
@@ -41,9 +46,48 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
   
   const form = useForm({ defaultValues });
   
+  // Fetch mandatory fields when component mounts
+  useEffect(() => {
+    const fetchMandatoryFields = async () => {
+      setIsLoading(true);
+      try {
+        // Map ticket type to entity type
+        const entityType = type === 'incident' ? 'incident' : 'service-request';
+        const fields = await getMandatoryFieldsConfig(entityType);
+        
+        // Extract field names of required fields
+        const requiredFields = fields
+          .filter(field => field.isRequired)
+          .map(field => field.fieldName);
+        
+        setMandatoryFields(requiredFields);
+      } catch (error) {
+        console.error('Failed to fetch mandatory fields:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchMandatoryFields();
+  }, [type]);
+  
   const handleSubmit = async (data: Partial<Ticket>) => {
     setIsSubmitting(true);
     try {
+      // Check for mandatory fields
+      const missingFields = mandatoryFields.filter(field => !data[field]);
+      
+      if (missingFields.length > 0) {
+        // Format field names for display
+        const formattedFields = missingFields
+          .map(field => field.charAt(0).toUpperCase() + field.slice(1))
+          .join(', ');
+        
+        toast.error(`Please complete all required fields: ${formattedFields}`);
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Simulate network request
       await new Promise(resolve => setTimeout(resolve, 1000));
       onSubmit(data);
@@ -57,16 +101,34 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
     }
   };
   
+  // Show which fields are mandatory
+  const isFieldRequired = (fieldName: string) => mandatoryFields.includes(fieldName);
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 animate-fade-in">
+        {isLoading && (
+          <div className="py-2">
+            <p className="text-muted-foreground">Loading form configuration...</p>
+          </div>
+        )}
+        
+        {!isLoading && mandatoryFields.length > 0 && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Fields marked with * are mandatory and must be completed.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <FormField
           control={form.control}
           name="title"
-          rules={{ required: 'Title is required' }}
+          rules={{ required: isFieldRequired('title') ? 'Title is required' : false }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              <FormLabel>{isFieldRequired('title') && <span className="text-red-500 mr-1">*</span>}Title</FormLabel>
               <FormControl>
                 <Input 
                   placeholder={type === 'incident' ? "e.g., Can't access email" : "e.g., Request new software"} 
@@ -84,10 +146,10 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
         <FormField
           control={form.control}
           name="description"
-          rules={{ required: 'Description is required' }}
+          rules={{ required: isFieldRequired('description') ? 'Description is required' : false }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>{isFieldRequired('description') && <span className="text-red-500 mr-1">*</span>}Description</FormLabel>
               <FormControl>
                 <Textarea 
                   placeholder={type === 'incident' ? "Describe what's happening..." : "Describe what you need..."} 
@@ -107,10 +169,10 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
           <FormField
             control={form.control}
             name="category"
-            rules={{ required: 'Category is required' }}
+            rules={{ required: isFieldRequired('category') ? 'Category is required' : false }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category</FormLabel>
+                <FormLabel>{isFieldRequired('category') && <span className="text-red-500 mr-1">*</span>}Category</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -136,9 +198,10 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
           <FormField
             control={form.control}
             name="priority"
+            rules={{ required: isFieldRequired('priority') ? 'Priority is required' : false }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Priority</FormLabel>
+                <FormLabel>{isFieldRequired('priority') && <span className="text-red-500 mr-1">*</span>}Priority</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
