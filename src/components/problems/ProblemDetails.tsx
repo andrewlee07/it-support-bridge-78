@@ -3,7 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Problem } from '@/utils/types/problem';
 import { formatRelative } from 'date-fns';
-import { Link } from 'lucide-react';
+import { Link as LinkIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ProblemDetailsProps {
   problem: Problem;
@@ -130,10 +131,10 @@ const ProblemDetails: React.FC<ProblemDetailsProps> = ({ problem }) => {
             <div className="space-y-2">
               {problem.relatedIncidents.map((incidentId) => (
                 <div key={incidentId} className="flex items-center gap-2 p-2 border rounded-md">
-                  <Link className="h-4 w-4 text-primary" />
-                  <a href={`/incidents/${incidentId}`} className="text-primary hover:underline">
+                  <LinkIcon className="h-4 w-4 text-primary" />
+                  <Link to={`/incidents/${incidentId}`} className="text-primary hover:underline">
                     {incidentId}
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>
