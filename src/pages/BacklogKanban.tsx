@@ -91,6 +91,15 @@ const BacklogKanban: React.FC = () => {
     setNewItemDialogOpen(true);
   };
 
+  const handleAddBucket = () => {
+    // This is a pass-through function that will be handled by the KanbanBoard component
+    // The board manages its own configuration
+    const kanbanBoardRef = document.querySelector('[data-add-bucket]');
+    if (kanbanBoardRef) {
+      kanbanBoardRef.dispatchEvent(new Event('addBucket'));
+    }
+  };
+
   return (
     <PageTransition>
       <div className="container py-6 space-y-4">
@@ -103,6 +112,7 @@ const BacklogKanban: React.FC = () => {
           columnSize={columnSize}
           setColumnSize={setColumnSize}
           onCreateItem={handleCreateItem}
+          onAddBucket={handleAddBucket}
         />
         
         <KanbanBoard 

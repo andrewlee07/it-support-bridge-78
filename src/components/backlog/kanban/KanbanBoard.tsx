@@ -11,6 +11,8 @@ import KanbanConfigDialog from './KanbanConfigDialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import BacklogItemForm from '@/components/backlog/BacklogItemForm';
+import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'sonner';
 
 interface KanbanBoardProps {
   backlogItems: BacklogItem[];
@@ -71,6 +73,29 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   const handleNewItemCancel = () => {
     setNewItemDialogOpen(false);
+  };
+
+  const handleAddBucket = () => {
+    // Create a new column/bucket
+    const newBucketId = uuidv4();
+    const newBucketName = `Bucket ${boardConfig.columns.length + 1}`;
+    const newStatusValue = `bucket-${boardConfig.columns.length + 1}`;
+    
+    const newColumn: KanbanColumnConfig = {
+      id: newBucketId,
+      displayName: newBucketName,
+      statusValue: newStatusValue,
+      order: boardConfig.columns.length + 1,
+      color: 'bg-gray-50 dark:bg-gray-950'
+    };
+    
+    const updatedConfig = {
+      ...boardConfig,
+      columns: [...boardConfig.columns, newColumn]
+    };
+    
+    setBoardConfig(updatedConfig);
+    toast.success(`New bucket "${newBucketName}" added`);
   };
 
   // Group items by status
