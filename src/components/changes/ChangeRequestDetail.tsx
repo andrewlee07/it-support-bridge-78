@@ -10,7 +10,7 @@ import { ChangeRequest, RiskLevel } from '@/utils/types';
 import { getUserById } from '@/utils/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface ChangeRequestDetailProps {
+export interface ChangeRequestDetailProps {
   changeRequest: ChangeRequest;
   onApprove?: () => void;
   onReject?: () => void;

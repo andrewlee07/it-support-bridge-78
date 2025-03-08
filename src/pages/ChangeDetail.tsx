@@ -11,7 +11,7 @@ import { ArrowLeft } from 'lucide-react';
 const ChangeDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [change, setChange] = useState<ChangeRequest | null>(null);
+  const [changeRequest, setChangeRequest] = useState<ChangeRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,15 +21,15 @@ const ChangeDetail = () => {
         setLoading(true);
         const response = await getChangeRequestById(id || '');
         if (response.success && response.data) {
-          setChange(response.data);
+          setChangeRequest(response.data);
           setError(null);
         } else {
           setError(response.message || 'Failed to load change request');
-          setChange(null);
+          setChangeRequest(null);
         }
       } catch (err) {
         setError('An unexpected error occurred');
-        setChange(null);
+        setChangeRequest(null);
       } finally {
         setLoading(false);
       }
@@ -40,6 +40,21 @@ const ChangeDetail = () => {
     }
   }, [id]);
 
+  const handleApprove = () => {
+    console.log('Approving change request');
+    // Implementation for approving the change request
+  };
+
+  const handleReject = () => {
+    console.log('Rejecting change request');
+    // Implementation for rejecting the change request
+  };
+
+  const handleEdit = () => {
+    console.log('Editing change request');
+    // Implementation for editing the change request
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -48,7 +63,7 @@ const ChangeDetail = () => {
     );
   }
 
-  if (error || !change) {
+  if (error || !changeRequest) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <h2 className="text-xl font-semibold mb-2">Change Request Not Found</h2>
@@ -77,10 +92,15 @@ const ChangeDetail = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Changes
           </Button>
-          <h1 className="text-2xl font-bold">Change Request: {change.id}</h1>
+          <h1 className="text-2xl font-bold">Change Request: {changeRequest.id}</h1>
         </div>
         
-        <ChangeRequestDetail change={change} />
+        <ChangeRequestDetail 
+          changeRequest={changeRequest} 
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onEdit={handleEdit}
+        />
       </div>
     </PageTransition>
   );

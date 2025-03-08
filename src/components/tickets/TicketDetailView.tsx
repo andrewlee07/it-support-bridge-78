@@ -9,13 +9,17 @@ import TicketTabs from './detail/TicketTabs';
 import TicketTabContent from './detail/TicketTabContent';
 import ReopenDialog, { ReopenFormValues } from './detail/ReopenDialog';
 
-interface TicketDetailViewProps {
+export interface TicketDetailViewProps {
   ticket: Ticket;
   type: 'incident' | 'service';
-  onUpdate: (data: UpdateTicketValues) => void;
-  onClose: (data: CloseTicketValues) => void;
+  onUpdate?: (data: UpdateTicketValues) => void;
+  onClose?: (data: CloseTicketValues) => void;
   onAddNote?: (note: string) => void;
   onReopen?: (reason: string) => void;
+  // For backward compatibility with existing components
+  onUpdateTicket?: (data: UpdateTicketValues) => void;
+  onCloseTicket?: (data: CloseTicketValues) => void;
+  onReopenTicket?: (reason: string) => void;
 }
 
 const TicketDetailView: React.FC<TicketDetailViewProps> = ({
@@ -24,7 +28,10 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   onUpdate,
   onClose,
   onAddNote,
-  onReopen
+  onReopen,
+  onUpdateTicket,
+  onCloseTicket,
+  onReopenTicket
 }) => {
   const [activeTab, setActiveTab] = useState('details');
   const [isReopenDialogOpen, setIsReopenDialogOpen] = useState(false);
@@ -35,13 +42,16 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   const canReopen = ticket.status === (isServiceRequest ? 'fulfilled' : 'resolved') || ticket.status === 'closed';
   const resolveTabLabel = isServiceRequest ? 'fulfill' : 'resolve';
 
+  // Use either the new or old prop handlers
   const handleUpdateSubmit = (data: UpdateTicketValues) => {
-    onUpdate(data);
+    if (onUpdate) onUpdate(data);
+    if (onUpdateTicket) onUpdateTicket(data);
     setActiveTab('details');
   };
 
   const handleCloseSubmit = (data: CloseTicketValues) => {
-    onClose(data);
+    if (onClose) onClose(data);
+    if (onCloseTicket) onCloseTicket(data);
     setActiveTab('details');
   };
 
@@ -52,10 +62,9 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   };
 
   const handleReopenSubmit = (data: ReopenFormValues) => {
-    if (onReopen) {
-      onReopen(data.reason);
-      setIsReopenDialogOpen(false);
-    }
+    if (onReopen) onReopen(data.reason);
+    if (onReopenTicket) onReopenTicket(data.reason);
+    setIsReopenDialogOpen(false);
   };
 
   return (

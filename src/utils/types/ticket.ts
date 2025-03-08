@@ -9,6 +9,14 @@ import { AuditEntry } from './audit';
 import { TestCase } from './test';
 import { BacklogItem } from './backlogTypes';
 
+export interface TicketNote {
+  id: string;
+  text: string;
+  createdAt: Date;
+  createdBy: string;
+  isInternal: boolean;
+}
+
 export interface Ticket {
   id: string;
   title: string;
@@ -22,8 +30,11 @@ export interface Ticket {
   createdAt: Date;
   updatedAt: Date;
   resolvedAt?: Date;
+  closedAt?: Date;
+  reopenedAt?: Date;
   dueDate?: Date;
   slaBreachAt?: Date;
+  notes?: TicketNote[];
   audit: AuditEntry[];
 }
 

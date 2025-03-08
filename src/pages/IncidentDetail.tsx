@@ -5,14 +5,24 @@ import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
 import TicketDetailView from '@/components/tickets/TicketDetailView';
 import { getTicketById } from '@/utils/mockData/tickets';
-import { Ticket } from '@/utils/types/ticket';
+import { Ticket, TicketStatus } from '@/utils/types/ticket';
 import { UpdateTicketValues } from '@/components/tickets/TicketUpdateForm';
 import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
+
+interface TicketWithNotes extends Ticket {
+  notes?: Array<{
+    id: string;
+    text: string;
+    createdAt: Date;
+    createdBy: string;
+    isInternal: boolean;
+  }>;
+}
 
 const IncidentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [ticket, setTicket] = useState<TicketWithNotes | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +33,11 @@ const IncidentDetail = () => {
         if (id) {
           const fetchedTicket = getTicketById(id);
           if (fetchedTicket) {
-            setTicket(fetchedTicket);
+            // Initialize notes array if it doesn't exist
+            setTicket({
+              ...fetchedTicket,
+              notes: fetchedTicket.notes || []
+            });
           } else {
             setError('Incident not found');
           }
@@ -45,6 +59,7 @@ const IncidentDetail = () => {
       const updatedTicket = {
         ...ticket,
         ...values,
+        status: values.status as TicketStatus,
         updatedAt: new Date()
       };
       setTicket(updatedTicket);
@@ -55,10 +70,13 @@ const IncidentDetail = () => {
     if (ticket) {
       const updatedTicket = {
         ...ticket,
-        ...values,
-        status: 'closed',
+        status: values.status as TicketStatus,
         updatedAt: new Date(),
-        closedAt: new Date()
+        closedAt: new Date(),
+        // Store additional values in a way that doesn't conflict with the Ticket type
+        _rootCause: values.rootCause,
+        _closureReason: values.closureReason,
+        _closeNotes: values.notes
       };
       setTicket(updatedTicket);
     }
@@ -66,28 +84,31 @@ const IncidentDetail = () => {
 
   const handleAddNote = (note: string) => {
     if (ticket) {
+      const noteItem = {
+        id: `note-${Date.now()}`,
+        text: note,
+        createdAt: new Date(),
+        createdBy: 'current-user',
+        isInternal: false
+      };
+      
       const updatedTicket = {
         ...ticket,
-        notes: [...ticket.notes, {
-          id: `note-${Date.now()}`,
-          text: note,
-          createdAt: new Date(),
-          createdBy: 'current-user',
-          isInternal: false
-        }],
+        notes: [...(ticket.notes || []), noteItem],
         updatedAt: new Date()
       };
       setTicket(updatedTicket);
     }
   };
 
-  const handleReopenTicket = () => {
+  const handleReopenTicket = (reason: string) => {
     if (ticket) {
       const updatedTicket = {
         ...ticket,
-        status: 'open',
+        status: 'open' as TicketStatus,
         updatedAt: new Date(),
-        reopenedAt: new Date()
+        reopenedAt: new Date(),
+        _reopenReason: reason
       };
       setTicket(updatedTicket);
     }
