@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
@@ -164,7 +165,7 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
                   <SelectValue placeholder="Filter by release" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Items</SelectItem>
+                  <SelectItem value="all">All Items</SelectItem>
                   <SelectItem value="unassigned">Unassigned</SelectItem>
                   {releases.map((release) => (
                     <SelectItem key={release.id} value={release.id}>

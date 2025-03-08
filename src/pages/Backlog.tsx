@@ -48,7 +48,6 @@ const Backlog: React.FC = () => {
   return (
     <PageTransition>
       <div className="container py-6">
-        <h1 className="text-3xl font-bold tracking-tight mb-6">Backlog</h1>
         <BacklogItemList 
           onCreateItem={handleCreateItem} 
           onEditItem={handleEditItem}
