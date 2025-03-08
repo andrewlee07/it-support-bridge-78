@@ -59,7 +59,11 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                   height: columnSize === 'compact' ? '320px' : '520px' 
                 }}
               >
-                <ScrollArea className="h-full w-full" orientation="vertical">
+                <ScrollArea 
+                  className="h-full w-full pr-1" 
+                  orientation="vertical"
+                  type="always"
+                >
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
