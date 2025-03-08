@@ -102,14 +102,14 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
     });
   };
 
-  // Create a mock coverage object for the TestCoverageIndicator
-  const mockCoverage = {
-    coverage: {
-      total: 10,
-      covered: 8,
-      passed: 7,
-      failed: 1
-    }
+  // Create a proper BacklogTestCoverage object for the TestCoverageIndicator
+  const mockCoverage: BacklogTestCoverage = {
+    totalTestCases: 10,
+    passedTests: 7,
+    failedTests: 2,
+    notExecutedTests: 1,
+    coveragePercentage: 70,
+    lastUpdated: new Date()
   };
 
   return (
@@ -129,7 +129,7 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
             </p>
           </div>
           <TestCoverageIndicator 
-            coverage={mockCoverage.coverage}
+            coverage={mockCoverage}
             size="lg" 
           />
         </div>
