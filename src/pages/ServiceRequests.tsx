@@ -1,22 +1,20 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getTicketsByType, generateServiceRequestId } from '@/utils/mockData';
 import TicketList from '@/components/tickets/TicketList';
 import TicketForm from '@/components/tickets/TicketForm';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
-import { Ticket } from '@/utils/types';
+import { Ticket } from '@/utils/types/ticket';
 import { toast } from 'sonner';
 import PageTransition from '@/components/shared/PageTransition';
 
 const ServiceRequests = () => {
   const [showForm, setShowForm] = useState(false);
-  const tickets = getTicketsByType('service');
   
   const handleSubmit = (data: Partial<Ticket>) => {
     // In a real app, this would connect to an API
-    console.log('Submitting service request:', { ...data, id: generateServiceRequestId() });
+    console.log('Submitting service request:', data);
     setShowForm(false);
     toast.success('Service request created successfully!');
   };
@@ -61,30 +59,19 @@ const ServiceRequests = () => {
             </TabsList>
             
             <TabsContent value="all" className="mt-0">
-              <TicketList tickets={tickets} type="service" />
+              <TicketList type="service" />
             </TabsContent>
             
             <TabsContent value="open" className="mt-0">
-              <TicketList 
-                tickets={tickets.filter(ticket => ticket.status === 'open')} 
-                type="service" 
-              />
+              <TicketList type="service" />
             </TabsContent>
             
             <TabsContent value="in-progress" className="mt-0">
-              <TicketList 
-                tickets={tickets.filter(ticket => ticket.status === 'in-progress')} 
-                type="service" 
-              />
+              <TicketList type="service" />
             </TabsContent>
             
             <TabsContent value="fulfilled" className="mt-0">
-              <TicketList 
-                tickets={tickets.filter(ticket => 
-                  ticket.status === 'resolved' || ticket.status === 'closed'
-                )} 
-                type="service" 
-              />
+              <TicketList type="service" />
             </TabsContent>
           </Tabs>
         )}

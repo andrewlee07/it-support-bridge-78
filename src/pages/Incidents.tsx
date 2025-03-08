@@ -1,22 +1,20 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getTicketsByType, generateIncidentId } from '@/utils/mockData';
 import TicketList from '@/components/tickets/TicketList';
 import TicketForm from '@/components/tickets/TicketForm';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
-import { Ticket } from '@/utils/types';
+import { Ticket } from '@/utils/types/ticket';
 import { toast } from 'sonner';
 import PageTransition from '@/components/shared/PageTransition';
 
 const Incidents = () => {
   const [showForm, setShowForm] = useState(false);
-  const tickets = getTicketsByType('incident');
   
   const handleSubmit = (data: Partial<Ticket>) => {
     // In a real app, this would connect to an API
-    console.log('Submitting incident:', { ...data, id: generateIncidentId() });
+    console.log('Submitting incident:', data);
     setShowForm(false);
     toast.success('Incident created successfully!');
   };
@@ -61,30 +59,19 @@ const Incidents = () => {
             </TabsList>
             
             <TabsContent value="all" className="mt-0">
-              <TicketList tickets={tickets} type="incident" />
+              <TicketList type="incident" />
             </TabsContent>
             
             <TabsContent value="open" className="mt-0">
-              <TicketList 
-                tickets={tickets.filter(ticket => ticket.status === 'open')} 
-                type="incident" 
-              />
+              <TicketList type="incident" />
             </TabsContent>
             
             <TabsContent value="in-progress" className="mt-0">
-              <TicketList 
-                tickets={tickets.filter(ticket => ticket.status === 'in-progress')} 
-                type="incident" 
-              />
+              <TicketList type="incident" />
             </TabsContent>
             
             <TabsContent value="resolved" className="mt-0">
-              <TicketList 
-                tickets={tickets.filter(ticket => 
-                  ticket.status === 'resolved' || ticket.status === 'closed'
-                )} 
-                type="incident" 
-              />
+              <TicketList type="incident" />
             </TabsContent>
           </Tabs>
         )}

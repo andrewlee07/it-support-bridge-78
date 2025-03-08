@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -11,9 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Ticket, TicketStatus, TicketPriority } from '@/utils/types/ticket';
+import { Ticket, TicketStatus, TicketPriority, TicketType } from '@/utils/types/ticket';
 import TicketCard from './TicketCard';
-import { fetchTickets } from '@/utils/api/ticketApi';
 import { PlusCircle, Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import TicketForm from './TicketForm';
@@ -55,14 +55,14 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
   const loadTickets = async () => {
     setLoading(true);
     try {
-      const response = await fetchTickets(type);
-      if (response.data) {
-        setTickets(response.data);
-        setFilteredTickets(response.data);
-      }
+      // Mock implementation, replace with actual API call later
+      setTimeout(() => {
+        setTickets([]);
+        setFilteredTickets([]);
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error('Failed to fetch tickets:', error);
-    } finally {
       setLoading(false);
     }
   };
@@ -153,9 +153,10 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
                 <SelectItem value="all">All statuses</SelectItem>
                 <SelectItem value="open">Open</SelectItem>
                 <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="waiting">Waiting</SelectItem>
                 <SelectItem value="resolved">Resolved</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="fulfilled">Fulfilled</SelectItem>
               </SelectContent>
             </Select>
             <Select
@@ -167,10 +168,10 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All priorities</SelectItem>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="P1">P1 (Critical)</SelectItem>
+                <SelectItem value="P2">P2 (High)</SelectItem>
+                <SelectItem value="P3">P3 (Medium)</SelectItem>
+                <SelectItem value="P4">P4 (Low)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -230,8 +231,9 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
           </DialogHeader>
           <TicketForm
             type={type}
-            onCancel={handleCloseTicketDialog}
-            onSuccess={handleTicketCreated}
+            onSubmit={(data) => {
+              handleTicketCreated();
+            }}
           />
         </DialogContent>
       </Dialog>
@@ -253,15 +255,15 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium">Status</h3>
-                  <Badge className="mt-1">{selectedTicket.status}</Badge>
+                  <Badge>{selectedTicket.status}</Badge>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium">Priority</h3>
-                  <Badge className="mt-1">{selectedTicket.priority}</Badge>
+                  <Badge>{selectedTicket.priority}</Badge>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium">Reported By</h3>
-                  <p className="text-sm">{selectedTicket.reportedBy}</p>
+                  <p className="text-sm">{selectedTicket.createdBy}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium">Assigned To</h3>
