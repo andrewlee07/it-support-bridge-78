@@ -161,7 +161,8 @@ const BugFormFields: React.FC<BugFormFieldsProps> = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                {/* Fix: Using "none" instead of an empty string for the placeholder option */}
+                <SelectItem value="none">None</SelectItem>
                 {testCases.map((testCase) => (
                   <SelectItem key={testCase.id} value={testCase.id}>
                     {testCase.title}

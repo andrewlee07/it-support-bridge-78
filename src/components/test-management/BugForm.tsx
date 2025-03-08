@@ -42,7 +42,7 @@ const BugForm: React.FC<BugFormProps> = ({
       priority: initialData?.priority || 'medium',
       status: initialData?.status || 'new',
       assignedDeveloper: initialData?.assignedDeveloper || '',
-      relatedTestCase: initialData?.relatedTestCase || '',
+      relatedTestCase: initialData?.relatedTestCase || 'none',
       attachment: initialData?.attachment || '',
     },
   });
@@ -55,6 +55,10 @@ const BugForm: React.FC<BugFormProps> = ({
 
   // Handle form submission
   const onSubmit = async (data: BugFormValues) => {
+    // Convert "none" value back to an empty string for the API
+    if (data.relatedTestCase === 'none') {
+      data.relatedTestCase = '';
+    }
     await handleSubmit(data);
   };
 
