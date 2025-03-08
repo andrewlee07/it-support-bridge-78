@@ -12,6 +12,16 @@ interface BugDetailProps {
 }
 
 const BugDetail: React.FC<BugDetailProps> = ({ bug, onClose, onEdit }) => {
+  // Helper function to get user display name
+  const getUserDisplayName = (userId: string) => {
+    // This would be replaced with actual user lookup
+    const userMap: Record<string, string> = {
+      'user-1': 'John Doe',
+      'user-2': 'Jane Smith',
+    };
+    return userMap[userId] || userId;
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -54,14 +64,14 @@ const BugDetail: React.FC<BugDetailProps> = ({ bug, onClose, onEdit }) => {
 
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <span className="font-semibold">Reported by:</span> {bug.createdBy}
+          <span className="font-semibold">Reported by:</span> {getUserDisplayName(bug.createdBy || bug.reportedBy || '')}
         </div>
         <div>
           <span className="font-semibold">Reported on:</span> {new Date(bug.createdAt).toLocaleString()}
         </div>
         {bug.assignedDeveloper && (
           <div>
-            <span className="font-semibold">Assigned to:</span> {bug.assignedDeveloper}
+            <span className="font-semibold">Assigned to:</span> {getUserDisplayName(bug.assignedDeveloper)}
           </div>
         )}
         <div>

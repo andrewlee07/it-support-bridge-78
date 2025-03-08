@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useNavigate } from 'react-router-dom';
 
 interface BugTableProps {
   bugs: Bug[];
@@ -26,6 +27,22 @@ const BugTable: React.FC<BugTableProps> = ({
   onEdit, 
   onStatusUpdate 
 }) => {
+  const navigate = useNavigate();
+
+  const handleBugClick = (bug: Bug) => {
+    navigate(`/bugs/${bug.id}`);
+  };
+
+  // Helper function to get user display name
+  const getUserDisplayName = (userId: string) => {
+    // This would be replaced with actual user lookup
+    const userMap: Record<string, string> = {
+      'user-1': 'John Doe',
+      'user-2': 'Jane Smith',
+    };
+    return userMap[userId] || userId;
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -53,7 +70,7 @@ const BugTable: React.FC<BugTableProps> = ({
               <TableRow 
                 key={bug.id} 
                 className="cursor-pointer hover:bg-muted/50"
-                onClick={() => onView(bug)}
+                onClick={() => handleBugClick(bug)}
               >
                 <TableCell className="font-medium">
                   {bug.title}
@@ -65,7 +82,7 @@ const BugTable: React.FC<BugTableProps> = ({
                   <StatusBadge status={bug.status} />
                 </TableCell>
                 <TableCell>
-                  {bug.createdBy || <span className="text-muted-foreground">-</span>}
+                  {getUserDisplayName(bug.createdBy || bug.reportedBy || '')}
                 </TableCell>
                 <TableCell>
                   {new Date(bug.createdAt).toLocaleDateString()}
