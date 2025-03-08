@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Ticket } from '@/utils/types/ticket';
 import { CheckCircle2, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,17 +24,12 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
   const resolveButtonLabel = isServiceRequest ? 'Fulfill Request' : 'Resolve';
   
   return (
-    <>
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold">{ticket.title}</DialogTitle>
-        <p className="text-sm text-muted-foreground">{ticket.id}</p>
-      </DialogHeader>
-      
+    <div className="space-y-4">
       {/* Ticket Header */}
       <div className="border-b pb-4">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-xl font-bold">{ticket.title}</h2>
+            <h2 className="text-2xl font-bold">{ticket.title}</h2>
             <p className="text-sm text-muted-foreground">{ticket.id}</p>
           </div>
           <div className="flex gap-2">
@@ -60,7 +54,7 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

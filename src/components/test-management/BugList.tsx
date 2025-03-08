@@ -15,7 +15,6 @@ import BugForm from './BugForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import BugTable from './BugTable';
-import BugDetail from './BugDetail';
 import { useNavigate } from 'react-router-dom';
 
 interface BugListProps {
@@ -27,7 +26,6 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedBug, setSelectedBug] = useState<Bug | null>(null);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Fetch bugs - only if initialBugs is not provided
@@ -91,7 +89,7 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
 
   // View bug details
   const viewBug = (bug: Bug) => {
-    // Navigate to the bug detail page instead of showing a dialog
+    // Navigate to the bug detail page
     navigate(`/bugs/${bug.id}`);
   };
 
