@@ -1,69 +1,13 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/auth';
-import { useToast } from '@/hooks/use-toast';
+import { useLoginForm } from '@/hooks/useLoginForm';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const { toast } = useToast();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password) {
-      toast({
-        title: "Error",
-        description: "Please enter both email and password",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      console.log("Login component: Attempting login with:", email, "and password length:", password.length);
-      const success = await login(email, password);
-      console.log("Login component: Login result:", success ? "success" : "failed");
-      
-      if (success) {
-        toast({
-          title: "Success",
-          description: "You have successfully logged in"
-        });
-        
-        // Check if there's a redirect path stored
-        const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
-        localStorage.removeItem('redirectAfterLogin'); // Clear it
-        
-        navigate(redirectPath);
-      } else {
-        toast({
-          title: "Error",
-          description: "Invalid credentials. Please try again.",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      toast({
-        title: "Error",
-        description: "An error occurred. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { email, setEmail, password, setPassword, isLoading, handleSubmit } = useLoginForm();
 
   return (
     <div className="flex flex-col items-center">
