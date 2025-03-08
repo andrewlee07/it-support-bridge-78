@@ -11,6 +11,7 @@ interface NavLinkProps {
 }
 
 const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
+  // Use Link component from react-router-dom instead of 'a' tags to prevent page reloads
   return (
     <Link 
       to={item.href || item.path || '#'}

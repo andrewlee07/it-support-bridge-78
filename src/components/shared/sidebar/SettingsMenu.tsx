@@ -61,7 +61,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
           className={cn(
             "flex w-full justify-between items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
             locationPathname.startsWith('/settings') && "bg-primary/10 text-primary font-medium",
-            "text-base" // Added text-base to match other menu items
+            "text-base"
           )}
         >
           <div className="flex items-center gap-3">

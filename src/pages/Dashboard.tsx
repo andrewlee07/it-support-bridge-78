@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,11 +14,17 @@ export const isHighPriority = (priority: TicketPriority): boolean => {
 
 // Dashboard component
 export const Dashboard = () => {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <div className="flex-1">
-        <Navbar />
+        <Navbar toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
         <main className="p-6">
           <PageTransition>
             <div className="space-y-6">
