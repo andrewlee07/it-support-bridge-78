@@ -65,21 +65,21 @@ const Login: React.FC = () => {
   return (
     <div className="flex flex-col items-center">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-[#9b87f5]">Test Management System</h1>
-        <p className="text-[#8E9196] mt-2">Log in to access your account</p>
+        <h1 className="text-3xl font-bold text-[#b047c9]">Test Management System</h1>
+        <p className="text-[#42284e] mt-2">Log in to access your account</p>
       </div>
       
-      <Card className="w-full max-w-md shadow-lg border-[#E5DEFF]">
-        <CardHeader className="space-y-1 bg-[#F1F0FB] rounded-t-lg border-b border-[#E5DEFF]">
-          <CardTitle className="text-2xl text-center text-[#7E69AB]">Login</CardTitle>
-          <CardDescription className="text-center text-[#6E59A5]">
+      <Card className="w-full max-w-md shadow-lg border-[#b047c9]/20">
+        <CardHeader className="space-y-1 bg-[#42284e]/5 rounded-t-lg border-b border-[#b047c9]/10">
+          <CardTitle className="text-2xl text-center text-[#42284e]">Login</CardTitle>
+          <CardDescription className="text-center text-[#42284e]/80">
             Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6 bg-white rounded-b-lg">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-[#403E43]">Email</Label>
+              <Label htmlFor="email" className="text-[#42284e]">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -87,11 +87,11 @@ const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="bg-[#F6F6F7] border-[#E5DEFF] focus-visible:ring-[#9b87f5]"
+                className="bg-[#f6f6f7] border-[#b047c9]/20 focus-visible:ring-[#b047c9]"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-[#403E43]">Password</Label>
+              <Label htmlFor="password" className="text-[#42284e]">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -99,20 +99,20 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="bg-[#F6F6F7] border-[#E5DEFF] focus-visible:ring-[#9b87f5]"
+                className="bg-[#f6f6f7] border-[#b047c9]/20 focus-visible:ring-[#b047c9]"
               />
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-[#9b87f5] hover:bg-[#7E69AB] text-white transition-colors"
+              className="w-full bg-[#b047c9] hover:bg-[#42284e] text-white transition-colors"
               disabled={isLoading}
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">
-            <span className="text-[#8E9196]">Don't have an account? </span>
-            <Link to="/auth/register" className="text-[#9b87f5] hover:text-[#7E69AB] hover:underline font-medium">
+            <span className="text-[#42284e]/60">Don't have an account? </span>
+            <Link to="/auth/register" className="text-[#b047c9] hover:text-[#42284e] hover:underline font-medium">
               Register
             </Link>
           </div>
