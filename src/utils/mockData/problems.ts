@@ -1,4 +1,3 @@
-
 import { Problem, KnownError, ProblemStatus, ProblemPriority } from '../types/problem';
 import { AuditEntry } from '../types/audit';
 import { createAuditEntries } from './auditHelpers';
@@ -16,7 +15,7 @@ let problems: Problem[] = [
     createdAt: new Date('2024-02-15T08:30:00Z'),
     updatedAt: new Date('2024-02-15T14:45:00Z'),
     audit: createAuditEntries('PRB00001', 'problem', 'john.doe'),
-    relatedIncidents: ['INC00123', 'INC00124', 'INC00125'],
+    relatedIncidents: ['INC00001', 'INC00003', 'INC00005'],
     rootCause: '',
     resolutionPlan: 'Investigate the network switches in the east wing.',
     affectedServices: ['Email', 'Intranet']
@@ -33,7 +32,7 @@ let problems: Problem[] = [
     createdAt: new Date('2024-02-10T10:15:00Z'),
     updatedAt: new Date('2024-02-16T09:30:00Z'),
     audit: createAuditEntries('PRB00002', 'problem', 'john.doe'),
-    relatedIncidents: ['INC00120', 'INC00132'],
+    relatedIncidents: ['INC00002', 'INC00003'],
     rootCause: 'Memory allocation issue in file processing module',
     resolutionPlan: 'Patch the application to properly handle memory for large files.',
     affectedServices: ['Document Management System']
@@ -50,7 +49,7 @@ let problems: Problem[] = [
     createdAt: new Date('2024-02-05T13:45:00Z'),
     updatedAt: new Date('2024-02-14T16:20:00Z'),
     audit: createAuditEntries('PRB00003', 'problem', 'maria.garcia'),
-    relatedIncidents: ['INC00110', 'INC00115', 'INC00118', 'INC00126'],
+    relatedIncidents: ['INC00001', 'INC00002', 'INC00003'],
     rootCause: 'Authentication server overload during concurrent login attempts',
     resolutionPlan: 'Upgrade authentication server capacity and implement load balancing.',
     workaround: 'Users should retry login after 1-2 minutes if they encounter an error.',
@@ -70,7 +69,7 @@ let problems: Problem[] = [
     updatedAt: new Date('2024-02-10T11:30:00Z'),
     resolvedAt: new Date('2024-02-10T11:30:00Z'),
     audit: createAuditEntries('PRB00004', 'problem', 'jane.smith'),
-    relatedIncidents: ['INC00095', 'INC00097', 'INC00100'],
+    relatedIncidents: ['INC00001', 'INC00003'],
     rootCause: 'Misconfigured spam filtering rules causing message queue backlog',
     resolutionDescription: 'Reconfigured spam filtering rules and optimized the mail queue processing.',
     resolutionStatus: 'resolved',
@@ -90,7 +89,7 @@ let problems: Problem[] = [
     resolvedAt: new Date('2024-01-30T09:15:00Z'),
     closedAt: new Date('2024-02-01T15:45:00Z'),
     audit: createAuditEntries('PRB00005', 'problem', 'alex.kumar'),
-    relatedIncidents: ['INC00080', 'INC00082', 'INC00085', 'INC00086'],
+    relatedIncidents: ['INC00001', 'INC00002'],
     rootCause: 'Windows update KB500123 conflicts with printer driver',
     resolutionDescription: 'Updated printer drivers to version compatible with the Windows security update.',
     resolutionStatus: 'resolved',

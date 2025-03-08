@@ -3,10 +3,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Link as LinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getTicketById } from '@/utils/mockData/tickets';
 
 interface RelatedItem {
   id: string;
-  title: string;
+  title?: string;
   type: string;
   status?: string;
 }
@@ -26,9 +27,26 @@ const RelatedItemsList: React.FC<RelatedItemsListProps> = ({ items, type }) => {
         return `/backlog/${item.id}`;
       case 'problem':
         return `/problems/${item.id}`;
+      case 'incident':
+        return `/incidents/${item.id}`;
+      case 'service':
+        return `/service-requests/${item.id}`;
       default:
         return '#';
     }
+  };
+
+  // Helper function to get the item title if not provided
+  const getItemTitle = (item: RelatedItem) => {
+    if (item.title) return item.title;
+    
+    // If no title provided and it's an incident or service request, try to fetch it
+    if (item.type.toLowerCase() === 'incident' || item.type.toLowerCase() === 'service') {
+      const ticket = getTicketById(item.id);
+      return ticket ? ticket.title : item.id;
+    }
+    
+    return item.id;
   };
   
   return (
@@ -41,7 +59,7 @@ const RelatedItemsList: React.FC<RelatedItemsListProps> = ({ items, type }) => {
               to={getItemPath(item)}
               className="text-primary hover:underline truncate"
             >
-              {item.id}: {item.title}
+              {item.id}: {getItemTitle(item)}
             </Link>
             {item.status && (
               <span className={cn(
@@ -56,6 +74,9 @@ const RelatedItemsList: React.FC<RelatedItemsListProps> = ({ items, type }) => {
           </div>
         </div>
       ))}
+      {items.length === 0 && (
+        <p className="text-muted-foreground text-sm">No related items found.</p>
+      )}
     </div>
   );
 };

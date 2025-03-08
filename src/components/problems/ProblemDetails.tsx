@@ -3,14 +3,19 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Problem } from '@/utils/types/problem';
 import { formatRelative } from 'date-fns';
-import { Link as LinkIcon } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import RelatedItemsList from '@/components/tickets/detail/RelatedItemsList';
 
 interface ProblemDetailsProps {
   problem: Problem;
 }
 
 const ProblemDetails: React.FC<ProblemDetailsProps> = ({ problem }) => {
+  // Transform the related incidents to the format expected by RelatedItemsList
+  const relatedIncidents = problem.relatedIncidents?.map(incidentId => ({
+    id: incidentId,
+    type: 'incident'
+  })) || [];
+
   return (
     <div className="space-y-6">
       <Card>
@@ -128,16 +133,7 @@ const ProblemDetails: React.FC<ProblemDetailsProps> = ({ problem }) => {
         </CardHeader>
         <CardContent>
           {problem.relatedIncidents && problem.relatedIncidents.length > 0 ? (
-            <div className="space-y-2">
-              {problem.relatedIncidents.map((incidentId) => (
-                <div key={incidentId} className="flex items-center gap-2 p-2 border rounded-md">
-                  <LinkIcon className="h-4 w-4 text-primary" />
-                  <Link to={`/incidents/${incidentId}`} className="text-primary hover:underline">
-                    {incidentId}
-                  </Link>
-                </div>
-              ))}
-            </div>
+            <RelatedItemsList items={relatedIncidents} type="incident" />
           ) : (
             <p className="text-muted-foreground">No related incidents have been linked to this problem.</p>
           )}
