@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
@@ -6,6 +7,7 @@ import { getTicketById } from '@/utils/mockData/tickets';
 import { Ticket, TicketStatus } from '@/utils/types/ticket';
 import { UpdateTicketValues } from '@/components/tickets/TicketUpdateForm';
 import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
+import { toast } from 'sonner';
 
 interface TicketWithNotes extends Ticket {
   notes?: Array<{
@@ -103,6 +105,7 @@ const ServiceRequestDetail = () => {
         updatedAt: new Date()
       };
       setTicket(updatedTicket);
+      toast.success("Note added successfully");
     }
   };
 

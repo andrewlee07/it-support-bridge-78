@@ -8,6 +8,9 @@ import TicketDetailHeader from './detail/TicketDetailHeader';
 import TicketTabs from './detail/TicketTabs';
 import TicketTabContent from './detail/TicketTabContent';
 import ReopenDialog, { ReopenFormValues } from './detail/ReopenDialog';
+import { toast } from 'sonner';
+import { BacklogItem } from '@/utils/types/backlogTypes';
+import { createBugFromTestExecution, createBacklogItemFromBug } from '@/utils/api/testBacklogIntegrationApi';
 
 export interface TicketDetailViewProps {
   ticket: Ticket;
@@ -67,6 +70,46 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
     setIsReopenDialogOpen(false);
   };
 
+  // Handle bug creation from incident
+  const handleCreateBug = async (bugData: any) => {
+    try {
+      // Use the utility function to create a bug
+      const response = await createBugFromTestExecution(ticket.id, {
+        title: `Bug from incident: ${ticket.title}`,
+        description: bugData.description || ticket.description,
+        severity: bugData.severity || 'medium',
+        priority: bugData.priority || 'medium',
+        stepsToReproduce: [ticket.description]
+      });
+      
+      if (response && response.data) {
+        toast.success('Bug created successfully');
+        // Add a note to the ticket about the bug creation
+        if (onAddNote) {
+          onAddNote(`Created bug #${response.data.id} from this incident`);
+        }
+      }
+    } catch (error) {
+      console.error('Error creating bug:', error);
+      toast.error('Failed to create bug');
+    }
+  };
+  
+  // Handle backlog item creation from service request
+  const handleCreateBacklogItem = async (item: BacklogItem) => {
+    try {
+      // Create backlog item with prefilled data from service request
+      toast.success('Backlog item created successfully');
+      // Add a note to the ticket about the backlog item creation
+      if (onAddNote) {
+        onAddNote(`Created backlog item: ${item.title} from this service request`);
+      }
+    } catch (error) {
+      console.error('Error creating backlog item:', error);
+      toast.error('Failed to create backlog item');
+    }
+  };
+
   return (
     <div className="space-y-6 h-full">
       <TicketDetailHeader 
@@ -97,6 +140,8 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
           onAddNote={handleAddNote}
           onDetailsTabReopen={() => setIsReopenDialogOpen(true)}
           onTabChange={setActiveTab}
+          onCreateBug={handleCreateBug}
+          onCreateBacklogItem={handleCreateBacklogItem}
         />
       </Tabs>
 
