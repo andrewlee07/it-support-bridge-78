@@ -34,25 +34,16 @@ export const useBugCreation = ({ testCase, onSuccess, onClose }: UseBugCreationP
     setIsSubmitting(true);
     
     try {
-      // Fix the API calls with proper implementation
-      // Mocked success response until API is fully implemented
-      const bugResponse = {
-        success: true,
-        data: {
-          id: `bug-${Date.now()}`,
-          title: `Bug for ${testCase.title}`,
-          description,
-          severity,
-          priority,
-          status: 'new',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          createdBy: 'current-user'
-        } as Bug
-      };
+      // Create the bug
+      const bugResponse = await createBugFromTestExecution(testCase.id, {
+        description,
+        severity,
+        priority,
+        stepsToReproduce: testCase.stepsToReproduce || []
+      });
       
       if (!bugResponse.success) {
-        throw new Error(bugResponse.error || "Failed to create bug");
+        throw new Error("Failed to create bug");
       }
       
       const bug = bugResponse.data;
@@ -60,22 +51,7 @@ export const useBugCreation = ({ testCase, onSuccess, onClose }: UseBugCreationP
       
       // Create backlog item if requested
       if (createBacklogItem) {
-        // Mocked success response until API is fully implemented
-        const backlogResponse = {
-          success: true,
-          data: {
-            id: `backlog-${Date.now()}`,
-            title: `Fix: ${description.substring(0, 50)}`,
-            description,
-            priority,
-            type: 'bug',
-            status: 'open',
-            labels: ['bug'],
-            creator: 'current-user',
-            createdAt: new Date(),
-            updatedAt: new Date()
-          } as BacklogItem
-        };
+        const backlogResponse = await createBacklogItemFromBug(bug.id);
         
         if (backlogResponse.success) {
           backlogItem = backlogResponse.data;

@@ -10,19 +10,88 @@ import {
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { BacklogItem, BacklogTestCoverage } from '@/utils/types/backlogTypes';
+import { TestCase } from '@/utils/types/test';
 import { useBacklogTestCoverage } from '@/hooks/useBacklogTestCoverage';
 import LinkTestCaseDialog from './LinkTestCaseDialog';
 import TestCoverageIndicator from './TestCoverageIndicator';
-import LinkedTestCases from './LinkedTestCases';
 
 interface TestCoverageTabProps {
-  backlogItem: BacklogItem;
+  backlogItemId: string;
+  onViewTestCase?: (testCase: TestCase) => void;
   onRefresh?: () => void;
 }
 
+interface LinkedTestCasesProps {
+  testCases: TestCase[];
+  isLoading: boolean;
+  onUnlink: (testCaseId: string) => Promise<void>;
+  onViewTestCase?: (testCase: TestCase) => void;
+}
+
+// LinkedTestCases subcomponent
+const LinkedTestCases: React.FC<LinkedTestCasesProps> = ({ 
+  testCases, 
+  isLoading, 
+  onUnlink,
+  onViewTestCase
+}) => {
+  if (isLoading) {
+    return <div className="text-center py-8">Loading test cases...</div>;
+  }
+
+  if (testCases.length === 0) {
+    return <div className="text-center py-8 text-muted-foreground">No test cases linked to this backlog item.</div>;
+  }
+
+  return (
+    <div className="space-y-3">
+      {testCases.map((testCase) => (
+        <div 
+          key={testCase.id} 
+          className="p-3 border rounded-md hover:bg-gray-50 flex justify-between items-center"
+        >
+          <div>
+            <div className="font-medium">{testCase.title}</div>
+            <div className="text-sm text-muted-foreground">ID: {testCase.id}</div>
+            <div className="mt-1">
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                testCase.status === 'pass' || testCase.status === 'passed' 
+                  ? 'bg-green-100 text-green-800' 
+                  : testCase.status === 'fail' || testCase.status === 'failed'
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-gray-100 text-gray-800'
+              }`}>
+                {testCase.status}
+              </span>
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            {onViewTestCase && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => onViewTestCase(testCase)}
+              >
+                View
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onUnlink(testCase.id)}
+            >
+              Unlink
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ 
-  backlogItem,
+  backlogItemId,
+  onViewTestCase,
   onRefresh 
 }) => {
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
@@ -33,7 +102,7 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
     isFetching, 
     unlinkTestCase,
     refreshTestCases
-  } = useBacklogTestCoverage(backlogItem.id);
+  } = useBacklogTestCoverage(backlogItemId);
 
   const testCaseCount = linkedTestCases?.length || 0;
   const passedTestsCount = linkedTestCases?.filter(tc => tc.status === 'pass' || tc.status === 'passed').length || 0;
@@ -46,19 +115,6 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
   const coveragePercentage = testCaseCount > 0 
     ? Math.round((passedTestsCount / testCaseCount) * 100) 
     : 0;
-  
-  // Create a coverage object for the TestCoverageIndicator
-  const coverage: BacklogTestCoverage = {
-    totalTestCases: testCaseCount,
-    passedTests: passedTestsCount,
-    failedTests: failedTestsCount,
-    notExecutedTests: notExecutedCount,
-    coveragePercentage: coveragePercentage,
-    lastUpdated: new Date(),
-    // Add these properties for compatibility with TestCoverageIndicator
-    total: testCaseCount,
-    covered: passedTestsCount
-  };
   
   const handleOpenLinkDialog = () => {
     setIsLinkDialogOpen(true);
@@ -182,13 +238,14 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
             testCases={linkedTestCases || []}
             isLoading={isLoading || isFetching}
             onUnlink={handleUnlinkTestCase}
+            onViewTestCase={onViewTestCase}
           />
         </CardContent>
       </Card>
       
       {/* Link Test Case Dialog */}
       <LinkTestCaseDialog
-        backlogItemId={backlogItem.id}
+        backlogItemId={backlogItemId}
         open={isLinkDialogOpen}
         onClose={handleCloseLinkDialog}
       />

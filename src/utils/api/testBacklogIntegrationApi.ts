@@ -25,6 +25,7 @@ const createBugFromTestExecution = async (testCaseId: string, bugData: any) => {
       id: `bug-${Date.now()}`,
       title: `Bug for test case ${testCaseId}`,
       ...bugData,
+      stepsToReproduce: bugData.stepsToReproduce || [],
       createdAt: new Date(),
       updatedAt: new Date(),
       createdBy: 'current-user',

@@ -40,6 +40,8 @@ export interface BacklogTestCoverage {
   // Additional properties for compatibility with TestCoverageIndicator
   total?: number; // For backward compatibility with TestCoverageIndicator
   covered?: number; // For backward compatibility with TestCoverageIndicator
+  passed?: number; // For backward compatibility with TestCoverageIndicator
+  failed?: number; // For backward compatibility with TestCoverageIndicator
 }
 
 // API response types for Backlog Management
