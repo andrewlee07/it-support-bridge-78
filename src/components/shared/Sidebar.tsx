@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import NavLink from './sidebar/NavLink';
@@ -12,10 +12,16 @@ import GlobalSearch from './search/GlobalSearch';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // Close mobile sidebar when route changes
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
   
   const isActiveRoute = (path: string | undefined): boolean => {
     if (!path) return false;
@@ -32,74 +38,105 @@ const Sidebar = () => {
   // Check if any settings items are accessible to the current user
   const hasSettingsAccess = settingsItems.some(item => hasPermission(item.allowedRoles));
 
-  // Ensure sidebar navigation links are working
-  const handleNavigation = (path: string) => {
-    navigate(path);
+  // Toggle sidebar for mobile view
+  const toggleMobileSidebar = () => {
+    setMobileOpen(!mobileOpen);
   };
 
   console.log('Current pathname:', location.pathname);
 
   return (
-    <div 
-      className={cn(
-        "h-screen fixed top-0 left-0 bg-sidebar border-r border-border/40 transition-all duration-300 ease-in-out z-30",
-        collapsed ? "w-16" : "w-64"
-      )}
-    >
-      <div className="flex h-16 items-center justify-between border-b border-border/40 px-4">
-        {!collapsed && (
-          <div className="font-semibold text-lg text-primary flex items-center">
-            IT Support Bridge
-          </div>
-        )}
+    <>
+      {/* Mobile menu toggle button - fixed to the top left */}
+      <div className="fixed top-4 left-4 z-50 md:hidden">
         <Button 
-          variant="ghost" 
-          size="sm" 
-          className={cn("rounded-full h-8 w-8", collapsed && "mx-auto")} 
-          onClick={() => setCollapsed(!collapsed)}
+          variant="outline" 
+          size="icon" 
+          onClick={toggleMobileSidebar}
+          className="h-10 w-10 rounded-full shadow-md bg-background"
         >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          <Menu className="h-5 w-5" />
         </Button>
       </div>
       
-      <div className="py-4 flex flex-col h-[calc(100vh-4rem)] justify-between">
-        {!collapsed && (
-          <div className="px-3 mb-4">
-            <GlobalSearch placeholder="Search..." />
-          </div>
+      {/* Overlay for mobile */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setMobileOpen(false)} 
+        />
+      )}
+      
+      <div 
+        className={cn(
+          "fixed top-0 left-0 bg-sidebar border-r border-border/40 h-screen z-30 transition-all duration-300 ease-in-out",
+          collapsed ? "w-16" : "w-64",
+          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
-        
-        <div className="space-y-1 px-3 overflow-y-auto flex-grow">
-          {navigationItems.map((item) => (
-            // Only render if user has permission
-            hasPermission(item.allowedRoles || []) && (
-              <NavLink 
-                key={item.path || item.name} 
-                item={item} 
-                isActive={isActiveRoute(item.path)}
-                collapsed={collapsed} 
-              />
-            )
-          ))}
-          
-          {/* Settings Menu (with submenu) */}
-          {hasSettingsAccess && (
-            <SettingsMenu 
-              collapsed={collapsed}
-              settingsOpen={settingsOpen}
-              setSettingsOpen={setSettingsOpen}
-              isActiveRoute={isActiveRoute}
-              hasPermission={hasPermission}
-              locationPathname={location.pathname}
-            />
+      >
+        <div className="flex h-16 items-center justify-between border-b border-border/40 px-4">
+          {!collapsed && (
+            <div className="font-semibold text-lg text-primary flex items-center">
+              IT Support Bridge
+            </div>
           )}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={cn("rounded-full h-8 w-8", collapsed && "mx-auto")} 
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
         </div>
         
-        <div className="space-y-1 px-3">
-          {/* Help and support links would go here */}
+        <div className="py-4 flex flex-col h-[calc(100vh-4rem)] justify-between">
+          {!collapsed && (
+            <div className="px-3 mb-4">
+              <GlobalSearch placeholder="Search..." />
+            </div>
+          )}
+          
+          <div className="space-y-1 px-3 overflow-y-auto flex-grow">
+            {navigationItems.map((item) => (
+              // Only render if user has permission
+              hasPermission(item.allowedRoles || []) && (
+                <NavLink 
+                  key={item.path || item.name} 
+                  item={item} 
+                  isActive={isActiveRoute(item.path)}
+                  collapsed={collapsed} 
+                />
+              )
+            ))}
+            
+            {/* Settings Menu (with submenu) */}
+            {hasSettingsAccess && (
+              <SettingsMenu 
+                collapsed={collapsed}
+                settingsOpen={settingsOpen}
+                setSettingsOpen={setSettingsOpen}
+                isActiveRoute={isActiveRoute}
+                hasPermission={hasPermission}
+                locationPathname={location.pathname}
+              />
+            )}
+          </div>
+          
+          <div className="space-y-1 px-3">
+            {/* Help and support links would go here */}
+          </div>
         </div>
       </div>
-    </div>
+      
+      {/* Main content wrapper with padding to prevent content from being hidden behind sidebar */}
+      <div className={cn(
+        "min-h-screen transition-all duration-300 ease-in-out",
+        collapsed ? "pl-16" : "pl-0 md:pl-64"
+      )}>
+        {/* This div creates space for the content */}
+      </div>
+    </>
   );
 };
 

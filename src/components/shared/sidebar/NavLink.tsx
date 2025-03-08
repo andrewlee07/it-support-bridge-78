@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NavigationItem } from './types';
 
@@ -11,30 +11,12 @@ interface NavLinkProps {
 }
 
 const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  // Skip rendering if item has no path or href
+  if (!item.href && !item.path && !item.items) return null;
   
   // Determine the actual path to navigate to
   const getPath = (navItem: NavigationItem): string => {
-    return navItem.href || navItem.path || '#';
-  };
-  
-  // Check if a route is active
-  const isRouteActive = (path: string | undefined): boolean => {
-    if (!path) return false;
-    return location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
-  };
-  
-  // Handle navigation click
-  const handleNavClick = (e: React.MouseEvent, path: string) => {
-    if (path === '#') {
-      e.preventDefault();
-      return;
-    }
-    
-    // Use navigate to ensure proper routing
-    e.preventDefault();
-    navigate(path);
+    return navItem.href || navItem.path || '/';
   };
 
   // Handle items with nested navigation
@@ -45,25 +27,25 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
           "flex items-center gap-3 px-3 py-2 text-sidebar-foreground/80 font-medium",
           collapsed && "justify-center px-2"
         )}>
-          <item.icon className={cn("h-5 w-5 flex-shrink-0", collapsed && "h-5 w-5")} />
+          {item.icon && <item.icon className={cn("h-5 w-5 flex-shrink-0", collapsed && "h-5 w-5")} />}
           {!collapsed && <span>{item.name}</span>}
         </div>
         <div className="pl-8 space-y-1">
           {item.items.map((subItem) => {
+            if (!subItem.href && !subItem.path) return null;
+            
             const subItemPath = getPath(subItem);
-            const subItemActive = isRouteActive(subItem.path);
             
             return (
               <Link
                 key={subItem.path || subItem.name}
                 to={subItemPath}
-                onClick={(e) => handleNavClick(e, subItemPath)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
-                  subItemActive && "bg-primary/10 text-primary font-medium"
+                  isActive && location.pathname === subItemPath && "bg-primary/10 text-primary font-medium"
                 )}
               >
-                <subItem.icon className="h-4 w-4 flex-shrink-0" />
+                {subItem.icon && <subItem.icon className="h-4 w-4 flex-shrink-0" />}
                 <span>{subItem.name}</span>
               </Link>
             );
@@ -79,14 +61,13 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
   return (
     <Link 
       to={itemPath}
-      onClick={(e) => handleNavClick(e, itemPath)}
       className={cn(
         "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
         isActive && "bg-primary/10 text-primary font-medium",
         collapsed && "justify-center px-2"
       )}
     >
-      <item.icon className={cn("h-5 w-5 flex-shrink-0", collapsed && "h-5 w-5")} />
+      {item.icon && <item.icon className={cn("h-5 w-5 flex-shrink-0", collapsed && "h-5 w-5")} />}
       {!collapsed && <span>{item.name}</span>}
     </Link>
   );
