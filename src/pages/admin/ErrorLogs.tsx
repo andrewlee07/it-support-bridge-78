@@ -1,8 +1,9 @@
 
 import React, { useEffect } from 'react';
+import { AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertCircle, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ErrorLogsList } from '@/components/admin/error-logs/ErrorLogsList';
 import { ErrorLogFilters } from '@/components/admin/error-logs/ErrorLogFilters';
 import { ErrorLogDetails } from '@/components/admin/error-logs/ErrorLogDetails';

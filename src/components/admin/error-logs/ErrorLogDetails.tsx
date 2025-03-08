@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { format } from 'date-fns';
+import { AlertCircle } from 'lucide-react';
 import { ErrorLog } from '@/utils/logging/errorLogger';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Alert, AlertCircle, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 import { User, Server } from 'lucide-react';
 
 interface ErrorLogDetailsProps {
