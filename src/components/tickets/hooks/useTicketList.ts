@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { addAuditEntry } from '@/utils/auditUtils';
 import { UpdateTicketValues } from '../TicketUpdateForm';
 import { CloseTicketValues } from '../TicketCloseForm';
+import { addDays, isAfter, parseISO } from 'date-fns';
 
 export const useTicketList = (type: 'incident' | 'service', initialId?: string) => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -23,8 +24,44 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
     try {
       // Get tickets from mockData based on type
       const ticketsData = getTicketsByType(type);
-      setTickets(ticketsData);
-      setFilteredTickets(ticketsData);
+      
+      // Process for auto-close logic
+      const processedTickets = ticketsData.map(ticket => {
+        // Auto-close logic: if resolved/fulfilled for 5+ days, change to closed
+        if (
+          (ticket.status === 'resolved' || ticket.status === 'fulfilled') && 
+          ticket.resolvedAt
+        ) {
+          const autoCloseDate = addDays(new Date(ticket.resolvedAt), 5);
+          if (isAfter(new Date(), autoCloseDate)) {
+            const status: TicketStatus = 'closed';
+            const auditMessage = type === 'service' 
+              ? 'Service request automatically closed after 5 days of being fulfilled' 
+              : 'Incident automatically closed after 5 days of being resolved';
+              
+            return {
+              ...ticket,
+              status,
+              updatedAt: new Date(),
+              audit: addAuditEntry(
+                ticket.audit,
+                ticket.id,
+                'ticket',
+                auditMessage,
+                'system'
+              ),
+            };
+          }
+        }
+        return ticket;
+      });
+      
+      setTickets(processedTickets);
+      
+      // Default filter to exclude closed tickets
+      const nonClosedTickets = processedTickets.filter(ticket => ticket.status !== 'closed');
+      setFilteredTickets(nonClosedTickets);
+      
       setLoading(false);
     } catch (error) {
       console.error('Failed to fetch tickets:', error);
@@ -66,6 +103,9 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
     // Apply status filter
     if (statusFilter !== 'all') {
       result = result.filter(t => t.status === statusFilter);
+    } else {
+      // "All" now means all except closed tickets
+      result = result.filter(t => t.status !== 'closed');
     }
 
     // Apply priority filter
@@ -88,7 +128,7 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
             type === 'service' && 
             !ticket.assignedTo && 
             data.assignedTo && 
-            ticket.status === 'open' && 
+            ticket.status === 'new' && 
             data.status === 'in-progress';
           
           // Show notification if service request is being assigned
@@ -99,7 +139,7 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
           
           const updatedTicket = {
             ...ticket,
-            status: data.status,
+            status: data.status as TicketStatus,
             assignedTo: data.assignedTo || ticket.assignedTo,
             updatedAt: new Date(),
             audit: data.notes 
@@ -118,7 +158,7 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
       });
       
       setTickets(updatedTickets);
-      setFilteredTickets(updatedTickets);
+      
       const updatedTicket = updatedTickets.find(t => t.id === selectedTicket.id) || null;
       setSelectedTicket(updatedTicket);
       
@@ -160,7 +200,7 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
       });
       
       setTickets(updatedTickets);
-      setFilteredTickets(updatedTickets);
+      
       const updatedTicket = updatedTickets.find(t => t.id === selectedTicket.id) || null;
       setSelectedTicket(updatedTicket);
       
@@ -172,6 +212,59 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
     } catch (error) {
       console.error('Failed to close ticket:', error);
       toast.error(type === 'service' ? 'Failed to fulfill request' : 'Failed to close ticket');
+    }
+  };
+
+  const handleReopenTicket = () => {
+    if (!selectedTicket) return;
+    
+    try {
+      // In a real app, we would call an API to reopen the ticket
+      const updatedTickets = tickets.map(ticket => {
+        if (ticket.id === selectedTicket.id) {
+          const isServiceRequest = type === 'service';
+          const fromStatus = isServiceRequest ? 'fulfilled' : 'resolved';
+          
+          if (ticket.status !== fromStatus) {
+            toast.error(`Can only reopen tickets in ${fromStatus} status`);
+            return ticket;
+          }
+          
+          const auditMessage = isServiceRequest
+            ? 'Service request reopened by customer'
+            : 'Incident reopened by customer';
+            
+          const updatedTicket = {
+            ...ticket,
+            status: 'in-progress' as TicketStatus,
+            updatedAt: new Date(),
+            resolvedAt: undefined, // Clear the resolved date
+            audit: addAuditEntry(
+              ticket.audit,
+              ticket.id,
+              'ticket',
+              auditMessage,
+              'current-user'
+            ),
+          };
+          return updatedTicket;
+        }
+        return ticket;
+      });
+      
+      setTickets(updatedTickets);
+      
+      const updatedTicket = updatedTickets.find(t => t.id === selectedTicket.id) || null;
+      setSelectedTicket(updatedTicket);
+      
+      const successMessage = type === 'service' 
+        ? 'Service request reopened successfully'
+        : 'Incident reopened successfully';
+        
+      toast.success(successMessage);
+    } catch (error) {
+      console.error('Failed to reopen ticket:', error);
+      toast.error(type === 'service' ? 'Failed to reopen service request' : 'Failed to reopen incident');
     }
   };
 
@@ -198,7 +291,7 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
       });
       
       setTickets(updatedTickets);
-      setFilteredTickets(updatedTickets);
+      
       const updatedTicket = updatedTickets.find(t => t.id === selectedTicket.id) || null;
       setSelectedTicket(updatedTicket);
       
@@ -243,5 +336,6 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
     handleTicketCreated,
     setIsViewingTicket,
     setSelectedTicket,
+    handleReopenTicket,
   };
 };

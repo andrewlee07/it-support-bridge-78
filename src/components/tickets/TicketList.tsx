@@ -35,7 +35,8 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
     handleCreateTicket,
     handleCloseTicketDialog,
     handleTicketCreated,
-    setIsViewingTicket
+    setIsViewingTicket,
+    handleReopenTicket
   } = useTicketList(type, id);
 
   const handleCardClick = (ticketId: string) => {
@@ -97,6 +98,7 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
         onTicketUpdate={handleUpdateTicket}
         onTicketClose={handleCloseTicket}
         onAddNote={handleAddNote}
+        onReopenTicket={handleReopenTicket}
       />
     </div>
   );

@@ -17,6 +17,7 @@ interface TicketDetailViewProps {
   onUpdate: (data: UpdateTicketValues) => void;
   onClose: (data: CloseTicketValues) => void;
   onAddNote?: (note: string) => void;
+  onReopen?: () => void;
 }
 
 const TicketDetailView: React.FC<TicketDetailViewProps> = ({
@@ -24,7 +25,8 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   type,
   onUpdate,
   onClose,
-  onAddNote
+  onAddNote,
+  onReopen
 }) => {
   const [note, setNote] = useState('');
   const [activeTab, setActiveTab] = useState('details');
@@ -49,6 +51,7 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   // Service request specific states
   const isServiceRequest = type === 'service';
   const isResolved = ['resolved', 'closed', 'fulfilled'].includes(ticket.status);
+  const canReopen = ticket.status === (isServiceRequest ? 'fulfilled' : 'resolved');
   const resolveTabLabel = isServiceRequest ? 'fulfill' : 'resolve';
   const resolveButtonLabel = isServiceRequest ? 'Fulfill Request' : 'Resolve';
 
@@ -96,7 +99,11 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
         <div className="mt-4 h-full overflow-y-auto">
           {/* Details Tab */}
           <TabsContent value="details" className="h-full">
-            <TicketDetails ticket={ticket} type={type} />
+            <TicketDetails 
+              ticket={ticket} 
+              type={type} 
+              onReopen={canReopen ? onReopen : undefined} 
+            />
           </TabsContent>
           
           {/* Activity Tab */}
