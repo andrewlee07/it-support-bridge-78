@@ -46,6 +46,12 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
     }
   };
 
+  // Service request specific states
+  const isServiceRequest = type === 'service';
+  const isResolved = ['resolved', 'closed', 'fulfilled'].includes(ticket.status);
+  const resolveTabLabel = isServiceRequest ? 'fulfill' : 'resolve';
+  const resolveButtonLabel = isServiceRequest ? 'Fulfill Request' : 'Resolve';
+
   return (
     <div className="space-y-6 h-full">
       <DialogHeader>
@@ -60,13 +66,13 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
             <h2 className="text-xl font-bold">{ticket.title}</h2>
             <p className="text-sm text-muted-foreground">{ticket.id}</p>
           </div>
-          {!['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
+          {!isResolved && (
             <Button 
               variant="destructive" 
-              onClick={() => setActiveTab('resolve')}
+              onClick={() => setActiveTab(resolveTabLabel)}
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
-              Resolve
+              {isServiceRequest ? 'Fulfill' : 'Resolve'}
             </Button>
           )}
         </div>
@@ -77,10 +83,10 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
         <TabsList className="mb-4">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
-          {!['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
+          {!isResolved && (
             <>
               <TabsTrigger value="update">Update</TabsTrigger>
-              <TabsTrigger value="resolve">Resolve</TabsTrigger>
+              <TabsTrigger value={resolveTabLabel}>{isServiceRequest ? 'Fulfill' : 'Resolve'}</TabsTrigger>
               <TabsTrigger value="notes">Add Note</TabsTrigger>
             </>
           )}
@@ -90,7 +96,7 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
         <div className="mt-4 h-full overflow-y-auto">
           {/* Details Tab */}
           <TabsContent value="details" className="h-full">
-            <TicketDetails ticket={ticket} />
+            <TicketDetails ticket={ticket} type={type} />
           </TabsContent>
           
           {/* Activity Tab */}
@@ -99,7 +105,7 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
           </TabsContent>
           
           {/* Update Tab */}
-          {!['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
+          {!isResolved && (
             <>
               <TabsContent value="update" className="h-full">
                 <TicketUpdateForm
@@ -114,11 +120,11 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
                 />
               </TabsContent>
               
-              {/* Resolve Tab */}
-              <TabsContent value="resolve" className="h-full">
+              {/* Resolve/Fulfill Tab */}
+              <TabsContent value={resolveTabLabel} className="h-full">
                 <TicketCloseForm
                   defaultValues={{
-                    status: 'resolved', // Always use 'resolved' for both types
+                    status: isServiceRequest ? 'fulfilled' : 'resolved',
                     notes: '',
                     rootCause: '',
                     closureReason: ''

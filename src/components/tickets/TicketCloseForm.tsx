@@ -13,7 +13,7 @@ const closeSchema = z.object({
   status: z.enum(['resolved', 'closed', 'fulfilled'] as const),
   notes: z.string().min(1, "Notes are required"),
   rootCause: z.string().min(1, "Root cause is required"),
-  closureReason: z.string().min(1, "Closure reason is required"),
+  closureReason: z.string().optional(),
 });
 
 export interface CloseTicketValues {
@@ -36,6 +36,8 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
   onCancel,
   type
 }) => {
+  const isServiceRequest = type === 'service';
+  
   const form = useForm<CloseTicketValues>({
     resolver: zodResolver(closeSchema),
     defaultValues
@@ -44,7 +46,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
   return (
     <div className="border p-4 rounded-md bg-muted/30">
       <h3 className="text-md font-medium mb-3">
-        Resolve {type === 'incident' ? 'Incident' : 'Request'}
+        {isServiceRequest ? 'Fulfill Request' : 'Resolve Incident'}
       </h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -53,7 +55,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Resolution Status</FormLabel>
+                <FormLabel>{isServiceRequest ? 'Request Status' : 'Resolution Status'}</FormLabel>
                 <Select 
                   onValueChange={field.onChange} 
                   defaultValue={field.value}
@@ -64,8 +66,14 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="resolved">Resolved</SelectItem>
-                    <SelectItem value="closed">Closed</SelectItem>
+                    {isServiceRequest ? (
+                      <SelectItem value="fulfilled">Fulfilled</SelectItem>
+                    ) : (
+                      <>
+                        <SelectItem value="resolved">Resolved</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -78,12 +86,14 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
             name="rootCause"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Root Cause</FormLabel>
+                <FormLabel>
+                  {isServiceRequest ? 'Fulfillment Details' : 'Root Cause'}
+                </FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder={type === 'incident' 
-                      ? "What was the root cause of this incident?" 
-                      : "What was the underlying reason for this request?"}
+                    placeholder={isServiceRequest 
+                      ? "Describe how the request was fulfilled" 
+                      : "What was the root cause of this incident?"}
                     className="min-h-[80px]"
                     {...field}
                   />
@@ -93,30 +103,34 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
             )}
           />
           
-          <FormField
-            control={form.control}
-            name="closureReason"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Closure Reason</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Explain how this was resolved"
-                    className="min-h-[80px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!isServiceRequest && (
+            <FormField
+              control={form.control}
+              name="closureReason"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Closure Reason</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Explain how this was resolved"
+                      className="min-h-[80px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           
           <FormField
             control={form.control}
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Additional Notes</FormLabel>
+                <FormLabel>
+                  {isServiceRequest ? 'Additional Fulfillment Notes' : 'Additional Notes'}
+                </FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Any additional information"
@@ -138,7 +152,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
               Cancel
             </Button>
             <Button type="submit" variant="destructive">
-              Resolve {type === 'incident' ? 'Incident' : 'Request'}
+              {isServiceRequest ? 'Fulfill Request' : 'Resolve Incident'}
             </Button>
           </div>
         </form>

@@ -7,10 +7,11 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { TicketStatus } from '@/utils/types/ticket';
 
 const updateSchema = z.object({
-  status: z.enum(['open', 'in-progress', 'resolved', 'closed', 'approved', 'fulfilled'] as const),
+  status: z.string(),
   assignedTo: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -34,6 +35,7 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
   onCancel,
   type
 }) => {
+  const isServiceRequest = type === 'service';
   const form = useForm<UpdateTicketValues>({
     resolver: zodResolver(updateSchema),
     defaultValues
@@ -41,63 +43,69 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
 
   return (
     <div className="border p-4 rounded-md bg-muted/30">
-      <h3 className="text-md font-medium mb-3">Update {type === 'incident' ? 'Incident' : 'Request'}</h3>
+      <h3 className="text-md font-medium mb-3">Update {isServiceRequest ? 'Request' : 'Incident'}</h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="open">Open</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
-                      {type === 'service' && <SelectItem value="approved">Approved</SelectItem>}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="assignedTo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Assign To</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Assign to" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="user-1">John Smith</SelectItem>
-                      <SelectItem value="user-2">Alice Johnson</SelectItem>
-                      <SelectItem value="user-3">Bob Miller</SelectItem>
-                      <SelectItem value="user-4">Jane Davidson</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {isServiceRequest ? (
+                      <>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="open">Open</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="assignedTo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Assign To</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select assignee" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">Unassigned</SelectItem>
+                    <SelectItem value="user-1">John Smith</SelectItem>
+                    <SelectItem value="user-2">Alice Johnson</SelectItem>
+                    <SelectItem value="user-3">Robert Chen</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           
           <FormField
             control={form.control}
@@ -107,7 +115,7 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
                 <FormLabel>Update Notes</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Enter notes about this update"
+                    placeholder="Add notes about this update"
                     className="min-h-[80px]"
                     {...field}
                   />
@@ -125,7 +133,9 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
             >
               Cancel
             </Button>
-            <Button type="submit">Save Changes</Button>
+            <Button type="submit">
+              Update {isServiceRequest ? 'Request' : 'Incident'}
+            </Button>
           </div>
         </form>
       </Form>

@@ -83,6 +83,20 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
       // In a real app, we would call an API to update the ticket
       const updatedTickets = tickets.map(ticket => {
         if (ticket.id === selectedTicket.id) {
+          // Check if this is a service request being assigned for the first time
+          const isServiceRequestBeingAssigned = 
+            type === 'service' && 
+            !ticket.assignedTo && 
+            data.assignedTo && 
+            ticket.status === 'open' && 
+            data.status === 'in-progress';
+          
+          // Show notification if service request is being assigned
+          if (isServiceRequestBeingAssigned) {
+            // In a real app, this would send an email, not just a toast
+            toast.info(`User ${ticket.createdBy} has been notified that their request ${ticket.id} has been assigned.`);
+          }
+          
           const updatedTicket = {
             ...ticket,
             status: data.status,
@@ -123,6 +137,10 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
       const status = data.status;
       const updatedTickets = tickets.map(ticket => {
         if (ticket.id === selectedTicket.id) {
+          const auditMessage = type === 'service'
+            ? `Request ${status}: ${data.rootCause}`
+            : `Ticket ${status}: ${data.closureReason} - Root cause: ${data.rootCause}`;
+            
           const updatedTicket = {
             ...ticket,
             status,
@@ -132,7 +150,7 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
               ticket.audit,
               ticket.id,
               'ticket',
-              `Ticket ${status}: ${data.closureReason} - Root cause: ${data.rootCause}`,
+              auditMessage,
               'current-user'
             ),
           };
@@ -146,10 +164,14 @@ export const useTicketList = (type: 'incident' | 'service', initialId?: string) 
       const updatedTicket = updatedTickets.find(t => t.id === selectedTicket.id) || null;
       setSelectedTicket(updatedTicket);
       
-      toast.success(`Ticket ${status} successfully`);
+      const successMessage = type === 'service' 
+        ? 'Request fulfilled successfully'
+        : `Ticket ${status} successfully`;
+        
+      toast.success(successMessage);
     } catch (error) {
       console.error('Failed to close ticket:', error);
-      toast.error('Failed to close ticket');
+      toast.error(type === 'service' ? 'Failed to fulfill request' : 'Failed to close ticket');
     }
   };
 
