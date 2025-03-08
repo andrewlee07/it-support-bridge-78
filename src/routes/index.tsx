@@ -240,7 +240,7 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Admin routes */}
+      {/* Admin routes - Make sure all are locked down to admin role */}
       <Route 
         path="/admin" 
         element={
@@ -252,7 +252,17 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       <Route 
-        path="/settings" 
+        path="/admin/*" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <AdminSettings />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/settings/*" 
         element={
           <ProtectedRoute requiredRoles={['admin']}>
             <MainLayout>

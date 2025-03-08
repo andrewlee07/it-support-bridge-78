@@ -9,19 +9,39 @@ import {
   PanelRightIcon,
   OctagonAlertIcon,
   BoxIcon,
-  AlertTriangleIcon
+  AlertTriangleIcon,
+  Settings2Icon,
+  ShieldIcon,
+  DatabaseIcon,
+  ListIcon
 } from 'lucide-react';
+import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 const AdminSettings = () => {
   const navigate = useNavigate();
   
   const configurationModules = [
+    // System Settings
     {
       title: 'System Configuration',
       description: 'Manage global system settings',
       icon: ServerCogIcon,
       path: '/admin/system-configuration'
     },
+    {
+      title: 'Security Settings',
+      description: 'Configure security and authentication',
+      icon: ShieldIcon,
+      path: '/admin/security-settings'
+    },
+    {
+      title: 'Error Logs',
+      description: 'View system error logs',
+      icon: AlertTriangleIcon,
+      path: '/admin/error-logs'
+    },
+    
+    // Process Configurations
     {
       title: 'Incident Configuration',
       description: 'Configure incident management settings',
@@ -52,12 +72,26 @@ const AdminSettings = () => {
       icon: BoxIcon,
       path: '/admin/asset-configuration'
     },
+    
+    // Dropdown & Field Configurations
     {
-      title: 'Error Logs',
-      description: 'View system error logs',
+      title: 'SLA Settings',
+      description: 'Configure service level agreements',
+      icon: Settings2Icon,
+      path: '/settings/sla'
+    },
+    {
+      title: 'Dropdown Configurations',
+      description: 'Manage dropdown field options',
+      icon: ListIcon,
+      path: '/settings/dropdown-configurations'
+    },
+    {
+      title: 'Risk Assessment Settings',
+      description: 'Configure risk assessment questions and thresholds',
       icon: AlertTriangleIcon,
-      path: '/admin/error-logs'
-    }
+      path: '/settings/risk-assessment'
+    },
   ];
 
   return (

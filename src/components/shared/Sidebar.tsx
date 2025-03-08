@@ -7,12 +7,11 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import NavLink from './sidebar/NavLink';
 import SettingsMenu from './sidebar/SettingsMenu';
-import { navigationItems, settingsItems } from './sidebar/navigationItems';
+import { navigationItems } from './sidebar/navigationItems';
 import GlobalSearch from './search/GlobalSearch';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
   
@@ -51,9 +50,6 @@ const Sidebar = () => {
     return allowedRoles.includes(user.role);
   };
 
-  // Check if any settings items are accessible to the current user
-  const hasSettingsAccess = settingsItems.some(item => hasPermission(item.allowedRoles));
-
   return (
     <div 
       className={cn(
@@ -86,8 +82,9 @@ const Sidebar = () => {
         
         <div className="space-y-1 px-3 overflow-y-auto flex-grow">
           {navigationItems.map((item) => (
-            // Only render if user has permission
-            hasPermission(item.allowedRoles || []) && (
+            // Only render if user has permission and it's not the Admin item
+            // (Admin will be rendered separately through SettingsMenu)
+            hasPermission(item.allowedRoles || []) && item.name !== "Admin" && (
               <NavLink 
                 key={item.path || item.name} 
                 item={item} 
@@ -97,17 +94,12 @@ const Sidebar = () => {
             )
           ))}
           
-          {/* Settings Menu (with submenu) */}
-          {hasSettingsAccess && (
-            <SettingsMenu 
-              collapsed={collapsed}
-              settingsOpen={settingsOpen}
-              setSettingsOpen={setSettingsOpen}
-              isActiveRoute={isActiveRoute}
-              hasPermission={hasPermission}
-              locationPathname={location.pathname}
-            />
-          )}
+          {/* Admin Menu (simpler version now) */}
+          <SettingsMenu 
+            collapsed={collapsed}
+            hasPermission={hasPermission}
+            locationPathname={location.pathname}
+          />
         </div>
         
         <div className="space-y-1 px-3">

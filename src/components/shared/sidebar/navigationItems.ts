@@ -1,4 +1,3 @@
-
 import {
   HomeIcon,
   AlertCircleIcon,
@@ -124,6 +123,13 @@ export const navigationItems: NavigationItem[] = [
     icon: BarChart2Icon,
     allowedRoles: ['admin', 'manager']
   },
+  {
+    name: "Admin",
+    path: "/admin",
+    href: "/admin",
+    icon: SettingsIcon,
+    allowedRoles: ['admin']
+  }
 ];
 
 export const settingsItems = [
