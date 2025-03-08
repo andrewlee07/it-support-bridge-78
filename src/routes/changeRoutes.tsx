@@ -1,28 +1,33 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import MainLayout from '@/layouts/MainLayout';
+import { RouteObject } from 'react-router-dom';
 import Changes from '@/pages/Changes';
+import ChangeDetail from '@/pages/ChangeDetail';
 import Releases from '@/pages/Releases';
-import { ProtectedRoute } from '@/routes/ProtectedRoute';
+import ReleaseDetail from '@/pages/ReleaseDetail';
+import NewRelease from '@/pages/NewRelease';
 
-export const ChangeRoutes: React.FC = () => {
-  return (
-    <Routes>
-      {/* Change Management routes */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute requiredRoles={['admin', 'manager']}>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Changes />} />
-        <Route path=":id" element={<Changes />} />
-        <Route path="releases" element={<Releases />} />
-        <Route path="releases/:id" element={<Releases />} />
-      </Route>
-    </Routes>
-  );
-};
+const changeRoutes: RouteObject[] = [
+  {
+    path: 'changes',
+    element: <Changes />,
+  },
+  {
+    path: 'changes/:id',
+    element: <ChangeDetail />,
+  },
+  {
+    path: 'releases',
+    element: <Releases />,
+  },
+  {
+    path: 'releases/new',
+    element: <NewRelease />,
+  },
+  {
+    path: 'releases/:id',
+    element: <ReleaseDetail />,
+  },
+];
+
+export default changeRoutes;

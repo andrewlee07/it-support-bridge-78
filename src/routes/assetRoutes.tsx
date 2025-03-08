@@ -1,24 +1,17 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import MainLayout from '@/layouts/MainLayout';
+import { RouteObject } from 'react-router-dom';
 import Assets from '@/pages/Assets';
-import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
-export const AssetRoutes: React.FC = () => {
-  return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Assets />} />
-        <Route path=":id" element={<Assets />} />
-      </Route>
-    </Routes>
-  );
-};
+const assetRoutes: RouteObject[] = [
+  {
+    path: 'assets',
+    element: <Assets />,
+  },
+  {
+    path: 'assets/:id',
+    element: <Assets />,
+  },
+];
+
+export default assetRoutes;
