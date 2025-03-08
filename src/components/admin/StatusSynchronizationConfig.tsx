@@ -66,11 +66,11 @@ const StatusSynchronizationConfig: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-4">Release to Backlog Item Status Mappings</h3>
                     <div className="space-y-4">
-                      {Object.entries(defaultStatusMappingConfiguration.releaseToBacklogMapping).map(([releaseStatus, backlogStatus]) => (
+                      {Object.keys(defaultStatusMappingConfiguration.releaseToBacklogMapping).map((releaseStatus) => (
                         <FormField
                           key={`backlog-${releaseStatus}`}
                           control={form.control}
-                          name={`releaseToBacklogMapping.${releaseStatus}`}
+                          name={`releaseToBacklogMapping.${releaseStatus}` as const}
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                               <div className="space-y-0.5">
@@ -107,11 +107,11 @@ const StatusSynchronizationConfig: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-4">Release to Bug Status Mappings</h3>
                     <div className="space-y-4">
-                      {Object.entries(defaultStatusMappingConfiguration.releaseToBugMapping).map(([releaseStatus, bugStatus]) => (
+                      {Object.keys(defaultStatusMappingConfiguration.releaseToBugMapping).map((releaseStatus) => (
                         <FormField
                           key={`bug-${releaseStatus}`}
                           control={form.control}
-                          name={`releaseToBugMapping.${releaseStatus}`}
+                          name={`releaseToBugMapping.${releaseStatus}` as const}
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                               <div className="space-y-0.5">
@@ -131,7 +131,6 @@ const StatusSynchronizationConfig: React.FC = () => {
                                   <SelectContent>
                                     <SelectItem value="open">Open</SelectItem>
                                     <SelectItem value="in_progress">In Progress</SelectItem>
-                                    <SelectItem value="in-progress">In Progress</SelectItem>
                                     <SelectItem value="resolved">Resolved</SelectItem>
                                     <SelectItem value="closed">Closed</SelectItem>
                                     <SelectItem value="fixed">Fixed</SelectItem>
