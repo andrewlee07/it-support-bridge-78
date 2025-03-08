@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Settings, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,7 @@ interface SettingsMenuProps {
   collapsed: boolean;
   settingsOpen: boolean;
   setSettingsOpen: (open: boolean) => void;
-  isActiveRoute: (path: string) => boolean;
+  isActiveRoute: (path: string | undefined) => boolean;
   hasPermission: (allowedRoles: string[]) => boolean;
   locationPathname: string;
 }
@@ -28,15 +28,37 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
   hasPermission,
   locationPathname 
 }) => {
+  const navigate = useNavigate();
+  
   // Filter settings items based on user permissions
-  const accessibleItems = settingsItems.filter(item => hasPermission(item.allowedRoles));
+  const accessibleItems = settingsItems.filter(item => hasPermission(item.allowedRoles || []));
   
   if (accessibleItems.length === 0) return null;
   
+  // Handle navigation
+  const handleNavigation = (e: React.MouseEvent, path: string) => {
+    if (path === '#') {
+      e.preventDefault();
+      return;
+    }
+    
+    e.preventDefault();
+    navigate(path);
+    // Close settings menu on mobile after navigation
+    if (window.innerWidth < 768) {
+      setSettingsOpen(false);
+    }
+  };
+  
   if (collapsed) {
+    const defaultPath = accessibleItems.length > 0 ? 
+      (accessibleItems[0].href || accessibleItems[0].path || '#') : 
+      '/settings/sla';
+    
     return (
       <Link 
-        to="/settings/sla"
+        to={defaultPath}
+        onClick={(e) => handleNavigation(e, defaultPath)}
         className={cn(
           "flex items-center gap-3 px-2 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors justify-center",
           locationPathname.startsWith('/settings') && "bg-primary/10 text-primary font-medium"
@@ -70,19 +92,23 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="pl-4 pt-1">
-        {accessibleItems.map((item) => (
-          <Link 
-            key={item.path || item.name} 
-            to={item.href || item.path || '#'}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
-              isActiveRoute(item.path || '') && "bg-primary/10 text-primary font-medium"
-            )}
-          >
-            <item.icon className="h-5 w-5 flex-shrink-0" />
-            <span>{item.name}</span>
-          </Link>
-        ))}
+        {accessibleItems.map((item) => {
+          const itemPath = item.href || item.path || '#';
+          return (
+            <Link 
+              key={item.path || item.name} 
+              to={itemPath}
+              onClick={(e) => handleNavigation(e, itemPath)}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
+                isActiveRoute(item.path) && "bg-primary/10 text-primary font-medium"
+              )}
+            >
+              <item.icon className="h-5 w-5 flex-shrink-0" />
+              <span>{item.name}</span>
+            </Link>
+          );
+        })}
       </CollapsibleContent>
     </Collapsible>
   );
