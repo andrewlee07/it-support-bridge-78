@@ -10,7 +10,7 @@ import TestCaseDetails from './TestCaseDetails';
 import TestCaseTable from './TestCaseTable';
 import { useTestCaseManagement } from './hooks/useTestCaseManagement';
 import { useTestCases } from './hooks/useTestCases';
-import { TestCase } from '@/utils/types/testTypes';
+import { TestCase } from '@/utils/types/test/testCase';
 
 const TestCaseList: React.FC = () => {
   const { testCasesData, isLoadingTestCases, isError, refetch } = useTestCases();

@@ -13,7 +13,7 @@ import TestCaseSelectionTable from './TestCaseSelectionTable';
 import TestExecutionForm from './TestExecutionForm';
 import { AlertCircle, Play } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { TestCase } from '@/utils/types/testTypes';
+import { TestCase } from '@/utils/types/test/testCase';
 
 const TestExecutionTab = () => {
   const [selectedTestCaseId, setSelectedTestCaseId] = useState<string | null>(null);

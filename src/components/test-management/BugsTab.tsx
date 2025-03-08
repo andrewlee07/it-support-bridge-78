@@ -3,7 +3,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBugs } from '@/utils/mockData/testData';
 import BugList from './BugList';
-import { Bug } from '@/utils/types/testTypes';
+import { Bug } from '@/utils/types/test/bug';
 import { 
   Card, 
   CardContent, 
@@ -36,8 +36,8 @@ const BugsTab = () => {
       assignedDeveloper: bug.assignedTo,
       relatedTestCase: bug.relatedTestCase,
       attachment: bug.attachment,
-      createdAt: bug.createdAt,
-      updatedAt: bug.updatedAt,
+      createdAt: new Date(bug.createdAt),
+      updatedAt: new Date(bug.updatedAt),
       createdBy: bug.createdBy || bug.reportedBy || '',
       reportedBy: bug.reportedBy
     }));
