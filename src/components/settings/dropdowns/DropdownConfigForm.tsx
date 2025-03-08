@@ -18,7 +18,7 @@ import { Loader2, Save, Plus, X, ArrowUp, ArrowDown, Trash2 } from 'lucide-react
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
-import { ConfigurableEntityType, DropdownOption } from '@/utils/types';
+import { ConfigurableEntityType, DropdownOption, DropdownConfigFormProps } from '@/utils/types';
 import OptionsList from './OptionsList';
 
 // Schema for the form
@@ -30,13 +30,6 @@ const configFormSchema = z.object({
 });
 
 type ConfigFormValues = z.infer<typeof configFormSchema>;
-
-interface DropdownConfigFormProps {
-  entityType: ConfigurableEntityType;
-  configId: string | null;
-  onClose: () => void;
-  isNew: boolean;
-}
 
 const DropdownConfigForm: React.FC<DropdownConfigFormProps> = ({
   entityType,

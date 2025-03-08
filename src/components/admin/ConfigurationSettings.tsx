@@ -86,7 +86,10 @@ const ConfigurationSettings = ({ entityType }: ConfigurationSettingsProps) => {
             
             {showRiskAssessment && (
               <TabsContent value="risk">
-                <RiskAssessmentQuestionForm />
+                <RiskAssessmentQuestionForm 
+                  onSubmit={() => {}} 
+                  onCancel={() => {}}
+                />
               </TabsContent>
             )}
           </Tabs>

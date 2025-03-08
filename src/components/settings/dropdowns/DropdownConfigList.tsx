@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlusCircle, Settings } from "lucide-react";
 import { ConfigurableDropdown, ConfigurableEntityType } from "@/utils/types/configuration";
-import { getAllDropdownConfigurations } from "@/utils/mockData/dropdownConfigurations";
+import { getDropdownConfigurations } from "@/utils/mockData/dropdownConfigurations";
 import DropdownConfigForm from "./DropdownConfigForm";
 
 interface DropdownConfigListProps {
@@ -18,7 +18,7 @@ const DropdownConfigList = ({ entityType }: DropdownConfigListProps) => {
 
   useEffect(() => {
     // Load all dropdowns but filter by entityType
-    const allDropdowns = getAllDropdownConfigurations();
+    const allDropdowns = getDropdownConfigurations();
     const filteredDropdowns = allDropdowns.filter(
       dropdown => dropdown.entityType === entityType
     );
@@ -63,7 +63,8 @@ const DropdownConfigList = ({ entityType }: DropdownConfigListProps) => {
 
       {(isCreating || editingDropdown) ? (
         <DropdownConfigForm 
-          defaultValues={editingDropdown || undefined}
+          isNew={isCreating}
+          configId={editingDropdown?.id || null}
           entityType={entityType}
           onClose={closeForm}
         />

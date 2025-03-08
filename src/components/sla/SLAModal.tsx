@@ -1,41 +1,35 @@
 
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { SLA } from '@/utils/types/sla';
 import SLAForm from './SLAForm';
-import { SLA } from '@/utils/types';
-import { toast } from 'sonner';
 
-interface SLAModalProps {
+export interface SLAModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialData?: SLA;
+  onSave: (slaData: Partial<SLA>) => void;
+  sla?: SLA;
+  entityType?: 'incident' | 'service-request';
 }
 
-export const SLAModal: React.FC<SLAModalProps> = ({ isOpen, onClose, initialData }) => {
-  const handleSubmit = (data: Partial<SLA>) => {
-    console.log('SLA submitted:', data);
-    // Here you would typically save the SLA to the backend
-    
-    // Simulate success
-    toast.success(initialData ? 'SLA updated successfully' : 'SLA created successfully');
-    onClose();
-  };
-  
+export const SLAModal: React.FC<SLAModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onSave, 
+  sla,
+  entityType
+}) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit SLA' : 'Create New SLA'}</DialogTitle>
+          <DialogTitle>{sla ? 'Edit SLA' : 'Create New SLA'}</DialogTitle>
         </DialogHeader>
         <SLAForm 
-          initialData={initialData} 
-          onSubmit={handleSubmit}
+          defaultValues={sla} 
+          onSubmit={onSave}
           onCancel={onClose}
+          entityType={entityType}
         />
       </DialogContent>
     </Dialog>

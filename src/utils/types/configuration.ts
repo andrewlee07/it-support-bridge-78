@@ -1,6 +1,6 @@
 
 // Configuration types for dropdown fields
-export type ConfigurableEntityType = 'incident' | 'service-request' | 'change' | 'asset';
+export type ConfigurableEntityType = 'incident' | 'service-request' | 'change' | 'asset' | 'backlog' | 'release';
 
 export interface DropdownOption {
   id: string;
@@ -20,4 +20,12 @@ export interface ConfigurableDropdown {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Configuration settings for dropdown fields in admin panel
+export interface DropdownConfigFormProps {
+  isNew: boolean;
+  configId: string | null;
+  entityType: ConfigurableEntityType;
+  onClose: () => void;
 }
