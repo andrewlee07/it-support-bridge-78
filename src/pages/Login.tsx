@@ -18,10 +18,13 @@ const Login = () => {
   const { login, user, pendingUser } = useAuth();
   const navigate = useNavigate();
 
-  // If user is already logged in, redirect to dashboard
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // Move the early return inside the useEffect to avoid React hooks errors
+  useEffect(() => {
+    // If user is already logged in, redirect to dashboard
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   // If there's a pending user requiring MFA verification, redirect to MFA page
   useEffect(() => {
