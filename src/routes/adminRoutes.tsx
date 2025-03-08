@@ -14,6 +14,7 @@ import ProcessConfiguration from '@/pages/admin/ProcessConfiguration';
 import BugConfiguration from '@/pages/admin/BugConfiguration';
 import ReleaseConfiguration from '@/pages/admin/ReleaseConfiguration';
 import TestConfiguration from '@/pages/admin/TestConfiguration';
+import StatusSynchronizationConfig from '@/pages/admin/StatusSynchronizationConfig';
 
 const adminRoutes: RouteObject[] = [
   {
@@ -67,6 +68,10 @@ const adminRoutes: RouteObject[] = [
   {
     path: 'admin/test-configuration',
     element: <TestConfiguration />,
+  },
+  {
+    path: 'admin/status-synchronization',
+    element: <StatusSynchronizationConfig />,
   },
 ];
 

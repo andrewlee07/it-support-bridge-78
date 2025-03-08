@@ -1,63 +1,71 @@
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { 
-  StatusSynchronizationSettings, 
-  defaultStatusSynchronizationSettings 
-} from '@/utils/types/StatusSynchronizationSettings';
-import { toast } from 'sonner';
+  getStatusSynchronizationSettings,
+  updateStatusSynchronizationSettings,
+  synchronizeReleaseStatus
+} from '@/api/statusSynchronization';
+import { StatusSynchronizationSettings, defaultStatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { BacklogItemStatus } from '@/utils/types/backlogTypes';
+import { ReleaseStatus } from '@/utils/types/release';
 
-// This is a mock implementation for now
-export const useStatusSynchronization = () => {
-  const [settings, setSettings] = useState<StatusSynchronizationSettings>(
-    defaultStatusSynchronizationSettings
-  );
-  const [isLoading, setIsLoading] = useState(true);
+export function useStatusSynchronization() {
+  const [settings, setSettings] = useState<StatusSynchronizationSettings>(defaultStatusSynchronizationSettings);
 
-  useEffect(() => {
-    // Simulate API call to load settings
-    setTimeout(() => {
-      // Try to load from localStorage
-      const savedSettings = localStorage.getItem('statusSyncSettings');
-      if (savedSettings) {
-        try {
-          setSettings(JSON.parse(savedSettings));
-        } catch (e) {
-          console.error('Failed to parse saved settings:', e);
-          // Fall back to defaults
-          setSettings(defaultStatusSynchronizationSettings);
-        }
+  // Fetch settings
+  const { isLoading, refetch } = useQuery({
+    queryKey: ['statusSynchronizationSettings'],
+    queryFn: async () => {
+      const response = await getStatusSynchronizationSettings();
+      if (response.success) {
+        setSettings(response.data);
       }
-      setIsLoading(false);
-    }, 500);
-  }, []);
+      return response.data;
+    }
+  });
 
-  const updateSettings = (newSettings: StatusSynchronizationSettings) => {
-    setSettings(newSettings);
-    
-    // Save to localStorage for persistence
-    localStorage.setItem('statusSyncSettings', JSON.stringify(newSettings));
-    
-    toast.success('Status synchronization settings updated');
-    return true;
-  };
+  // Mutation for updating settings
+  const updateMutation = useMutation({
+    mutationFn: updateStatusSynchronizationSettings,
+    onSuccess: (data) => {
+      setSettings(data.data);
+    }
+  });
 
-  // Add the validateConfiguration function
-  const validateConfiguration = (config: StatusSynchronizationSettings): boolean => {
-    // Simple validation - ensures all required fields are present
-    return (
-      config.enableCascadingUpdates !== undefined &&
-      config.enableDateSynchronization !== undefined &&
-      config.notifyOnStatusChange !== undefined &&
-      config.allowOverrides !== undefined &&
-      !!config.releaseToBacklogMapping &&
-      !!config.releaseToBugMapping
-    );
-  };
+  // Function to update settings
+  const updateSettings = useCallback((newSettings: StatusSynchronizationSettings) => {
+    updateMutation.mutate(newSettings);
+  }, [updateMutation]);
+
+  // Function to handle status synchronization
+  const handleStatusChange = useCallback(async (
+    releaseId: string, 
+    status: ReleaseStatus
+  ) => {
+    if (!settings.enableCascadingUpdates) return { updatedItems: 0 };
+    
+    const response = await synchronizeReleaseStatus(releaseId, status);
+    return response.data;
+  }, [settings.enableCascadingUpdates]);
+
+  // Get the mapped status for backlog items
+  const getBacklogStatusForRelease = useCallback((releaseStatus: ReleaseStatus): BacklogItemStatus => {
+    return settings.releaseToBacklogMapping[releaseStatus] || 'open';
+  }, [settings.releaseToBacklogMapping]);
+
+  // Get the mapped status for bugs
+  const getBugStatusForRelease = useCallback((releaseStatus: ReleaseStatus): string => {
+    return settings.releaseToBugMapping[releaseStatus] || 'open';
+  }, [settings.releaseToBugMapping]);
 
   return {
     settings,
-    isLoading,
     updateSettings,
-    validateConfiguration
+    isLoading: isLoading || updateMutation.isPending,
+    handleStatusChange,
+    getBacklogStatusForRelease,
+    getBugStatusForRelease,
+    refresh: refetch
   };
-};
+}

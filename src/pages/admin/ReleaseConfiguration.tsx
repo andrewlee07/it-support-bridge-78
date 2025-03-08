@@ -3,6 +3,9 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
 import Breadcrumb from '@/components/shared/Breadcrumb';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { ArrowRightLeft } from 'lucide-react';
 
 const ReleaseConfiguration = () => {
   const breadcrumbItems = [
@@ -20,6 +23,15 @@ const ReleaseConfiguration = () => {
           <p className="text-muted-foreground mt-1">
             Configure release management settings and workflows
           </p>
+        </div>
+
+        <div className="mb-6">
+          <Button asChild variant="outline" className="gap-2">
+            <Link to="/admin/status-synchronization">
+              <ArrowRightLeft className="h-4 w-4" />
+              Status Synchronization Settings
+            </Link>
+          </Button>
         </div>
 
         <Tabs defaultValue="workflow">

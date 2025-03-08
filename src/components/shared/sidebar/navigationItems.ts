@@ -22,6 +22,7 @@ import {
   GitPullRequest,
   Settings,
   Sliders,
+  ArrowRightLeft,
 } from 'lucide-react';
 
 import { NavItem } from './types';
