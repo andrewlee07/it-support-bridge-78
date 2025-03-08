@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserRole } from '@/utils/types';
 import NavLink from './sidebar/NavLink';
 import SettingsMenu from './sidebar/SettingsMenu';
 import { navigationItems, settingsItems } from './sidebar/navigationItems';

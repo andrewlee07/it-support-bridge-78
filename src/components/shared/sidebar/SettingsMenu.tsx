@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Settings, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -73,12 +73,17 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({
       </CollapsibleTrigger>
       <CollapsibleContent className="pl-4 pt-1">
         {accessibleItems.map((item) => (
-          <NavLink 
+          <Link 
             key={item.path} 
-            item={item} 
-            isActive={isActiveRoute(item.path)}
-            collapsed={false} 
-          />
+            to={item.href || item.path || '#'}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
+              isActiveRoute(item.path) && "bg-primary/10 text-primary font-medium"
+            )}
+          >
+            <item.icon className="h-5 w-5 flex-shrink-0" />
+            <span>{item.name}</span>
+          </Link>
         ))}
       </CollapsibleContent>
     </Collapsible>
