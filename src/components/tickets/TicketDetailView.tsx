@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Ticket } from '@/utils/types/ticket';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { UserPlus, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TicketDetails from './TicketDetails';
 import ActivityHistory from './ActivityHistory';
 import TicketUpdateForm, { UpdateTicketValues } from './TicketUpdateForm';
@@ -25,28 +26,17 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   onClose,
   onAddNote
 }) => {
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
-  const [isClosing, setIsClosing] = useState<boolean>(false);
   const [note, setNote] = useState('');
-
-  const handleUpdateClick = () => {
-    setIsUpdating(true);
-    setIsClosing(false);
-  };
-
-  const handleCloseClick = () => {
-    setIsClosing(true);
-    setIsUpdating(false);
-  };
+  const [activeTab, setActiveTab] = useState('details');
 
   const handleUpdateSubmit = (data: UpdateTicketValues) => {
     onUpdate(data);
-    setIsUpdating(false);
+    setActiveTab('details');
   };
 
   const handleCloseSubmit = (data: CloseTicketValues) => {
     onClose(data);
-    setIsClosing(false);
+    setActiveTab('details');
   };
 
   const handleAddNote = () => {
@@ -65,82 +55,94 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
             <h2 className="text-xl font-bold">{ticket.title}</h2>
             <p className="text-sm text-muted-foreground">{ticket.id}</p>
           </div>
-          <div className="flex gap-2">
-            {!['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
-              <>
-                <Button 
-                  variant="outline" 
-                  onClick={handleUpdateClick}
-                >
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Update
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleCloseClick}
-                >
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  {type === 'incident' ? 'Resolve' : 'Fulfill'}
-                </Button>
-              </>
-            )}
-          </div>
+          {!['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
+            <Button 
+              variant="destructive" 
+              onClick={() => setActiveTab('resolve')}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Resolve
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Update Form */}
-      {isUpdating && (
-        <TicketUpdateForm
-          defaultValues={{
-            status: ticket.status,
-            assignedTo: ticket.assignedTo || '',
-            notes: ''
-          }}
-          onSubmit={handleUpdateSubmit}
-          onCancel={() => setIsUpdating(false)}
-          type={type}
-        />
-      )}
-      
-      {/* Closure Form */}
-      {isClosing && (
-        <TicketCloseForm
-          defaultValues={{
-            status: type === 'incident' ? 'resolved' : 'fulfilled',
-            notes: '',
-            rootCause: '',
-            closureReason: ''
-          }}
-          onSubmit={handleCloseSubmit}
-          onCancel={() => setIsClosing(false)}
-          type={type}
-        />
-      )}
-
-      {/* Ticket Details */}
-      <TicketDetails ticket={ticket} />
-      
-      {/* Activity History */}
-      <ActivityHistory auditEntries={ticket.audit} />
-      
-      {/* Add Notes Section */}
-      {!isUpdating && !isClosing && !['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
-        <div className="mt-4 border-t pt-4">
-          <h3 className="text-md font-medium mb-2">Add Note</h3>
-          <div className="flex gap-2">
-            <Textarea 
-              placeholder="Add a note to this ticket..." 
-              className="min-h-[80px]"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-            <Button className="self-end" onClick={handleAddNote}>
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Add Note
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Tabs Navigation */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+          {!['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
+            <>
+              <TabsTrigger value="update">Update</TabsTrigger>
+              <TabsTrigger value="resolve">Resolve</TabsTrigger>
+              <TabsTrigger value="notes">Add Note</TabsTrigger>
+            </>
+          )}
+        </TabsList>
+        
+        {/* Details Tab */}
+        <TabsContent value="details">
+          <TicketDetails ticket={ticket} />
+        </TabsContent>
+        
+        {/* Activity Tab */}
+        <TabsContent value="activity">
+          <ActivityHistory auditEntries={ticket.audit} />
+        </TabsContent>
+        
+        {/* Update Tab */}
+        {!['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
+          <>
+            <TabsContent value="update">
+              <TicketUpdateForm
+                defaultValues={{
+                  status: ticket.status,
+                  assignedTo: ticket.assignedTo || '',
+                  notes: ''
+                }}
+                onSubmit={handleUpdateSubmit}
+                onCancel={() => setActiveTab('details')}
+                type={type}
+              />
+            </TabsContent>
+            
+            {/* Resolve Tab */}
+            <TabsContent value="resolve">
+              <TicketCloseForm
+                defaultValues={{
+                  status: type === 'incident' ? 'resolved' : 'fulfilled',
+                  notes: '',
+                  rootCause: '',
+                  closureReason: ''
+                }}
+                onSubmit={handleCloseSubmit}
+                onCancel={() => setActiveTab('details')}
+                type={type}
+              />
+            </TabsContent>
+            
+            {/* Add Note Tab */}
+            <TabsContent value="notes">
+              <div className="space-y-4">
+                <h3 className="text-md font-medium">Add Note</h3>
+                <Textarea 
+                  placeholder="Add a note to this ticket..." 
+                  className="min-h-[120px]"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+                <div className="flex justify-end">
+                  <Button onClick={handleAddNote}>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Add Note
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+          </>
+        )}
+      </Tabs>
     </div>
   );
 };

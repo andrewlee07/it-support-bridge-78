@@ -44,7 +44,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
   return (
     <div className="border p-4 rounded-md bg-muted/30">
       <h3 className="text-md font-medium mb-3">
-        {type === 'incident' ? 'Resolve Incident' : 'Fulfill Request'}
+        Resolve {type === 'incident' ? 'Incident' : 'Request'}
       </h3>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -147,7 +147,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
               Cancel
             </Button>
             <Button type="submit" variant="destructive">
-              {type === 'incident' ? 'Resolve Incident' : 'Complete Request'}
+              Resolve {type === 'incident' ? 'Incident' : 'Request'}
             </Button>
           </div>
         </form>
