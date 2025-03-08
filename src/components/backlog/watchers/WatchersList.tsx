@@ -9,7 +9,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { User } from '@/utils/types/user';
-import { getUserById } from '@/utils/mockData';
+import { getUserById } from '@/utils/mockData/users';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
@@ -19,7 +19,7 @@ interface WatchersListProps {
   onAddWatcher: (userId: string) => void;
   onRemoveWatcher: (userId: string) => void;
   isCurrentUserWatching: boolean;
-  availableUsers: any[]; // Using any[] here to avoid strict typing as the data comes from multiple sources
+  availableUsers: User[]; // Updated to explicitly use User type
 }
 
 const WatchersList: React.FC<WatchersListProps> = ({
@@ -30,10 +30,10 @@ const WatchersList: React.FC<WatchersListProps> = ({
   isCurrentUserWatching,
   availableUsers
 }) => {
-  // Get the users from watchers IDs, ensure they're compatible with User type
+  // Get the users from watchers IDs and ensure they're compatible with User type
   const watchers = watcherIds
     .map(id => getUserById(id))
-    .filter(user => user !== undefined) as User[];
+    .filter((user): user is User => user !== undefined); // Type predicate to ensure non-undefined values
   
   // Only show users that aren't already watchers
   const nonWatchingUsers = availableUsers.filter(

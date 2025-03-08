@@ -1,12 +1,12 @@
 
-// This is an update to add the getAllUsers export that was missing
+import { User, UserRole } from '../types/user';
 
 export const mockUsers = [
   {
     id: 'user-1',
     name: 'John Doe',
     email: 'john.doe@example.com',
-    role: 'admin',
+    role: 'admin' as UserRole,
     department: 'IT',
     title: 'System Administrator',
     active: true,
@@ -17,7 +17,7 @@ export const mockUsers = [
     id: 'user-2',
     name: 'Jane Smith',
     email: 'jane.smith@example.com',
-    role: 'manager',
+    role: 'manager' as UserRole,
     department: 'Support',
     title: 'Support Team Lead',
     active: true,
@@ -28,7 +28,7 @@ export const mockUsers = [
     id: 'user-3',
     name: 'Mike Johnson',
     email: 'mike.johnson@example.com',
-    role: 'agent',
+    role: 'agent' as UserRole,
     department: 'Support',
     title: 'Support Specialist',
     active: true,
@@ -39,7 +39,7 @@ export const mockUsers = [
     id: 'user-4',
     name: 'Sarah Williams',
     email: 'sarah.williams@example.com',
-    role: 'developer',
+    role: 'developer' as UserRole,
     department: 'Engineering',
     title: 'Software Engineer',
     active: true,
@@ -50,7 +50,7 @@ export const mockUsers = [
     id: 'user-5',
     name: 'Alex Turner',
     email: 'alex.turner@example.com',
-    role: 'agent',
+    role: 'agent' as UserRole,
     department: 'Support',
     title: 'Support Specialist',
     active: false,

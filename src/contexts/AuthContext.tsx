@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockUsers } from '@/utils/mockData/users';
-import { User, UserRole } from '@/utils/types';
+import { User, UserRole } from '@/utils/types/user';
 import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
@@ -46,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const foundUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (foundUser) {
-      // Update last login time
+      // Update last login time and ensure it's a valid User object
       const userWithUpdatedLogin: User = {
         ...foundUser,
         lastLogin: new Date()

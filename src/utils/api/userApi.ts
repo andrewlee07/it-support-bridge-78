@@ -1,5 +1,5 @@
 
-import { User, ApiResponse } from '../types';
+import { User, UserRole, ApiResponse } from '../types';
 import { mockUsers, delay } from '../mockData';
 import { createApiErrorResponse, createApiSuccessResponse } from '../mockData/apiHelpers';
 
@@ -14,13 +14,8 @@ export const getUsers = async (page: number = 1, limit: number = USERS_PER_PAGE)
 
   const paginatedUsers = mockUsers.slice(startIndex, endIndex);
   
-  // Convert to User[] type
-  const typedUsers: User[] = paginatedUsers.map(user => ({
-    ...user,
-    createdAt: user.createdAt || new Date() // Ensure createdAt exists
-  }));
-
-  return createApiSuccessResponse(typedUsers);
+  // No need for conversion since mockUsers is already in the correct format
+  return createApiSuccessResponse(paginatedUsers as User[]);
 };
 
 // Simulate fetching a user by ID
@@ -30,13 +25,7 @@ export const getUserById = async (id: string): Promise<ApiResponse<User | null>>
   const user = mockUsers.find(user => user.id === id);
 
   if (user) {
-    // Convert to User type
-    const typedUser: User = {
-      ...user,
-      createdAt: user.createdAt || new Date() // Ensure createdAt exists
-    };
-    
-    return createApiSuccessResponse(typedUser);
+    return createApiSuccessResponse(user as User);
   } else {
     return createApiErrorResponse<User | null>('User not found', 404);
   }
@@ -71,13 +60,7 @@ export const updateUser = async (id: string, updates: Partial<User>): Promise<Ap
   // Update the user
   mockUsers[userIndex] = { ...mockUsers[userIndex], ...updates };
   
-  // Convert to User type
-  const updatedUser: User = {
-    ...mockUsers[userIndex],
-    createdAt: mockUsers[userIndex].createdAt || new Date() // Ensure createdAt exists
-  };
-
-  return createApiSuccessResponse(updatedUser);
+  return createApiSuccessResponse(mockUsers[userIndex] as User);
 };
 
 // Simulate deleting a user
