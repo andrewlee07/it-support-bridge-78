@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { getTicketById } from '@/utils/mockData/tickets';
-import { Ticket, TicketStatus, RelatedItem, PendingSubStatus } from '@/utils/types/ticket';
+import { Ticket, TicketStatus, RelatedItem, PendingSubStatus, TicketNote } from '@/utils/types/ticket';
 import { UpdateTicketValues } from '@/components/tickets/TicketUpdateForm';
 import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
 import { toast } from 'sonner';

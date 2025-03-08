@@ -11,13 +11,8 @@ interface ProblemActivityProps {
   auditEntries: AuditEntry[];
 }
 
-interface ProblemAuditEntry extends AuditEntry {
-  // Add additional fields that might exist in the audit entry
-  action?: string;
-  user?: string;
-  description?: string;
-  assignedTo?: string;
-}
+// No need for a separate interface since we updated the main AuditEntry interface
+type ProblemAuditEntry = AuditEntry;
 
 const ProblemActivity: React.FC<ProblemActivityProps> = ({ auditEntries }) => {
   if (!auditEntries || auditEntries.length === 0) {
@@ -45,7 +40,7 @@ const ProblemActivity: React.FC<ProblemActivityProps> = ({ auditEntries }) => {
                 <div className="flex gap-4">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                      {(entry.user || entry.performedBy || 'User').substring(0, 2).toUpperCase()}
+                      {(entry.user || entry.performedBy || entry.userName || entry.userId || 'User').substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-1">
@@ -56,7 +51,7 @@ const ProblemActivity: React.FC<ProblemActivityProps> = ({ auditEntries }) => {
                     </p>
                     
                     <div className="text-sm text-muted-foreground">
-                      {entry.user || entry.performedBy || 'User'} • {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
+                      {entry.user || entry.performedBy || entry.userName || entry.userId || 'User'} • {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
                     </div>
                     
                     {(entry.description || entry.message || entry.details) && (

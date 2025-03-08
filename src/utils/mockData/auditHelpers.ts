@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuditEntry } from '../types';
 
 // Mock audit trail entries helper function
-export const createAuditEntries = (entityId: string, entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release', createdBy: string): AuditEntry[] => {
+export const createAuditEntries = (entityId: string, entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release' | 'problem', createdBy: string): AuditEntry[] => {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -36,7 +36,7 @@ export const createAuditEntry = ({
   performedBy
 }: {
   entityId: string;
-  entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release';
+  entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release' | 'problem';
   message: string;
   performedBy: string;
 }): AuditEntry => {

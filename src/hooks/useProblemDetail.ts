@@ -75,7 +75,7 @@ export const useProblemDetail = (id: string | undefined) => {
         id: `note-${Date.now()}`,
         entityId: problem.id,
         entityType: 'problem',
-        message: 'added-note',
+        action: 'added-note',
         performedBy: 'current-user',
         timestamp: new Date(),
         details: note
@@ -133,7 +133,7 @@ export const useProblemDetail = (id: string | undefined) => {
         id: `reopen-${Date.now()}`,
         entityId: problem.id,
         entityType: 'problem',
-        message: 'reopened',
+        action: 'reopened',
         performedBy: 'current-user',
         timestamp: new Date(),
         details: reason
