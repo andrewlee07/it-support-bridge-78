@@ -1,13 +1,16 @@
 
-import { 
-  backlogItems,
-  fetchBacklogItems, 
+// Re-export all backlog-related mock data functions and constants
+import { backlogItems, generateBacklogItemId } from './backlogItems';
+import {
+  fetchBacklogItems,
   fetchBacklogItemById,
   createBacklogItem,
   updateBacklogItem,
   assignToRelease,
   removeFromRelease,
-  getBacklogStats,
+  getBacklogStats
+} from './backlogOperations';
+import {
   addAttachment,
   removeAttachment,
   addComment,
@@ -15,14 +18,15 @@ import {
   deleteComment,
   addWatcher,
   removeWatcher
-} from '../mockData/backlog';
+} from './enhancedFeatures';
 
-import { BacklogItem, BacklogItemStatus, BacklogStats } from '../types/backlogTypes';
-import { ApiResponse } from '../types';
-
-// Re-export all functionality
+// Export all functionality
 export {
+  // Core data
   backlogItems,
+  generateBacklogItemId,
+  
+  // Core operations
   fetchBacklogItems,
   fetchBacklogItemById,
   createBacklogItem,
@@ -30,6 +34,8 @@ export {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
+  
+  // Enhanced feature operations
   addAttachment,
   removeAttachment,
   addComment,
@@ -39,8 +45,10 @@ export {
   removeWatcher
 };
 
-// Create a default export with all functions
+// Default export
 export default {
+  backlogItems,
+  generateBacklogItemId,
   fetchBacklogItems,
   fetchBacklogItemById,
   createBacklogItem,

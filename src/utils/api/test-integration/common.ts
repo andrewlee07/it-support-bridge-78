@@ -6,7 +6,7 @@ import { BacklogItem, BacklogTestCoverage } from '../../types/backlogTypes';
 import { TestCoverageRelationship } from '../../types/ticket';
 import { testCases } from '../../mockData/testCases';
 import { bugs } from '../../mockData/bugs';
-import { backlogItems } from '../../mockData/backlogItems';
+import { backlogItems } from '../../mockData/backlog';
 
 // Define delay function since we can't import it
 export const delay = (ms: number = 500): Promise<void> => {

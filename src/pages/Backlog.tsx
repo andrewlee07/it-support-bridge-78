@@ -8,7 +8,6 @@ import { BacklogItem } from '@/utils/types/backlogTypes';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { updateBacklogItem } from '@/utils/api/backlogApi';
-import { v4 as uuidv4 } from 'uuid';
 
 const Backlog: React.FC = () => {
   const { user } = useAuth();
@@ -34,8 +33,7 @@ const Backlog: React.FC = () => {
   };
 
   const handleFormSuccess = (item: BacklogItem) => {
-    toast({
-      title: isCreating ? 'Backlog item created' : 'Backlog item updated',
+    toast.success(isCreating ? 'Backlog item created' : 'Backlog item updated', {
       description: `${item.title} has been ${isCreating ? 'created' : 'updated'} successfully.`,
     });
     setIsCreating(false);
@@ -53,7 +51,6 @@ const Backlog: React.FC = () => {
         <BacklogItemList 
           onCreateItem={handleCreateItem} 
           onEditItem={handleEditItem}
-          onUpdateItem={handleUpdateItem}
         />
 
         <Dialog open={isCreating} onOpenChange={setIsCreating}>

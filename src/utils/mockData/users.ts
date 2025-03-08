@@ -1,56 +1,64 @@
 
-import { User } from '../types';
+// This is an update to add the getAllUsers export that was missing
 
-// Mock users
-export const mockUsers: User[] = [
+export const mockUsers = [
   {
     id: 'user-1',
     name: 'John Doe',
     email: 'john.doe@example.com',
     role: 'admin',
     department: 'IT',
-    createdAt: new Date(2023, 0, 15),
-    lastLogin: new Date(),
+    title: 'System Administrator',
+    active: true,
+    lastActive: new Date('2023-05-10T12:30:00')
   },
   {
     id: 'user-2',
     name: 'Jane Smith',
     email: 'jane.smith@example.com',
-    role: 'it',
-    department: 'IT',
-    createdAt: new Date(2023, 1, 20),
-    lastLogin: new Date(new Date().setDate(new Date().getDate() - 1)),
+    role: 'manager',
+    department: 'Support',
+    title: 'Support Team Lead',
+    active: true,
+    lastActive: new Date('2023-05-09T16:45:00')
   },
   {
     id: 'user-3',
-    name: 'Bob Johnson',
-    email: 'bob.johnson@example.com',
-    role: 'user',
-    department: 'Marketing',
-    createdAt: new Date(2023, 2, 10),
-    lastLogin: new Date(new Date().setDate(new Date().getDate() - 2)),
+    name: 'Mike Johnson',
+    email: 'mike.johnson@example.com',
+    role: 'agent',
+    department: 'Support',
+    title: 'Support Specialist',
+    active: true,
+    lastActive: new Date('2023-05-10T10:15:00')
   },
   {
     id: 'user-4',
-    name: 'Emily Davis',
-    email: 'emily.davis@example.com',
-    role: 'user',
-    department: 'Finance',
-    createdAt: new Date(2023, 3, 5),
-    lastLogin: new Date(new Date().setDate(new Date().getDate() - 3)),
+    name: 'Sarah Williams',
+    email: 'sarah.williams@example.com',
+    role: 'developer',
+    department: 'Engineering',
+    title: 'Software Engineer',
+    active: true,
+    lastActive: new Date('2023-05-10T09:30:00')
   },
   {
     id: 'user-5',
-    name: 'Michael Wilson',
-    email: 'michael.wilson@example.com',
-    role: 'user',
-    department: 'HR',
-    createdAt: new Date(2023, 4, 18),
-    lastLogin: new Date(new Date().setDate(new Date().getDate() - 5)),
-  },
+    name: 'Alex Turner',
+    email: 'alex.turner@example.com',
+    role: 'agent',
+    department: 'Support',
+    title: 'Support Specialist',
+    active: false,
+    lastActive: new Date('2023-05-01T14:20:00')
+  }
 ];
 
-// Helper function to get user by ID
-export const getUserById = (id: string): User | undefined => {
-  return mockUsers.find(user => user.id === id);
+export const getUserById = (userId: string) => {
+  return mockUsers.find(user => user.id === userId);
+};
+
+// Add the missing getAllUsers function
+export const getAllUsers = () => {
+  return [...mockUsers];
 };

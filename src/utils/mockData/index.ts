@@ -1,5 +1,6 @@
+
 // Re-export all mock data from individual files
-import { mockUsers, getUserById } from './users';
+import { mockUsers, getUserById, getAllUsers } from './users';
 import { 
   mockTickets, 
   getTicketById, 
@@ -52,13 +53,14 @@ import {
   assignToRelease,
   removeFromRelease,
   getBacklogStats
-} from './backlogItems';
+} from './backlog';
 
 // Export all mock data and helper functions
 export {
   // Users
   mockUsers,
   getUserById,
+  getAllUsers,
   
   // Tickets
   mockTickets,
