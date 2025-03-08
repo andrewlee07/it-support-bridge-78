@@ -36,6 +36,11 @@ export interface Ticket {
   slaBreachAt?: Date;
   notes?: TicketNote[];
   audit: AuditEntry[];
+  // Additional metadata fields that don't conflict with the base type
+  _rootCause?: string;
+  _closureReason?: string;
+  _reopenReason?: string;
+  _closeNotes?: string;
 }
 
 // Filter and search

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -56,11 +55,14 @@ const IncidentDetail = () => {
 
   const handleUpdateTicket = (values: UpdateTicketValues) => {
     if (ticket) {
+      // Keep existing notes array, don't replace it with the notes string from the form
       const updatedTicket = {
         ...ticket,
         ...values,
         status: values.status as TicketStatus,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        // Keep existing notes array instead of replacing it
+        notes: ticket.notes || []
       };
       setTicket(updatedTicket);
     }
@@ -68,15 +70,25 @@ const IncidentDetail = () => {
 
   const handleCloseTicket = (values: CloseTicketValues) => {
     if (ticket) {
+      // Add a new note to the notes array with the close information
+      const closeNote = {
+        id: `note-close-${Date.now()}`,
+        text: values.notes,
+        createdAt: new Date(),
+        createdBy: 'current-user',
+        isInternal: false
+      };
+      
       const updatedTicket = {
         ...ticket,
         status: values.status as TicketStatus,
         updatedAt: new Date(),
         closedAt: new Date(),
+        // Keep existing notes and append the new close note
+        notes: [...(ticket.notes || []), closeNote],
         // Store additional values in a way that doesn't conflict with the Ticket type
         _rootCause: values.rootCause,
-        _closureReason: values.closureReason,
-        _closeNotes: values.notes
+        _closureReason: values.closureReason
       };
       setTicket(updatedTicket);
     }
@@ -103,11 +115,20 @@ const IncidentDetail = () => {
 
   const handleReopenTicket = (reason: string) => {
     if (ticket) {
+      const reopenNote = {
+        id: `note-reopen-${Date.now()}`,
+        text: `Ticket reopened: ${reason}`,
+        createdAt: new Date(),
+        createdBy: 'current-user',
+        isInternal: false
+      };
+      
       const updatedTicket = {
         ...ticket,
         status: 'open' as TicketStatus,
         updatedAt: new Date(),
         reopenedAt: new Date(),
+        notes: [...(ticket.notes || []), reopenNote],
         _reopenReason: reason
       };
       setTicket(updatedTicket);
