@@ -11,7 +11,9 @@ export const useTestCases = (options?: { enabled?: boolean, testCycleId?: string
     refetch
   } = useQuery({
     queryKey: ['testCases', options?.testCycleId],
-    queryFn: fetchTestCases,
+    queryFn: async () => {
+      return fetchTestCases();
+    },
     enabled: options?.enabled !== false,
   });
 

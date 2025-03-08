@@ -57,7 +57,9 @@ export const useTestDashboard = (): TestDashboardResult => {
     isLoading: isLoadingTestCases 
   } = useQuery({
     queryKey: ['testCases', statusFilter],
-    queryFn: () => fetchTestCases(statusFilter),
+    queryFn: async () => {
+      return fetchTestCases(statusFilter);
+    },
   });
 
   // Handler for applying status filter from the chart

@@ -16,7 +16,9 @@ export const useTestExecution = (testCycleId?: string) => {
   // Fetch test cases that can be executed
   const { data: testCasesData, isLoading: isLoadingTestCases, refetch: refetchTestCases } = useQuery({
     queryKey: ['testCases', testCycleId],
-    queryFn: fetchTestCases,
+    queryFn: async () => {
+      return fetchTestCases();
+    },
   });
 
   // Handle test case selection

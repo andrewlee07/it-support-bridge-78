@@ -26,7 +26,9 @@ const BugForm: React.FC<BugFormProps> = ({
   // Fetch test cases for dropdown
   const { data: testCasesResponse } = useQuery({
     queryKey: ['testCases'],
-    queryFn: fetchTestCases,
+    queryFn: async () => {
+      return fetchTestCases();
+    },
   });
 
   // Initialize form with default values
