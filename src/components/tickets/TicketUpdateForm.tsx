@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,11 +9,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { RelatedItem, TicketStatus } from '@/utils/types/ticket';
+import PendingSubStatusField from './PendingSubStatusField';
 
 const updateSchema = z.object({
   status: z.string(),
   assignedTo: z.string().optional(),
   notes: z.string().optional(),
+  pendingSubStatus: z.string().optional(),
   _relatedItems: z.array(z.any()).optional(),
 });
 
@@ -20,6 +23,7 @@ export interface UpdateTicketValues {
   status: TicketStatus;
   assignedTo: string;
   notes: string;
+  pendingSubStatus?: string;
   _relatedItems?: RelatedItem[];
 }
 
@@ -41,6 +45,16 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
     resolver: zodResolver(updateSchema),
     defaultValues
   });
+
+  const watchStatus = form.watch('status');
+  const isPendingStatus = watchStatus === 'pending';
+
+  // Set up validation for pendingSubStatus when status is 'pending'
+  useEffect(() => {
+    if (isPendingStatus) {
+      form.register('pendingSubStatus', { required: 'Sub-status is required when status is Pending' });
+    }
+  }, [isPendingStatus, form]);
 
   return (
     <div className="border p-4 rounded-md bg-muted/30">
@@ -67,11 +81,17 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
                       <>
                         <SelectItem value="new">New</SelectItem>
                         <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="fulfilled">Fulfilled</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
                       </>
                     ) : (
                       <>
                         <SelectItem value="open">Open</SelectItem>
                         <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="resolved">Resolved</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
                       </>
                     )}
                   </SelectContent>
@@ -80,6 +100,10 @@ const TicketUpdateForm: React.FC<TicketUpdateFormProps> = ({
               </FormItem>
             )}
           />
+          
+          {isPendingStatus && (
+            <PendingSubStatusField form={form} ticketType={type} />
+          )}
           
           <FormField
             control={form.control}

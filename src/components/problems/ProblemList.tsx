@@ -60,6 +60,7 @@ const ProblemList = () => {
               <SelectItem value="new">New</SelectItem>
               <SelectItem value="under-investigation">Under Investigation</SelectItem>
               <SelectItem value="root-cause-identified">Root Cause Identified</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="known-error">Known Error</SelectItem>
               <SelectItem value="resolved">Resolved</SelectItem>
               <SelectItem value="closed">Closed</SelectItem>
@@ -93,9 +94,11 @@ const ProblemList = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProblems.map((problem) => (
-            <div key={problem.id} onClick={() => handleProblemClick(problem.id)}>
-              <ProblemCard problem={problem} />
-            </div>
+            <ProblemCard 
+              key={problem.id} 
+              problem={problem} 
+              onClick={() => handleProblemClick(problem.id)}
+            />
           ))}
         </div>
       )}

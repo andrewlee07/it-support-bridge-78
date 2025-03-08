@@ -1,6 +1,7 @@
 
 // SLA types
 import { TicketPriority, TicketType } from './ticket';
+import { SLACalculationOptions } from './businessHours';
 
 export interface SLA {
   id: string;
@@ -10,5 +11,6 @@ export interface SLA {
   ticketType: TicketType;
   responseTimeHours: number;
   resolutionTimeHours: number;
+  calculationOptions: SLACalculationOptions;
   isActive: boolean;
 }

@@ -5,13 +5,14 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Paperclip, Database } from 'lucide-react';
+import { Paperclip, Database, Clock } from 'lucide-react';
 
 interface ProblemCardProps {
   problem: Problem;
+  onClick?: () => void;
 }
 
-const ProblemCard: React.FC<ProblemCardProps> = ({ problem }) => {
+const ProblemCard: React.FC<ProblemCardProps> = ({ problem, onClick }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-blue-500 hover:bg-blue-500';
@@ -20,6 +21,7 @@ const ProblemCard: React.FC<ProblemCardProps> = ({ problem }) => {
       case 'known-error': return 'bg-orange-500 hover:bg-orange-500';
       case 'resolved': return 'bg-green-500 hover:bg-green-500';
       case 'closed': return 'bg-gray-500 hover:bg-gray-500';
+      case 'pending': return 'bg-amber-500 hover:bg-amber-500';
       default: return 'bg-gray-500 hover:bg-gray-500';
     }
   };
@@ -37,8 +39,14 @@ const ProblemCard: React.FC<ProblemCardProps> = ({ problem }) => {
     return status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleClick}>
       <CardContent className="p-5">
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -53,7 +61,7 @@ const ProblemCard: React.FC<ProblemCardProps> = ({ problem }) => {
             </div>
           </div>
           
-          <Link to={`/problems/${problem.id}`}>
+          <Link to={`/problems/${problem.id}`} onClick={(e) => e.stopPropagation()}>
             <h3 className="font-semibold text-lg hover:text-primary hover:underline transition-colors cursor-pointer">
               {problem.title}
             </h3>
@@ -67,6 +75,13 @@ const ProblemCard: React.FC<ProblemCardProps> = ({ problem }) => {
             <div className="flex items-center gap-2 text-sm bg-amber-50 text-amber-800 p-2 rounded">
               <Database size={16} />
               <span>Known Error: {problem.knownErrorId}</span>
+            </div>
+          )}
+          
+          {problem.status === 'pending' && problem.pendingSubStatus && (
+            <div className="flex items-center gap-2 text-sm bg-amber-50 text-amber-800 p-2 rounded">
+              <Clock size={16} />
+              <span>Pending: {problem.pendingSubStatus.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
             </div>
           )}
         </div>
@@ -84,7 +99,13 @@ const ProblemCard: React.FC<ProblemCardProps> = ({ problem }) => {
             </span>
           )}
           
-          <Button variant="ghost" size="sm" asChild className="text-primary hover:text-primary hover:bg-primary/10">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            asChild 
+            className="text-primary hover:text-primary hover:bg-primary/10"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Link to={`/problems/${problem.id}`}>View Details</Link>
           </Button>
         </div>

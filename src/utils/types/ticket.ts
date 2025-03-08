@@ -1,9 +1,11 @@
-
 // Base ticket types
-export type TicketStatus = 'open' | 'in-progress' | 'resolved' | 'closed' | 'approved' | 'fulfilled';
+export type TicketStatus = 'open' | 'in-progress' | 'pending' | 'resolved' | 'closed' | 'approved' | 'fulfilled';
 export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4' | 'medium'; // Added 'medium' for compatibility
 export type TicketCategory = 'hardware' | 'software' | 'network' | 'access' | 'other';
 export type TicketType = 'incident' | 'service' | 'change';
+
+// New type for pending sub-statuses
+export type PendingSubStatus = 'customer-info' | 'customer-testing' | 'third-party' | 'approval' | 'development';
 
 import { AuditEntry } from './audit';
 import { TestCase } from './test';
@@ -52,6 +54,14 @@ export interface Ticket {
   _closureReason?: string;
   _reopenReason?: string;
   _closeNotes?: string;
+  // Pending sub-status
+  pendingSubStatus?: PendingSubStatus;
+  // SLA pause tracking
+  slaResponsePausedAt?: Date;
+  slaResolutionPausedAt?: Date;
+  slaTotalPausedDuration?: number; // In milliseconds
+  // First response tracking
+  firstResponseAt?: Date;
 }
 
 // Filter and search

@@ -9,6 +9,7 @@ import SLAConfigurationTab from '@/components/admin/SLAConfigurationTab';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
 import DropdownFieldsTab from '@/components/admin/change-configuration/DropdownFieldsTab';
+import BusinessHoursConfigurationTab from '@/components/admin/BusinessHoursConfigurationTab';
 
 const IncidentConfiguration = () => {
   const breadcrumbItems = [
@@ -34,6 +35,7 @@ const IncidentConfiguration = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="sla">SLA Settings</TabsTrigger>
+            <TabsTrigger value="business-hours">Business Hours</TabsTrigger>
             <TabsTrigger value="autoclose">Auto-Close</TabsTrigger>
             <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
             <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
@@ -53,6 +55,10 @@ const IncidentConfiguration = () => {
           
           <TabsContent value="sla">
             <SLAConfigurationTab ticketType="incident" />
+          </TabsContent>
+          
+          <TabsContent value="business-hours">
+            <BusinessHoursConfigurationTab moduleType="incident" />
           </TabsContent>
           
           <TabsContent value="autoclose">
