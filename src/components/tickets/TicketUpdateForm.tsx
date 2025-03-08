@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -8,18 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { TicketStatus } from '@/utils/types/ticket';
+import { RelatedItem, TicketStatus } from '@/utils/types/ticket';
 
 const updateSchema = z.object({
   status: z.string(),
   assignedTo: z.string().optional(),
   notes: z.string().optional(),
+  _relatedItems: z.array(z.any()).optional(),
 });
 
 export interface UpdateTicketValues {
   status: TicketStatus;
   assignedTo: string;
   notes: string;
+  _relatedItems?: RelatedItem[];
 }
 
 interface TicketUpdateFormProps {

@@ -27,14 +27,14 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold text-foreground">{ticket.title}</h1>
-          <StatusBadge status={ticket.status} />
-          <PriorityBadge priority={ticket.priority} />
+          <StatusBadge status={ticket.status} isServiceRequest={isServiceRequest} />
+          <PriorityBadge priority={ticket.priority} isServiceRequest={isServiceRequest} />
         </div>
         
         <p className="text-muted-foreground">{ticket.description}</p>
       </div>
       
-      <TicketDetailsGrid ticket={ticket} type={type} />
+      <TicketDetailsGrid ticket={ticket} isServiceRequest={isServiceRequest} />
       
       {/* Show related items section */}
       <div className="space-y-4 mt-6">

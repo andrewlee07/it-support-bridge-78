@@ -94,7 +94,7 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
             notes: '',
             rootCause: '',
             closureReason: '',
-            resolution: ''
+            resolution: '' // Adding the missing resolution field
           }}
           onSubmit={onClose}
           onCancel={() => onTabChange('details')}
