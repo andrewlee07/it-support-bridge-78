@@ -9,7 +9,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { getProblems } from '@/utils/mockData/problems';
+import { getAllProblems } from '@/utils/mockData/problems';
 import ProblemCard from './ProblemCard';
 import { Problem, ProblemStatus } from '@/utils/types/problem';
 
@@ -20,7 +20,7 @@ const ProblemList = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
 
   // Get problems from mock data
-  const problems = getProblems();
+  const problems = getAllProblems();
 
   // Filter problems based on search query and filters
   const filteredProblems = problems.filter((problem) => {
@@ -93,11 +93,9 @@ const ProblemList = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProblems.map((problem) => (
-            <ProblemCard
-              key={problem.id}
-              problem={problem}
-              onClick={() => handleProblemClick(problem.id)}
-            />
+            <div key={problem.id} onClick={() => handleProblemClick(problem.id)}>
+              <ProblemCard problem={problem} />
+            </div>
           ))}
         </div>
       )}

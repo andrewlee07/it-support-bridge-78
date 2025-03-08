@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { AuditEntry } from '@/utils/types/audit';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -59,9 +59,9 @@ const ProblemActivity: React.FC<ProblemActivityProps> = ({ auditEntries }) => {
                       {entry.user || entry.performedBy || 'User'} • {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
                     </div>
                     
-                    {(entry.description || entry.message) && (
+                    {(entry.description || entry.message || entry.details) && (
                       <p className="text-sm mt-2 bg-muted p-3 rounded-md whitespace-pre-wrap">
-                        {entry.description || entry.message}
+                        {entry.description || entry.details || entry.message}
                       </p>
                     )}
                   </div>
@@ -86,11 +86,11 @@ function getEventText(entry: ProblemAuditEntry): string {
     case 'created':
       return 'Created the problem';
     case 'status-changed':
-      return `Changed status to ${entry.newValue}`;
+      return `Changed status to ${entry.newValue || ''}`;
     case 'assigned':
       return `Assigned to ${entry.assignedTo || 'someone'}`;
     case 'priority-changed':
-      return `Changed priority to ${entry.newValue}`;
+      return `Changed priority to ${entry.newValue || ''}`;
     case 'added-note':
       return 'Added a note';
     case 'reopened':

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Problem } from '@/utils/types/problem';
 import { formatDistanceToNow } from 'date-fns';
@@ -39,7 +38,7 @@ const ProblemCard: React.FC<ProblemCardProps> = ({ problem }) => {
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow cursor-pointer">
       <CardContent className="p-5">
         <div className="space-y-3">
           <div className="flex justify-between">

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getKnownErrors } from '@/utils/mockData/problems';
+import { getAllKnownErrors } from '@/utils/mockData/problems';
 import { formatDistanceToNow } from 'date-fns';
 import { Search, Database, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,7 @@ const KnownErrorDatabase = () => {
   const navigate = useNavigate();
   
   // Get known errors from mock data
-  const knownErrors = getKnownErrors();
+  const knownErrors = getAllKnownErrors();
   
   // Filter known errors based on search query
   const filteredErrors = knownErrors.filter((error) => {

@@ -1,6 +1,6 @@
 
 import { Problem, KnownError, ProblemStatus, ProblemPriority } from '../types/problem';
-import { generateAuditEntries } from './auditHelpers';
+import { createAuditEntries } from './auditHelpers';
 import { AuditEntry } from '../types/audit';
 
 let problems: Problem[] = [
@@ -15,7 +15,7 @@ let problems: Problem[] = [
     assignedTo: 'jane.smith',
     createdAt: new Date('2024-02-15T08:30:00Z'),
     updatedAt: new Date('2024-02-15T14:45:00Z'),
-    audit: generateAuditEntries(5, 'PRB00001', 'problem' as any),
+    audit: createAuditEntries('PRB00001', 'ticket', 'john.doe'),
     relatedIncidents: ['INC00123', 'INC00124', 'INC00125'],
     rootCause: '',
     resolutionPlan: 'Investigate the network switches in the east wing.',
@@ -27,12 +27,12 @@ let problems: Problem[] = [
     description: 'The document management system consistently crashes when users attempt to upload files larger than 500MB.',
     status: 'root-cause-identified' as ProblemStatus,
     priority: 'P2' as ProblemPriority,
-    category: 'application',
+    category: 'software',
     createdBy: 'john.doe',
     assignedTo: 'alex.kumar',
     createdAt: new Date('2024-02-10T10:15:00Z'),
     updatedAt: new Date('2024-02-16T09:30:00Z'),
-    audit: generateAuditEntries(8, 'PRB00002', 'problem' as any),
+    audit: createAuditEntries('PRB00002', 'ticket', 'john.doe'),
     relatedIncidents: ['INC00120', 'INC00132'],
     rootCause: 'Memory allocation issue in file processing module',
     resolutionPlan: 'Patch the application to properly handle memory for large files.',
@@ -44,12 +44,12 @@ let problems: Problem[] = [
     description: 'Users report intermittent errors when logging in during peak hours (8-9am and 1-2pm).',
     status: 'known-error' as ProblemStatus,
     priority: 'P1' as ProblemPriority,
-    category: 'application',
+    category: 'software',
     createdBy: 'maria.garcia',
     assignedTo: 'alex.kumar',
     createdAt: new Date('2024-02-05T13:45:00Z'),
     updatedAt: new Date('2024-02-14T16:20:00Z'),
-    audit: generateAuditEntries(12, 'PRB00003', 'problem' as any),
+    audit: createAuditEntries('PRB00003', 'ticket', 'maria.garcia'),
     relatedIncidents: ['INC00110', 'INC00115', 'INC00118', 'INC00126'],
     rootCause: 'Authentication server overload during concurrent login attempts',
     resolutionPlan: 'Upgrade authentication server capacity and implement load balancing.',
@@ -63,13 +63,13 @@ let problems: Problem[] = [
     description: 'Emails sent to external domains are consistently delayed by 30+ minutes.',
     status: 'resolved' as ProblemStatus,
     priority: 'P2' as ProblemPriority,
-    category: 'email',
+    category: 'network',
     createdBy: 'jane.smith',
     assignedTo: 'john.doe',
     createdAt: new Date('2024-01-25T09:00:00Z'),
     updatedAt: new Date('2024-02-10T11:30:00Z'),
     resolvedAt: new Date('2024-02-10T11:30:00Z'),
-    audit: generateAuditEntries(10, 'PRB00004', 'problem' as any),
+    audit: createAuditEntries('PRB00004', 'ticket', 'jane.smith'),
     relatedIncidents: ['INC00095', 'INC00097', 'INC00100'],
     rootCause: 'Misconfigured spam filtering rules causing message queue backlog',
     resolutionDescription: 'Reconfigured spam filtering rules and optimized the mail queue processing.',
@@ -89,7 +89,7 @@ let problems: Problem[] = [
     updatedAt: new Date('2024-02-01T15:45:00Z'),
     resolvedAt: new Date('2024-01-30T09:15:00Z'),
     closedAt: new Date('2024-02-01T15:45:00Z'),
-    audit: generateAuditEntries(15, 'PRB00005', 'problem' as any),
+    audit: createAuditEntries('PRB00005', 'ticket', 'alex.kumar'),
     relatedIncidents: ['INC00080', 'INC00082', 'INC00085', 'INC00086'],
     rootCause: 'Windows update KB500123 conflicts with printer driver',
     resolutionDescription: 'Updated printer drivers to version compatible with the Windows security update.',
@@ -120,10 +120,6 @@ export const getProblemById = (id: string): Problem | undefined => {
 
 export const getAllProblems = (): Problem[] => {
   return [...problems];
-};
-
-export const getKnownErrorById = (id: string): KnownError | undefined => {
-  return knownErrors.find(ke => ke.id === id);
 };
 
 export const getAllKnownErrors = (): KnownError[] => {
@@ -172,4 +168,8 @@ export const updateProblem = (id: string, updates: Partial<Problem>): Problem | 
   };
   
   return problems[index];
+};
+
+export const getNextProblemId = (): string => {
+  return `PRB${(problems.length + 1).toString().padStart(5, '0')}`;
 };
