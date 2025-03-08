@@ -1,17 +1,19 @@
 
-export type UserRole = 'admin' | 'manager' | 'user' | 'tester' | 'developer';
+import { User, UserRole } from './user';
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-}
-
+// Auth context types
 export interface AuthContextType {
   user: User | null;
+  pendingUser: User | null;
   loading: boolean;
-  isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  hasPermission: (requiredRoles: UserRole[]) => boolean;
+  verifyMFA: (code: string) => Promise<boolean>;
+  resendMFACode: () => Promise<boolean>;
+  cancelMFA: () => void;
+  checkSessionValidity: () => boolean;
+  refreshSession: () => boolean;
+  userHasPermission: (permissionName: string) => boolean;
+  userCanPerformAction: (resource: string, action: string) => boolean;
 }

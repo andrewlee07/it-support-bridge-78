@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
-import IntegratedDashboard from '@/pages/IntegratedDashboard';
+import Dashboard from '@/pages/Dashboard';
 
 const dashboardRoutes: RouteObject[] = [
   {
-    path: 'integrated-dashboard',
-    element: <IntegratedDashboard />,
+    path: 'dashboard',
+    element: <Dashboard />,
   },
 ];
 

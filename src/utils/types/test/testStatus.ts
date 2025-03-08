@@ -11,19 +11,16 @@ export type TestStatus =
 export type TestPriority = 'high' | 'medium' | 'low';
 
 // Test case types
-export type TestType = 'functional' | 'integration' | 'performance' | 'security' | 'usability' | 'regression' | 'e2e';
+export type TestType = 'functional' | 'integration' | 'performance' | 'security' | 'usability' | 'regression';
 
 // Bug severity levels
-export type BugSeverity = 'critical' | 'high' | 'medium' | 'low' | 'major' | 'minor' | 'trivial';
+export type BugSeverity = 'critical' | 'high' | 'medium' | 'low';
 
 // Bug priority levels
 export type BugPriority = 'high' | 'medium' | 'low';
 
 // Bug status types 
-export type BugStatus = 'open' | 'in_progress' | 'in-progress' | 'fixed' | 'closed' | 'verified' | 'rejected' | 'reopened' | 'deferred' | 'resolved' | 'new';
-
-// Test cycle status types
-export type TestCycleStatus = 'planned' | 'in_progress' | 'in-progress' | 'completed' | 'aborted';
+export type BugStatus = 'open' | 'in_progress' | 'fixed' | 'closed' | 'verified' | 'rejected' | 'reopened' | 'deferred';
 
 // Function to map between different status representations
 export const mapTestStatus = (status: string): TestStatus => {
