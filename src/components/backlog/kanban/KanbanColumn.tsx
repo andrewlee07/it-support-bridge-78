@@ -29,10 +29,25 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   onQuickStatusChange,
   columnSize,
 }) => {
+  // Calculate column height based on viewport height
+  const getColumnHeight = () => {
+    const baseHeight = columnSize === 'compact' ? 
+      'min-h-[400px] h-[calc(70vh-100px)]' : 
+      'min-h-[600px] h-[calc(80vh-100px)]';
+    return baseHeight;
+  };
+
+  // Calculate scroll area height based on viewport height
+  const getScrollAreaHeight = () => {
+    return columnSize === 'compact' ? 
+      'h-[calc(70vh-180px)]' : 
+      'h-[calc(80vh-180px)]';
+  };
+
   return (
     <Card className={cn(
       "flex-shrink-0 w-[300px] flex flex-col border-2 border-slate-200 dark:border-slate-700 bg-background",
-      columnSize === 'compact' ? "min-h-[400px]" : "min-h-[600px]"
+      getColumnHeight()
     )}>
       <CardHeader className={cn(
         "p-3 pb-2 flex flex-row items-center justify-between",
@@ -54,13 +69,10 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
           <Droppable droppableId={columnConfig.statusValue}>
             {(provided, snapshot) => (
               <div 
-                className="h-full relative" 
-                style={{ 
-                  height: columnSize === 'compact' ? '320px' : '520px' 
-                }}
+                className="h-full relative"
               >
                 <ScrollArea 
-                  className="h-full w-full pr-1" 
+                  className={`w-full ${getScrollAreaHeight()}`}
                   orientation="vertical"
                   type="always"
                 >

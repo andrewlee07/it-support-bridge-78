@@ -41,13 +41,13 @@ const KanbanColumns: React.FC<KanbanColumnsProps> = ({
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="relative w-full overflow-hidden">
+      <div className="relative w-full h-full overflow-hidden">
         <ScrollArea 
           orientation="horizontal" 
           className="w-full h-full pb-4"
           type="always"
         >
-          <div className="flex gap-4 min-w-max pb-4 pr-4">
+          <div className="flex gap-4 min-w-max pb-4 pr-4 pl-1 pt-1">
             {sortedColumns.map((column) => (
               <KanbanColumn
                 key={column.id}

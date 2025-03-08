@@ -99,28 +99,32 @@ const BacklogKanban: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="container py-6 space-y-4">
-        <BacklogKanbanHeader 
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          onViewTable={handleViewTable}
-          columnSize={columnSize}
-          setColumnSize={setColumnSize}
-          onCreateItem={handleCreateItem}
-          onAddBucket={handleAddBucket}
-        />
-        
-        <div data-kanban-board>
-          <KanbanBoard 
-            backlogItems={backlogItems}
-            isLoading={isLoading}
-            onDragEnd={handleDragEnd}
-            onEditItem={handleEditItem}
-            onQuickStatusChange={handleQuickStatusChange}
+      <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+        <div className="flex-none px-4 md:px-6 py-4">
+          <BacklogKanbanHeader 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            onViewTable={handleViewTable}
             columnSize={columnSize}
+            setColumnSize={setColumnSize}
+            onCreateItem={handleCreateItem}
+            onAddBucket={handleAddBucket}
           />
+        </div>
+        
+        <div className="flex-grow overflow-hidden px-4 md:px-6">
+          <div data-kanban-board className="h-full">
+            <KanbanBoard 
+              backlogItems={backlogItems}
+              isLoading={isLoading}
+              onDragEnd={handleDragEnd}
+              onEditItem={handleEditItem}
+              onQuickStatusChange={handleQuickStatusChange}
+              columnSize={columnSize}
+            />
+          </div>
         </div>
       </div>
     </PageTransition>
