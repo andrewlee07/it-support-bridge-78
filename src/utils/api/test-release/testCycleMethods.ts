@@ -12,6 +12,11 @@ export const fetchTestCyclesForRelease = async (releaseId: string): Promise<ApiR
   return createApiSuccessResponse(filteredCycles);
 };
 
+// Added the missing function for getTestCyclesByReleaseId
+export const getTestCyclesByReleaseId = async (releaseId: string): Promise<ApiResponse<TestCycle[]>> => {
+  return fetchTestCyclesForRelease(releaseId);
+};
+
 // Create a test cycle for a release
 export const createTestCycleForRelease = async (
   releaseId: string,
