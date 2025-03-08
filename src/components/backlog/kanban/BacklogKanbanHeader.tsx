@@ -8,7 +8,8 @@ import {
   Search, 
   Maximize, 
   Minimize,
-  FolderKanban
+  FolderKanban,
+  Settings
 } from 'lucide-react';
 
 interface BacklogKanbanHeaderProps {
@@ -21,6 +22,7 @@ interface BacklogKanbanHeaderProps {
   setColumnSize: (size: 'compact' | 'standard') => void;
   onCreateItem: () => void;
   onAddBucket: () => void;
+  onConfigOpen: () => void;
 }
 
 const BacklogKanbanHeader: React.FC<BacklogKanbanHeaderProps> = ({
@@ -33,6 +35,7 @@ const BacklogKanbanHeader: React.FC<BacklogKanbanHeaderProps> = ({
   setColumnSize,
   onCreateItem,
   onAddBucket,
+  onConfigOpen,
 }) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -87,6 +90,15 @@ const BacklogKanbanHeader: React.FC<BacklogKanbanHeaderProps> = ({
           >
             <FolderKanban className="h-4 w-4 mr-1" />
             Add Bucket
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onConfigOpen}
+          >
+            <Settings className="h-4 w-4 mr-1" />
+            Configure Board
           </Button>
         </div>
       </div>

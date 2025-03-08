@@ -1,7 +1,4 @@
-
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
 
 interface KanbanBoardHeaderProps {
   onConfigOpen: () => void;
@@ -14,15 +11,7 @@ const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({
 }) => {
   return (
     <div className="flex justify-end mb-4">
-      <Button 
-        variant="outline" 
-        size="sm" 
-        onClick={onConfigOpen}
-        className="flex items-center gap-1"
-      >
-        <Settings className="h-4 w-4" />
-        Configure Board
-      </Button>
+      {/* Removed Configure Board button as it's now in the BacklogKanbanHeader */}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -19,8 +18,8 @@ const BacklogKanban: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [newItemDialogOpen, setNewItemDialogOpen] = useState(false);
   const [boardConfig, setBoardConfig] = useState<KanbanBoardConfig | null>(null);
+  const [configOpen, setConfigOpen] = useState(false);
 
-  // Load board configuration from localStorage if available
   useEffect(() => {
     const savedConfig = localStorage.getItem('kanbanBoardConfig');
     if (savedConfig) {
@@ -32,7 +31,6 @@ const BacklogKanban: React.FC = () => {
     }
   }, []);
 
-  // Fetch all backlog items
   const { data: backlogItemsResponse, isLoading, refetch } = useQuery({
     queryKey: ['backlogItems', searchQuery],
     queryFn: () => fetchBacklogItems(undefined, undefined, searchQuery),
@@ -105,16 +103,23 @@ const BacklogKanban: React.FC = () => {
   };
 
   const handleAddBucket = () => {
-    // Directly interact with the KanbanBoard component
-    // by dispatching a custom event to add a new bucket
     const kanbanBoardElement = document.querySelector('[data-kanban-board]');
     if (kanbanBoardElement) {
-      // Create and dispatch a custom event
       const event = new CustomEvent('addBucket');
       kanbanBoardElement.dispatchEvent(event);
       toast.success('Adding new bucket...');
     } else {
       toast.error('Could not find the kanban board element');
+    }
+  };
+
+  const handleOpenConfigDialog = () => {
+    setConfigOpen(true);
+    
+    const kanbanBoardElement = document.querySelector('[data-kanban-board]');
+    if (kanbanBoardElement) {
+      const event = new CustomEvent('openConfig');
+      kanbanBoardElement.dispatchEvent(event);
     }
   };
 
@@ -132,6 +137,7 @@ const BacklogKanban: React.FC = () => {
             setColumnSize={setColumnSize}
             onCreateItem={handleCreateItem}
             onAddBucket={handleAddBucket}
+            onConfigOpen={handleOpenConfigDialog}
           />
         </div>
         
