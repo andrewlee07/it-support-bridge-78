@@ -226,12 +226,14 @@ export const getBacklogStats = (): ApiResponse<BacklogStats> => {
   const openItems = backlogItems.filter(item => item.status === 'open').length;
   const inProgressItems = backlogItems.filter(item => item.status === 'in-progress').length;
   const completedItems = backlogItems.filter(item => item.status === 'completed').length;
+  const blockedItems = backlogItems.filter(item => item.status === 'blocked').length;
   
   const stats: BacklogStats = {
     totalItems,
     openItems,
     completedItems,
-    inProgressItems
+    inProgressItems,
+    blockedItems
   };
   
   return {
