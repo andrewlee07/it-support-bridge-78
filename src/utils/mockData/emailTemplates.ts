@@ -27,4 +27,28 @@ export const mockEmailTemplates: EmailTemplate[] = [
     triggerOn: 'sla-breach',
     isActive: true,
   },
+  {
+    id: 'email-4',
+    name: 'Change Request Submitted',
+    subject: 'Change Request #{changeId} has been submitted',
+    body: 'Hello {managerName},\n\nA new change request "{changeTitle}" has been submitted and requires your review.\n\nPlease review the details and approve or reject the change request.\n\nThank you,\nChange Management Team',
+    triggerOn: 'change-submitted',
+    isActive: true,
+  },
+  {
+    id: 'email-5',
+    name: 'Change Request Approved',
+    subject: 'Change Request #{changeId} has been approved',
+    body: 'Hello {userName},\n\nYour change request "{changeTitle}" has been approved. You may proceed with the implementation as planned.\n\nImplementation Window: {startDate} to {endDate}\n\nThank you,\nChange Management Team',
+    triggerOn: 'change-approved',
+    isActive: true,
+  },
+  {
+    id: 'email-6',
+    name: 'Problem Created',
+    subject: 'New Problem Record #{problemId} has been created',
+    body: 'Hello {teamName},\n\nA new problem "{problemTitle}" has been created and assigned to your team.\n\nPlease review and begin root cause analysis.\n\nPriority: {problemPriority}\nRelated Incidents: {relatedIncidents}\n\nProblem Management Team',
+    triggerOn: 'problem-created',
+    isActive: false,
+  },
 ];

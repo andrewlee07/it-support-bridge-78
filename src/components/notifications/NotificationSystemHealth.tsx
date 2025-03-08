@@ -1,154 +1,151 @@
 
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { useNotificationSystem } from '@/hooks/useNotifications';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, CheckCircle, AlertTriangle, XCircle, RefreshCw } from 'lucide-react';
+import { useNotificationSystemHealth } from '@/hooks/useNotifications';
 
-interface NotificationSystemHealthProps {
-  className?: string;
-}
-
-const NotificationSystemHealth: React.FC<NotificationSystemHealthProps> = ({ className }) => {
-  const { healthData, loading, refreshHealthData } = useNotificationSystem();
+const NotificationSystemHealth: React.FC = () => {
+  const { healthData, loading, refreshHealthData } = useNotificationSystemHealth();
 
   useEffect(() => {
     refreshHealthData();
-    // Set up polling every 30 seconds
-    const interval = setInterval(() => {
-      refreshHealthData();
-    }, 30000);
-
-    return () => {
-      clearInterval(interval);
-    };
   }, [refreshHealthData]);
 
-  const getStatusBadge = () => {
-    switch (healthData?.status) {
-      case 'operational':
-        return (
-          <Badge variant="success" className="text-xs">
-            ● Operational
-          </Badge>
-        );
+  // Helper to render the appropriate status icon
+  const StatusIcon = ({ status }: { status: 'healthy' | 'degraded' | 'down' | 'unknown' }) => {
+    switch (status) {
+      case 'healthy':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'degraded':
-        return (
-          <Badge variant="warning" className="text-xs">
-            ● Degraded
-          </Badge>
-        );
+        return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
       case 'down':
-        return (
-          <Badge variant="destructive" className="text-xs">
-            ● Down
-          </Badge>
-        );
+        return <XCircle className="h-5 w-5 text-red-500" />;
       default:
-        return (
-          <Badge variant="secondary" className="text-xs">
-            ● Unknown
-          </Badge>
-        );
+        return <AlertTriangle className="h-5 w-5 text-gray-400" />;
     }
   };
 
-  const formatTime = (timeInMs: number) => {
-    if (timeInMs < 1000) return `${timeInMs}ms`;
-    return `${(timeInMs / 1000).toFixed(1)}s`;
+  // Helper to render the right badge variant
+  const getStatusBadgeVariant = (status: 'healthy' | 'degraded' | 'down' | 'unknown') => {
+    switch (status) {
+      case 'healthy':
+        return 'success';
+      case 'degraded':
+        return 'warning';
+      case 'down':
+        return 'destructive';
+      default:
+        return 'secondary';
+    }
   };
 
   return (
-    <Card className={className}>
+    <Card className="w-full">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-xl">Notification System Health</CardTitle>
-          {getStatusBadge()}
+          <CardTitle>Notification System Health</CardTitle>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={refreshHealthData}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh
+              </>
+            )}
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="py-4 text-center">Loading health data...</div>
-        ) : (
-          <>
-            <div className="space-y-4 mt-2">
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm">Success Rate</span>
-                  <span className="text-sm font-semibold">
-                    {healthData?.metrics.successRate.toFixed(1)}%
-                  </span>
-                </div>
-                <Progress
-                  value={healthData?.metrics.successRate}
-                  className="h-2"
-                  indicatorColor={
-                    healthData?.metrics.successRate > 98
-                      ? 'bg-emerald-500'
-                      : healthData?.metrics.successRate > 90
-                      ? 'bg-amber-500'
-                      : 'bg-red-500'
-                  }
-                />
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-muted-foreground">Loading system health data...</span>
+          </div>
+        ) : healthData ? (
+          <div className="space-y-6">
+            {/* Overall System Health */}
+            <div className="flex items-center justify-between border-b pb-4">
+              <div className="flex items-center">
+                <StatusIcon status={healthData.overallStatus} />
+                <span className="ml-2 font-medium">Overall System Health</span>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-muted/30 rounded-md p-3">
-                  <div className="text-sm text-muted-foreground">
-                    Total Notifications (24h)
+              <Badge variant={getStatusBadgeVariant(healthData.overallStatus)}>
+                {healthData.overallStatus.charAt(0).toUpperCase() + healthData.overallStatus.slice(1)}
+              </Badge>
+            </div>
+            
+            {/* Individual Components Health */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground">Components</h3>
+              
+              {healthData.components.map((component, index) => (
+                <div 
+                  key={index} 
+                  className="flex items-center justify-between py-2 border-b border-border/40 last:border-0"
+                >
+                  <div className="flex items-center">
+                    <StatusIcon status={component.status} />
+                    <span className="ml-2">{component.name}</span>
                   </div>
-                  <div className="text-2xl font-semibold">
-                    {healthData?.metrics.totalNotifications}
+                  <div className="flex items-center">
+                    <Badge variant={getStatusBadgeVariant(component.status)}>
+                      {component.status.charAt(0).toUpperCase() + component.status.slice(1)}
+                    </Badge>
+                    {component.latency && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        {component.latency}ms
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="bg-muted/30 rounded-md p-3">
-                  <div className="text-sm text-muted-foreground">Processing Time</div>
-                  <div className="text-2xl font-semibold">
-                    {healthData?.metrics.processingTime ? formatTime(healthData.metrics.processingTime) : '-'}
-                  </div>
-                </div>
+              ))}
+            </div>
+            
+            {/* Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="bg-muted/40 p-4 rounded-md">
+                <div className="text-xs text-muted-foreground">Notifications Sent (24h)</div>
+                <div className="text-2xl font-bold mt-1">{healthData.stats.notificationsSent}</div>
               </div>
-
-              <div className="bg-muted/30 rounded-md p-3">
-                <div className="text-sm text-muted-foreground mb-1">Current Queue</div>
-                <div className="flex justify-between items-center">
-                  <div className="text-2xl font-semibold">
-                    {healthData?.metrics.queueSize} messages
-                  </div>
-                  <Badge
-                    variant={healthData?.metrics.queueSize > 20 ? 'warning' : 'success'}
-                    className="text-xs"
-                  >
-                    {healthData?.metrics.queueSize > 20 ? 'High' : 'Normal'}
-                  </Badge>
-                </div>
+              <div className="bg-muted/40 p-4 rounded-md">
+                <div className="text-xs text-muted-foreground">Success Rate</div>
+                <div className="text-2xl font-bold mt-1">{healthData.stats.successRate}%</div>
               </div>
-
-              {healthData?.errors && healthData.errors.length > 0 && (
-                <div>
-                  <h3 className="font-medium mb-2">Recent Errors</h3>
-                  <div className="space-y-2">
-                    {healthData.errors.map((error, index) => (
-                      <div
-                        key={index}
-                        className="bg-destructive/10 text-destructive text-sm p-2 rounded-md flex justify-between items-center"
-                      >
-                        <div>{error.type}</div>
-                        <Badge variant="outline">{error.count}</Badge>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end">
-                <Button variant="outline" size="sm" onClick={refreshHealthData}>
-                  Refresh
-                </Button>
+              <div className="bg-muted/40 p-4 rounded-md">
+                <div className="text-xs text-muted-foreground">Avg. Delivery Time</div>
+                <div className="text-2xl font-bold mt-1">{healthData.stats.avgDeliveryTime}s</div>
               </div>
             </div>
-          </>
+            
+            {/* Last Updated */}
+            <div className="text-xs text-muted-foreground text-right">
+              Last updated: {new Date(healthData.lastUpdated).toLocaleString()}
+            </div>
+          </div>
+        ) : (
+          <div className="py-8 text-center">
+            <XCircle className="h-8 w-8 text-destructive mx-auto mb-2" />
+            <p className="text-muted-foreground">Failed to load system health data</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={refreshHealthData}
+              className="mt-4"
+            >
+              Try Again
+            </Button>
+          </div>
         )}
       </CardContent>
     </Card>
