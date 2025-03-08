@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { getProblemById } from '@/utils/mockData/problems';
 import { Problem, ProblemStatus } from '@/utils/types/problem';
+import { AuditEntry } from '@/utils/types/audit';
 import { toast } from 'sonner';
 
 export const useProblemDetail = (id: string | undefined) => {
@@ -69,20 +70,23 @@ export const useProblemDetail = (id: string | undefined) => {
 
   const handleAddNote = (note: string) => {
     if (problem) {
+      // Create a proper AuditEntry object
+      const newAuditEntry: AuditEntry = {
+        id: `note-${Date.now()}`,
+        entityId: problem.id,
+        entityType: 'problem',
+        message: 'added-note',
+        performedBy: 'current-user',
+        timestamp: new Date(),
+        details: note
+      };
+      
       const updatedProblem = {
         ...problem,
-        audit: [
-          ...problem.audit,
-          {
-            id: `note-${Date.now()}`,
-            user: 'current-user',
-            action: 'added-note',
-            description: note,
-            timestamp: new Date()
-          }
-        ],
+        audit: [...problem.audit, newAuditEntry],
         updatedAt: new Date()
       };
+      
       setProblem(updatedProblem);
       toast.success('Note added successfully');
     }
@@ -124,23 +128,26 @@ export const useProblemDetail = (id: string | undefined) => {
 
   const handleReopenProblem = (reason: string) => {
     if (problem) {
+      // Create a proper AuditEntry object for reopening
+      const reopenAuditEntry: AuditEntry = {
+        id: `reopen-${Date.now()}`,
+        entityId: problem.id,
+        entityType: 'problem',
+        message: 'reopened',
+        performedBy: 'current-user',
+        timestamp: new Date(),
+        details: reason
+      };
+      
       const updatedProblem = {
         ...problem,
         status: 'under-investigation' as ProblemStatus,
         reopenReason: reason,
         reopenedAt: new Date(),
         updatedAt: new Date(),
-        audit: [
-          ...problem.audit,
-          {
-            id: `reopen-${Date.now()}`,
-            user: 'current-user',
-            action: 'reopened',
-            description: reason,
-            timestamp: new Date()
-          }
-        ]
+        audit: [...problem.audit, reopenAuditEntry]
       };
+      
       setProblem(updatedProblem);
       toast.success('Problem reopened successfully');
     }

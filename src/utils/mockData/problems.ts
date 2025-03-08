@@ -1,158 +1,175 @@
 
-import { Problem, KnownError, ProblemStatus } from '../types/problem';
-import { createAuditEntries } from './auditHelpers';
+import { Problem, KnownError, ProblemStatus, ProblemPriority } from '../types/problem';
+import { generateAuditEntries } from './auditHelpers';
+import { AuditEntry } from '../types/audit';
 
-// Mock problems
-export const mockProblems: Problem[] = [
+let problems: Problem[] = [
   {
     id: 'PRB00001',
-    title: 'Recurring network outages in Building B',
-    description: 'Users in Building B report network outages lasting 5-10 minutes several times per day',
-    status: 'under-investigation',
-    priority: 'P1',
+    title: 'Recurring network outages in the east wing',
+    description: 'Users in the east wing experience intermittent network connectivity every morning between 9-10am.',
+    status: 'under-investigation' as ProblemStatus,
+    priority: 'P1' as ProblemPriority,
     category: 'network',
-    createdBy: 'user-2',
-    assignedTo: 'user-3',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 7)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
-    audit: createAuditEntries('PRB00001', 'problem', 'user-2'),
-    relatedIncidents: ['INC00003', 'INC00005'],
-    resolutionPlan: 'Investigating network switches in Building B'
+    createdBy: 'john.doe',
+    assignedTo: 'jane.smith',
+    createdAt: new Date('2024-02-15T08:30:00Z'),
+    updatedAt: new Date('2024-02-15T14:45:00Z'),
+    audit: generateAuditEntries(5, 'PRB00001', 'problem' as any),
+    relatedIncidents: ['INC00123', 'INC00124', 'INC00125'],
+    rootCause: '',
+    resolutionPlan: 'Investigate the network switches in the east wing.',
+    affectedServices: ['Email', 'Intranet']
   },
   {
     id: 'PRB00002',
-    title: 'Email delivery delays',
-    description: 'Multiple users report emails taking over 30 minutes to deliver both internally and externally',
-    status: 'root-cause-identified',
-    priority: 'P2',
-    category: 'software',
-    createdBy: 'user-3',
-    assignedTo: 'user-2',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 10)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 3)),
-    audit: createAuditEntries('PRB00002', 'problem', 'user-3'),
-    relatedIncidents: ['INC00002'],
-    rootCause: 'Mail server configuration issue resulting in queue processing delays',
-    resolutionPlan: 'Reconfigure mail server queue processing parameters'
+    title: 'Application crashes when processing large files',
+    description: 'The document management system consistently crashes when users attempt to upload files larger than 500MB.',
+    status: 'root-cause-identified' as ProblemStatus,
+    priority: 'P2' as ProblemPriority,
+    category: 'application',
+    createdBy: 'john.doe',
+    assignedTo: 'alex.kumar',
+    createdAt: new Date('2024-02-10T10:15:00Z'),
+    updatedAt: new Date('2024-02-16T09:30:00Z'),
+    audit: generateAuditEntries(8, 'PRB00002', 'problem' as any),
+    relatedIncidents: ['INC00120', 'INC00132'],
+    rootCause: 'Memory allocation issue in file processing module',
+    resolutionPlan: 'Patch the application to properly handle memory for large files.',
+    affectedServices: ['Document Management System']
   },
   {
     id: 'PRB00003',
-    title: 'Database performance degradation',
-    description: 'CRM application experiencing slowdowns during peak hours',
-    status: 'known-error',
-    priority: 'P2',
-    category: 'software',
-    createdBy: 'user-1',
-    assignedTo: 'user-3',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 14)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 5)),
-    audit: createAuditEntries('PRB00003', 'problem', 'user-1'),
-    relatedIncidents: ['INC00001', 'INC00004'],
-    rootCause: 'Inefficient database queries causing high CPU usage',
-    workaround: 'Restart the database service when performance degrades',
-    knownErrorId: 'KE00001'
+    title: 'Login page errors during peak hours',
+    description: 'Users report intermittent errors when logging in during peak hours (8-9am and 1-2pm).',
+    status: 'known-error' as ProblemStatus,
+    priority: 'P1' as ProblemPriority,
+    category: 'application',
+    createdBy: 'maria.garcia',
+    assignedTo: 'alex.kumar',
+    createdAt: new Date('2024-02-05T13:45:00Z'),
+    updatedAt: new Date('2024-02-14T16:20:00Z'),
+    audit: generateAuditEntries(12, 'PRB00003', 'problem' as any),
+    relatedIncidents: ['INC00110', 'INC00115', 'INC00118', 'INC00126'],
+    rootCause: 'Authentication server overload during concurrent login attempts',
+    resolutionPlan: 'Upgrade authentication server capacity and implement load balancing.',
+    workaround: 'Users should retry login after 1-2 minutes if they encounter an error.',
+    knownErrorId: 'KE00001',
+    affectedServices: ['Authentication', 'HR Portal', 'CRM']
   },
   {
     id: 'PRB00004',
-    title: 'Printer connectivity issues',
-    description: 'Users unable to connect to network printers intermittently',
-    status: 'resolved',
-    priority: 'P3',
-    category: 'hardware',
-    createdBy: 'user-2',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 21)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 2)),
-    resolvedAt: new Date(new Date().setDate(new Date().getDate() - 2)),
-    audit: createAuditEntries('PRB00004', 'problem', 'user-2'),
-    relatedIncidents: ['INC00006'],
-    rootCause: 'Outdated printer drivers causing connection drops',
+    title: 'Email delivery delays to external domains',
+    description: 'Emails sent to external domains are consistently delayed by 30+ minutes.',
+    status: 'resolved' as ProblemStatus,
+    priority: 'P2' as ProblemPriority,
+    category: 'email',
+    createdBy: 'jane.smith',
+    assignedTo: 'john.doe',
+    createdAt: new Date('2024-01-25T09:00:00Z'),
+    updatedAt: new Date('2024-02-10T11:30:00Z'),
+    resolvedAt: new Date('2024-02-10T11:30:00Z'),
+    audit: generateAuditEntries(10, 'PRB00004', 'problem' as any),
+    relatedIncidents: ['INC00095', 'INC00097', 'INC00100'],
+    rootCause: 'Misconfigured spam filtering rules causing message queue backlog',
+    resolutionDescription: 'Reconfigured spam filtering rules and optimized the mail queue processing.',
     resolutionStatus: 'resolved',
-    resolutionDescription: 'Updated printer drivers on all workstations',
-    closureNotes: 'Problem resolved by updating printer drivers. Communicated fix to all users.'
+    affectedServices: ['Email']
   },
   {
     id: 'PRB00005',
-    title: 'VPN authentication failures',
-    description: 'Remote workers experiencing random VPN disconnections and authentication failures',
-    status: 'closed',
-    priority: 'P1',
-    category: 'network',
-    createdBy: 'user-3',
-    assignedTo: 'user-2',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 30)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 7)),
-    resolvedAt: new Date(new Date().setDate(new Date().getDate() - 8)),
-    closedAt: new Date(new Date().setDate(new Date().getDate() - 7)),
-    audit: createAuditEntries('PRB00005', 'problem', 'user-3'),
-    relatedIncidents: ['INC00007', 'INC00008'],
-    rootCause: 'VPN server certificate expired',
+    title: 'Printers offline after Windows update',
+    description: 'Multiple network printers go offline after the latest Windows security update was deployed.',
+    status: 'closed' as ProblemStatus,
+    priority: 'P3' as ProblemPriority,
+    category: 'hardware',
+    createdBy: 'alex.kumar',
+    assignedTo: 'maria.garcia',
+    createdAt: new Date('2024-01-18T14:20:00Z'),
+    updatedAt: new Date('2024-02-01T15:45:00Z'),
+    resolvedAt: new Date('2024-01-30T09:15:00Z'),
+    closedAt: new Date('2024-02-01T15:45:00Z'),
+    audit: generateAuditEntries(15, 'PRB00005', 'problem' as any),
+    relatedIncidents: ['INC00080', 'INC00082', 'INC00085', 'INC00086'],
+    rootCause: 'Windows update KB500123 conflicts with printer driver',
+    resolutionDescription: 'Updated printer drivers to version compatible with the Windows security update.',
     resolutionStatus: 'resolved',
-    resolutionDescription: 'Renewed VPN server certificate and implemented monitoring to alert before expiration',
-    closureNotes: 'Problem resolved by renewing the certificate. Added to certificate monitoring system to prevent recurrence.'
+    closureNotes: 'All affected printers are now functioning properly. Users have reported no further issues.',
+    affectedServices: ['Printing Services']
   }
 ];
 
-// Mock known errors
-export const mockKnownErrors: KnownError[] = [
+let knownErrors: KnownError[] = [
   {
     id: 'KE00001',
     problemId: 'PRB00003',
-    title: 'CRM Database Performance Degradation',
-    description: 'CRM application experiences slowdowns during peak hours due to inefficient database queries',
-    symptoms: 'Slow page loads, timeout errors, delayed data retrieval in CRM application',
-    workaround: 'Restart the database service when performance degrades. This requires admin privileges.',
-    affectedServices: ['CRM System', 'Sales Reporting'],
+    title: 'Authentication server overload during peak hours',
+    description: 'The authentication server cannot handle the volume of concurrent login attempts during peak hours (8-9am and 1-2pm).',
+    symptoms: 'Login errors, slow authentication, session timeouts at peak hours',
+    workaround: 'Users should retry login after 1-2 minutes if they encounter an error. Alternatively, avoid logging in during peak hours if possible.',
+    affectedServices: ['Authentication', 'HR Portal', 'CRM'],
     status: 'active',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 5)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 5))
-  },
-  {
-    id: 'KE00002',
-    problemId: 'PRB00002',
-    title: 'Email Delivery Delays',
-    description: 'Emails take over 30 minutes to deliver both internally and externally due to mail server configuration',
-    symptoms: 'Delayed email delivery, missing emails, out of order email threads',
-    workaround: 'For urgent communications, use the messaging system instead of email',
-    affectedServices: ['Email', 'Notifications'],
-    status: 'active',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 3)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 3))
+    createdAt: new Date('2024-02-14T16:20:00Z'),
+    updatedAt: new Date('2024-02-14T16:20:00Z')
   }
 ];
 
-// Helper function to get problems
-export const getProblems = (): Problem[] => {
-  return mockProblems;
-};
-
-// Helper function to get problem by ID
 export const getProblemById = (id: string): Problem | undefined => {
-  return mockProblems.find(problem => problem.id === id);
+  return problems.find(problem => problem.id === id);
 };
 
-// Helper function to get known errors
-export const getKnownErrors = (): KnownError[] => {
-  return mockKnownErrors;
+export const getAllProblems = (): Problem[] => {
+  return [...problems];
 };
 
-// Helper function to get known error by ID
 export const getKnownErrorById = (id: string): KnownError | undefined => {
-  return mockKnownErrors.find(error => error.id === id);
+  return knownErrors.find(ke => ke.id === id);
 };
 
-// Helper function to get known errors by problem ID
-export const getKnownErrorsByProblemId = (problemId: string): KnownError[] => {
-  return mockKnownErrors.filter(error => error.problemId === problemId);
+export const getAllKnownErrors = (): KnownError[] => {
+  return [...knownErrors];
 };
 
-// Helper function to get next problem ID
-export const getNextProblemId = (): string => {
-  const maxId = Math.max(...mockProblems.map(problem => parseInt(problem.id.replace('PRB', ''), 10)));
-  return `PRB${(maxId + 1).toString().padStart(5, '0')}`;
+export const createProblem = (problem: Omit<Problem, 'id' | 'createdAt' | 'updatedAt' | 'audit'>): Problem => {
+  const newId = `PRB${(problems.length + 1).toString().padStart(5, '0')}`;
+  const now = new Date();
+  
+  const newProblem: Problem = {
+    id: newId,
+    createdAt: now,
+    updatedAt: now,
+    audit: [] as AuditEntry[],
+    ...problem
+  };
+  
+  problems.push(newProblem);
+  return newProblem;
 };
 
-// Helper function to get next known error ID
-export const getNextKnownErrorId = (): string => {
-  const maxId = Math.max(...mockKnownErrors.map(error => parseInt(error.id.replace('KE', ''), 10)));
-  return `KE${(maxId + 1).toString().padStart(5, '0')}`;
+export const createKnownError = (knownError: Omit<KnownError, 'id' | 'createdAt' | 'updatedAt'>): KnownError => {
+  const newId = `KE${(knownErrors.length + 1).toString().padStart(5, '0')}`;
+  const now = new Date();
+  
+  const newKnownError: KnownError = {
+    id: newId,
+    createdAt: now,
+    updatedAt: now,
+    ...knownError
+  };
+  
+  knownErrors.push(newKnownError);
+  return newKnownError;
+};
+
+export const updateProblem = (id: string, updates: Partial<Problem>): Problem | undefined => {
+  const index = problems.findIndex(problem => problem.id === id);
+  if (index === -1) return undefined;
+  
+  problems[index] = {
+    ...problems[index],
+    ...updates,
+    updatedAt: new Date()
+  };
+  
+  return problems[index];
 };

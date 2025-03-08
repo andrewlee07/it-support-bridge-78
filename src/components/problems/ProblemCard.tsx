@@ -1,112 +1,93 @@
 
 import React from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Problem } from '@/utils/types/problem';
 import { formatDistanceToNow } from 'date-fns';
-import { Link, LinkedPaperclip, Search } from 'lucide-react';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Paperclip, Database } from 'lucide-react';
 
 interface ProblemCardProps {
   problem: Problem;
-  onClick: () => void;
 }
 
-const ProblemCard: React.FC<ProblemCardProps> = ({ problem, onClick }) => {
-  const getStatusBadgeColor = (status: string) => {
+const ProblemCard: React.FC<ProblemCardProps> = ({ problem }) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'new':
-        return 'bg-blue-500';
-      case 'under-investigation':
-        return 'bg-purple-500';
-      case 'root-cause-identified':
-        return 'bg-yellow-500';
-      case 'known-error':
-        return 'bg-orange-500';
-      case 'resolved':
-        return 'bg-green-500';
-      case 'closed':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-500';
+      case 'new': return 'bg-blue-500 hover:bg-blue-500';
+      case 'under-investigation': return 'bg-purple-500 hover:bg-purple-500';
+      case 'root-cause-identified': return 'bg-yellow-500 hover:bg-yellow-500';
+      case 'known-error': return 'bg-orange-500 hover:bg-orange-500';
+      case 'resolved': return 'bg-green-500 hover:bg-green-500';
+      case 'closed': return 'bg-gray-500 hover:bg-gray-500';
+      default: return 'bg-gray-500 hover:bg-gray-500';
     }
   };
 
-  const getPriorityBadgeColor = (priority: string) => {
+  const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'P1':
-        return 'bg-red-500';
-      case 'P2':
-        return 'bg-yellow-500';
-      case 'P3':
-        return 'bg-green-500';
-      default:
-        return 'bg-gray-500';
+      case 'P1': return 'bg-red-100 text-red-800 hover:bg-red-100';
+      case 'P2': return 'bg-amber-100 text-amber-800 hover:bg-amber-100';
+      case 'P3': return 'bg-green-100 text-green-800 hover:bg-green-100';
+      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
     }
   };
 
   const formatStatus = (status: string) => {
-    return status.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
   return (
-    <Card 
-      className="cursor-pointer hover:bg-accent/50 transition-colors" 
-      onClick={onClick}
-    >
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-md font-semibold truncate">{problem.title}</CardTitle>
-        </div>
-        <div className="text-sm text-muted-foreground">{problem.id}</div>
-      </CardHeader>
-      <CardContent className="pb-2">
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-          {problem.description}
-        </p>
-        <div className="flex flex-wrap gap-2 mt-2">
-          <Badge 
-            variant="secondary"
-            className={`${getStatusBadgeColor(problem.status)} text-white hover:${getStatusBadgeColor(problem.status)}`}
-          >
-            {formatStatus(problem.status)}
-          </Badge>
-          <Badge 
-            variant="secondary"
-            className={`${getPriorityBadgeColor(problem.priority)} text-white hover:${getPriorityBadgeColor(problem.priority)}`}
-          >
-            {problem.priority}
-          </Badge>
-          <Badge variant="outline">{problem.category}</Badge>
-        </div>
-        
-        {problem.knownErrorId && (
-          <div className="flex items-center gap-1 mt-3 text-sm">
-            <Search className="h-3 w-3 text-muted-foreground" />
-            <span className="text-muted-foreground">
-              Known Error: {problem.knownErrorId}
-            </span>
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-5">
+        <div className="space-y-3">
+          <div className="flex justify-between">
+            <div className="font-mono text-sm text-muted-foreground">{problem.id}</div>
+            <div className="flex gap-2">
+              <Badge variant="secondary" className={`${getStatusColor(problem.status)} text-white`}>
+                {formatStatus(problem.status)}
+              </Badge>
+              <Badge variant="outline" className={getPriorityColor(problem.priority)}>
+                {problem.priority}
+              </Badge>
+            </div>
           </div>
-        )}
-        
-        {problem.relatedIncidents && problem.relatedIncidents.length > 0 && (
-          <div className="flex items-center gap-1 mt-1 text-sm">
-            <Link className="h-3 w-3 text-muted-foreground" />
-            <span className="text-muted-foreground">
-              {problem.relatedIncidents.length} related incident{problem.relatedIncidents.length !== 1 ? 's' : ''}
-            </span>
-          </div>
-        )}
+          
+          <Link to={`/problems/${problem.id}`}>
+            <h3 className="font-semibold text-lg hover:text-primary hover:underline transition-colors cursor-pointer">
+              {problem.title}
+            </h3>
+          </Link>
+          
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {problem.description}
+          </p>
+          
+          {problem.knownErrorId && (
+            <div className="flex items-center gap-2 text-sm bg-amber-50 text-amber-800 p-2 rounded">
+              <Database size={16} />
+              <span>Known Error: {problem.knownErrorId}</span>
+            </div>
+          )}
+        </div>
       </CardContent>
-      <CardFooter>
-        <div className="w-full flex justify-between items-center text-xs text-muted-foreground">
-          <div>
-            {problem.assignedTo ? `Assigned to: ${problem.assignedTo}` : 'Unassigned'}
-          </div>
-          <div>
-            Updated {formatDistanceToNow(new Date(problem.updatedAt), { addSuffix: true })}
-          </div>
+      
+      <CardFooter className="p-5 pt-0 flex justify-between border-t mt-3 text-sm text-muted-foreground">
+        <div>
+          Created {formatDistanceToNow(new Date(problem.createdAt), { addSuffix: true })}
+        </div>
+        
+        <div className="flex items-center">
+          {problem.relatedIncidents && problem.relatedIncidents.length > 0 && (
+            <span className="flex items-center gap-1 mr-3">
+              <Paperclip size={14} /> {problem.relatedIncidents.length}
+            </span>
+          )}
+          
+          <Button variant="ghost" size="sm" asChild className="text-primary hover:text-primary hover:bg-primary/10">
+            <Link to={`/problems/${problem.id}`}>View Details</Link>
+          </Button>
         </div>
       </CardFooter>
     </Card>

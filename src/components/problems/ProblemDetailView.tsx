@@ -9,19 +9,11 @@ import ProblemResolveForm from './ProblemResolveForm';
 import ProblemNoteForm from './ProblemNoteForm';
 import KnownErrorForm from './KnownErrorForm';
 import { Button } from '@/components/ui/button';
-import {
-  Badge,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertCircle, Database, AlertTriangle } from 'lucide-react';
+import { AlertCircle, Database } from 'lucide-react';
 
 interface ProblemDetailViewProps {
   problem: Problem;
