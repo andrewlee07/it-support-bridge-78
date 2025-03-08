@@ -128,7 +128,11 @@ const ChangesList: React.FC<ChangesListProps> = ({
   return (
     <div className="space-y-4">
       {changes.map((change) => (
-        <Card key={change.id} className="shadow-sm">
+        <Card 
+          key={change.id} 
+          className="shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+          onClick={() => onViewChange(change.id)}
+        >
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
               <div>
@@ -165,21 +169,16 @@ const ChangesList: React.FC<ChangesListProps> = ({
                   : `Created: ${format(new Date(change.createdAt), 'MMM d, yyyy')}`}
               </span>
             </div>
-            <div className="flex gap-2">
-              {change.status === 'submitted' && userRole === 'admin' && (
-                <>
-                  <Button size="sm" variant="outline" onClick={() => onReject(change.id)}>
-                    Reject
-                  </Button>
-                  <Button size="sm" onClick={() => onApprove(change.id)}>
-                    Approve
-                  </Button>
-                </>
-              )}
-              <Button size="sm" variant="outline" onClick={() => onViewChange(change.id)}>
-                View
-              </Button>
-            </div>
+            {change.status === 'submitted' && userRole === 'admin' && (
+              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                <Button size="sm" variant="outline" onClick={() => onReject(change.id)}>
+                  Reject
+                </Button>
+                <Button size="sm" onClick={() => onApprove(change.id)}>
+                  Approve
+                </Button>
+              </div>
+            )}
           </CardFooter>
         </Card>
       ))}

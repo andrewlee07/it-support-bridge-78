@@ -9,8 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import PageTransition from '@/components/shared/PageTransition';
+import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
+  const navigate = useNavigate();
+  
   // Get the first letter of each name part
   const getInitials = (name: string) => {
     return name
@@ -32,6 +35,12 @@ const Users = () => {
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300';
     }
+  };
+  
+  const handleViewUser = (userId: string) => {
+    // In a real app, this would navigate to the user profile page
+    console.log(`Viewing user profile: ${userId}`);
+    // navigate(`/users/${userId}`); // Commented out as we don't have this route yet
   };
 
   return (
@@ -71,7 +80,11 @@ const Users = () => {
           <TabsContent value="all" className="mt-0">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {mockUsers.map(user => (
-                <Card key={user.id} className="p-5 hover:shadow-md transition-shadow">
+                <Card 
+                  key={user.id} 
+                  className="p-5 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleViewUser(user.id)}
+                >
                   <div className="flex items-start justify-between mb-4">
                     <Avatar className="h-14 w-14">
                       <AvatarFallback className="bg-primary/10 text-primary">
@@ -88,9 +101,6 @@ const Users = () => {
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                     <p className="text-sm mt-1">Department: <span className="text-muted-foreground">{user.department}</span></p>
                   </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button variant="ghost" size="sm">View Profile</Button>
-                  </div>
                 </Card>
               ))}
             </div>
@@ -99,7 +109,11 @@ const Users = () => {
           <TabsContent value="admin" className="mt-0">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {mockUsers.filter(user => user.role === 'admin').map(user => (
-                <Card key={user.id} className="p-5 hover:shadow-md transition-shadow">
+                <Card 
+                  key={user.id} 
+                  className="p-5 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleViewUser(user.id)}
+                >
                   <div className="flex items-start justify-between mb-4">
                     <Avatar className="h-14 w-14">
                       <AvatarFallback className="bg-primary/10 text-primary">
@@ -115,9 +129,6 @@ const Users = () => {
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                     <p className="text-sm mt-1">Department: <span className="text-muted-foreground">{user.department}</span></p>
                   </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button variant="ghost" size="sm">View Profile</Button>
-                  </div>
                 </Card>
               ))}
             </div>
@@ -126,7 +137,11 @@ const Users = () => {
           <TabsContent value="it" className="mt-0">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {mockUsers.filter(user => user.role === 'it').map(user => (
-                <Card key={user.id} className="p-5 hover:shadow-md transition-shadow">
+                <Card 
+                  key={user.id} 
+                  className="p-5 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleViewUser(user.id)}
+                >
                   <div className="flex items-start justify-between mb-4">
                     <Avatar className="h-14 w-14">
                       <AvatarFallback className="bg-primary/10 text-primary">
@@ -142,9 +157,6 @@ const Users = () => {
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                     <p className="text-sm mt-1">Department: <span className="text-muted-foreground">{user.department}</span></p>
                   </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button variant="ghost" size="sm">View Profile</Button>
-                  </div>
                 </Card>
               ))}
             </div>
@@ -153,7 +165,11 @@ const Users = () => {
           <TabsContent value="user" className="mt-0">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {mockUsers.filter(user => user.role === 'user').map(user => (
-                <Card key={user.id} className="p-5 hover:shadow-md transition-shadow">
+                <Card 
+                  key={user.id} 
+                  className="p-5 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleViewUser(user.id)}
+                >
                   <div className="flex items-start justify-between mb-4">
                     <Avatar className="h-14 w-14">
                       <AvatarFallback className="bg-primary/10 text-primary">
@@ -168,9 +184,6 @@ const Users = () => {
                     <h3 className="font-medium text-lg">{user.name}</h3>
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                     <p className="text-sm mt-1">Department: <span className="text-muted-foreground">{user.department}</span></p>
-                  </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button variant="ghost" size="sm">View Profile</Button>
                   </div>
                 </Card>
               ))}

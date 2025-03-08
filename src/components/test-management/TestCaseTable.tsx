@@ -11,7 +11,6 @@ import {
 import { File } from 'lucide-react';
 import { TestCase } from '@/utils/types/testTypes';
 import StatusBadge from './ui/StatusBadge';
-import TestCaseActions from './ui/TestCaseActions';
 
 interface TestCaseTableProps {
   testCases: TestCase[] | undefined;
@@ -35,7 +34,6 @@ const TestCaseTable: React.FC<TestCaseTableProps> = ({
             <TableHead>Status</TableHead>
             <TableHead>Related Requirement</TableHead>
             <TableHead>Updated</TableHead>
-            <TableHead className="w-[80px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -50,14 +48,13 @@ const TestCaseTable: React.FC<TestCaseTableProps> = ({
             </TableRow>
           ) : (
             testCases?.map((testCase) => (
-              <TableRow key={testCase.id}>
+              <TableRow 
+                key={testCase.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => onView(testCase)}
+              >
                 <TableCell className="font-medium">
-                  <div 
-                    className="cursor-pointer hover:text-primary"
-                    onClick={() => onView(testCase)}
-                  >
-                    {testCase.title}
-                  </div>
+                  {testCase.title}
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={testCase.status} />
@@ -67,14 +64,6 @@ const TestCaseTable: React.FC<TestCaseTableProps> = ({
                 </TableCell>
                 <TableCell>
                   {new Date(testCase.updatedAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <TestCaseActions 
-                    testCase={testCase} 
-                    onView={onView} 
-                    onEdit={onEdit} 
-                    onDelete={onDelete} 
-                  />
                 </TableCell>
               </TableRow>
             ))

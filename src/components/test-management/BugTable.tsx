@@ -2,7 +2,6 @@
 import React from 'react';
 import { Bug, BugStatus } from '@/utils/types/testTypes';
 import { StatusBadge, SeverityBadge } from './ui/BugBadges';
-import BugActions from './BugActions';
 import { Bug as BugIcon } from 'lucide-react';
 import {
   Table,
@@ -36,7 +35,6 @@ const BugTable: React.FC<BugTableProps> = ({
             <TableHead>Status</TableHead>
             <TableHead>Reported By</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead className="w-[120px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -51,14 +49,13 @@ const BugTable: React.FC<BugTableProps> = ({
             </TableRow>
           ) : (
             bugs.map((bug) => (
-              <TableRow key={bug.id}>
+              <TableRow 
+                key={bug.id} 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => onView(bug)}
+              >
                 <TableCell className="font-medium">
-                  <div 
-                    className="cursor-pointer hover:text-primary"
-                    onClick={() => onView(bug)}
-                  >
-                    {bug.title}
-                  </div>
+                  {bug.title}
                 </TableCell>
                 <TableCell>
                   <SeverityBadge severity={bug.severity} />
@@ -71,14 +68,6 @@ const BugTable: React.FC<BugTableProps> = ({
                 </TableCell>
                 <TableCell>
                   {new Date(bug.createdAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <BugActions 
-                    bugId={bug.id}
-                    onView={() => onView(bug)}
-                    onEdit={() => onEdit(bug)}
-                    onStatusUpdate={(status) => onStatusUpdate(bug.id, status)}
-                  />
                 </TableCell>
               </TableRow>
             ))

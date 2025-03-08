@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Monitor, Laptop, Server, Smartphone, Plus, Search, Tag, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Assets = () => {
+  const navigate = useNavigate();
+  
   // Sample asset data
   const assets = [
     {
@@ -106,6 +109,13 @@ const Assets = () => {
         return <Monitor className="h-8 w-8" />;
     }
   };
+  
+  const handleViewAsset = (assetId: string) => {
+    // In a real app, this would navigate to the asset detail page
+    console.log(`Viewing asset: ${assetId}`);
+    // Placeholder navigation - in a real app would go to actual asset page
+    // navigate(`/assets/${assetId}`);
+  };
 
   return (
     <PageTransition>
@@ -148,7 +158,11 @@ const Assets = () => {
           <TabsContent value="all" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {assets.map((asset) => (
-                <Card key={asset.id} className="shadow-sm overflow-hidden">
+                <Card 
+                  key={asset.id} 
+                  className="shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => handleViewAsset(asset.id)}
+                >
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg font-medium">{asset.name}</CardTitle>
@@ -188,8 +202,11 @@ const Assets = () => {
           <TabsContent value="hardware" className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {assets.filter(a => ['laptop', 'mobile', 'server', 'monitor', 'network'].includes(a.type)).map((asset) => (
-                <Card key={asset.id} className="shadow-sm overflow-hidden">
-                  {/* Same card structure as above */}
+                <Card 
+                  key={asset.id} 
+                  className="shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => handleViewAsset(asset.id)}
+                >
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg font-medium">{asset.name}</CardTitle>

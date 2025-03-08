@@ -1,8 +1,8 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { CalendarClock, User } from 'lucide-react';
 import { Ticket } from '@/utils/types';
 import { getUserById } from '@/utils/mockData';
@@ -105,18 +105,6 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
             <span className="text-muted-foreground">Unassigned</span>
           )}
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="text-xs" 
-          onClick={(e) => {
-            e.stopPropagation();
-            const baseRoute = getRouteForTicket(ticket.type);
-            navigate(`${baseRoute}/${ticket.id}`);
-          }}
-        >
-          View Details
-        </Button>
       </CardFooter>
     </Card>
   );
