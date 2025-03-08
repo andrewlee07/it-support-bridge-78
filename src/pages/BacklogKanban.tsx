@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import PageTransition from '@/components/shared/PageTransition';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { fetchBacklogItems, updateBacklogItem } from '@/utils/api/backlogApi';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
 import BacklogItemForm from '@/components/backlog/BacklogItemForm';
@@ -24,7 +23,7 @@ const BacklogKanban: React.FC = () => {
     queryFn: () => fetchBacklogItems(undefined, undefined, searchQuery),
   });
 
-  const backlogItems = backlogItemsResponse?.data || [];
+  const backlogItems = backlogItemsResponse?.data || backlogItemsResponse?.items || [];
 
   const handleDragEnd = async (result: any) => {
     if (!result.destination) return;

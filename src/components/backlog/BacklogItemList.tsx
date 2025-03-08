@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -33,7 +32,7 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
   const { data: backlogItemsResponse, isLoading, refetch } = useQuery({
     queryKey: ['backlogItems', selectedReleaseId, selectedStatus, searchQuery],
     queryFn: () => fetchBacklogItems(
-      selectedReleaseId === 'unassigned' ? 'unassigned' : selectedReleaseId, 
+      selectedReleaseId === 'unassigned' ? 'unassigned' as any : selectedReleaseId, 
       selectedStatus.length > 0 ? selectedStatus : undefined, 
       searchQuery
     ),
@@ -45,7 +44,7 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
   });
 
   const releases = releasesResponse?.data || [];
-  const backlogItems = backlogItemsResponse?.data || [];
+  const backlogItems = backlogItemsResponse?.data || backlogItemsResponse?.items || [];
 
   const handleViewItem = (backlogItem: BacklogItem) => {
     setSelectedBacklogItem(backlogItem);

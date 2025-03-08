@@ -10,6 +10,7 @@ export * from './email';
 export * from './dashboard';
 export * from './api';
 export * from './configuration';
+export * from './StatusSynchronizationSettings'; // Add this export
 
 // Explicitly re-export from backlogTypes to avoid name conflicts
 export type {

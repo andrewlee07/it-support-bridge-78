@@ -1,268 +1,167 @@
 
-import React, { useState, useEffect } from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter 
-} from '@/components/ui/dialog';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from '@/components/ui/card';
+import { 
+  Form, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormDescription 
+} from '@/components/ui/form';
+import { Switch } from '@/components/ui/switch';
+import { useForm } from 'react-hook-form';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
-  ArrowUp, 
-  ArrowDown, 
-  Trash2, 
-  Plus,
-  LayoutGrid,
-  LayoutRow
+  SlidersHorizontal, 
+  Layout, 
+  LayoutGrid, 
+  ChevronRight, 
+  AlertTriangle
 } from 'lucide-react';
-import { KanbanBoardConfig, KanbanColumnConfig } from '@/utils/types/kanbanTypes';
-import { v4 as uuidv4 } from 'uuid';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { KanbanBoardConfig, defaultKanbanConfig } from '@/utils/types/kanbanTypes';
 
 interface KanbanConfigDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  currentConfig: KanbanBoardConfig;
-  onSave: (config: KanbanBoardConfig) => void;
+  config: KanbanBoardConfig;
+  onUpdateConfig: (config: KanbanBoardConfig) => void;
 }
 
 const KanbanConfigDialog: React.FC<KanbanConfigDialogProps> = ({
-  isOpen,
-  onClose,
-  currentConfig,
-  onSave,
+  config,
+  onUpdateConfig
 }) => {
-  const [config, setConfig] = useState<KanbanBoardConfig>(currentConfig);
-  const [newColumnName, setNewColumnName] = useState('');
-  const [newStatusValue, setNewStatusValue] = useState('');
+  const [open, setOpen] = useState(false);
+  const form = useForm<KanbanBoardConfig>({
+    defaultValues: config || defaultKanbanConfig
+  });
 
-  // Reset form when dialog opens
-  useEffect(() => {
-    if (isOpen) {
-      setConfig(currentConfig);
-      setNewColumnName('');
-      setNewStatusValue('');
-    }
-  }, [isOpen, currentConfig]);
-
-  const handleSave = () => {
-    onSave(config);
-  };
-
-  const handleMoveUp = (index: number) => {
-    if (index === 0) return;
-    
-    const newColumns = [...config.columns];
-    const currentOrder = newColumns[index].order;
-    const prevOrder = newColumns[index - 1].order;
-    
-    newColumns[index].order = prevOrder;
-    newColumns[index - 1].order = currentOrder;
-    
-    setConfig({
-      ...config,
-      columns: newColumns.sort((a, b) => a.order - b.order)
-    });
-  };
-
-  const handleMoveDown = (index: number) => {
-    if (index === config.columns.length - 1) return;
-    
-    const newColumns = [...config.columns];
-    const currentOrder = newColumns[index].order;
-    const nextOrder = newColumns[index + 1].order;
-    
-    newColumns[index].order = nextOrder;
-    newColumns[index + 1].order = currentOrder;
-    
-    setConfig({
-      ...config,
-      columns: newColumns.sort((a, b) => a.order - b.order)
-    });
-  };
-
-  const handleUpdateColumnName = (index: number, name: string) => {
-    const newColumns = [...config.columns];
-    newColumns[index].displayName = name;
-    setConfig({
-      ...config,
-      columns: newColumns
-    });
-  };
-
-  const handleDeleteColumn = (index: number) => {
-    const newColumns = [...config.columns];
-    newColumns.splice(index, 1);
-    
-    // Reorder remaining columns
-    newColumns.forEach((col, idx) => {
-      col.order = idx + 1;
-    });
-    
-    setConfig({
-      ...config,
-      columns: newColumns
-    });
-  };
-
-  const handleAddColumn = () => {
-    if (!newColumnName || !newStatusValue) return;
-    
-    const newColumn: KanbanColumnConfig = {
-      id: uuidv4(),
-      displayName: newColumnName,
-      statusValue: newStatusValue,
-      order: config.columns.length + 1,
-      color: `bg-gray-50 dark:bg-gray-950` // default color
-    };
-    
-    setConfig({
-      ...config,
-      columns: [...config.columns, newColumn].sort((a, b) => a.order - b.order)
-    });
-    
-    setNewColumnName('');
-    setNewStatusValue('');
-  };
-
-  const handleLayoutChange = (layout: 'horizontal' | 'grid') => {
-    setConfig({
-      ...config,
-      layout
-    });
+  const handleSubmit = (data: KanbanBoardConfig) => {
+    onUpdateConfig(data);
+    setOpen(false);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Configure Kanban Board</DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-6 my-4">
-          <div className="space-y-2">
-            <Label>Board Layout</Label>
-            <RadioGroup 
-              value={config.layout} 
-              onValueChange={(val: 'horizontal' | 'grid') => handleLayoutChange(val)}
-              className="flex items-center gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="horizontal" id="layout-horizontal" />
-                <Label htmlFor="layout-horizontal" className="flex items-center">
-                  <LayoutRow className="h-4 w-4 mr-2" />
-                  Horizontal (Like screenshot)
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="grid" id="layout-grid" />
-                <Label htmlFor="layout-grid" className="flex items-center">
-                  <LayoutGrid className="h-4 w-4 mr-2" />
-                  Grid Layout
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
+    <>
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="gap-1"
+        onClick={() => setOpen(true)}
+      >
+        <SlidersHorizontal className="h-4 w-4" />
+        Configure
+      </Button>
 
-          <div className="space-y-2">
-            <Label>Columns</Label>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[200px]">Display Name</TableHead>
-                  <TableHead>Status Value</TableHead>
-                  <TableHead className="w-[100px]">Order</TableHead>
-                  <TableHead className="w-[120px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {config.columns.map((column, index) => (
-                  <TableRow key={column.id}>
-                    <TableCell>
-                      <Input 
-                        value={column.displayName} 
-                        onChange={(e) => handleUpdateColumnName(index, e.target.value)}
-                      />
-                    </TableCell>
-                    <TableCell>{column.statusValue}</TableCell>
-                    <TableCell>{column.order}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleMoveUp(index)}
-                          disabled={index === 0}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Kanban Board Configuration</DialogTitle>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Board Layout</CardTitle>
+                  <CardDescription>
+                    Choose how columns are displayed on the board
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <FormField
+                    control={form.control}
+                    name="layout"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>Layout Style</FormLabel>
+                        <RadioGroup
+                          value={field.value}
+                          onValueChange={(value: 'horizontal' | 'grid') => field.onChange(value)}
+                          className="flex flex-col space-y-1"
                         >
-                          <ArrowUp className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleMoveDown(index)}
-                          disabled={index === config.columns.length - 1}
-                        >
-                          <ArrowDown className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleDeleteColumn(index)}
-                          disabled={config.columns.length <= 1}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                          <div className="flex items-center space-x-3 space-y-0">
+                            <RadioGroupItem value="horizontal" id="horizontal" />
+                            <Layout className="h-4 w-4 text-muted-foreground" />
+                            <Label htmlFor="horizontal">Horizontal Columns</Label>
+                          </div>
+                          <div className="flex items-center space-x-3 space-y-0">
+                            <RadioGroupItem value="grid" id="grid" />
+                            <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+                            <Label htmlFor="grid">Grid Layout</Label>
+                          </div>
+                        </RadioGroup>
+                        <FormDescription>
+                          Horizontal layout is recommended for boards with 6 or fewer columns
+                        </FormDescription>
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Column Visibility</CardTitle>
+                  <CardDescription>
+                    Configure which columns are visible by default
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {config.columns.map((column) => (
+                      <div key={column.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div 
+                            className="w-3 h-3 rounded-full"
+                            style={{
+                              backgroundColor: column.color.includes('bg-') 
+                                ? `var(--${column.color.split('bg-')[1].split(' ')[0]})` 
+                                : column.color
+                            }}
+                          />
+                          <Label htmlFor={`collapse-${column.id}`} className="font-medium">
+                            {column.displayName}
+                          </Label>
+                        </div>
+                        <Switch
+                          id={`collapse-${column.id}`}
+                          checked={!config.defaultCollapsed.includes(column.id)}
+                          onCheckedChange={(checked) => {
+                            const newCollapsed = checked 
+                              ? config.defaultCollapsed.filter(id => id !== column.id)
+                              : [...config.defaultCollapsed, column.id];
+                            form.setValue('defaultCollapsed', newCollapsed);
+                          }}
+                        />
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-          <div className="space-y-2 pt-4 border-t">
-            <Label>Add New Column</Label>
-            <div className="flex space-x-2">
-              <Input 
-                placeholder="Display Name" 
-                value={newColumnName}
-                onChange={(e) => setNewColumnName(e.target.value)}
-                className="flex-1"
-              />
-              <Input 
-                placeholder="Status Value" 
-                value={newStatusValue}
-                onChange={(e) => setNewStatusValue(e.target.value)}
-                className="flex-1"
-              />
-              <Button 
-                onClick={handleAddColumn}
-                disabled={!newColumnName || !newStatusValue}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Add
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave}>Save Configuration</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Save Configuration</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

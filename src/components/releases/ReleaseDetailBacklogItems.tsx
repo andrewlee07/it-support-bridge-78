@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBacklogItems } from '@/utils/api/backlogApi';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { calculateReleaseCapacity } from '@/utils/types/backlogTypes';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,10 +26,10 @@ const ReleaseDetailBacklogItems: React.FC<ReleaseDetailBacklogItemsProps> = ({
   // Fetch backlog items for this release
   const { data: backlogItemsResponse, isLoading } = useQuery({
     queryKey: ['backlogItems', releaseId],
-    queryFn: () => fetchBacklogItems(releaseId),
+    queryFn: () => fetchBacklogItems(releaseId as any),
   });
 
-  const backlogItems = backlogItemsResponse?.data || [];
+  const backlogItems = backlogItemsResponse?.data || backlogItemsResponse?.items || [];
   
   // Calculate capacity metrics
   const targetCapacity = 100; // This could be configurable per release

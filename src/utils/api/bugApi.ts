@@ -1,170 +1,218 @@
 
-import { Bug, BugStatus } from '@/utils/types/test/bug';
+// src/utils/api/bugApi.ts
+
+import { Bug } from '@/utils/types/test/bug';
+import { BugStatus } from '@/utils/types/test/testStatus';
 import { ApiResponse, PaginatedResponse } from '@/utils/types/api';
-import { bugs } from '@/utils/mockData/bugs';
+import { v4 as uuidv4 } from 'uuid';
 
-// Export the mock bugs
-export const mockBugs = bugs;
+// In-memory storage of bugs
+const mockBugs: Bug[] = [];
 
-// Get all bugs
-export const fetchBugs = async (
-  filters?: Partial<Bug>
-): Promise<PaginatedResponse<Bug>> => {
-  let filteredBugs = [...bugs];
+// Get all bugs with optional filters
+export const fetchBugs = (
+  filters?: {
+    status?: BugStatus | BugStatus[];
+    severity?: string;
+    priority?: string;
+    releaseId?: string;
+    relatedBacklogItemId?: string;
+  }
+): PaginatedResponse<Bug> => {
+  let filteredBugs = [...mockBugs];
   
   if (filters) {
-    Object.keys(filters).forEach(key => {
-      const filterKey = key as keyof Bug;
-      const filterValue = filters[filterKey];
-      
-      if (filterValue !== undefined) {
-        filteredBugs = filteredBugs.filter(bug => bug[filterKey] === filterValue);
-      }
-    });
+    if (filters.status) {
+      const statuses = Array.isArray(filters.status) ? filters.status : [filters.status];
+      filteredBugs = filteredBugs.filter(bug => statuses.includes(bug.status as BugStatus));
+    }
+    
+    if (filters.severity) {
+      filteredBugs = filteredBugs.filter(bug => bug.severity === filters.severity);
+    }
+    
+    if (filters.priority) {
+      filteredBugs = filteredBugs.filter(bug => bug.priority === filters.priority);
+    }
+    
+    if (filters.releaseId) {
+      filteredBugs = filteredBugs.filter(bug => bug.releaseId === filters.releaseId);
+    }
+    
+    if (filters.relatedBacklogItemId) {
+      filteredBugs = filteredBugs.filter(bug => bug.relatedBacklogItemId === filters.relatedBacklogItemId);
+    }
   }
   
   return {
-    data: filteredBugs,
-    pagination: {
-      total: filteredBugs.length,
-      page: 1,
-      pageSize: filteredBugs.length,
-      totalPages: 1
-    }
+    items: filteredBugs,
+    data: filteredBugs, // For backward compatibility
+    total: filteredBugs.length,
+    page: 1,
+    limit: filteredBugs.length,
+    totalPages: 1
   };
 };
 
 // Get bug by ID
-export const fetchBugById = async (bugId: string): Promise<ApiResponse<Bug>> => {
-  const bug = bugs.find(b => b.id === bugId);
+export const fetchBugById = (id: string): ApiResponse<Bug> => {
+  const bug = mockBugs.find(b => b.id === id);
   
   if (!bug) {
     return {
       success: false,
       error: 'Bug not found',
       status: 404,
-      data: null
+      statusCode: 404
     };
   }
   
   return {
     success: true,
     data: bug,
-    status: 200
-  };
-};
-
-// Update bug status
-export const updateBugStatus = async (
-  bugId: string, 
-  newStatus: BugStatus
-): Promise<ApiResponse<Bug>> => {
-  const bugIndex = bugs.findIndex(b => b.id === bugId);
-  
-  if (bugIndex === -1) {
-    return {
-      success: false,
-      error: 'Bug not found',
-      status: 404,
-      data: null
-    };
-  }
-  
-  const updatedBug = {
-    ...bugs[bugIndex],
-    status: newStatus,
-    updatedAt: new Date()
-  };
-  
-  bugs[bugIndex] = updatedBug;
-  
-  return {
-    success: true,
-    data: updatedBug,
-    status: 200
-  };
-};
-
-// Get bugs by release ID
-export const getBugsByReleaseId = async (
-  releaseId: string
-): Promise<ApiResponse<Bug[]>> => {
-  const releaseBugs = bugs.filter(bug => bug.releaseId === releaseId);
-  
-  return {
-    success: true,
-    data: releaseBugs,
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
 // Create a new bug
-export const createBug = async (bugData: Omit<Bug, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Bug>> => {
+export const createBug = (
+  bugData: Omit<Bug, 'id' | 'createdAt' | 'updatedAt'>
+): ApiResponse<Bug> => {
   const newBug: Bug = {
-    id: `BUG-${bugs.length + 1}`,
+    id: uuidv4(),
     ...bugData,
     createdAt: new Date(),
     updatedAt: new Date()
   };
   
-  bugs.push(newBug);
+  mockBugs.push(newBug);
   
   return {
     success: true,
     data: newBug,
-    status: 201
+    status: 201,
+    statusCode: 201
   };
 };
 
-// Update a bug
-export const updateBug = async (
-  bugId: string,
-  bugData: Partial<Bug>
-): Promise<ApiResponse<Bug>> => {
-  const bugIndex = bugs.findIndex(b => b.id === bugId);
+// Update an existing bug
+export const updateBug = (
+  id: string,
+  updates: Partial<Bug>
+): ApiResponse<Bug> => {
+  const bugIndex = mockBugs.findIndex(bug => bug.id === id);
   
   if (bugIndex === -1) {
     return {
       success: false,
       error: 'Bug not found',
       status: 404,
-      data: null
+      statusCode: 404
     };
   }
   
   const updatedBug = {
-    ...bugs[bugIndex],
-    ...bugData,
+    ...mockBugs[bugIndex],
+    ...updates,
     updatedAt: new Date()
   };
   
-  bugs[bugIndex] = updatedBug;
+  mockBugs[bugIndex] = updatedBug;
   
   return {
     success: true,
     data: updatedBug,
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
-// Delete a bug
-export const deleteBug = async (bugId: string): Promise<ApiResponse<boolean>> => {
-  const bugIndex = bugs.findIndex(b => b.id === bugId);
+// Get bugs by release ID
+export const getBugsByReleaseId = (releaseId: string): ApiResponse<Bug[]> => {
+  const bugs = mockBugs.filter(bug => bug.releaseId === releaseId);
+  
+  return {
+    success: true,
+    data: bugs,
+    status: 200,
+    statusCode: 200
+  };
+};
+
+// Get bugs by backlog item ID
+export const getBugsByBacklogItemId = (
+  backlogItemId: string
+): ApiResponse<Bug[]> => {
+  const bugs = mockBugs.filter(bug => bug.relatedBacklogItemId === backlogItemId);
+  
+  return {
+    success: true,
+    data: bugs,
+    status: 200,
+    statusCode: 200
+  };
+};
+
+// Change bug status
+export const changeBugStatus = (
+  id: string,
+  newStatus: BugStatus
+): ApiResponse<Bug> => {
+  const bugIndex = mockBugs.findIndex(bug => bug.id === id);
   
   if (bugIndex === -1) {
     return {
       success: false,
       error: 'Bug not found',
       status: 404,
+      statusCode: 404
+    };
+  }
+  
+  mockBugs[bugIndex].status = newStatus;
+  mockBugs[bugIndex].updatedAt = new Date();
+  
+  return {
+    success: true,
+    data: mockBugs[bugIndex],
+    status: 200,
+    statusCode: 200
+  };
+};
+
+// Delete a bug
+export const deleteBug = (id: string): ApiResponse<boolean> => {
+  const bugIndex = mockBugs.findIndex(bug => bug.id === id);
+  
+  if (bugIndex === -1) {
+    return {
+      success: false,
+      error: 'Bug not found',
+      status: 404,
+      statusCode: 404,
       data: false
     };
   }
   
-  bugs.splice(bugIndex, 1);
+  mockBugs.splice(bugIndex, 1);
   
   return {
     success: true,
     data: true,
-    status: 200
+    status: 200,
+    statusCode: 200
   };
+};
+
+// Export all functions to make them available to components
+export default {
+  fetchBugs,
+  fetchBugById,
+  createBug,
+  updateBug,
+  getBugsByReleaseId,
+  getBugsByBacklogItemId,
+  changeBugStatus,
+  deleteBug
 };

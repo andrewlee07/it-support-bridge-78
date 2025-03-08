@@ -1,12 +1,13 @@
-import { BacklogItem, BacklogItemStatus, BacklogStats } from '@/utils/types/backlogTypes';
+
+import { BacklogItem, BacklogItemStatus, BacklogStats, Attachment, Comment } from '@/utils/types/backlogTypes';
 import { backlogItems } from './backlogItems';
 import { ApiResponse, PaginatedResponse } from '@/utils/types/api';
 import { v4 as uuidv4 } from 'uuid';
 
 // Get all backlog items
 export const fetchBacklogItems = (
-  status?: BacklogItemStatus | BacklogItemStatus[],
   releaseId?: string,
+  status?: BacklogItemStatus | BacklogItemStatus[],
   searchQuery?: string
 ): PaginatedResponse<BacklogItem> => {
   let filteredItems = [...backlogItems];
@@ -20,7 +21,11 @@ export const fetchBacklogItems = (
   }
   
   if (releaseId) {
-    filteredItems = filteredItems.filter(item => item.releaseId === releaseId);
+    if (releaseId === 'unassigned') {
+      filteredItems = filteredItems.filter(item => !item.releaseId);
+    } else {
+      filteredItems = filteredItems.filter(item => item.releaseId === releaseId);
+    }
   }
   
   if (searchQuery) {
@@ -33,7 +38,12 @@ export const fetchBacklogItems = (
   }
   
   return {
-    data: filteredItems,
+    items: filteredItems,
+    data: filteredItems, // For backward compatibility
+    total: filteredItems.length,
+    page: 1,
+    limit: filteredItems.length,
+    totalPages: 1,
     pagination: {
       total: filteredItems.length,
       page: 1,
@@ -52,7 +62,8 @@ export const getBacklogItemsByReleaseId = (
   return {
     success: true,
     data: items,
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -67,14 +78,16 @@ export const fetchBacklogItemById = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
   return {
     success: true,
     data: item,
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -94,7 +107,8 @@ export const createBacklogItem = (
   return {
     success: true,
     data: newItem,
-    status: 201
+    status: 201,
+    statusCode: 201
   };
 };
 
@@ -110,7 +124,8 @@ export const updateBacklogItem = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -125,7 +140,8 @@ export const updateBacklogItem = (
   return {
     success: true,
     data: updatedItem,
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -138,6 +154,7 @@ export const deleteBacklogItem = (id: string): ApiResponse<boolean> => {
       success: false,
       error: 'Backlog item not found',
       status: 404,
+      statusCode: 404,
       data: false
     };
   }
@@ -147,7 +164,8 @@ export const deleteBacklogItem = (id: string): ApiResponse<boolean> => {
   return {
     success: true,
     data: true,
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -163,7 +181,8 @@ export const assignToRelease = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -172,7 +191,8 @@ export const assignToRelease = (
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -185,7 +205,8 @@ export const removeFromRelease = (itemId: string): ApiResponse<BacklogItem> => {
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -194,7 +215,8 @@ export const removeFromRelease = (itemId: string): ApiResponse<BacklogItem> => {
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -208,14 +230,15 @@ export const getBacklogStats = (): ApiResponse<BacklogStats> => {
   const stats: BacklogStats = {
     totalItems,
     openItems,
-    inProgressItems,
-    completedItems
+    completedItems,
+    inProgressItems
   };
   
   return {
     success: true,
     data: stats,
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -231,7 +254,8 @@ export const addAttachment = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -239,12 +263,26 @@ export const addAttachment = (
     backlogItems[itemIndex].attachments = [];
   }
   
-  backlogItems[itemIndex].attachments!.push(attachment);
+  // Create a proper Attachment object
+  const newAttachment: Attachment = {
+    id: uuidv4(),
+    fileName: attachment.name,
+    fileUrl: attachment.url,
+    fileType: attachment.url.split('.').pop() || 'unknown',
+    fileSize: 0, // We don't have this info
+    uploadedBy: 'system',
+    uploadedAt: new Date(),
+    name: attachment.name, // For backward compatibility
+    url: attachment.url // For backward compatibility
+  };
+  
+  backlogItems[itemIndex].attachments!.push(newAttachment);
   
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -260,18 +298,20 @@ export const removeAttachment = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
   backlogItems[itemIndex].attachments = backlogItems[itemIndex].attachments?.filter(
-    attachment => attachment.url !== attachmentUrl
+    attachment => attachment.fileUrl !== attachmentUrl && attachment.url !== attachmentUrl
   );
   
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -287,7 +327,8 @@ export const addComment = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -295,10 +336,13 @@ export const addComment = (
     backlogItems[itemIndex].comments = [];
   }
   
-  const newComment = {
+  // Create a proper Comment object
+  const newComment: Comment = {
     id: uuidv4(),
-    ...comment,
-    createdAt: new Date()
+    content: comment.text,
+    author: comment.author,
+    createdAt: new Date(),
+    text: comment.text // For backward compatibility
   };
   
   backlogItems[itemIndex].comments!.push(newComment);
@@ -306,7 +350,8 @@ export const addComment = (
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -323,7 +368,8 @@ export const updateComment = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -336,16 +382,20 @@ export const updateComment = (
       success: false,
       error: 'Comment not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
-  backlogItems[itemIndex].comments![commentIndex].text = text;
+  backlogItems[itemIndex].comments![commentIndex].content = text;
+  backlogItems[itemIndex].comments![commentIndex].text = text; // For backward compatibility
+  backlogItems[itemIndex].comments![commentIndex].updatedAt = new Date();
   
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -361,7 +411,8 @@ export const deleteComment = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -372,7 +423,8 @@ export const deleteComment = (
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -388,7 +440,8 @@ export const addWatcher = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -403,7 +456,8 @@ export const addWatcher = (
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };
 
@@ -419,7 +473,8 @@ export const removeWatcher = (
       success: false,
       error: 'Backlog item not found',
       status: 404,
-      data: null
+      statusCode: 404,
+      data: null as any
     };
   }
   
@@ -430,6 +485,7 @@ export const removeWatcher = (
   return {
     success: true,
     data: backlogItems[itemIndex],
-    status: 200
+    status: 200,
+    statusCode: 200
   };
 };

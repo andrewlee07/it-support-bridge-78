@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { fetchBacklogItems } from '@/utils/api/backlogApi';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -25,14 +25,14 @@ const BacklogItemSelectionDialog: React.FC<BacklogItemSelectionDialogProps> = ({
   const [selectedItems, setSelectedItems] = useState<BacklogItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fetch unassigned backlog items
+  // Fetch unassigned backlog items - using array of statuses to fix type error
   const { data: unassignedItemsResponse, isLoading } = useQuery({
     queryKey: ['unassignedBacklogItems', releaseId],
-    queryFn: () => fetchBacklogItems('', ['open', 'ready']),
+    queryFn: () => fetchBacklogItems('', ['open', 'ready'] as BacklogItemStatus[]),
     enabled: open,
   });
 
-  const unassignedItems = (unassignedItemsResponse?.data || [])
+  const unassignedItems = (unassignedItemsResponse?.data || unassignedItemsResponse?.items || [])
     .filter(item => !item.releaseId || item.releaseId !== releaseId);
 
   const handleItemToggle = (item: BacklogItem) => {

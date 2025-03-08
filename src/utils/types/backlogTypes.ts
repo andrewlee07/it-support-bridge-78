@@ -1,4 +1,3 @@
-
 // Backlog Item Management Types
 
 // Status types
@@ -44,6 +43,8 @@ export interface Attachment {
   fileSize: number;
   uploadedBy: string;
   uploadedAt: Date;
+  name?: string; // For backward compatibility
+  url?: string; // For backward compatibility
 }
 
 export interface Comment {
@@ -54,6 +55,7 @@ export interface Comment {
   updatedAt?: Date;
   parentId?: string; // For threaded comments
   mentions?: string[]; // User IDs mentioned in the comment
+  text?: string; // For backward compatibility
 }
 
 export interface HistoryEntry {

@@ -9,6 +9,9 @@ export type BugStatus =
   'new' | 'in-progress' | 'fixed' | 'verified' | 'closed' | 
   'open' | 'in_progress' | 'resolved'; // Including all values used in the codebase
 
+// Export BugStatus for use in other modules
+export { BugStatus };
+
 // For test cycles - updated to include both formats for consistency
 export type TestCycleStatus = 'planned' | 'in_progress' | 'in-progress' | 'completed' | 'aborted';
 

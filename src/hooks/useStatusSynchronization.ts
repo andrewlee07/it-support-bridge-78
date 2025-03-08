@@ -41,9 +41,23 @@ export const useStatusSynchronization = () => {
     return true;
   };
 
+  // Add the validateConfiguration function
+  const validateConfiguration = (config: StatusSynchronizationSettings): boolean => {
+    // Simple validation - ensures all required fields are present
+    return (
+      config.enableCascadingUpdates !== undefined &&
+      config.enableDateSynchronization !== undefined &&
+      config.notifyOnStatusChange !== undefined &&
+      config.allowOverrides !== undefined &&
+      !!config.releaseToBacklogMapping &&
+      !!config.releaseToBugMapping
+    );
+  };
+
   return {
     settings,
     isLoading,
-    updateSettings
+    updateSettings,
+    validateConfiguration
   };
 };
