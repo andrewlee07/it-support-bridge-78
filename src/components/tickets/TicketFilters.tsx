@@ -8,10 +8,10 @@ import { TicketPriority, TicketStatus } from '@/utils/types/ticket';
 
 interface TicketFiltersProps {
   searchQuery: string;
-  statusFilter: TicketStatus | 'all';
+  statusFilter: TicketStatus | 'all' | 'closed';
   priorityFilter: TicketPriority | 'all';
   onSearchChange: (value: string) => void;
-  onStatusChange: (value: TicketStatus | 'all') => void;
+  onStatusChange: (value: TicketStatus | 'all' | 'closed') => void;
   onPriorityChange: (value: TicketPriority | 'all') => void;
 }
 
@@ -38,7 +38,7 @@ const TicketFilters: React.FC<TicketFiltersProps> = ({
           </div>
           <Select
             value={statusFilter}
-            onValueChange={value => onStatusChange(value as TicketStatus | 'all')}
+            onValueChange={value => onStatusChange(value as TicketStatus | 'all' | 'closed')}
           >
             <SelectTrigger>
               <SelectValue placeholder="Filter by status" />
@@ -48,9 +48,9 @@ const TicketFilters: React.FC<TicketFiltersProps> = ({
               <SelectItem value="open">Open</SelectItem>
               <SelectItem value="in-progress">In Progress</SelectItem>
               <SelectItem value="resolved">Resolved</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="fulfilled">Fulfilled</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="closed">Closed</SelectItem>
             </SelectContent>
           </Select>
           <Select

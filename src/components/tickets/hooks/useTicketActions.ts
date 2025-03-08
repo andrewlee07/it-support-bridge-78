@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Ticket, TicketStatus } from '@/utils/types/ticket';
 import { toast } from 'sonner';
@@ -35,7 +34,7 @@ export const useTicketActions = ({
             type === 'service' && 
             !ticket.assignedTo && 
             data.assignedTo && 
-            ticket.status === 'new' && 
+            ticket.status === 'open' && 
             data.status === 'in-progress';
           
           // Show notification if service request is being assigned

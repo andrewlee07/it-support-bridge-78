@@ -9,17 +9,17 @@ export interface UseTicketFiltersProps {
 export interface UseTicketFiltersReturn {
   filteredTickets: Ticket[];
   searchQuery: string;
-  statusFilter: TicketStatus | 'all';
+  statusFilter: TicketStatus | 'all' | 'closed';
   priorityFilter: TicketPriority | 'all';
   setSearchQuery: (query: string) => void;
-  setStatusFilter: (status: TicketStatus | 'all') => void;
+  setStatusFilter: (status: TicketStatus | 'all' | 'closed') => void;
   setPriorityFilter: (priority: TicketPriority | 'all') => void;
 }
 
 export const useTicketFilters = ({ tickets }: UseTicketFiltersProps): UseTicketFiltersReturn => {
   const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<TicketStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<TicketStatus | 'all' | 'closed'>('all');
   const [priorityFilter, setPriorityFilter] = useState<TicketPriority | 'all'>('all');
 
   useEffect(() => {
@@ -37,10 +37,14 @@ export const useTicketFilters = ({ tickets }: UseTicketFiltersProps): UseTicketF
     }
 
     // Apply status filter
-    if (statusFilter !== 'all') {
+    if (statusFilter === 'closed') {
+      // Only show closed tickets
+      result = result.filter(t => t.status === 'closed');
+    } else if (statusFilter !== 'all') {
+      // Filter by specific status
       result = result.filter(t => t.status === statusFilter);
     } else {
-      // "All" now means all except closed tickets
+      // "All" means all except closed tickets
       result = result.filter(t => t.status !== 'closed');
     }
 
