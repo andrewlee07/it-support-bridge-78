@@ -16,6 +16,7 @@ import {
   OctagonAlertIcon,
   CalendarIcon,
   PlayIcon,
+  AlertTriangleIcon,
 } from "lucide-react";
 import { NavigationItem } from './types';
 
@@ -140,6 +141,13 @@ export const settingsItems = [
     path: "/settings/risk-assessment",
     href: "/settings/risk-assessment",
     icon: BarChart2Icon,
+    allowedRoles: ['admin']
+  },
+  {
+    name: "Error Logs",
+    path: "/admin/error-logs",
+    href: "/admin/error-logs",
+    icon: AlertTriangleIcon,
     allowedRoles: ['admin']
   },
 ];

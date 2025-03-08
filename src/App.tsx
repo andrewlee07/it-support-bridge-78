@@ -1,89 +1,265 @@
+import React, { useEffect } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+} from 'react-router-dom';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import Login from '@/pages/Login';
+import Dashboard from '@/pages/Dashboard';
+import Incidents from '@/pages/Incidents';
+import ServiceRequests from '@/pages/ServiceRequests';
+import Changes from '@/pages/Changes';
+import Releases from '@/pages/Releases';
+import Assets from '@/pages/Assets';
+import Users from '@/pages/Users';
+import Reports from '@/pages/Reports';
+import AdminSettings from '@/pages/AdminSettings';
+import SLASettings from '@/pages/SLASettings';
+import DropdownConfigurations from '@/pages/DropdownConfigurations';
+import RiskAssessment from '@/pages/RiskAssessment';
+import TestTracking from '@/pages/TestTracking';
+import TestExecution from '@/pages/TestExecution';
+import Bugs from '@/pages/Bugs';
+import ProblemManagement from '@/pages/ProblemManagement';
+import Calendar from '@/pages/Calendar';
+import Backlog from '@/pages/Backlog';
+import MainLayout from '@/components/shared/MainLayout';
+import { mockUsers } from '@/utils/mockData/users';
+import { updateUser } from '@/utils/mockData/users';
+import { User } from '@/utils/types/user';
+import ErrorLogs from './pages/admin/ErrorLogs';
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { ThemeProvider } from "@/components/ui/theme-provider"
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Index from './pages/Index';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/auth/ProtectedRoute';
-import MFAVerification from './pages/MFAVerification';
-import SecurityQuestionRecovery from './pages/SecurityQuestionRecovery';
-import SecurityAuditLog from './pages/SecurityAuditLog';
-import AdminSettings from './pages/AdminSettings';
-import SessionTimeoutAlert from './components/auth/SessionTimeoutAlert';
-import Incidents from './pages/Incidents';
-import ServiceRequests from './pages/ServiceRequests';
-import Changes from './pages/Changes';
-import Releases from './pages/Releases';
-import Assets from './pages/Assets';
-import Backlog from './pages/Backlog';
-import TestTracking from './pages/TestTracking';
-import Users from './pages/Users';
-import Reports from './pages/Reports';
-import SLASettings from './pages/SLASettings';
-import DropdownConfigurations from './pages/settings/DropdownConfigurations';
-import RiskAssessmentSettings from './pages/settings/RiskAssessmentSettings';
-import TestExecution from './pages/TestExecution';
-import Bugs from './pages/Bugs';
-import Calendar from './pages/Calendar';
-import ProblemManagement from './pages/ProblemManagement';
+// ProtectedRoute component
+const ProtectedRoute: React.FC<{
+  children: React.ReactNode;
+  requiredRoles?: string[];
+}> = ({ children, requiredRoles }) => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
-// Create a client
-const queryClient = new QueryClient();
+  useEffect(() => {
+    // Persist current location to localStorage for post-login redirect
+    if (!loading && !user) {
+      localStorage.setItem('redirectAfterLogin', location.pathname);
+    }
+  }, [user, loading, location]);
 
-function App() {
+  if (loading) {
+    return <div>Loading...</div>; // Show loading indicator while checking auth
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (requiredRoles && !requiredRoles.includes(user.role)) {
+    return <div>Unauthorized</div>; // Or redirect to an unauthorized page
+  }
+
+  return <>{children}</>;
+};
+
+const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <Router>
-          <AuthProvider>
-            <SessionTimeoutAlert />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/mfa-verification" element={<MFAVerification />} />
-              <Route path="/security-recovery" element={<SecurityQuestionRecovery />} />
-              
-              {/* Main application routes */}
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/incidents" element={<ProtectedRoute><Incidents /></ProtectedRoute>} />
-              <Route path="/service-requests" element={<ProtectedRoute><ServiceRequests /></ProtectedRoute>} />
-              <Route path="/changes" element={<ProtectedRoute><Changes /></ProtectedRoute>} />
-              <Route path="/releases" element={<ProtectedRoute><Releases /></ProtectedRoute>} />
-              <Route path="/backlog" element={<ProtectedRoute><Backlog /></ProtectedRoute>} />
-              <Route path="/assets" element={<ProtectedRoute><Assets /></ProtectedRoute>} />
-              <Route path="/test-tracking" element={<ProtectedRoute><TestTracking /></ProtectedRoute>} />
-              <Route path="/test-execution" element={<ProtectedRoute><TestExecution /></ProtectedRoute>} />
-              <Route path="/bugs" element={<ProtectedRoute><Bugs /></ProtectedRoute>} />
-              <Route path="/problem-management" element={<ProtectedRoute><ProblemManagement /></ProtectedRoute>} />
-              <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
-              <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
-              <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-              
-              {/* Settings routes */}
-              <Route path="/settings/sla" element={<ProtectedRoute><SLASettings /></ProtectedRoute>} />
-              <Route path="/settings/dropdown-configurations" element={<ProtectedRoute><DropdownConfigurations /></ProtectedRoute>} />
-              <Route path="/settings/risk-assessment" element={<ProtectedRoute><RiskAssessmentSettings /></ProtectedRoute>} />
-              
-              {/* Security routes */}
-              <Route path="/security-audit-log" element={<ProtectedRoute><SecurityAuditLog /></ProtectedRoute>} />
-              <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
-              
-              {/* Add a fallback redirect */}
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </AuthProvider>
-        </Router>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Dashboard />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/incidents"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Incidents />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/service-requests"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ServiceRequests />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/changes"
+            element={
+              <ProtectedRoute requiredRoles={['admin', 'manager']}>
+                <MainLayout>
+                  <Changes />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/releases"
+            element={
+              <ProtectedRoute requiredRoles={['admin', 'manager']}>
+                <MainLayout>
+                  <Releases />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assets"
+            element={
+              <ProtectedRoute requiredRoles={['admin', 'manager']}>
+                <MainLayout>
+                  <Assets />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <MainLayout>
+                  <Users />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute requiredRoles={['admin', 'manager']}>
+                <MainLayout>
+                  <Reports />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings/sla"
+            element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <MainLayout>
+                  <SLASettings />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings/dropdown-configurations"
+            element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <MainLayout>
+                  <DropdownConfigurations />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings/risk-assessment"
+            element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <MainLayout>
+                  <RiskAssessment />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/test-tracking"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <TestTracking />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/test-execution"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <TestExecution />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bugs"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Bugs />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/problem-management"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ProblemManagement />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Calendar />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/backlog"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Backlog />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <MainLayout>
+                  <AdminSettings />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/admin/error-logs" element={
+            <ProtectedRoute requiredRoles={['admin']}>
+              <MainLayout>
+                <ErrorLogs />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
-}
+};
 
 export default App;

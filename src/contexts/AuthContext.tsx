@@ -8,6 +8,7 @@ import { usePermissions } from '@/hooks/usePermissions';
 import { useSessionManagement } from '@/hooks/useSessionManagement';
 import { isSessionValid } from '@/utils/securityUtils';
 import { useToast } from '@/hooks/use-toast';
+import { logError } from '@/utils/logging/errorLogger';
 
 // Session checker interval in milliseconds (5 minutes)
 const SESSION_CHECK_INTERVAL = 5 * 60 * 1000;
@@ -43,6 +44,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             description: "Your session has expired. Please log in again.",
             variant: "destructive",
           });
+          
+          // Log the session expiry
+          logError("User session expired", { 
+            user, 
+            componentName: "AuthContext", 
+            severity: "info",
+            tags: ["session", "expiry"]
+          });
         }
       }, SESSION_CHECK_INTERVAL);
     }
@@ -76,10 +85,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               title: "Session expired",
               description: "Your previous session has expired. Please log in again.",
             });
+            
+            // Log the invalid session
+            logError("Invalid saved user session", { 
+              componentName: "AuthContext", 
+              severity: "info",
+              tags: ["session", "invalid"]
+            });
           }
         } catch (error) {
           console.error('Failed to parse saved user', error);
           localStorage.removeItem('currentUser');
+          
+          // Log the parsing error
+          logError(error as Error, { 
+            componentName: "AuthContext", 
+            severity: "error",
+            tags: ["localStorage", "parsing"]
+          });
         }
       } else {
         console.log("No saved user found in localStorage");
