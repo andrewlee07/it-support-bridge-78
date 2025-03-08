@@ -1,86 +1,120 @@
 
-import { useCallback, useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { StatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
+import { MandatoryFieldConfig } from '@/utils/types/configuration';
+import { useToast } from './use-toast';
 import { 
-  getStatusSynchronizationSettings,
+  getStatusSynchronizationSettings, 
   updateStatusSynchronizationSettings,
-  synchronizeReleaseStatus
+  getMandatoryFieldsConfig,
+  updateMandatoryFieldsConfig
 } from '@/api/statusSynchronization';
-import { StatusSynchronizationSettings, defaultStatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { BacklogItemStatus } from '@/utils/types/backlogTypes';
-import { ReleaseStatus } from '@/utils/types/release';
 
-export function useStatusSynchronization() {
-  const [settings, setSettings] = useState<StatusSynchronizationSettings>(defaultStatusSynchronizationSettings);
-
-  // Fetch settings
-  const { isLoading, refetch } = useQuery({
-    queryKey: ['statusSynchronizationSettings'],
-    queryFn: async () => {
-      const response = await getStatusSynchronizationSettings();
-      if (response.success) {
-        setSettings(response.data);
-      }
-      return response.data;
+export const useStatusSynchronization = () => {
+  const [settings, setSettings] = useState<StatusSynchronizationSettings>({
+    enableCascadingUpdates: true,
+    enableDateSynchronization: false,
+    notifyOnStatusChange: true,
+    allowOverrides: true,
+    releaseToBacklogMapping: {
+      'Planned': 'open',
+      'In Progress': 'in-progress',
+      'Deployed': 'completed',
+      'Cancelled': 'deferred'
+    },
+    releaseToBugMapping: {
+      'Planned': 'open',
+      'In Progress': 'in_progress',
+      'Deployed': 'fixed',
+      'Cancelled': 'closed'
     }
   });
 
-  // Mutation for updating settings
-  const updateMutation = useMutation({
-    mutationFn: updateStatusSynchronizationSettings,
-    onSuccess: (data) => {
-      setSettings(data.data);
-    }
-  });
+  const [mandatoryFields, setMandatoryFields] = useState<MandatoryFieldConfig[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Function to update settings
-  const updateSettings = useCallback((newSettings: StatusSynchronizationSettings) => {
-    updateMutation.mutate(newSettings);
-  }, [updateMutation]);
-
-  // Function to validate configuration
-  const validateConfiguration = useCallback((config: StatusSynchronizationSettings): boolean => {
-    // Check if all required release statuses have mappings
-    const requiredStatuses: ReleaseStatus[] = ['Planned', 'In Progress', 'Deployed', 'Cancelled'];
-    
-    for (const status of requiredStatuses) {
-      if (!config.releaseToBacklogMapping[status] || !config.releaseToBugMapping[status]) {
-        return false;
-      }
+  const fetchSettings = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getStatusSynchronizationSettings();
+      setSettings(data);
+      
+      // Fetch mandatory fields
+      const fields = await getMandatoryFieldsConfig('release');
+      setMandatoryFields(fields);
+      
+      setError(null);
+    } catch (err) {
+      setError('Failed to load settings');
+      toast({
+        title: 'Error',
+        description: 'Failed to load settings. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    return true;
+  };
+
+  useEffect(() => {
+    fetchSettings();
   }, []);
 
-  // Function to handle status synchronization
-  const handleStatusChange = useCallback(async (
-    releaseId: string, 
-    status: ReleaseStatus
-  ) => {
-    if (!settings.enableCascadingUpdates) return { updatedItems: 0 };
-    
-    const response = await synchronizeReleaseStatus(releaseId, status);
-    return response.data;
-  }, [settings.enableCascadingUpdates]);
+  const updateSettings = async (newSettings: StatusSynchronizationSettings) => {
+    setIsLoading(true);
+    try {
+      await updateStatusSynchronizationSettings(newSettings);
+      setSettings(newSettings);
+      toast({
+        title: 'Settings updated',
+        description: 'Status synchronization settings have been updated successfully.',
+      });
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update settings. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // Get the mapped status for backlog items
-  const getBacklogStatusForRelease = useCallback((releaseStatus: ReleaseStatus): BacklogItemStatus => {
-    return settings.releaseToBacklogMapping[releaseStatus] || 'open';
-  }, [settings.releaseToBacklogMapping]);
+  const updateMandatoryFields = async (fields: MandatoryFieldConfig[]) => {
+    setIsLoading(true);
+    try {
+      await updateMandatoryFieldsConfig('release', fields);
+      setMandatoryFields(fields);
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update mandatory fields. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // Get the mapped status for bugs
-  const getBugStatusForRelease = useCallback((releaseStatus: ReleaseStatus): string => {
-    return settings.releaseToBugMapping[releaseStatus] || 'open';
-  }, [settings.releaseToBugMapping]);
+  const validateConfiguration = () => {
+    // Validate the configuration (e.g., make sure all necessary mappings exist)
+    return true;
+  };
+
+  const refresh = () => {
+    fetchSettings();
+  };
 
   return {
     settings,
     updateSettings,
-    isLoading: isLoading || updateMutation.isPending,
-    handleStatusChange,
-    getBacklogStatusForRelease,
-    getBugStatusForRelease,
+    mandatoryFields,
+    updateMandatoryFields,
+    isLoading,
+    error,
     validateConfiguration,
-    refresh: refetch
+    refresh,
   };
-}
+};

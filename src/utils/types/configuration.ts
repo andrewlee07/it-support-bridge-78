@@ -1,4 +1,3 @@
-
 // Configuration types for dropdown fields
 export type ConfigurableEntityType = 'ticket' | 'asset' | 'change' | 'user' | 'incident' | 'service-request' | 'backlog' | 'release' | 'problem';
 
@@ -56,4 +55,18 @@ export interface ModuleConfiguration {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Configuration for mandatory fields
+export interface MandatoryFieldConfig {
+  fieldName: string;
+  displayName: string;
+  isRequired: boolean;
+  entityType: ConfigurableEntityType;
+  description?: string;
+}
+
+// Updated module configuration to include mandatory fields
+export interface ModuleConfigurationWithMandatory extends ModuleConfiguration {
+  mandatoryFields?: MandatoryFieldConfig[];
 }

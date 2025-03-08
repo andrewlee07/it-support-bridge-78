@@ -15,6 +15,8 @@ import { useStatusSynchronization } from '@/hooks/useStatusSynchronization';
 import { StatusMappingTable } from '@/components/admin/status-sync/StatusMappingTable';
 import PageTransition from '@/components/shared/PageTransition';
 import Breadcrumb from '@/components/shared/Breadcrumb';
+import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
+import { MandatoryFieldConfig } from '@/utils/types/configuration';
 
 const StatusSynchronizationConfig = () => {
   const { toast } = useToast();
@@ -23,7 +25,9 @@ const StatusSynchronizationConfig = () => {
     updateSettings, 
     isLoading,
     validateConfiguration,
-    refresh 
+    refresh,
+    mandatoryFields,
+    updateMandatoryFields
   } = useStatusSynchronization();
 
   const handleToggle = (key: keyof typeof settings) => {
@@ -41,6 +45,10 @@ const StatusSynchronizationConfig = () => {
       releaseToBacklogMapping,
       releaseToBugMapping
     });
+  };
+
+  const handleSaveMandatoryFields = (fields: MandatoryFieldConfig[]) => {
+    updateMandatoryFields(fields);
   };
 
   const breadcrumbItems = [
@@ -132,6 +140,22 @@ const StatusSynchronizationConfig = () => {
                 onUpdate={handleUpdateMappings}
                 isLoading={isLoading}
                 isDisabled={!settings.enableCascadingUpdates}
+              />
+            </div>
+            
+            <div className="pt-6">
+              <h3 className="text-lg font-medium mb-4">Mandatory Fields</h3>
+              <MandatoryFieldsConfig
+                entityType="release"
+                fields={mandatoryFields || [
+                  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'release', description: 'The name of the release' },
+                  { fieldName: 'version', displayName: 'Version', isRequired: false, entityType: 'release', description: 'The version number of the release' },
+                  { fieldName: 'description', displayName: 'Description', isRequired: false, entityType: 'release', description: 'A detailed description of the release' },
+                  { fieldName: 'plannedDate', displayName: 'Planned Date', isRequired: false, entityType: 'release', description: 'The planned release date' },
+                  { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'release', description: 'The current status of the release' }
+                ]}
+                onSave={handleSaveMandatoryFields}
+                isLoading={isLoading}
               />
             </div>
             
