@@ -8,7 +8,8 @@ import {
   updateBacklogItem,
   assignToRelease,
   removeFromRelease,
-  getBacklogStats
+  getBacklogStats,
+  deleteBacklogItem
 } from './backlogOperations';
 import {
   addAttachment,
@@ -34,6 +35,7 @@ export {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
+  deleteBacklogItem,
   
   // Enhanced feature operations
   addAttachment,
@@ -56,6 +58,7 @@ export default {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
+  deleteBacklogItem,
   addAttachment,
   removeAttachment,
   addComment,

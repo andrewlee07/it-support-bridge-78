@@ -1,4 +1,3 @@
-
 import { BacklogItem, BacklogItemStatus, BacklogStats } from '@/utils/types/backlogTypes';
 import { ApiResponse } from '@/utils/types';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from '../apiHelpers';
@@ -179,4 +178,16 @@ export const getBacklogStats = async (): Promise<ApiResponse<BacklogStats>> => {
   };
   
   return createApiSuccessResponse(stats);
+};
+
+export const deleteBacklogItem = async (id: string): Promise<ApiResponse<boolean>> => {
+  await delay(500);
+  const index = backlogItems.findIndex(b => b.id === id);
+  if (index === -1) {
+    return createApiErrorResponse<boolean>('Backlog item not found', 404);
+  }
+  
+  // Remove the item from the array
+  backlogItems.splice(index, 1);
+  return createApiSuccessResponse(true);
 };

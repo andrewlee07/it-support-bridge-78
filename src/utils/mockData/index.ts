@@ -52,7 +52,8 @@ import {
   updateBacklogItem,
   assignToRelease,
   removeFromRelease,
-  getBacklogStats
+  getBacklogStats,
+  deleteBacklogItem
 } from './backlog';
 
 // Export all mock data and helper functions
@@ -125,5 +126,6 @@ export {
   updateBacklogItem,
   assignToRelease,
   removeFromRelease,
-  getBacklogStats
+  getBacklogStats,
+  deleteBacklogItem
 };
