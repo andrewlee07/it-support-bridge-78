@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import BacklogItemList from '@/components/backlog/BacklogItemList';
 import BacklogItemForm from '@/components/backlog/BacklogItemForm';
 import { BacklogItem } from '@/utils/types/backlogTypes';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { updateBacklogItem } from '@/utils/api/backlogApi';
 
@@ -55,6 +55,9 @@ const Backlog: React.FC = () => {
 
         <Dialog open={isCreating} onOpenChange={setIsCreating}>
           <DialogContent className="sm:max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Create New Backlog Item</DialogTitle>
+            </DialogHeader>
             <BacklogItemForm
               onSuccess={handleFormSuccess}
               onCancel={handleFormCancel}

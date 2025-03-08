@@ -43,7 +43,8 @@ const AssignmentFields: React.FC<AssignmentFieldsProps> = ({ form, releases }) =
             <FormLabel>Release</FormLabel>
             <Select 
               onValueChange={field.onChange} 
-              defaultValue={field.value}
+              defaultValue={field.value} 
+              value={field.value}
             >
               <FormControl>
                 <SelectTrigger>
@@ -51,7 +52,7 @@ const AssignmentFields: React.FC<AssignmentFieldsProps> = ({ form, releases }) =
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {releases.map((release) => (
                   <SelectItem key={release.id} value={release.id}>
                     {release.title}
