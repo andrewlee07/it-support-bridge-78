@@ -1,5 +1,4 @@
 
-// Audit trail
 export interface AuditEntry {
   id: string;
   entityId: string;
@@ -8,6 +7,6 @@ export interface AuditEntry {
   performedBy: string;
   timestamp: Date;
   details?: string;
-  newValue?: string;
   oldValue?: string;
+  newValue?: string;
 }

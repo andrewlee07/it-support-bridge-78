@@ -1,9 +1,9 @@
 
 import { AuditEntry } from './audit';
-import { Ticket, TicketCategory } from './ticket';
+import { Ticket, TicketCategory, PendingSubStatus } from './ticket';
 
 // Problem management specific types
-export type ProblemStatus = 'new' | 'under-investigation' | 'root-cause-identified' | 'known-error' | 'resolved' | 'closed';
+export type ProblemStatus = 'new' | 'under-investigation' | 'root-cause-identified' | 'known-error' | 'resolved' | 'closed' | 'pending';
 export type ProblemPriority = 'P1' | 'P2' | 'P3';
 
 export interface Problem {
@@ -34,6 +34,9 @@ export interface Problem {
   knownErrorId?: string;
   symptoms?: string;
   affectedServices?: string[];
+  
+  // Pending status fields
+  pendingSubStatus?: PendingSubStatus;
 }
 
 export interface RelatedIncident {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getTicketById } from '@/utils/mockData/tickets';
-import { Ticket, TicketStatus, RelatedItem } from '@/utils/types/ticket';
+import { Ticket, TicketStatus, RelatedItem, PendingSubStatus } from '@/utils/types/ticket';
 import { UpdateTicketValues } from '@/components/tickets/TicketUpdateForm';
 import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
 import { toast } from 'sonner';
@@ -57,10 +57,17 @@ export const useTicketDetail = (id: string | undefined) => {
         _relatedItems?: RelatedItem[] 
       };
 
+      // Ensure pendingSubStatus is properly typed
+      let pendingSubStatus: PendingSubStatus | undefined;
+      if (standardValues.pendingSubStatus) {
+        pendingSubStatus = standardValues.pendingSubStatus as PendingSubStatus;
+      }
+
       // Keep existing notes array, don't replace it with the notes string from the form
       const updatedTicket = {
         ...ticket,
         ...standardValues,
+        pendingSubStatus,
         status: standardValues.status as TicketStatus,
         updatedAt: new Date(),
         // Keep existing notes array instead of replacing it
@@ -169,8 +176,8 @@ export const useTicketDetail = (id: string | undefined) => {
     loading,
     error,
     handleUpdateTicket,
-    handleCloseTicket,
-    handleAddNote, 
-    handleReopenTicket
+    handleCloseTicket: handleCloseTicket,
+    handleAddNote: handleAddNote, 
+    handleReopenTicket: handleReopenTicket
   };
 };

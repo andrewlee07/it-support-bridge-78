@@ -1,119 +1,24 @@
-
-import { Ticket, PendingSubStatus } from './types/ticket';
-import { SLA } from './types/sla';
-import { differenceInMilliseconds, addMilliseconds, isWithinInterval, getDay } from 'date-fns';
-import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz';
-import { BusinessHours, WorkingDay } from './types/businessHours';
-
-// Map of day number to WorkingDay type
-const dayMap: Record<number, WorkingDay> = {
-  0: 'sunday',
-  1: 'monday',
-  2: 'tuesday',
-  3: 'wednesday',
-  4: 'thursday',
-  5: 'friday',
-  6: 'saturday'
-};
+import { addHours, differenceInMilliseconds, isWithinInterval } from 'date-fns';
+import { fromZonedTime, toZonedTime } from 'date-fns-tz';
+import { BusinessHours, SLACalculationOptions } from './types/businessHours';
 
 /**
- * Calculates the SLA breach timestamp for a ticket
- */
-export const calculateSLABreachTime = (
-  ticket: Ticket,
-  sla: SLA,
-  businessHours?: BusinessHours
-): Date => {
-  // Start with creation time
-  const creationTime = new Date(ticket.createdAt);
-  
-  // Choose response or resolution time based on whether we've had a response
-  const slaHours = ticket.firstResponseAt 
-    ? sla.resolutionTimeHours // Use resolution time if we've had a response
-    : sla.responseTimeHours;  // Use response time if we haven't had a response
-    
-  // Convert hours to milliseconds
-  const slaMilliseconds = slaHours * 60 * 60 * 1000;
-  
-  // If we don't need to consider business hours and pending status, simple calculation
-  if (!sla.calculationOptions.pauseOutsideBusinessHours && !sla.calculationOptions.pauseDuringPendingStatus) {
-    return new Date(creationTime.getTime() + slaMilliseconds);
-  }
-  
-  // Account for any already paused time
-  const pausedDuration = ticket.slaTotalPausedDuration || 0;
-  
-  // Basic calculation without business hours but accounting for already paused time
-  if (!sla.calculationOptions.pauseOutsideBusinessHours || !businessHours) {
-    return new Date(creationTime.getTime() + slaMilliseconds + pausedDuration);
-  }
-  
-  // For complex business hours calculation we need to progressively add time
-  // This is a simplified implementation; a full implementation would track
-  // all working hours between start and estimated end time
-  
-  // Start with creation time in the business time zone
-  const timeZone = businessHours.timeZone || 'UTC';
-  const zonedCreationTime = utcToZonedTime(creationTime, timeZone);
-  
-  // Parse business hours start and end times
-  const [startHour, startMinute] = businessHours.startTime.split(':').map(Number);
-  const [endHour, endMinute] = businessHours.endTime.split(':').map(Number);
-  
-  // Calculate business hours duration in milliseconds per day
-  const businessHoursPerDay = 
-    (endHour * 60 + endMinute - (startHour * 60 + startMinute)) * 60 * 1000;
-  
-  // Calculate how many full business days and remaining milliseconds
-  const fullBusinessDays = Math.floor(slaMilliseconds / businessHoursPerDay);
-  let remainingMilliseconds = slaMilliseconds % businessHoursPerDay;
-  
-  // Start with creation time
-  let currentTime = new Date(zonedCreationTime);
-  
-  // Add business days
-  let addedDays = 0;
-  while (addedDays < fullBusinessDays) {
-    // Add a day
-    currentTime.setDate(currentTime.getDate() + 1);
-    
-    // Check if it's a working day
-    const dayOfWeek = dayMap[getDay(currentTime)];
-    if (businessHours.workingDays.includes(dayOfWeek)) {
-      addedDays++;
-    }
-  }
-  
-  // Set time to end of business day
-  currentTime.setHours(endHour, endMinute, 0, 0);
-  
-  // If there are remaining milliseconds, add them only during business hours
-  if (remainingMilliseconds > 0) {
-    // This is simplified - a real implementation would need to track
-    // working vs. non-working time more carefully
-    currentTime = addMilliseconds(currentTime, remainingMilliseconds);
-  }
-  
-  // Convert back to UTC
-  const utcBreachTime = zonedTimeToUtc(currentTime, timeZone);
-  
-  // Add any previously paused duration
-  return addMilliseconds(utcBreachTime, pausedDuration);
-};
-
-/**
- * Checks if a given time is within business hours
+ * Check if the current time is within business hours
  */
 export const isWithinBusinessHours = (
-  time: Date,
+  date: Date, 
   businessHours: BusinessHours
 ): boolean => {
-  const timeZone = businessHours.timeZone || 'UTC';
-  const zonedTime = utcToZonedTime(time, timeZone);
+  // Convert UTC time to the business hours timezone
+  const localDate = toZonedTime(date, businessHours.timeZone);
   
-  // Check if it's a working day
-  const dayOfWeek = dayMap[getDay(zonedTime)];
-  if (!businessHours.workingDays.includes(dayOfWeek)) {
+  // Get day of week (0 = Sunday, 1 = Monday, etc.)
+  const dayOfWeek = localDate.getDay();
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const currentDay = dayNames[dayOfWeek];
+  
+  // Check if current day is a working day
+  if (!businessHours.workingDays.includes(currentDay as any)) {
     return false;
   }
   
@@ -121,134 +26,88 @@ export const isWithinBusinessHours = (
   const [startHour, startMinute] = businessHours.startTime.split(':').map(Number);
   const [endHour, endMinute] = businessHours.endTime.split(':').map(Number);
   
+  // Create Date objects for start and end of business hours on the current day
+  const businessStart = new Date(localDate);
+  businessStart.setHours(startHour, startMinute, 0, 0);
+  
+  const businessEnd = new Date(localDate);
+  businessEnd.setHours(endHour, endMinute, 0, 0);
+  
   // Check if current time is within business hours
-  const startTime = new Date(zonedTime);
-  startTime.setHours(startHour, startMinute, 0, 0);
-  
-  const endTime = new Date(zonedTime);
-  endTime.setHours(endHour, endMinute, 0, 0);
-  
-  return isWithinInterval(zonedTime, { start: startTime, end: endTime });
+  return isWithinInterval(localDate, {
+    start: businessStart,
+    end: businessEnd
+  });
 };
 
 /**
- * Handles pausing the SLA when a ticket enters pending status
+ * Calculate SLA breach time, accounting for business hours and pending status
  */
-export const pauseSLA = (
-  ticket: Ticket, 
-  reason: 'pending-status' | 'outside-business-hours'
-): Ticket => {
-  const now = new Date();
-  
-  // Create a copy of the ticket
-  const updatedTicket = { ...ticket };
-  
-  // Set the appropriate pause timestamp
-  if (!updatedTicket.slaResponsePausedAt && !updatedTicket.firstResponseAt) {
-    updatedTicket.slaResponsePausedAt = now;
+export const calculateSLABreachTime = (
+  startTime: Date,
+  slaHours: number,
+  options: SLACalculationOptions,
+  businessHours?: BusinessHours,
+  pauseDurations?: { pendingDuration: number, outsideBusinessHoursDuration: number }
+): Date => {
+  // Simple calculation if we don't need to account for business hours or pending status
+  if (!options.pauseOutsideBusinessHours && !options.pauseDuringPendingStatus) {
+    return addHours(startTime, slaHours);
   }
   
-  if (!updatedTicket.slaResolutionPausedAt) {
-    updatedTicket.slaResolutionPausedAt = now;
-  }
+  // Account for already accumulated pause durations if provided
+  let adjustedSlaMilliseconds = slaHours * 60 * 60 * 1000;
   
-  return updatedTicket;
-};
-
-/**
- * Handles resuming the SLA when a ticket leaves pending status
- */
-export const resumeSLA = (
-  ticket: Ticket,
-  reason: 'pending-status' | 'outside-business-hours'
-): Ticket => {
-  const now = new Date();
-  
-  // Create a copy of the ticket
-  const updatedTicket = { ...ticket };
-  
-  // Calculate paused duration for response SLA
-  if (updatedTicket.slaResponsePausedAt && !updatedTicket.firstResponseAt) {
-    const pausedDuration = differenceInMilliseconds(now, updatedTicket.slaResponsePausedAt);
-    updatedTicket.slaTotalPausedDuration = (updatedTicket.slaTotalPausedDuration || 0) + pausedDuration;
-    updatedTicket.slaResponsePausedAt = undefined;
-  }
-  
-  // Calculate paused duration for resolution SLA
-  if (updatedTicket.slaResolutionPausedAt) {
-    const pausedDuration = differenceInMilliseconds(now, updatedTicket.slaResolutionPausedAt);
-    updatedTicket.slaTotalPausedDuration = (updatedTicket.slaTotalPausedDuration || 0) + pausedDuration;
-    updatedTicket.slaResolutionPausedAt = undefined;
-  }
-  
-  return updatedTicket;
-};
-
-/**
- * Handles recording a response (first note) on a ticket
- */
-export const recordFirstResponse = (ticket: Ticket): Ticket => {
-  const now = new Date();
-  
-  // Create a copy of the ticket
-  const updatedTicket = { ...ticket };
-  
-  // If this is the first response, set firstResponseAt
-  if (!updatedTicket.firstResponseAt) {
-    updatedTicket.firstResponseAt = now;
-    
-    // If response SLA was paused, resume it for accounting
-    if (updatedTicket.slaResponsePausedAt) {
-      const pausedDuration = differenceInMilliseconds(now, updatedTicket.slaResponsePausedAt);
-      updatedTicket.slaTotalPausedDuration = (updatedTicket.slaTotalPausedDuration || 0) + pausedDuration;
-      updatedTicket.slaResponsePausedAt = undefined;
+  if (pauseDurations) {
+    if (options.pauseDuringPendingStatus) {
+      adjustedSlaMilliseconds += pauseDurations.pendingDuration;
+    }
+    if (options.pauseOutsideBusinessHours && businessHours) {
+      adjustedSlaMilliseconds += pauseDurations.outsideBusinessHoursDuration;
     }
   }
   
-  return updatedTicket;
+  // Convert milliseconds back to hours for the final calculation
+  const adjustedSlaHours = adjustedSlaMilliseconds / (60 * 60 * 1000);
+  return addHours(startTime, adjustedSlaHours);
 };
 
 /**
- * Updates SLA status based on ticket status changes
+ * Calculate time until SLA breach, accounting for pauses
  */
-export const updateSLAOnStatusChange = (
-  ticket: Ticket, 
-  oldStatus: string, 
-  newStatus: string,
-  pendingSubStatus?: PendingSubStatus,
+export const calculateTimeUntilBreach = (
+  currentTime: Date,
+  breachTime: Date,
+  isPaused: boolean
+): number => {
+  if (isPaused) {
+    // SLA is paused, so time until breach remains the same
+    return differenceInMilliseconds(breachTime, currentTime);
+  }
+  
+  // SLA is active, return time until breach (can be negative if already breached)
+  return differenceInMilliseconds(breachTime, currentTime);
+};
+
+/**
+ * Check if SLA is currently paused due to pending status or outside business hours
+ */
+export const isSLAPaused = (
+  ticket: { status: string; pendingSubStatus?: string },
+  currentTime: Date,
+  options: SLACalculationOptions,
   businessHours?: BusinessHours
-): Ticket => {
-  let updatedTicket = { ...ticket };
+): boolean => {
+  // Check if paused due to pending status
+  const isPausedDueToPending = 
+    options.pauseDuringPendingStatus && 
+    ticket.status === 'pending';
   
-  // Handle transition to 'pending' status
-  if (newStatus === 'pending' && oldStatus !== 'pending') {
-    updatedTicket = pauseSLA(updatedTicket, 'pending-status');
-    
-    // Set the pending sub-status
-    if (pendingSubStatus) {
-      updatedTicket.pendingSubStatus = pendingSubStatus;
-    }
+  // Check if paused due to being outside business hours
+  let isPausedDueToBusinessHours = false;
+  if (options.pauseOutsideBusinessHours && businessHours) {
+    isPausedDueToBusinessHours = !isWithinBusinessHours(currentTime, businessHours);
   }
   
-  // Handle transition from 'pending' status
-  else if (oldStatus === 'pending' && newStatus !== 'pending') {
-    updatedTicket = resumeSLA(updatedTicket, 'pending-status');
-    
-    // Clear the pending sub-status
-    updatedTicket.pendingSubStatus = undefined;
-  }
-  
-  // Handle resolved/fulfilled status
-  if (newStatus === 'resolved' || newStatus === 'fulfilled') {
-    updatedTicket.resolvedAt = new Date();
-  }
-  
-  // Handle closed status
-  if (newStatus === 'closed') {
-    if (!updatedTicket.closedAt) {
-      updatedTicket.closedAt = new Date();
-    }
-  }
-  
-  return updatedTicket;
+  return isPausedDueToPending || isPausedDueToBusinessHours;
 };

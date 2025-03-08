@@ -1,6 +1,13 @@
 
 import { SLA } from '../types';
 
+// Default SLA calculation options
+const defaultCalculationOptions = {
+  pauseOutsideBusinessHours: true,
+  pauseDuringPendingStatus: true,
+  businessHoursId: 'default-business-hours'
+};
+
 // Mock SLAs
 export const mockSLAs: SLA[] = [
   // Incident SLAs
@@ -13,6 +20,7 @@ export const mockSLAs: SLA[] = [
     responseTimeHours: 0.5, // 30 minutes
     resolutionTimeHours: 4,
     isActive: true,
+    calculationOptions: defaultCalculationOptions,
   },
   {
     id: 'sla-2',
@@ -23,6 +31,7 @@ export const mockSLAs: SLA[] = [
     responseTimeHours: 1,
     resolutionTimeHours: 8,
     isActive: true,
+    calculationOptions: defaultCalculationOptions,
   },
   {
     id: 'sla-3',
@@ -33,6 +42,7 @@ export const mockSLAs: SLA[] = [
     responseTimeHours: 4,
     resolutionTimeHours: 24,
     isActive: true,
+    calculationOptions: defaultCalculationOptions,
   },
   {
     id: 'sla-4',
@@ -43,6 +53,7 @@ export const mockSLAs: SLA[] = [
     responseTimeHours: 8,
     resolutionTimeHours: 48,
     isActive: true,
+    calculationOptions: defaultCalculationOptions,
   },
   // Service Request SLAs
   {
@@ -54,6 +65,7 @@ export const mockSLAs: SLA[] = [
     responseTimeHours: 0.5, // Same response time as incidents
     resolutionTimeHours: 8,  // Different resolution time
     isActive: true,
+    calculationOptions: defaultCalculationOptions,
   },
   {
     id: 'sla-6',
@@ -64,6 +76,7 @@ export const mockSLAs: SLA[] = [
     responseTimeHours: 1,
     resolutionTimeHours: 16,
     isActive: true,
+    calculationOptions: defaultCalculationOptions,
   },
   {
     id: 'sla-7',
@@ -74,6 +87,7 @@ export const mockSLAs: SLA[] = [
     responseTimeHours: 4,
     resolutionTimeHours: 40,
     isActive: true,
+    calculationOptions: defaultCalculationOptions,
   },
   {
     id: 'sla-8',
@@ -84,5 +98,6 @@ export const mockSLAs: SLA[] = [
     responseTimeHours: 8,
     resolutionTimeHours: 72,
     isActive: true,
+    calculationOptions: defaultCalculationOptions,
   },
 ];
