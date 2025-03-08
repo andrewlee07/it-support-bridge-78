@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,7 +6,9 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TicketStatus } from '@/utils/types/ticket';
+import { TicketStatus, RelatedItem } from '@/utils/types/ticket';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 const closeSchema = z.object({
   status: z.enum(['resolved', 'closed', 'fulfilled'] as const),
@@ -30,13 +31,15 @@ interface TicketCloseFormProps {
   onSubmit: (data: CloseTicketValues) => void;
   onCancel: () => void;
   type: 'incident' | 'service';
+  relatedItems?: RelatedItem[];
 }
 
 const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
   defaultValues,
   onSubmit,
   onCancel,
-  type
+  type,
+  relatedItems = []
 }) => {
   const isServiceRequest = type === 'service';
   
@@ -45,11 +48,45 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
     defaultValues
   });
 
+  // Filter unresolved related items
+  const unresolvedItems = relatedItems.filter(item => {
+    if (item.type === 'bug') {
+      return !['closed', 'resolved', 'fixed'].includes(item.status.toLowerCase());
+    }
+    if (item.type === 'backlogItem') {
+      return !['completed', 'closed', 'done'].includes(item.status.toLowerCase());
+    }
+    return false;
+  });
+
+  const hasUnresolvedItems = unresolvedItems.length > 0;
+
   return (
     <div className="border p-4 rounded-md bg-muted/30">
       <h3 className="text-md font-medium mb-3">
         {isServiceRequest ? 'Fulfill Request' : 'Resolve Incident'}
       </h3>
+      
+      {hasUnresolvedItems && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Cannot close {isServiceRequest ? 'service request' : 'incident'}</AlertTitle>
+          <AlertDescription>
+            {isServiceRequest ? 
+              'This service request has related backlog items that are not yet completed.' :
+              'This incident has related bugs that are not yet resolved.'
+            }
+            <ul className="mt-2 list-disc pl-5">
+              {unresolvedItems.map(item => (
+                <li key={item.id}>
+                  {item.title} - Status: {item.status}
+                </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -61,6 +98,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
                 <Select 
                   onValueChange={field.onChange} 
                   defaultValue={field.value}
+                  disabled={hasUnresolvedItems}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -98,6 +136,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
                       : "What was the root cause of this incident?"}
                     className="min-h-[80px]"
                     {...field}
+                    disabled={hasUnresolvedItems}
                   />
                 </FormControl>
                 <FormMessage />
@@ -116,6 +155,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
                     placeholder="Provide detailed information about the resolution"
                     className="min-h-[80px]"
                     {...field}
+                    disabled={hasUnresolvedItems}
                   />
                 </FormControl>
                 <FormMessage />
@@ -135,6 +175,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
                       placeholder="Explain how this was resolved"
                       className="min-h-[80px]"
                       {...field}
+                      disabled={hasUnresolvedItems}
                     />
                   </FormControl>
                   <FormMessage />
@@ -156,6 +197,7 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
                     placeholder="Any additional information"
                     className="min-h-[80px]"
                     {...field}
+                    disabled={hasUnresolvedItems}
                   />
                 </FormControl>
                 <FormMessage />
@@ -171,7 +213,11 @@ const TicketCloseForm: React.FC<TicketCloseFormProps> = ({
             >
               Cancel
             </Button>
-            <Button type="submit" variant="destructive">
+            <Button 
+              type="submit" 
+              variant="destructive"
+              disabled={hasUnresolvedItems}
+            >
               {isServiceRequest ? 'Fulfill Request' : 'Resolve Incident'}
             </Button>
           </div>

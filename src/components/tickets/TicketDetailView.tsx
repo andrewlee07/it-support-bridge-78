@@ -88,6 +88,31 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
         if (onAddNote) {
           onAddNote(`Created bug #${response.data.id} from this incident`);
         }
+        
+        // Add the bug to related items
+        // In a real implementation, this would be handled by the backend
+        // Here we're just simulating the update to show the concept
+        if (onUpdate) {
+          const relatedItem = {
+            id: response.data.id,
+            type: 'bug' as const,
+            status: 'open',
+            title: response.data.title,
+            createdAt: new Date()
+          };
+          
+          // Update the ticket's related items
+          const updatedRelatedItems = [...(ticket.relatedItems || []), relatedItem];
+          
+          // This is just to show the update in UI, in a real implementation
+          // this would be stored in the database
+          onUpdate({
+            status: ticket.status as any,
+            assignedTo: ticket.assignedTo || '',
+            notes: `Added bug ${response.data.id} to related items`,
+            _relatedItems: updatedRelatedItems
+          });
+        }
       }
     } catch (error) {
       console.error('Error creating bug:', error);
@@ -100,9 +125,32 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
     try {
       // Create backlog item with prefilled data from service request
       toast.success('Backlog item created successfully');
+      
       // Add a note to the ticket about the backlog item creation
       if (onAddNote) {
         onAddNote(`Created backlog item: ${item.title} from this service request`);
+      }
+      
+      // Add the backlog item to related items
+      if (onUpdate) {
+        const relatedItem = {
+          id: item.id || `backlog-${Date.now()}`,
+          type: 'backlogItem' as const,
+          status: item.status || 'open',
+          title: item.title,
+          createdAt: new Date()
+        };
+        
+        // Update the ticket's related items
+        const updatedRelatedItems = [...(ticket.relatedItems || []), relatedItem];
+        
+        // This is just to show the update in UI
+        onUpdate({
+          status: ticket.status as any,
+          assignedTo: ticket.assignedTo || '',
+          notes: `Added backlog item ${item.title} to related items`,
+          _relatedItems: updatedRelatedItems
+        });
       }
     } catch (error) {
       console.error('Error creating backlog item:', error);

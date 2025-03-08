@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
 import TicketDetailView from '@/components/tickets/TicketDetailView';
 import { getTicketById } from '@/utils/mockData/tickets';
-import { Ticket, TicketStatus } from '@/utils/types/ticket';
+import { Ticket, TicketStatus, RelatedItem } from '@/utils/types/ticket';
 import { UpdateTicketValues } from '@/components/tickets/TicketUpdateForm';
 import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
 import { toast } from 'sonner';
@@ -37,7 +36,9 @@ const IncidentDetail = () => {
             // Initialize notes array if it doesn't exist
             setTicket({
               ...fetchedTicket,
-              notes: fetchedTicket.notes || []
+              notes: fetchedTicket.notes || [],
+              // Add sample related items for testing
+              relatedItems: fetchedTicket.relatedItems || []
             });
           } else {
             setError('Incident not found');
@@ -57,21 +58,47 @@ const IncidentDetail = () => {
 
   const handleUpdateTicket = (values: UpdateTicketValues) => {
     if (ticket) {
+      // Extract special fields from the update data
+      const { _relatedItems, ...standardValues } = values as UpdateTicketValues & { 
+        _relatedItems?: RelatedItem[] 
+      };
+
       // Keep existing notes array, don't replace it with the notes string from the form
       const updatedTicket = {
         ...ticket,
-        ...values,
-        status: values.status as TicketStatus,
+        ...standardValues,
+        status: standardValues.status as TicketStatus,
         updatedAt: new Date(),
         // Keep existing notes array instead of replacing it
-        notes: ticket.notes || []
+        notes: ticket.notes || [],
+        // Update related items if provided
+        ...((_relatedItems !== undefined) ? { relatedItems: _relatedItems } : {})
       };
+
       setTicket(updatedTicket);
+      
+      // If there's a note in the update, add it
+      if (values.notes?.trim()) {
+        handleAddNote(values.notes);
+      }
     }
   };
 
   const handleCloseTicket = (values: CloseTicketValues) => {
     if (ticket) {
+      // Check if there are any unresolved related items
+      const hasUnresolvedItems = (ticket.relatedItems || []).some(item => {
+        if (item.type === 'bug') {
+          return !['closed', 'resolved', 'fixed'].includes(item.status.toLowerCase());
+        }
+        return false;
+      });
+
+      if (hasUnresolvedItems) {
+        toast.error('Cannot close incident with unresolved bugs');
+        return;
+      }
+
       // Add a new note to the notes array with the close information
       const closeNote = {
         id: `note-close-${Date.now()}`,
@@ -90,9 +117,12 @@ const IncidentDetail = () => {
         notes: [...(ticket.notes || []), closeNote],
         // Store additional values in a way that doesn't conflict with the Ticket type
         _rootCause: values.rootCause,
-        _closureReason: values.closureReason
+        _closureReason: values.closureReason,
+        resolution: values.resolution
       };
       setTicket(updatedTicket);
+      
+      toast.success('Incident closed successfully');
     }
   };
 
@@ -135,6 +165,8 @@ const IncidentDetail = () => {
         _reopenReason: reason
       };
       setTicket(updatedTicket);
+      
+      toast.success('Incident reopened successfully');
     }
   };
 

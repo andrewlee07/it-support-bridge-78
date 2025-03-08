@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
 import TicketDetailView from '@/components/tickets/TicketDetailView';
 import { getTicketById } from '@/utils/mockData/tickets';
-import { Ticket, TicketStatus } from '@/utils/types/ticket';
+import { Ticket, TicketStatus, RelatedItem } from '@/utils/types/ticket';
 import { UpdateTicketValues } from '@/components/tickets/TicketUpdateForm';
 import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
 import { toast } from 'sonner';
@@ -35,7 +35,9 @@ const ServiceRequestDetail = () => {
           if (fetchedTicket) {
             setTicket({
               ...fetchedTicket,
-              notes: fetchedTicket.notes || []
+              notes: fetchedTicket.notes || [],
+              // Add sample related items for testing
+              relatedItems: fetchedTicket.relatedItems || []
             });
           } else {
             setError('Service Request not found');
@@ -55,19 +57,45 @@ const ServiceRequestDetail = () => {
 
   const handleUpdateTicket = (values: UpdateTicketValues) => {
     if (ticket) {
+      // Extract special fields from the update data
+      const { _relatedItems, ...standardValues } = values as UpdateTicketValues & { 
+        _relatedItems?: RelatedItem[] 
+      };
+
       const updatedTicket = {
         ...ticket,
-        ...values,
-        status: values.status as TicketStatus,
+        ...standardValues,
+        status: standardValues.status as TicketStatus,
         updatedAt: new Date(),
-        notes: ticket.notes || []
+        notes: ticket.notes || [],
+        // Update related items if provided
+        ...((_relatedItems !== undefined) ? { relatedItems: _relatedItems } : {})
       };
+      
       setTicket(updatedTicket);
+      
+      // If there's a note in the update, add it
+      if (values.notes?.trim()) {
+        handleAddNote(values.notes);
+      }
     }
   };
 
   const handleCloseTicket = (values: CloseTicketValues) => {
     if (ticket) {
+      // Check if there are any incomplete related backlog items
+      const hasIncompleteItems = (ticket.relatedItems || []).some(item => {
+        if (item.type === 'backlogItem') {
+          return !['completed', 'done', 'closed'].includes(item.status.toLowerCase());
+        }
+        return false;
+      });
+
+      if (hasIncompleteItems) {
+        toast.error('Cannot fulfill service request with incomplete backlog items');
+        return;
+      }
+
       const closeNote = {
         id: `note-close-${Date.now()}`,
         text: values.notes,
@@ -83,9 +111,12 @@ const ServiceRequestDetail = () => {
         closedAt: new Date(),
         notes: [...(ticket.notes || []), closeNote],
         _rootCause: values.rootCause,
-        _closureReason: values.closureReason
+        _closureReason: values.closureReason,
+        resolution: values.resolution
       };
+      
       setTicket(updatedTicket);
+      toast.success('Service request fulfilled successfully');
     }
   };
 
@@ -128,6 +159,7 @@ const ServiceRequestDetail = () => {
         _reopenReason: reason
       };
       setTicket(updatedTicket);
+      toast.success('Service request reopened successfully');
     }
   };
 

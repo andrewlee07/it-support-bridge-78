@@ -8,6 +8,7 @@ export type TicketType = 'incident' | 'service' | 'change';
 import { AuditEntry } from './audit';
 import { TestCase } from './test';
 import { BacklogItem } from './backlogTypes';
+import { Bug } from './test/bug';
 
 export interface TicketNote {
   id: string;
@@ -15,6 +16,14 @@ export interface TicketNote {
   createdAt: Date;
   createdBy: string;
   isInternal: boolean;
+}
+
+export interface RelatedItem {
+  id: string;
+  type: 'bug' | 'backlogItem';
+  status: string;
+  title: string;
+  createdAt: Date;
 }
 
 export interface Ticket {
@@ -36,6 +45,8 @@ export interface Ticket {
   slaBreachAt?: Date;
   notes?: TicketNote[];
   audit: AuditEntry[];
+  // Related items (bugs or backlog items created from this ticket)
+  relatedItems?: RelatedItem[];
   // Additional metadata fields that don't conflict with the base type
   _rootCause?: string;
   _closureReason?: string;
