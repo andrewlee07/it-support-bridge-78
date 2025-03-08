@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 import { Bug } from '@/utils/types/testTypes';
 import { createBug, updateBug } from '@/utils/mockData/testData';
 import { BugFormValues } from '../forms/bugSchema';

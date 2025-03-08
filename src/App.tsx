@@ -1,3 +1,4 @@
+
 import { Suspense, useEffect, useState } from "react";
 import {
   Outlet,
@@ -33,7 +34,7 @@ import dashboardRoutes from "./routes/dashboardRoutes";
 
 import BugDetail from "./pages/BugDetail";
 import { useSessionTimeout } from "./hooks/useSessionTimeout";
-import { useAuth } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/auth";
 import { Toaster } from "sonner";
 
 function App() {
