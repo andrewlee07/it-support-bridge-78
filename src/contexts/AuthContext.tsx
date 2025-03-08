@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 type User = {
@@ -6,6 +5,7 @@ type User = {
   name: string;
   email: string;
   role: string;
+  department: string;
   sessionTimeout?: number;
   sessionStartTime?: Date;
 };
@@ -47,7 +47,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check local storage for user
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -58,21 +57,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Mock login - replace with actual API call
+      setLoading(true);
       const mockUser: User = {
         id: '1',
         name: 'Test User',
         email,
         role: 'admin',
-        sessionTimeout: 30, // 30 minutes
+        department: 'IT',
+        sessionTimeout: 30,
         sessionStartTime: new Date(),
       };
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       setUser(mockUser);
       setIsAuthenticated(true);
       localStorage.setItem('user', JSON.stringify(mockUser));
+      setLoading(false);
       return true;
     } catch (error) {
       console.error('Login error:', error);
+      setLoading(false);
       return false;
     }
   };
@@ -102,13 +107,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const userCanPerformAction = (resource: string, action: string): boolean => {
-    // Mock implementation - in a real app, would check against more granular permissions
     if (!user) return false;
     
-    // Admin can do anything
     if (user.role === 'admin') return true;
     
-    // Simple role-based check for demo purposes
     const rolePermissions: Record<string, string[]> = {
       'it': ['admin', 'read', 'write'],
       'manager': ['read', 'approve'],
@@ -122,7 +124,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const verifyMFA = async (code: string): Promise<boolean> => {
-    // Mock implementation
     if (pendingUser && code === '123456') {
       setUser(pendingUser);
       setIsAuthenticated(true);
@@ -134,7 +135,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const resendMFACode = async (): Promise<boolean> => {
-    // Mock implementation
     console.log('MFA code resent');
     return true;
   };

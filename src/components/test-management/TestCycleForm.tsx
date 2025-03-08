@@ -11,7 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { createTestCycle } from '@/utils/api/testReleaseApi';
+import { createTestCycleForRelease } from '@/utils/api/testReleaseApi';
 import { TestCycle } from '@/utils/types/testTypes';
 
 // Define the form schema
@@ -55,18 +55,15 @@ const TestCycleForm: React.FC<TestCycleFormProps> = ({ releaseId, onSuccess, onC
     
     try {
       // Creating test cycle with all required properties including createdBy
-      const testCycleData = {
+      const response = await createTestCycleForRelease(releaseId, {
         name: data.name,
         description: data.description,
-        releaseId,
         startDate: data.startDate,
         endDate: data.endDate,
         status: 'planned' as const,
         testCases: [],
-        createdBy: user.id, // Add the createdBy property using the current user's ID
-      };
-      
-      const response = await createTestCycle(testCycleData);
+        createdBy: user?.id || 'unknown-user', // Add the user ID from context
+      });
       
       if (response.success) {
         onSuccess();
