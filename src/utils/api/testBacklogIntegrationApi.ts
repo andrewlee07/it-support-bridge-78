@@ -1,9 +1,43 @@
 
-// This file is maintained for backward compatibility
-// New code should import from the specialized files in the test-integration directory
-// Re-export all functions from the new location
-export * from './test-integration';
+import {
+  linkTestCaseToBacklogItem,
+  unlinkTestCaseFromBacklogItem,
+  getLinkedTestCases,
+  getBacklogItemCoverage,
+  getUnlinkedTestCases
+} from './test-integration';
 
-// Export default object with all functions
-import api from './test-integration';
-export default api;
+export {
+  linkTestCaseToBacklogItem,
+  unlinkTestCaseFromBacklogItem,
+  getLinkedTestCases,
+  getBacklogItemCoverage,
+  getUnlinkedTestCases
+};
+
+// For backward compatibility with existing imports
+const createBugFromTestExecution = async () => {
+  // Implementation to be added when needed
+  return { success: false, error: 'Not implemented' };
+};
+
+const createBacklogItemFromBug = async () => {
+  // Implementation to be added when needed
+  return { success: false, error: 'Not implemented' };
+};
+
+export {
+  createBugFromTestExecution,
+  createBacklogItemFromBug
+};
+
+// Default export for backward compatibility
+export default {
+  linkTestCaseToBacklogItem,
+  unlinkTestCaseFromBacklogItem,
+  getLinkedTestCases,
+  getBacklogItemCoverage,
+  getUnlinkedTestCases,
+  createBugFromTestExecution,
+  createBacklogItemFromBug
+};

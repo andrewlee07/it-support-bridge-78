@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BacklogItem } from '@/utils/types/backlogTypes';
@@ -45,7 +44,6 @@ const BacklogItemDetailTabs: React.FC<BacklogItemDetailTabsProps> = ({
       <TabsContent value="tests">
         <TestCoverageTab 
           backlogItemId={backlogItem.id}
-          backlogItem={backlogItem} 
           onViewTestCase={handleViewTestCase}
         />
       </TabsContent>
