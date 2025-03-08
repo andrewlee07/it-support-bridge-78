@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
@@ -13,45 +14,15 @@ export const ChangeRoutes: React.FC = () => {
         path="/"
         element={
           <ProtectedRoute requiredRoles={['admin', 'manager']}>
-            <MainLayout>
-              <Changes />
-            </MainLayout>
+            <MainLayout />
           </ProtectedRoute>
         }
-      />
-      
-      <Route
-        path="/:id"
-        element={
-          <ProtectedRoute requiredRoles={['admin', 'manager']}>
-            <MainLayout>
-              <Changes />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/releases"
-        element={
-          <ProtectedRoute requiredRoles={['admin', 'manager']}>
-            <MainLayout>
-              <Releases />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/releases/:id"
-        element={
-          <ProtectedRoute requiredRoles={['admin', 'manager']}>
-            <MainLayout>
-              <Releases />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route index element={<Changes />} />
+        <Route path=":id" element={<Changes />} />
+        <Route path="releases" element={<Releases />} />
+        <Route path="releases/:id" element={<Releases />} />
+      </Route>
     </Routes>
   );
 };

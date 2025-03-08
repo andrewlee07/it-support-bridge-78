@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
@@ -9,39 +10,19 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute';
 export const TestManagementRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Test Management routes */}
       <Route
-        path="/test-tracking"
+        path="/"
         element={
           <ProtectedRoute>
-            <MainLayout>
-              <TestTracking />
-            </MainLayout>
+            <MainLayout />
           </ProtectedRoute>
         }
-      />
-      
-      <Route
-        path="/test-execution"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <TestExecution />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/bugs"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <Bugs />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
+      >
+        {/* Test Management routes */}
+        <Route path="test-tracking" element={<TestTracking />} />
+        <Route path="test-execution" element={<TestExecution />} />
+        <Route path="bugs" element={<Bugs />} />
+      </Route>
     </Routes>
   );
 };

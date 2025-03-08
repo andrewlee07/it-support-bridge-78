@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '@/layouts/MainLayout';
@@ -11,65 +12,43 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute';
 export const OtherRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* User Management route */}
       <Route
-        path="/users"
+        path="/"
         element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <MainLayout>
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        {/* User Management route */}
+        <Route 
+          path="users" 
+          element={
+            <ProtectedRoute requiredRoles={['admin']}>
               <Users />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Reporting route */}
-      <Route
-        path="/reports"
-        element={
-          <ProtectedRoute requiredRoles={['admin', 'manager']}>
-            <MainLayout>
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Reporting route */}
+        <Route 
+          path="reports" 
+          element={
+            <ProtectedRoute requiredRoles={['admin', 'manager']}>
               <Reports />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Problem Management route */}
-      <Route
-        path="/problem-management"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <ProblemManagement />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Calendar route */}
-      <Route
-        path="/calendar"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <Calendar />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Backlog route */}
-      <Route
-        path="/backlog"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <Backlog />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Problem Management route */}
+        <Route path="problem-management" element={<ProblemManagement />} />
+        
+        {/* Calendar route */}
+        <Route path="calendar" element={<Calendar />} />
+        
+        {/* Backlog route */}
+        <Route path="backlog" element={<Backlog />} />
+      </Route>
     </Routes>
   );
 };
