@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -24,10 +23,15 @@ const Sidebar = () => {
   // Update isMobile state when window resizes
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const newIsMobile = window.innerWidth < 768;
+      setIsMobile(newIsMobile);
+      
       // Auto-collapse on mobile, expand on desktop
-      if (window.innerWidth < 768) {
+      if (newIsMobile && !collapsed) {
         setCollapsed(true);
+      } else if (!newIsMobile && collapsed && !mobileOpen) {
+        // Only auto-expand on desktop if it wasn't explicitly collapsed by user
+        setCollapsed(false);
       }
     };
     
@@ -37,12 +41,14 @@ const Sidebar = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [collapsed, mobileOpen]);
   
   // Close mobile sidebar when route changes
   useEffect(() => {
-    setMobileOpen(false);
-  }, [location.pathname]);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  }, [location.pathname, isMobile]);
   
   const isActiveRoute = (path: string | undefined): boolean => {
     if (!path) return false;
@@ -78,8 +84,8 @@ const Sidebar = () => {
         </Button>
       </div>
       
-      {/* Overlay for mobile */}
-      {mobileOpen && (
+      {/* Overlay for mobile menu when open */}
+      {mobileOpen && isMobile && (
         <div 
           className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setMobileOpen(false)} 
@@ -90,7 +96,8 @@ const Sidebar = () => {
         className={cn(
           "fixed top-0 left-0 bg-sidebar border-r border-border/40 h-screen z-50 transition-all duration-300 ease-in-out",
           collapsed ? "w-16" : "w-64",
-          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          // On mobile, only show if mobileOpen is true, otherwise collapse to 0 width but keep visible on desktop
+          isMobile && !mobileOpen ? "-translate-x-full" : "translate-x-0"
         )}
       >
         <div className="flex h-16 items-center justify-between border-b border-border/40 px-4">
@@ -151,7 +158,9 @@ const Sidebar = () => {
       {/* Main content wrapper with proper padding to prevent content from being hidden under sidebar */}
       <div className={cn(
         "min-h-screen bg-background transition-all duration-300 ease-in-out",
-        collapsed ? "pl-16 md:pl-16" : "pl-0 md:pl-64"
+        // Always add padding for the sidebar (collapsed or expanded) on desktop
+        // On mobile, only add padding if the menu is visible
+        isMobile && !mobileOpen ? "pl-0" : collapsed ? "pl-16" : "pl-64"
       )}>
         {/* Content is inserted here */}
       </div>

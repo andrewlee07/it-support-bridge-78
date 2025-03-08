@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,17 +56,18 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
     });
   };
   
-  // Handle click for the card to navigate to the ticket detail
+  const getRouteForTicket = (ticketType: string): string => {
+    if (ticketType === 'service') {
+      return '/service-requests';
+    } else if (ticketType === 'change') {
+      return '/changes';
+    } 
+    return '/incidents';
+  };
+  
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // For tickets, use the right route based on ticket type
-    let baseRoute = '/incidents'; 
-    if (ticket.type === 'service') {
-      baseRoute = '/service-requests';
-    } else if (ticket.type === 'change') {
-      baseRoute = '/changes';
-    }
-    
+    const baseRoute = getRouteForTicket(ticket.type);
     navigate(`${baseRoute}/${ticket.id}`);
   };
 
@@ -110,9 +110,8 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
           size="sm" 
           className="text-xs" 
           onClick={(e) => {
-            e.stopPropagation(); // Prevent triggering the card click
-            const baseRoute = ticket.type === 'service' ? '/service-requests' : 
-                            ticket.type === 'change' ? '/changes' : '/incidents';
+            e.stopPropagation();
+            const baseRoute = getRouteForTicket(ticket.type);
             navigate(`${baseRoute}/${ticket.id}`);
           }}
         >
