@@ -52,6 +52,17 @@ const SLAConfigurationTab: React.FC<SLAConfigurationTabProps> = ({ ticketType })
     setSelectedSla(null);
   };
 
+  // Convert ticketType to entityType format required by SLAModal
+  const getEntityType = (type: TicketType): 'incident' | 'service-request' => {
+    return type === 'incident' ? 'incident' : 'service-request';
+  };
+
+  const handleSaveSLA = (slaData: Partial<SLA>) => {
+    // This would typically make an API call to save the SLA
+    console.log('Saving SLA:', slaData);
+    closeModal();
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -113,8 +124,9 @@ const SLAConfigurationTab: React.FC<SLAConfigurationTabProps> = ({ ticketType })
         <SLAModal 
           isOpen={isModalOpen} 
           onClose={closeModal} 
+          onSave={handleSaveSLA}
           sla={selectedSla} 
-          ticketType={ticketType}
+          entityType={getEntityType(ticketType)}
         />
       )}
     </div>
