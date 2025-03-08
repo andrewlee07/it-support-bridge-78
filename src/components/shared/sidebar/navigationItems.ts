@@ -13,6 +13,9 @@ import {
   ClipboardListIcon,
   BarChartIcon,
   BugIcon,
+  InboxIcon,
+  OctagonAlertIcon,
+  CalendarIcon,
 } from "lucide-react";
 import { NavigationItem } from './types';
 
@@ -25,91 +28,81 @@ export const navigationItems: NavigationItem[] = [
     allowedRoles: ['admin', 'manager', 'user']
   },
   {
-    name: "Incident Management",
+    name: "Incidents",
+    path: "/incidents",
+    href: "/incidents",
     icon: AlertCircleIcon,
-    collapsed: true,
-    allowedRoles: ['admin', 'manager', 'user'],
-    items: [
-      {
-        name: "Incidents",
-        path: "/incidents",
-        href: "/incidents",
-        icon: AlertCircleIcon,
-        allowedRoles: ['admin', 'manager', 'user']
-      },
-      {
-        name: "Service Requests",
-        path: "/service-requests",
-        href: "/service-requests",
-        icon: MessageSquareIcon,
-        allowedRoles: ['admin', 'manager', 'user']
-      },
-    ],
+    allowedRoles: ['admin', 'manager', 'user']
   },
   {
-    name: "Change Management",
+    name: "Service Requests",
+    path: "/service-requests",
+    href: "/service-requests",
+    icon: MessageSquareIcon,
+    allowedRoles: ['admin', 'manager', 'user']
+  },
+  {
+    name: "Changes",
     path: "/changes",
     href: "/changes",
     icon: PanelRightIcon,
     allowedRoles: ['admin', 'manager']
   },
   {
-    name: "Release Management",
+    name: "Releases",
+    path: "/releases",
+    href: "/releases",
     icon: PackageIcon,
-    collapsed: true,
-    allowedRoles: ['admin', 'manager'],
-    items: [
-      {
-        name: "Releases",
-        path: "/releases",
-        href: "/releases",
-        icon: PackageIcon,
-        allowedRoles: ['admin', 'manager']
-      },
-      {
-        name: "Backlog",
-        path: "/backlog",
-        href: "/backlog",
-        icon: ClipboardListIcon,
-        allowedRoles: ['admin', 'manager', 'user']
-      },
-    ],
+    allowedRoles: ['admin', 'manager']
   },
   {
-    name: "Asset Management",
+    name: "Backlog",
+    path: "/backlog",
+    href: "/backlog",
+    icon: InboxIcon,
+    allowedRoles: ['admin', 'manager', 'user']
+  },
+  {
+    name: "Assets",
     path: "/assets",
     href: "/assets",
     icon: BoxIcon,
     allowedRoles: ['admin', 'manager']
   },
   {
-    name: "Test Management",
+    name: "Test Cases",
+    path: "/test-tracking",
+    href: "/test-tracking",
     icon: FileTextIcon,
-    collapsed: true,
-    allowedRoles: ['admin', 'manager', 'user'],
-    items: [
-      {
-        name: "Test Tracking",
-        path: "/test-tracking",
-        href: "/test-tracking",
-        icon: FileTextIcon,
-        allowedRoles: ['admin', 'manager', 'user']
-      },
-      {
-        name: "Test Execution",
-        path: "/test-execution",
-        href: "/test-execution",
-        icon: ClipboardListIcon,
-        allowedRoles: ['admin', 'manager', 'user']
-      },
-      {
-        name: "Bugs",
-        path: "/bugs",
-        href: "/bugs",
-        icon: BugIcon,
-        allowedRoles: ['admin', 'manager', 'user']
-      },
-    ],
+    allowedRoles: ['admin', 'manager', 'user']
+  },
+  {
+    name: "Test Execution",
+    path: "/test-execution",
+    href: "/test-execution",
+    icon: ClipboardListIcon,
+    allowedRoles: ['admin', 'manager', 'user']
+  },
+  {
+    name: "Bugs",
+    path: "/bugs",
+    href: "/bugs",
+    icon: BugIcon,
+    allowedRoles: ['admin', 'manager', 'user']
+  },
+  {
+    name: "Problem Management",
+    path: "/problem-management",
+    href: "/problem-management",
+    icon: OctagonAlertIcon,
+    allowedRoles: ['admin', 'manager', 'user']
+  },
+  {
+    name: "Calendar",
+    path: "/calendar",
+    href: "/calendar",
+    icon: CalendarIcon,
+    allowedRoles: ['admin', 'manager', 'user']
   },
   {
     name: "Users",
