@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -27,6 +26,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { getIconForResultType } from '../notifications/notificationHelpers';
 
 interface SearchResult {
   id: string;
@@ -99,6 +99,15 @@ const mockSearch = async (query: string): Promise<SearchResult[]> => {
       type: 'asset',
       url: '/assets/asset-1',
       status: 'active'
+    },
+    {
+      id: 'change-1',
+      title: 'Database server migration',
+      description: 'Migrate primary database to new hardware',
+      type: 'change',
+      url: '/changes/change-1',
+      status: 'pending',
+      priority: 'high'
     }
   ].filter(item => 
     item.title.toLowerCase().includes(query.toLowerCase()) || 
@@ -106,27 +115,6 @@ const mockSearch = async (query: string): Promise<SearchResult[]> => {
   );
   
   return results;
-};
-
-const getIconForResultType = (type: string) => {
-  switch (type) {
-    case 'incident':
-      return <AlertCircle className="h-4 w-4 text-red-500" />;
-    case 'bug':
-      return <Bug className="h-4 w-4 text-red-500" />;
-    case 'testCase':
-      return <FileText className="h-4 w-4 text-purple-500" />;
-    case 'backlogItem':
-      return <ClipboardList className="h-4 w-4 text-orange-500" />;
-    case 'release':
-      return <Package className="h-4 w-4 text-green-500" />;
-    case 'asset':
-      return <Box className="h-4 w-4 text-blue-500" />;
-    case 'change':
-      return <Calendar className="h-4 w-4 text-cyan-500" />;
-    default:
-      return <Search className="h-4 w-4" />;
-  }
 };
 
 interface GlobalSearchProps {
