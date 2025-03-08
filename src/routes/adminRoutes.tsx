@@ -11,11 +11,16 @@ import AssetConfiguration from '@/pages/admin/AssetConfiguration';
 import SLASettings from '@/pages/admin/SLASettings';
 import SecurityAuditLog from '@/pages/SecurityAuditLog';
 import SecuritySettings from '@/pages/admin/SecuritySettings';
+import ProcessConfiguration from '@/pages/admin/ProcessConfiguration';
 
 const adminRoutes: RouteObject[] = [
   {
     path: 'admin-settings',
     element: <AdminSettings />,
+  },
+  {
+    path: 'process-configuration',
+    element: <ProcessConfiguration />,
   },
   {
     path: 'admin/error-logs',

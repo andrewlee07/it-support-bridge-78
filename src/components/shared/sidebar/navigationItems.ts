@@ -20,6 +20,8 @@ import {
   Bug,
   ListChecks,
   GitPullRequest,
+  Settings,
+  Sliders,
 } from 'lucide-react';
 
 import { NavItem } from './types';
@@ -89,6 +91,12 @@ export const navigationItems: NavItem[] = [
     name: 'User Management',
     icon: Users2,
     path: '/user-management',
+  },
+  {
+    name: 'Process Configuration',
+    icon: Sliders,
+    path: '/process-configuration',
+    allowedRoles: ['admin'],
   },
   {
     name: 'Admin Settings',

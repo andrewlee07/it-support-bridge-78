@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import NavLink from './sidebar/NavLink';
-import SettingsMenu from './sidebar/SettingsMenu';
 import { navigationItems } from './sidebar/navigationItems';
 import GlobalSearch from './search/GlobalSearch';
 
@@ -82,9 +81,8 @@ const Sidebar = () => {
         
         <div className="space-y-1 px-3 overflow-y-auto flex-grow">
           {navigationItems.map((item) => (
-            // Only render if user has permission and it's not the Admin item
-            // (Admin will be rendered separately through SettingsMenu)
-            hasPermission(item.allowedRoles || []) && item.name !== "Admin" && (
+            // Only render if user has permission
+            hasPermission(item.allowedRoles || []) && (
               <NavLink 
                 key={item.path || item.name} 
                 item={item} 
@@ -93,13 +91,6 @@ const Sidebar = () => {
               />
             )
           ))}
-          
-          {/* Admin Menu (simpler version now) */}
-          <SettingsMenu 
-            collapsed={collapsed}
-            hasPermission={hasPermission}
-            locationPathname={location.pathname}
-          />
         </div>
         
         <div className="space-y-1 px-3">
