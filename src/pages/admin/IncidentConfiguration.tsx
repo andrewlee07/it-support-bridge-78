@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
@@ -49,11 +50,11 @@ const IncidentConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="sla">
-            <SLAConfigurationTab entityType="incident" />
+            <SLAConfigurationTab ticketType="incident" />
           </TabsContent>
           
           <TabsContent value="autoclose">
-            <AutoCloseConfigurationTab entityType="incident" />
+            <AutoCloseConfigurationTab moduleType="incident" />
           </TabsContent>
           
           <TabsContent value="mandatoryfields">

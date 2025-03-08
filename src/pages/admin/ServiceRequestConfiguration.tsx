@@ -50,11 +50,11 @@ const ServiceRequestConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="sla">
-            <SLAConfigurationTab entityType="service-request" />
+            <SLAConfigurationTab ticketType="service" />
           </TabsContent>
           
           <TabsContent value="autoclose">
-            <AutoCloseConfigurationTab entityType="service-request" />
+            <AutoCloseConfigurationTab moduleType="service-request" />
           </TabsContent>
           
           <TabsContent value="mandatoryfields">

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { 
   AlertCircle, Headphones, PanelRightIcon, OctagonAlert, 
   BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert, 
-  Sliders, ArrowsUpDown
+  Sliders, ArrowUpDown
 } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -62,7 +62,7 @@ const AdminSettings = () => {
     {
       title: 'Status Synchronization',
       description: 'Configure how statuses are synchronized between related items',
-      icon: <ArrowsUpDown className="h-8 w-8 text-primary/80" />,
+      icon: <ArrowUpDown className="h-8 w-8 text-primary/80" />,
       path: '/admin/status-synchronization'
     },
     {
