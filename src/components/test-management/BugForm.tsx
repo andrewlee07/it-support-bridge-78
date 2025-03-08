@@ -67,7 +67,7 @@ const BugForm: React.FC<BugFormProps> = ({
       <CardHeader>
         <CardTitle>{isEditing ? 'Edit Bug' : 'Report Bug'}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="max-h-[70vh] overflow-y-auto pb-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <BugFormFields

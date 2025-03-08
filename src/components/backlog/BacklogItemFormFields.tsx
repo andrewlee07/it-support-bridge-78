@@ -30,9 +30,12 @@ const BacklogItemFormFields: React.FC<BacklogItemFormFieldsProps> = ({
     <>
       <BasicInfoFields form={form} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <StatusAndPriorityFields form={form} />
         <TypeAndPointsFields form={form} />
+      </div>
+      
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <AssignmentFields form={form} releases={releases} />
         <DueDateField form={form} />
       </div>
