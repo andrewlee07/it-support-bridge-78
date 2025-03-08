@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ import {
 } from '@/utils/statusSynchronization/statusMappings';
 import { ReleaseStatus } from '@/utils/types/release';
 import { BacklogItemStatus } from '@/utils/types/backlogTypes';
+import { BugStatus } from '@/utils/types/test/testStatus';
 import { toast } from 'sonner';
 
 const StatusSynchronizationConfig: React.FC = () => {
@@ -42,6 +43,14 @@ const StatusSynchronizationConfig: React.FC = () => {
     // For now we just show a success toast
     toast.success('Status mapping configuration saved successfully');
   };
+
+  // Helper to get typed keys of an object
+  const getKeys = <T extends object>(obj: T): (keyof T)[] => {
+    return Object.keys(obj) as (keyof T)[];
+  };
+
+  // Get release statuses from the default configuration
+  const releaseStatuses = getKeys(defaultStatusMappingConfiguration.releaseToBacklogMapping);
 
   return (
     <Card>
@@ -66,11 +75,11 @@ const StatusSynchronizationConfig: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-4">Release to Backlog Item Status Mappings</h3>
                     <div className="space-y-4">
-                      {Object.keys(defaultStatusMappingConfiguration.releaseToBacklogMapping).map((releaseStatus) => (
-                        <FormField
+                      {releaseStatuses.map((releaseStatus) => (
+                        <Controller
                           key={`backlog-${releaseStatus}`}
                           control={form.control}
-                          name={`releaseToBacklogMapping.${releaseStatus}` as const}
+                          name={`releaseToBacklogMapping.${releaseStatus}`}
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                               <div className="space-y-0.5">
@@ -79,24 +88,22 @@ const StatusSynchronizationConfig: React.FC = () => {
                                   Set Backlog Item Status to:
                                 </FormDescription>
                               </div>
-                              <FormControl>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  defaultValue={field.value}
-                                >
-                                  <SelectTrigger className="w-40">
-                                    <SelectValue placeholder="Select status" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="open">Open</SelectItem>
-                                    <SelectItem value="in-progress">In Progress</SelectItem>
-                                    <SelectItem value="ready">Ready</SelectItem>
-                                    <SelectItem value="blocked">Blocked</SelectItem>
-                                    <SelectItem value="completed">Completed</SelectItem>
-                                    <SelectItem value="deferred">Deferred</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
+                              <Select
+                                onValueChange={field.onChange as (value: string) => void}
+                                value={field.value as string}
+                              >
+                                <SelectTrigger className="w-40">
+                                  <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="open">Open</SelectItem>
+                                  <SelectItem value="in-progress">In Progress</SelectItem>
+                                  <SelectItem value="ready">Ready</SelectItem>
+                                  <SelectItem value="blocked">Blocked</SelectItem>
+                                  <SelectItem value="completed">Completed</SelectItem>
+                                  <SelectItem value="deferred">Deferred</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </FormItem>
                           )}
                         />
@@ -107,11 +114,11 @@ const StatusSynchronizationConfig: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-medium mb-4">Release to Bug Status Mappings</h3>
                     <div className="space-y-4">
-                      {Object.keys(defaultStatusMappingConfiguration.releaseToBugMapping).map((releaseStatus) => (
-                        <FormField
+                      {releaseStatuses.map((releaseStatus) => (
+                        <Controller
                           key={`bug-${releaseStatus}`}
                           control={form.control}
-                          name={`releaseToBugMapping.${releaseStatus}` as const}
+                          name={`releaseToBugMapping.${releaseStatus}`}
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                               <div className="space-y-0.5">
@@ -120,24 +127,22 @@ const StatusSynchronizationConfig: React.FC = () => {
                                   Set Bug Status to:
                                 </FormDescription>
                               </div>
-                              <FormControl>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  defaultValue={field.value}
-                                >
-                                  <SelectTrigger className="w-40">
-                                    <SelectValue placeholder="Select status" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="open">Open</SelectItem>
-                                    <SelectItem value="in_progress">In Progress</SelectItem>
-                                    <SelectItem value="resolved">Resolved</SelectItem>
-                                    <SelectItem value="closed">Closed</SelectItem>
-                                    <SelectItem value="fixed">Fixed</SelectItem>
-                                    <SelectItem value="verified">Verified</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
+                              <Select
+                                onValueChange={field.onChange as (value: string) => void}
+                                value={field.value as string}
+                              >
+                                <SelectTrigger className="w-40">
+                                  <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="open">Open</SelectItem>
+                                  <SelectItem value="in_progress">In Progress</SelectItem>
+                                  <SelectItem value="resolved">Resolved</SelectItem>
+                                  <SelectItem value="closed">Closed</SelectItem>
+                                  <SelectItem value="fixed">Fixed</SelectItem>
+                                  <SelectItem value="verified">Verified</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </FormItem>
                           )}
                         />
