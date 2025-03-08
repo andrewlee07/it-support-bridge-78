@@ -1,11 +1,12 @@
 
 import React from 'react';
 import TestStatusChart from '../TestStatusChart';
+import { TestStatus } from '@/utils/types/testTypes';
 
 interface DashboardChartSectionProps {
   testStatsData: any;
   isLoadingTestStats: boolean;
-  onFilterByStatus: (status: any) => void;
+  onFilterByStatus: (status: TestStatus | null) => void;
 }
 
 const DashboardChartSection: React.FC<DashboardChartSectionProps> = ({ 
