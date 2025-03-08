@@ -65,21 +65,21 @@ const Login: React.FC = () => {
   return (
     <div className="flex flex-col items-center">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-primary">Test Management System</h1>
-        <p className="text-muted-foreground mt-2">Log in to access your account</p>
+        <h1 className="text-3xl font-bold text-[#9b87f5]">Test Management System</h1>
+        <p className="text-[#8E9196] mt-2">Log in to access your account</p>
       </div>
       
-      <Card className="w-full max-w-md shadow-lg border-primary/10">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Login</CardTitle>
-          <CardDescription className="text-center">
+      <Card className="w-full max-w-md shadow-lg border-[#E5DEFF]">
+        <CardHeader className="space-y-1 bg-[#F1F0FB] rounded-t-lg border-b border-[#E5DEFF]">
+          <CardTitle className="text-2xl text-center text-[#7E69AB]">Login</CardTitle>
+          <CardDescription className="text-center text-[#6E59A5]">
             Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6 bg-white rounded-b-lg">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-[#403E43]">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -87,11 +87,11 @@ const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="bg-background"
+                className="bg-[#F6F6F7] border-[#E5DEFF] focus-visible:ring-[#9b87f5]"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-[#403E43]">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
@@ -99,20 +99,20 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="bg-background"
+                className="bg-[#F6F6F7] border-[#E5DEFF] focus-visible:ring-[#9b87f5]"
               />
             </div>
             <Button 
               type="submit" 
-              className="w-full"
+              className="w-full bg-[#9b87f5] hover:bg-[#7E69AB] text-white transition-colors"
               disabled={isLoading}
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
-          <div className="mt-4 text-center text-sm">
-            <span>Don't have an account? </span>
-            <Link to="/auth/register" className="text-primary hover:underline">
+          <div className="mt-6 text-center text-sm">
+            <span className="text-[#8E9196]">Don't have an account? </span>
+            <Link to="/auth/register" className="text-[#9b87f5] hover:text-[#7E69AB] hover:underline font-medium">
               Register
             </Link>
           </div>
