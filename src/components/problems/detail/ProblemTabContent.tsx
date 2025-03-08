@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Problem } from '@/utils/types/problem';
-import { TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import ProblemDetails from '../ProblemDetails';
 import ProblemActivity from '../ProblemActivity';
 import ProblemUpdateForm from '../ProblemUpdateForm';
@@ -31,7 +31,7 @@ const ProblemTabContent = ({
   setActiveTab
 }: ProblemTabContentProps) => {
   return (
-    <>
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
       <TabsContent value="details" className="pt-6">
         <ProblemDetails problem={problem} />
       </TabsContent>
@@ -88,7 +88,7 @@ const ProblemTabContent = ({
           </TabsContent>
         </>
       )}
-    </>
+    </Tabs>
   );
 };
 

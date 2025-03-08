@@ -49,7 +49,7 @@ const ProblemDetailView: React.FC<ProblemDetailViewProps> = ({
         />
       </div>
 
-      {/* Tabs Section */}
+      {/* Tab Navigation */}
       <ProblemTabs 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
