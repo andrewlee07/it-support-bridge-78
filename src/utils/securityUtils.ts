@@ -1,4 +1,3 @@
-
 import { User, PasswordPolicy, SecurityEvent, Permission, RolePermission } from './types/user';
 
 // Default password policy
@@ -11,6 +10,12 @@ export const DEFAULT_PASSWORD_POLICY: PasswordPolicy = {
   preventPasswordReuse: 5,
   expiryDays: 90
 };
+
+// Store the current password policy - in a real app, this would be stored in a database
+let currentPasswordPolicy: PasswordPolicy = { ...DEFAULT_PASSWORD_POLICY };
+
+// Store the default session timeout in minutes - in a real app, this would be stored in a database
+let defaultSessionTimeout = 30;
 
 // Mock permissions data - in a real app, this would come from a database
 export const mockPermissions: Permission[] = [
@@ -65,7 +70,7 @@ export const mockRolePermissions: RolePermission[] = [
 const securityEventLog: SecurityEvent[] = [];
 
 // Check if a password meets the password policy
-export const isPasswordValid = (password: string, policy: PasswordPolicy = DEFAULT_PASSWORD_POLICY): { valid: boolean; reason?: string } => {
+export const isPasswordValid = (password: string, policy: PasswordPolicy = currentPasswordPolicy): { valid: boolean; reason?: string } => {
   if (password.length < policy.minLength) {
     return { valid: false, reason: `Password must be at least ${policy.minLength} characters long` };
   }
@@ -87,6 +92,33 @@ export const isPasswordValid = (password: string, policy: PasswordPolicy = DEFAU
   }
   
   return { valid: true };
+};
+
+// Update the password policy
+export const updatePasswordPolicy = (newPolicy: PasswordPolicy): PasswordPolicy => {
+  currentPasswordPolicy = { ...newPolicy };
+  console.log('Password policy updated:', currentPasswordPolicy);
+  return currentPasswordPolicy;
+};
+
+// Get the current password policy
+export const getCurrentPasswordPolicy = (): PasswordPolicy => {
+  return { ...currentPasswordPolicy };
+};
+
+// Update the default session timeout
+export const updateDefaultSessionTimeout = (minutes: number): number => {
+  if (minutes < 1) {
+    throw new Error('Session timeout must be at least 1 minute');
+  }
+  defaultSessionTimeout = minutes;
+  console.log('Default session timeout updated:', defaultSessionTimeout);
+  return defaultSessionTimeout;
+};
+
+// Get the default session timeout
+export const getDefaultSessionTimeout = (): number => {
+  return defaultSessionTimeout;
 };
 
 // Check if password has been used before (in a real app, you'd compare hashes)

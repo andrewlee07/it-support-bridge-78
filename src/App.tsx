@@ -10,6 +10,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import MFAVerification from './pages/MFAVerification';
 import SecurityQuestionRecovery from './pages/SecurityQuestionRecovery';
 import SecurityAuditLog from './pages/SecurityAuditLog';
+import AdminSettings from './pages/AdminSettings';
 import SessionTimeoutAlert from './components/auth/SessionTimeoutAlert';
 
 function App() {
@@ -43,6 +44,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SecurityAuditLog />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/admin/settings" 
+              element={
+                <ProtectedRoute>
+                  <AdminSettings />
                 </ProtectedRoute>
               } 
             />
