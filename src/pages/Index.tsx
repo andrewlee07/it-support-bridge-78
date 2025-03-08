@@ -113,7 +113,7 @@ const Index = () => {
                 <Button asChild variant="outline" className="border-[#b047c9]/30 hover:bg-[#b047c9]/5">
                   <Link to="/admin/settings">
                     <Settings className="mr-2 h-4 w-4" />
-                    System Security Settings
+                    System Administration
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="border-[#b047c9]/30 hover:bg-[#b047c9]/5">

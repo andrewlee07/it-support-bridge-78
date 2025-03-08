@@ -1,101 +1,136 @@
+import React, { useState, useEffect } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { PlusCircle, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { getSLAs } from "@/utils/mockData/slas";
+import { SLAModal } from "./SLAModal";
+import { SLA } from "@/utils/types/sla";
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { mockSLAs } from '@/utils/mockData';
-import { SLA } from '@/utils/types';
-import { Pencil, Trash2, Clock, Tag } from 'lucide-react';
+type SLAListProps = {
+  entityType?: string;
+};
 
-interface SLAListProps {
-  showActive: boolean;
-}
+const SLAList = ({ entityType }: SLAListProps) => {
+  const [slas, setSlas] = useState<SLA[]>([]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedSLA, setSelectedSLA] = useState<SLA | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-const SLAList: React.FC<SLAListProps> = ({ showActive }) => {
-  // Filter SLAs based on active status
-  const filteredSLAs = mockSLAs.filter(sla => sla.isActive === showActive);
-  
-  // Utility function to get appropriate badge class for priority level
-  const getPriorityBadgeClass = (priority: string) => {
-    switch (priority) {
-      case 'P1':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-      case 'P2':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
-      case 'P3':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-      case 'P4':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300';
-    }
+  useEffect(() => {
+    loadSLAs();
+  }, []);
+
+  const loadSLAs = () => {
+    const fetchedSLAs = getSLAs();
+    setSlas(fetchedSLAs);
   };
 
-  const getTicketTypeBadgeClass = (type: string) => {
-    switch (type) {
-      case 'incident':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-      case 'service':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300';
-    }
+  const openCreateModal = () => {
+    setSelectedSLA(null);
+    setIsCreateModalOpen(true);
   };
+
+  const openEditModal = (sla: SLA) => {
+    setSelectedSLA(sla);
+    setIsEditModalOpen(true);
+  };
+
+  const closeModals = () => {
+    setIsCreateModalOpen(false);
+    setIsEditModalOpen(false);
+    setSelectedSLA(null);
+    loadSLAs();
+  };
+
+  // Filter SLAs based on entityType if provided
+  const filteredSLAs = slas.filter(sla => {
+    if (!entityType) return true;
+    if (entityType === 'incident' && sla.ticketType === 'incident') return true;
+    if (entityType === 'service-request' && sla.ticketType === 'service_request') return true;
+    return !entityType;
+  });
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {filteredSLAs.length > 0 ? (
-        filteredSLAs.map((sla) => (
-          <Card key={sla.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-lg">{sla.name}</CardTitle>
-                <div className="flex gap-1">
-                  <Badge variant="outline" className={getPriorityBadgeClass(sla.priorityLevel)}>
-                    {sla.priorityLevel}
-                  </Badge>
-                  <Badge variant="outline" className={getTicketTypeBadgeClass(sla.ticketType)}>
-                    {sla.ticketType === 'incident' ? 'Incident' : 'Service Request'}
-                  </Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">{sla.description}</p>
-              
-              <div className="space-y-2">
-                <div className="flex items-center text-sm">
-                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>Response Time: <strong>{sla.responseTimeHours} hours</strong></span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>Resolution Time: <strong>{sla.resolutionTimeHours} hours</strong></span>
-                </div>
-              </div>
-              
-              <div className="flex justify-end mt-4 gap-2">
-                <Button variant="outline" size="sm">
-                  <Pencil className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-                <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Delete
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))
-      ) : (
-        <div className="col-span-full text-center py-12">
-          <h3 className="text-lg font-medium text-muted-foreground">No SLAs found</h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            {showActive 
-              ? "No active SLAs. Click 'Add SLA' to create one." 
-              : "No inactive SLAs. Deactivated SLAs will appear here."}
-          </p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Service Level Agreements</h2>
+        <Button onClick={openCreateModal}>
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Add New SLA
+        </Button>
+      </div>
+
+      <div className="border rounded-md">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Response Time</TableHead>
+              <TableHead>Resolution Time</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredSLAs.map((sla) => (
+              <TableRow key={sla.id}>
+                <TableCell>{sla.name}</TableCell>
+                <TableCell>
+                  <Badge className="capitalize">{sla.priorityLevel}</Badge>
+                </TableCell>
+                <TableCell>{sla.ticketType}</TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    <Clock className="mr-2 h-4 w-4" />
+                    {sla.responseTimeHours} Hours
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    <Clock className="mr-2 h-4 w-4" />
+                    {sla.resolutionTimeHours} Hours
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {sla.isActive ? (
+                    <div className="flex items-center space-x-1 text-green-600">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Active</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-1 text-red-600">
+                      <XCircle className="h-4 w-4" />
+                      <span>Inactive</span>
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="sm" onClick={() => openEditModal(sla)}>
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <SLAModal
+        isOpen={isCreateModalOpen}
+        onClose={closeModals}
+        onSubmit={closeModals}
+      />
+
+      {selectedSLA && (
+        <SLAModal
+          isOpen={isEditModalOpen}
+          onClose={closeModals}
+          onSubmit={closeModals}
+          sla={selectedSLA}
+        />
       )}
     </div>
   );

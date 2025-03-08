@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { 
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/tabs";
 import SecuritySettings from '@/components/admin/SecuritySettings';
 import UserMFASettings from '@/components/admin/UserMFASettings';
+import ConfigurationSettings from '@/components/admin/ConfigurationSettings';
 import { Card } from '@/components/ui/card';
 import { AlertTriangle } from 'lucide-react';
 
@@ -40,18 +41,56 @@ const AdminSettings = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">System Administration</h1>
       
-      <Tabs defaultValue="security" className="w-full">
+      <Tabs defaultValue="overall" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="security">Security Settings</TabsTrigger>
-          <TabsTrigger value="mfa">User MFA Management</TabsTrigger>
+          <TabsTrigger value="overall">Overall System Settings</TabsTrigger>
+          <TabsTrigger value="incident">Incidents</TabsTrigger>
+          <TabsTrigger value="service-request">Service Requests</TabsTrigger>
+          <TabsTrigger value="change">Change Management</TabsTrigger>
+          <TabsTrigger value="release">Releases</TabsTrigger>
+          <TabsTrigger value="asset">Asset Management</TabsTrigger>
+          <TabsTrigger value="backlog">Backlog</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="security">
-          <SecuritySettings />
+        <TabsContent value="overall">
+          <Tabs defaultValue="security" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="security">Security Settings</TabsTrigger>
+              <TabsTrigger value="mfa">User MFA Management</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="security">
+              <SecuritySettings />
+            </TabsContent>
+            
+            <TabsContent value="mfa">
+              <UserMFASettings />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
         
-        <TabsContent value="mfa">
-          <UserMFASettings />
+        <TabsContent value="incident">
+          <ConfigurationSettings entityType="incident" />
+        </TabsContent>
+        
+        <TabsContent value="service-request">
+          <ConfigurationSettings entityType="service-request" />
+        </TabsContent>
+        
+        <TabsContent value="change">
+          <ConfigurationSettings entityType="change" />
+        </TabsContent>
+        
+        <TabsContent value="release">
+          <ConfigurationSettings entityType="release" />
+        </TabsContent>
+        
+        <TabsContent value="asset">
+          <ConfigurationSettings entityType="asset" />
+        </TabsContent>
+        
+        <TabsContent value="backlog">
+          <ConfigurationSettings entityType="backlog" />
         </TabsContent>
       </Tabs>
     </div>
