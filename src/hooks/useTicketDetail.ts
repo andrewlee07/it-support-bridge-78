@@ -96,8 +96,9 @@ export const useTicketDetail = (id: string | undefined) => {
       }
 
       // Add a new note to the notes array with the close information
-      const closeNote = {
+      const closeNote: TicketNote = {
         id: `note-close-${Date.now()}`,
+        ticketId: ticket.id, // Add the required ticketId
         text: values.notes,
         createdAt: new Date(),
         createdBy: 'current-user',
@@ -124,8 +125,9 @@ export const useTicketDetail = (id: string | undefined) => {
 
   const handleAddNote = (note: string) => {
     if (ticket) {
-      const noteItem = {
+      const noteItem: TicketNote = {
         id: `note-${Date.now()}`,
+        ticketId: ticket.id, // Add the required ticketId
         text: note,
         createdAt: new Date(),
         createdBy: 'current-user',
@@ -144,8 +146,9 @@ export const useTicketDetail = (id: string | undefined) => {
 
   const handleReopenTicket = (reason: string) => {
     if (ticket) {
-      const reopenNote = {
+      const reopenNote: TicketNote = {
         id: `note-reopen-${Date.now()}`,
+        ticketId: ticket.id, // Add the required ticketId
         text: `Ticket reopened: ${reason}`,
         createdAt: new Date(),
         createdBy: 'current-user',
