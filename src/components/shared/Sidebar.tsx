@@ -9,7 +9,11 @@ import NavLink from './sidebar/NavLink';
 import { navigationItems } from './sidebar/navigationItems';
 import GlobalSearch from './search/GlobalSearch';
 
-const Sidebar = () => {
+interface SidebarProps {
+  onCollapsedChange?: (collapsed: boolean) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
@@ -26,6 +30,7 @@ const Sidebar = () => {
       // Auto-collapse on mobile, but ensure sidebar is always visible
       if (newIsMobile) {
         setCollapsed(true);
+        if (onCollapsedChange) onCollapsedChange(true);
       }
     };
     
@@ -35,7 +40,17 @@ const Sidebar = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [onCollapsedChange]);
+  
+  const toggleCollapsed = () => {
+    const newCollapsedState = !collapsed;
+    setCollapsed(newCollapsedState);
+    
+    // Notify parent component about the collapse state change
+    if (onCollapsedChange) {
+      onCollapsedChange(newCollapsedState);
+    }
+  };
   
   const isActiveRoute = (path: string | undefined): boolean => {
     if (!path) return false;
@@ -66,7 +81,7 @@ const Sidebar = () => {
           variant="ghost" 
           size="sm" 
           className={cn("rounded-full h-8 w-8", collapsed && "mx-auto")} 
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={toggleCollapsed}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>

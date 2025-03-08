@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/shared/Navbar';
 import Sidebar from '@/components/shared/Sidebar';
 import { cn } from '@/lib/utils';
@@ -38,12 +38,17 @@ const MainLayout: React.FC = () => {
     });
   };
 
+  // Handle sidebar collapse state changes
+  const handleSidebarCollapse = (collapsed: boolean) => {
+    setSidebarCollapsed(collapsed);
+  };
+
   return (
     <div className="min-h-screen w-full bg-background">
-      <Sidebar />
+      <Sidebar onCollapsedChange={handleSidebarCollapse} />
       
       <div className={cn(
-        "pl-16 md:pl-64 min-h-screen",
+        "transition-all duration-300 ease-in-out min-h-screen",
         sidebarCollapsed ? "pl-16" : "pl-16 md:pl-64"
       )}>
         <Navbar toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
