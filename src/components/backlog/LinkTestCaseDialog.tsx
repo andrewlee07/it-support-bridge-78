@@ -1,199 +1,156 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { useQuery } from '@tanstack/react-query';
-import { fetchTestCases } from '@/utils/mockData/testCases';
-import { TestCase } from '@/utils/types/testTypes';
-import { BacklogItem } from '@/utils/types/backlogTypes';
-import { linkTestCaseToBacklogItem, getTestCasesForBacklogItem } from '@/utils/api/testBacklogIntegrationApi';
-import { Skeleton } from '@/components/ui/skeleton';
-import StatusBadge from '@/components/test-management/ui/StatusBadge';
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { TestCase } from '@/utils/types/test';
+import { getUnlinkedTestCases } from '@/utils/api/test-integration';
 
 interface LinkTestCaseDialogProps {
-  backlogItem: BacklogItem;
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  backlogItemId: string;
+  onLinkTestCase: (testCaseId: string) => Promise<void>;
+  existingTestCaseIds: string[];
 }
 
-const LinkTestCaseDialog: React.FC<LinkTestCaseDialogProps> = ({
-  backlogItem,
-  isOpen,
-  onClose,
-  onSuccess
-}) => {
+const LinkTestCaseDialog = ({
+  open,
+  onOpenChange,
+  backlogItemId,
+  onLinkTestCase,
+  existingTestCaseIds
+}: LinkTestCaseDialogProps) => {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTestCases, setSelectedTestCases] = useState<string[]>([]);
+  const [availableTestCases, setAvailableTestCases] = useState<TestCase[]>([]);
+  const [filteredTestCases, setFilteredTestCases] = useState<TestCase[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const [isLinking, setIsLinking] = useState(false);
 
-  // Fetch all test cases
-  const { data: testCasesResponse, isLoading: isLoadingTestCases } = useQuery({
-    queryKey: ['testCases'],
-    queryFn: fetchTestCases,
-    enabled: isOpen
-  });
-
-  // Fetch already linked test cases to exclude them
-  const { data: linkedTestCasesResponse } = useQuery({
-    queryKey: ['linkedTestCases', backlogItem.id],
-    queryFn: () => getTestCasesForBacklogItem(backlogItem.id),
-    enabled: isOpen && !!backlogItem.id
-  });
-
-  const allTestCases = testCasesResponse?.data || [];
-  const linkedTestCaseIds = (linkedTestCasesResponse?.data || []).map(tc => tc.id);
-
-  // Filter test cases that are not already linked and match the search query
-  const filteredTestCases = allTestCases.filter(testCase => 
-    !linkedTestCaseIds.includes(testCase.id) &&
-    (
-      searchQuery === '' || 
-      testCase.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      testCase.description.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
-
-  const handleToggleTestCase = (testCaseId: string) => {
-    setSelectedTestCases(prev => 
-      prev.includes(testCaseId) 
-        ? prev.filter(id => id !== testCaseId)
-        : [...prev, testCaseId]
-    );
-  };
-
-  const handleLinkTestCases = async () => {
-    if (selectedTestCases.length === 0) return;
-    
-    setIsLinking(true);
-    
-    try {
-      // Link each selected test case one by one
-      const results = await Promise.all(
-        selectedTestCases.map(testCaseId => 
-          linkTestCaseToBacklogItem(testCaseId, backlogItem.id)
-        )
-      );
+  // Load available test cases that can be linked
+  useEffect(() => {
+    const loadAvailableTestCases = async () => {
+      if (!open) return;
       
-      const successCount = results.filter(r => r.success).length;
-      
-      if (successCount > 0) {
-        toast({
-          title: "Test cases linked",
-          description: `Successfully linked ${successCount} test case${successCount > 1 ? 's' : ''} to the backlog item.`,
-        });
-        onSuccess();
-        onClose();
-      } else {
+      setIsLoading(true);
+      try {
+        const response = await getUnlinkedTestCases(backlogItemId);
+        if (response.success) {
+          setAvailableTestCases(response.data);
+          setFilteredTestCases(response.data);
+        } else {
+          toast({
+            title: "Error",
+            description: response.error || "Failed to load available test cases",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
         toast({
           title: "Error",
-          description: "Failed to link test cases",
-          variant: "destructive",
+          description: "An unexpected error occurred",
+          variant: "destructive"
         });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+    };
+
+    loadAvailableTestCases();
+  }, [open, backlogItemId, existingTestCaseIds]);
+
+  // Filter test cases based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredTestCases(availableTestCases);
+    } else {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      setFilteredTestCases(
+        availableTestCases.filter(
+          tc => 
+            tc.id.toLowerCase().includes(lowerCaseSearchTerm) || 
+            tc.title.toLowerCase().includes(lowerCaseSearchTerm)
+        )
+      );
+    }
+  }, [searchTerm, availableTestCases]);
+
+  // Handle linking a test case
+  const handleLink = async (testCaseId: string) => {
+    setIsLinking(true);
+    try {
+      await onLinkTestCase(testCaseId);
+      onOpenChange(false); // Close dialog after successful linking
     } finally {
       setIsLinking(false);
     }
   };
 
-  const handleClearSelection = () => {
-    setSelectedTestCases([]);
-  };
-
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Link Test Cases to Backlog Item</DialogTitle>
+          <DialogTitle>Link Test Case</DialogTitle>
         </DialogHeader>
-
-        <div className="mb-4">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search test cases..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+        
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search test cases..."
+            className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-
-        <div className="flex items-center justify-between py-2">
-          <div className="text-sm">
-            {selectedTestCases.length} test case{selectedTestCases.length !== 1 ? 's' : ''} selected
-          </div>
-          {selectedTestCases.length > 0 && (
-            <Button variant="outline" size="sm" onClick={handleClearSelection}>
-              Clear selection
-            </Button>
-          )}
-        </div>
-
-        <Separator />
-
-        {isLoadingTestCases ? (
-          <div className="space-y-2 py-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        ) : filteredTestCases.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
-            <p>No test cases available to link</p>
-            <p className="text-sm mt-1">All test cases are already linked or none match your search criteria</p>
-          </div>
-        ) : (
-          <ScrollArea className="h-[300px] pr-4">
-            <div className="space-y-2 py-2">
-              {filteredTestCases.map((testCase) => (
-                <div 
-                  key={testCase.id}
-                  className="flex items-start p-3 border rounded-md hover:bg-muted/30"
-                >
-                  <Checkbox
-                    checked={selectedTestCases.includes(testCase.id)}
-                    onCheckedChange={() => handleToggleTestCase(testCase.id)}
-                    className="mt-1"
-                  />
-                  <div className="ml-3 flex-1">
-                    <div className="flex items-center">
-                      <StatusBadge status={testCase.status} />
-                      <h4 className="ml-2 text-sm font-medium">{testCase.title}</h4>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                      {testCase.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
+        
+        <div className="overflow-y-auto max-h-[400px] border rounded-md">
+          {isLoading ? (
+            <div className="p-8 text-center text-muted-foreground">Loading test cases...</div>
+          ) : filteredTestCases.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">
+              {searchTerm ? "No test cases match your search" : "All test cases are already linked"}
             </div>
-          </ScrollArea>
-        )}
-
-        <div className="flex justify-end space-x-2 pt-4">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleLinkTestCases} 
-            disabled={selectedTestCases.length === 0 || isLinking}
-          >
-            {isLinking ? 'Linking...' : 'Link Selected Test Cases'}
-          </Button>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-muted/50 sticky top-0">
+                <tr>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-muted-foreground">ID</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-muted-foreground">Title</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-muted-foreground">Status</th>
+                  <th className="px-4 py-2 text-right text-sm font-medium text-muted-foreground">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTestCases.map((testCase) => (
+                  <tr key={testCase.id} className="border-t hover:bg-muted/50">
+                    <td className="px-4 py-2 text-sm">{testCase.id}</td>
+                    <td className="px-4 py-2 text-sm">{testCase.title}</td>
+                    <td className="px-4 py-2 text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        testCase.status === 'passed' ? 'bg-green-100 text-green-800' :
+                        testCase.status === 'failed' ? 'bg-red-100 text-red-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {testCase.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-sm text-right">
+                      <Button
+                        size="sm"
+                        onClick={() => handleLink(testCase.id)}
+                        disabled={isLinking}
+                      >
+                        Link
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </DialogContent>
     </Dialog>

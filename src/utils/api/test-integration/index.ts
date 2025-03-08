@@ -1,41 +1,25 @@
 
-// Re-export all test-backlog integration API functions
+// Re-export all functions from the test integration API files
 import { linkTestCaseToBacklogItem, unlinkTestCaseFromBacklogItem } from './testCaseLinking';
-import { getTestCasesForBacklogItem, getBacklogItemsForTestCase } from './testCaseQueries';
-import { createBugFromTestExecution, createBacklogItemFromBug } from './bugOperations';
-import { getTestCoverageForBacklogItem, updateAllBacklogTestCoverage } from './coverageOperations';
-import { getTraceabilityMatrix } from './traceabilityMatrix';
+import { getLinkedTestCases, getBacklogItemCoverage, getUnlinkedTestCases } from './testBacklogCoverage';
 
+// Export all functions
 export {
-  // Test Case Linking
+  // Test case linking functions
   linkTestCaseToBacklogItem,
   unlinkTestCaseFromBacklogItem,
   
-  // Test Case Queries
-  getTestCasesForBacklogItem,
-  getBacklogItemsForTestCase,
-  
-  // Bug Operations
-  createBugFromTestExecution,
-  createBacklogItemFromBug,
-  
-  // Coverage Operations
-  getTestCoverageForBacklogItem,
-  updateAllBacklogTestCoverage,
-  
-  // Traceability
-  getTraceabilityMatrix,
+  // Backlog item coverage functions
+  getLinkedTestCases,
+  getBacklogItemCoverage,
+  getUnlinkedTestCases
 };
 
-// Export default object with all functions
+// Default export with all functions
 export default {
   linkTestCaseToBacklogItem,
   unlinkTestCaseFromBacklogItem,
-  getTestCasesForBacklogItem,
-  getBacklogItemsForTestCase,
-  createBugFromTestExecution,
-  createBacklogItemFromBug,
-  getTestCoverageForBacklogItem,
-  updateAllBacklogTestCoverage,
-  getTraceabilityMatrix,
+  getLinkedTestCases,
+  getBacklogItemCoverage,
+  getUnlinkedTestCases
 };

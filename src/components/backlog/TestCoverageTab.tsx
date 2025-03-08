@@ -1,336 +1,208 @@
 
-import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { MoreVertical } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
-import TestCoverageIndicator from "@/components/backlog/TestCoverageIndicator";
-import LinkTestCaseDialog from "@/components/backlog/LinkTestCaseDialog";
-import { BacklogItem } from '@/utils/types/backlogTypes';
-import { TestCase } from '@/utils/types/test/testCase';
-import { TestStatus } from '@/utils/types/test/testStatus';
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { TestCase } from '@/utils/types/test';
 import { BacklogTestCoverage } from '@/utils/types/backlogTypes';
+import TestCoverageIndicator from '@/components/backlog/TestCoverageIndicator';
+import LinkTestCaseDialog from '@/components/backlog/LinkTestCaseDialog';
+import { 
+  getLinkedTestCases, 
+  getBacklogItemCoverage, 
+  linkTestCaseToBacklogItem, 
+  unlinkTestCaseFromBacklogItem 
+} from '@/utils/api/test-integration';
 
 interface TestCoverageTabProps {
   backlogItemId: string;
-  riskLevel?: "high" | "medium" | "low";
-  backlogItem?: BacklogItem;
-  onViewTestCase?: (testCase: TestCase) => void;
 }
 
-interface BacklogCoverage {
-  totalTestCases: number;
-  passedTests: number;
-  failedTests: number;
-  notExecutedTests: number;
-  coveragePercentage: number;
-}
-
-const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ 
-  backlogItemId, 
-  riskLevel,
-  backlogItem,
-  onViewTestCase
-}) => {
+const TestCoverageTab = ({ backlogItemId }: TestCoverageTabProps) => {
   const { toast } = useToast();
+  const [linkedTestCases, setLinkedTestCases] = useState<TestCase[]>([]);
+  const [coverage, setCoverage] = useState<BacklogTestCoverage | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
-  const [overallCoverage, setOverallCoverage] = useState(0);
-  
-  const itemId = backlogItem?.id || backlogItemId;
 
+  // Function to load test cases
+  const loadTestCases = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch linked test cases using the new API
+      const response = await getLinkedTestCases(backlogItemId);
+      if (response.success) {
+        setLinkedTestCases(response.data);
+      } else {
+        toast({
+          title: "Error loading test cases",
+          description: response.error || "An unexpected error occurred",
+          variant: "destructive"
+        });
+      }
+
+      // Fetch coverage statistics
+      const coverageResponse = await getBacklogItemCoverage(backlogItemId);
+      if (coverageResponse.success) {
+        setCoverage(coverageResponse.data);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load test cases",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load test cases on component mount
   useEffect(() => {
-    const calculateCoverage = () => {
-      const mockTotalTests = 10;
-      const mockPassedTests = 7;
-      const mockFailedTests = 2;
-      const mockNotRunTests = 1;
+    loadTestCases();
+  }, [backlogItemId]);
 
-      const coveragePercentage = (mockPassedTests / mockTotalTests) * 100;
-      setOverallCoverage(coveragePercentage);
-    };
-
-    calculateCoverage();
-  }, [itemId]);
-
-  const handleOpenLinkDialog = () => {
-    setIsLinkDialogOpen(true);
+  // Handle linking a test case
+  const handleLinkTestCase = async (testCaseId: string) => {
+    try {
+      const response = await linkTestCaseToBacklogItem(testCaseId, backlogItemId);
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: "Test case linked successfully"
+        });
+        loadTestCases(); // Reload test cases after linking
+      } else {
+        toast({
+          title: "Error",
+          description: response.error || "Failed to link test case",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleCloseLinkDialog = () => {
-    setIsLinkDialogOpen(false);
-  };
-
-  const handleTestCaseLinked = () => {
-    toast({
-      title: "Test case linked",
-      description: "The test case has been successfully linked to the backlog item.",
-    });
-  };
-
-  // Create a proper BacklogTestCoverage object for the TestCoverageIndicator
-  const mockCoverage: BacklogTestCoverage = {
-    totalTestCases: 10,
-    passedTests: 7,
-    failedTests: 2,
-    notExecutedTests: 1,
-    coveragePercentage: 70,
-    lastUpdated: new Date()
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Test Coverage</CardTitle>
-        <CardDescription>
-          View and manage test coverage for this backlog item
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">Overall Coverage</h3>
-            <p className="text-sm text-muted-foreground">
-              {overallCoverage}% of requirements covered
-            </p>
-          </div>
-          <TestCoverageIndicator 
-            coverage={mockCoverage}
-            size="lg" 
-          />
-        </div>
-
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Test Execution Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="text-center">
-                <div className="text-2xl font-bold text-green-500">3</div>
-                <p className="text-sm text-muted-foreground">Passed</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="text-center">
-                <div className="text-2xl font-bold text-red-500">1</div>
-                <p className="text-sm text-muted-foreground">Failed</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="text-center">
-                <div className="text-2xl font-bold text-yellow-500">1</div>
-                <p className="text-sm text-muted-foreground">Blocked</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="text-center">
-                <div className="text-2xl font-bold text-gray-500">5</div>
-                <p className="text-sm text-muted-foreground">Not Run</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Linked Test Cases</h3>
-          <TestCaseTable onViewTestCase={onViewTestCase} />
-        </div>
-
-        <div className="flex justify-end">
-          <Button onClick={handleOpenLinkDialog}>Link Test Case</Button>
-        </div>
-      </CardContent>
-
-      {backlogItem && (
-        <LinkTestCaseDialog
-          isOpen={isLinkDialogOpen}
-          backlogItem={backlogItem}
-          onClose={handleCloseLinkDialog}
-          onSuccess={handleTestCaseLinked}
-        />
-      )}
-    </Card>
-  );
-};
-
-const TestCaseTable: React.FC<{onViewTestCase?: (testCase: TestCase) => void}> = ({ onViewTestCase }) => {
-  const mockTestCases = [
-    {
-      id: "1",
-      title: "Verify login functionality",
-      status: "pass" as TestStatus,
-      lastExecutionDate: new Date(),
-    },
-    {
-      id: "2",
-      title: "Check user profile update",
-      status: "fail" as TestStatus,
-      lastExecutionDate: new Date(),
-    },
-    {
-      id: "3",
-      title: "Validate data export",
-      status: "blocked" as TestStatus,
-      lastExecutionDate: new Date(),
-    },
-  ];
-
-  const mockCoverage: BacklogTestCoverage = {
-    totalTestCases: 5,
-    passedTests: 3,
-    failedTests: 1,
-    notExecutedTests: 1,
-    coveragePercentage: 80,
-    lastUpdated: new Date()
-  };
-
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Title</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Last Execution</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {mockTestCases.map((mockTest) => {
-          const testCase = {
-            id: mockTest.id,
-            title: mockTest.title,
-            description: "Mock test case",
-            stepsToReproduce: ["Step 1", "Step 2"],
-            expectedResults: "Expected result",
-            status: mockTest.status,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            lastExecutionDate: mockTest.lastExecutionDate,
-          } as TestCase;
-
-          return (
-            <TableRow key={testCase.id}>
-              <TableCell className="font-medium">{testCase.title}</TableCell>
-              <TableCell>
-                <Badge
-                  variant="outline"
-                  className={
-                    testCase.status === "pass"
-                      ? "bg-green-100 text-green-800"
-                      : testCase.status === "fail"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }
-                >
-                  {testCase.status}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {testCase.lastExecutionDate
-                  ? testCase.lastExecutionDate.toLocaleDateString()
-                  : "N/A"}
-              </TableCell>
-              <TableCell className="text-right">
-                <TestCaseActions testCase={testCase} onViewTestCase={onViewTestCase} />
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
-  );
-};
-
-interface TestCaseActionsProps {
-  testCase: TestCase;
-  onViewTestCase?: (testCase: TestCase) => void;
-}
-
-const TestCaseActions: React.FC<TestCaseActionsProps> = ({ testCase, onViewTestCase }) => {
-  const { toast } = useToast();
-
-  const handleRemoveTestCase = () => {
-    toast({
-      title: "Test case unlinked",
-      description: "The test case has been successfully unlinked from the backlog item.",
-    });
-  };
-
-  const handleView = () => {
-    if (onViewTestCase) {
-      onViewTestCase(testCase);
+  // Handle unlinking a test case
+  const handleUnlinkTestCase = async (testCaseId: string) => {
+    try {
+      const response = await unlinkTestCaseFromBacklogItem(testCaseId, backlogItemId);
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: "Test case unlinked successfully"
+        });
+        loadTestCases(); // Reload test cases after unlinking
+      } else {
+        toast({
+          title: "Error",
+          description: response.error || "Failed to unlink test case",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
     }
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreVertical className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleView}>View</DropdownMenuItem>
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <DropdownMenuItem>Unlink</DropdownMenuItem>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will remove the test case
-                from the backlog item.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleRemoveTestCase}>
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="space-y-6">
+      {/* Coverage summary */}
+      <div className="bg-white rounded-lg p-6 shadow-sm border flex justify-between items-center">
+        <div>
+          <h3 className="font-semibold text-lg mb-1">Test Coverage</h3>
+          <p className="text-muted-foreground">
+            {isLoading ? "Loading..." : 
+              coverage ? 
+                `${coverage.totalTestCases} test cases, ${coverage.passedTests} passed, ${coverage.failedTests} failed` : 
+                "No test cases linked"
+            }
+          </p>
+        </div>
+        {coverage && (
+          <TestCoverageIndicator 
+            coverage={coverage}
+            size="lg" 
+          />
+        )}
+      </div>
+
+      {/* Test Cases Section */}
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="p-4 border-b flex justify-between items-center">
+          <h3 className="font-semibold">Linked Test Cases</h3>
+          <Button onClick={() => setIsLinkDialogOpen(true)} size="sm">
+            <Plus className="h-4 w-4 mr-1" />
+            Link Test Case
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <div className="p-8 text-center text-muted-foreground">Loading test cases...</div>
+        ) : linkedTestCases.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground">
+            No test cases linked to this item yet.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">ID</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Title</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {linkedTestCases.map((testCase) => (
+                  <tr key={testCase.id} className="border-t hover:bg-muted/50">
+                    <td className="px-4 py-3 text-sm">{testCase.id}</td>
+                    <td className="px-4 py-3 text-sm">{testCase.title}</td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        testCase.status === 'passed' ? 'bg-green-100 text-green-800' :
+                        testCase.status === 'failed' ? 'bg-red-100 text-red-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {testCase.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleUnlinkTestCase(testCase.id)}
+                      >
+                        Unlink
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Link Test Case Dialog */}
+      <LinkTestCaseDialog
+        open={isLinkDialogOpen}
+        onOpenChange={setIsLinkDialogOpen}
+        backlogItemId={backlogItemId}
+        onLinkTestCase={handleLinkTestCase}
+        existingTestCaseIds={linkedTestCases.map(tc => tc.id)}
+      />
+    </div>
   );
 };
 
