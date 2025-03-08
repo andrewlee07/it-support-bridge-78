@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import BugTable from './BugTable';
 import BugDetail from './BugDetail';
+import { useNavigate } from 'react-router-dom';
 
 interface BugListProps {
   bugs?: Bug[];
@@ -24,6 +25,7 @@ interface BugListProps {
 const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedBug, setSelectedBug] = useState<Bug | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -89,8 +91,8 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
 
   // View bug details
   const viewBug = (bug: Bug) => {
-    setSelectedBug(bug);
-    setIsViewDialogOpen(true);
+    // Navigate to the bug detail page instead of showing a dialog
+    navigate(`/bugs/${bug.id}`);
   };
 
   // Edit bug
@@ -137,22 +139,6 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
           onStatusUpdate={handleStatusUpdate}
         />
       )}
-
-      {/* View Bug Dialog */}
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-3xl">
-          {selectedBug && (
-            <BugDetail 
-              bug={selectedBug}
-              onClose={() => setIsViewDialogOpen(false)}
-              onEdit={() => {
-                setIsViewDialogOpen(false);
-                editBug(selectedBug);
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* Edit Bug Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

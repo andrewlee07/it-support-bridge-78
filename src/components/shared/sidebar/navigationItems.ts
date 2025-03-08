@@ -19,6 +19,7 @@ import {
   BookText,
   Bug,
   ListChecks,
+  GitPullRequest,
 } from 'lucide-react';
 
 import { NavItem } from './types';
@@ -60,9 +61,14 @@ export const navigationItems: NavItem[] = [
     path: '/backlog',
   },
   {
+    name: 'Releases',
+    icon: GitPullRequest,
+    path: '/releases',
+  },
+  {
     name: 'Testing',
     icon: FlaskConical,
-    path: '/test-tracking',  // Updated to match the route that has the actual component
+    path: '/test-tracking',
   },
   {
     name: 'Bugs',

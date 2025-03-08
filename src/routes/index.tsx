@@ -21,7 +21,11 @@ import NotFound from '@/pages/NotFound';
 import Index from '@/pages/Index';
 import AdminSettings from '@/pages/AdminSettings';
 import Bugs from '@/pages/Bugs';
+import BugDetail from '@/pages/BugDetail';
 import Backlog from '@/pages/Backlog';
+import Releases from '@/pages/Releases';
+import ReleaseDetail from '@/pages/ReleaseDetail';
+import NewRelease from '@/pages/NewRelease';
 
 // Admin configuration pages
 import ErrorLogs from '@/pages/admin/ErrorLogs';
@@ -112,12 +116,28 @@ const routes: RouteObject[] = [
         element: <Backlog />,
       },
       {
+        path: 'releases',
+        element: <Releases />,
+      },
+      {
+        path: 'releases/new',
+        element: <NewRelease />,
+      },
+      {
+        path: 'releases/:id',
+        element: <ReleaseDetail />,
+      },
+      {
         path: 'test-tracking',
         element: <TestTracking />,
       },
       {
         path: 'bugs',
         element: <Bugs />,
+      },
+      {
+        path: 'bugs/:id',
+        element: <BugDetail />,
       },
       {
         path: 'reports',
