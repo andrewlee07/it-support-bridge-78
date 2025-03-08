@@ -3,114 +3,117 @@ import React from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Info, ArrowRightCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import Breadcrumb from '@/components/shared/Breadcrumb';
 
 const ProcessConfiguration = () => {
+  const breadcrumbItems = [
+    { label: 'Admin Settings', path: '/admin-settings' },
+    { label: 'Process Configuration' }
+  ];
+
+  const moduleLinks = [
+    { name: 'Incident Configuration', path: '/admin/incident-configuration' },
+    { name: 'Service Request Configuration', path: '/admin/service-request-configuration' },
+    { name: 'Change Configuration', path: '/admin/change-configuration' },
+    { name: 'Problem Configuration', path: '/admin/problem-configuration' },
+    { name: 'Asset Configuration', path: '/admin/asset-configuration' },
+    { name: 'Bug Configuration', path: '/admin/bug-configuration' },
+    { name: 'Release Configuration', path: '/admin/release-configuration' },
+    { name: 'Test Configuration', path: '/admin/test-configuration' }
+  ];
+
   return (
     <PageTransition>
-      <div className="container mx-auto py-6">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Process Configuration</h1>
-            <p className="text-muted-foreground mt-1">
-              Configure workflows and processes across different modules
-            </p>
-          </div>
-          
-          <Tabs defaultValue="incidents">
-            <TabsList className="mb-4">
-              <TabsTrigger value="incidents">Incidents</TabsTrigger>
-              <TabsTrigger value="service-requests">Service Requests</TabsTrigger>
-              <TabsTrigger value="changes">Changes</TabsTrigger>
-              <TabsTrigger value="problems">Problems</TabsTrigger>
-              <TabsTrigger value="assets">Assets</TabsTrigger>
-              <TabsTrigger value="releases">Releases</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="incidents">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Incident Process Configuration</CardTitle>
-                  <CardDescription>
-                    Configure incident management workflows, statuses, and automations
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Incident process configuration options will appear here.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="service-requests">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Service Request Process Configuration</CardTitle>
-                  <CardDescription>
-                    Configure service request workflows, approvals, and automations
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Service request process configuration options will appear here.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="changes">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Change Process Configuration</CardTitle>
-                  <CardDescription>
-                    Configure change management workflows, approvals, and risk assessments
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Change process configuration options will appear here.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="problems">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Problem Process Configuration</CardTitle>
-                  <CardDescription>
-                    Configure problem management workflows and resolution paths
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Problem process configuration options will appear here.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="assets">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Asset Process Configuration</CardTitle>
-                  <CardDescription>
-                    Configure asset management lifecycles and workflows
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Asset process configuration options will appear here.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="releases">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Release Process Configuration</CardTitle>
-                  <CardDescription>
-                    Configure release management workflows and deployment processes
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Release process configuration options will appear here.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+      <div className="space-y-6">
+        <Breadcrumb items={breadcrumbItems} />
+        
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Global Process Configuration</h1>
+          <p className="text-muted-foreground mt-1">
+            Configure cross-module workflows and global processes
+          </p>
         </div>
+        
+        <Alert className="bg-amber-50 border-amber-200">
+          <Info className="h-4 w-4" />
+          <AlertTitle>Module-Specific Settings</AlertTitle>
+          <AlertDescription className="pt-2">
+            <p className="mb-2">For module-specific process configurations, please use the dedicated configuration pages:</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mt-3">
+              {moduleLinks.map((link, index) => (
+                <Button key={index} variant="outline" size="sm" asChild className="justify-start">
+                  <Link to={link.path}>
+                    <ArrowRightCircle className="mr-2 h-4 w-4" />
+                    {link.name}
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </AlertDescription>
+        </Alert>
+          
+        <Tabs defaultValue="integration">
+          <TabsList className="mb-4">
+            <TabsTrigger value="integration">Process Integration</TabsTrigger>
+            <TabsTrigger value="automation">Global Automation</TabsTrigger>
+            <TabsTrigger value="synchronization">Status Synchronization</TabsTrigger>
+          </TabsList>
+            
+          <TabsContent value="integration">
+            <Card>
+              <CardHeader>
+                <CardTitle>Cross-Module Process Integration</CardTitle>
+                <CardDescription>
+                  Configure how processes integrate and interact across different modules
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Global process integration configuration will appear here.</p>
+                <div className="mt-4 p-4 border rounded-lg bg-muted/20">
+                  <h3 className="font-medium mb-2">Available Integrations</h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Incident to Problem workflow</li>
+                    <li>Change to Release association</li>
+                    <li>Bug to Incident conversion</li>
+                    <li>Asset to Change request integration</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+            
+          <TabsContent value="automation">
+            <Card>
+              <CardHeader>
+                <CardTitle>Global Automation Settings</CardTitle>
+                <CardDescription>
+                  Configure system-wide automation rules and triggers
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Global automation configuration options will appear here.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+            
+          <TabsContent value="synchronization">
+            <Card>
+              <CardHeader>
+                <CardTitle>Status Synchronization</CardTitle>
+                <CardDescription>
+                  Configure how status changes in one module affect related items
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Status synchronization configuration options will appear here.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </PageTransition>
   );

@@ -93,12 +93,6 @@ export const navigationItems: NavItem[] = [
     path: '/user-management',
   },
   {
-    name: 'Process Configuration',
-    icon: Sliders,
-    path: '/process-configuration',
-    allowedRoles: ['admin'],
-  },
-  {
     name: 'Admin Settings',
     icon: Settings2,
     path: '/admin-settings',

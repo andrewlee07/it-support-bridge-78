@@ -58,7 +58,9 @@ const IncidentConfiguration = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
             <TabsTrigger value="sla">SLA Settings</TabsTrigger>
+            <TabsTrigger value="workflow">Workflow Settings</TabsTrigger>
             <TabsTrigger value="autoclose">Auto-Close Settings</TabsTrigger>
+            <TabsTrigger value="notification">Notification Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dropdowns" className="space-y-4">
@@ -100,8 +102,30 @@ const IncidentConfiguration = () => {
             <SLAConfigurationTab ticketType="incident" />
           </TabsContent>
           
+          <TabsContent value="workflow" className="space-y-4">
+            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+              <div className="text-center">
+                <h3 className="text-lg font-medium">Incident Workflow Configuration</h3>
+                <p className="text-muted-foreground mt-1">
+                  Configure incident lifecycle and state transitions
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+          
           <TabsContent value="autoclose" className="space-y-4">
             <AutoCloseConfigurationTab moduleType="incident" />
+          </TabsContent>
+          
+          <TabsContent value="notification" className="space-y-4">
+            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+              <div className="text-center">
+                <h3 className="text-lg font-medium">Incident Notification Settings</h3>
+                <p className="text-muted-foreground mt-1">
+                  Configure email and in-app notifications for incident events
+                </p>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

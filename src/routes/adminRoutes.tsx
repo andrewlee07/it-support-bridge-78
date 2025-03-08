@@ -9,9 +9,11 @@ import ChangeConfiguration from '@/pages/admin/ChangeConfiguration';
 import ProblemConfiguration from '@/pages/admin/ProblemConfiguration';
 import AssetConfiguration from '@/pages/admin/AssetConfiguration';
 import SLASettings from '@/pages/admin/SLASettings';
-import SecurityAuditLog from '@/pages/SecurityAuditLog';
 import SecuritySettings from '@/pages/admin/SecuritySettings';
 import ProcessConfiguration from '@/pages/admin/ProcessConfiguration';
+import BugConfiguration from '@/pages/admin/BugConfiguration';
+import ReleaseConfiguration from '@/pages/admin/ReleaseConfiguration';
+import TestConfiguration from '@/pages/admin/TestConfiguration';
 
 const adminRoutes: RouteObject[] = [
   {
@@ -51,12 +53,20 @@ const adminRoutes: RouteObject[] = [
     element: <SLASettings />,
   },
   {
-    path: 'admin/security-audit-log',
-    element: <SecurityAuditLog />,
-  },
-  {
     path: 'admin/security-settings',
     element: <SecuritySettings />,
+  },
+  {
+    path: 'admin/bug-configuration',
+    element: <BugConfiguration />,
+  },
+  {
+    path: 'admin/release-configuration',
+    element: <ReleaseConfiguration />,
+  },
+  {
+    path: 'admin/test-configuration',
+    element: <TestConfiguration />,
   },
 ];
 
