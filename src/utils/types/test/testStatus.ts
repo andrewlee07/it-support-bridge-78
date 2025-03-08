@@ -9,6 +9,9 @@ export type BugStatus =
   'new' | 'in-progress' | 'fixed' | 'verified' | 'closed' | 
   'open' | 'in_progress' | 'resolved'; // Including all values used in the codebase
 
+// For test cycles
+export type TestCycleStatus = 'planned' | 'in_progress' | 'completed' | 'aborted';
+
 // For backwards compatibility with testData.ts
 export type TestCaseStatus = TestStatus;
 export type TestPriority = BugPriority;

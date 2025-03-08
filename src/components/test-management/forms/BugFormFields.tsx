@@ -76,6 +76,9 @@ const BugFormFields: React.FC<BugFormFieldsProps> = ({
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="major">Major</SelectItem>
+                  <SelectItem value="minor">Minor</SelectItem>
+                  <SelectItem value="trivial">Trivial</SelectItem>
                   <SelectItem value="high">High</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="low">Low</SelectItem>

@@ -1,5 +1,5 @@
 
-import { TestStatus } from './testStatus';
+import { TestStatus, TestCycleStatus } from './testStatus';
 
 export interface TestExecution {
   id: string;
@@ -29,8 +29,6 @@ export interface TestCycle {
   updatedAt: Date;
   createdBy?: string; // For compatibility with testData
 }
-
-import { TestCycleStatus } from './testStatus';
 
 // New interfaces for Release test coverage - renamed to avoid conflicts
 export interface TestExecutionForRelease {

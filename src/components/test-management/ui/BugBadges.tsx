@@ -7,6 +7,9 @@ import { cn } from '@/lib/utils';
 // Severity badge configurations
 const severityConfig: Record<BugSeverity, { label: string, className: string }> = {
   critical: { label: 'Critical', className: 'bg-red-600 hover:bg-red-700' },
+  major: { label: 'Major', className: 'bg-orange-500 hover:bg-orange-600' },
+  minor: { label: 'Minor', className: 'bg-yellow-500 hover:bg-yellow-600' },
+  trivial: { label: 'Trivial', className: 'bg-blue-300 hover:bg-blue-400' },
   high: { label: 'High', className: 'bg-orange-500 hover:bg-orange-600' },
   medium: { label: 'Medium', className: 'bg-yellow-500 hover:bg-yellow-600' },
   low: { label: 'Low', className: 'bg-blue-500 hover:bg-blue-600' },
