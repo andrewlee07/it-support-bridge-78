@@ -1,49 +1,71 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from './apiHelpers';
 import { ApiResponse } from '../types';
-import { TestCase, TestStatus, TestPriority, TestType } from '../types/testTypes';
+import { TestCase, TestStatus } from '../types/testTypes';
 
 // Mock Test Cases data
 export let testCases: TestCase[] = [
   {
     id: 'tc-1',
-    title: 'Verify user login',
-    description: 'Test user login functionality with valid credentials',
-    preConditions: 'User must have an existing account',
-    steps: ['Open login page', 'Enter username', 'Enter password', 'Click login button'],
-    expectedResult: 'User should be logged in successfully',
-    stepsToReproduce: ['Open login page', 'Enter username', 'Enter password', 'Click login button'],
-    expectedResults: 'User should be logged in successfully',
-    status: 'ready' as TestStatus,
-    priority: 'high',
-    type: 'e2e',
-    createdBy: 'user-1',
+    title: 'Verify user login with valid credentials',
+    description: 'Test case to verify the login functionality with valid credentials',
+    stepsToReproduce: [
+      'Navigate to login page',
+      'Enter valid username and password',
+      'Click login button'
+    ],
+    expectedResults: 'User should be logged in successfully and redirected to the dashboard',
+    status: 'pass',
     createdAt: new Date(),
     updatedAt: new Date(),
   },
   {
     id: 'tc-2',
-    title: 'Check password reset',
-    description: 'Test password reset process',
-    preConditions: 'User must have an existing account',
-    steps: ['Open password reset page', 'Enter email', 'Click reset button'],
-    expectedResult: 'User should receive a password reset email',
-    stepsToReproduce: ['Open password reset page', 'Enter email', 'Click reset button'],
-    expectedResults: 'User should receive a password reset email',
-    status: 'ready' as TestStatus,
-    priority: 'medium',
-    type: 'e2e',
-    createdBy: 'user-1',
+    title: 'Verify user login with invalid credentials',
+    description: 'Test case to verify the login functionality with invalid credentials',
+    stepsToReproduce: [
+      'Navigate to login page',
+      'Enter invalid username and password',
+      'Click login button'
+    ],
+    expectedResults: 'Error message should be displayed indicating invalid credentials',
+    status: 'fail',
     createdAt: new Date(),
     updatedAt: new Date(),
   },
 ];
 
 // Test Case API functions
-export const fetchTestCases = async (): Promise<ApiResponse<TestCase[]>> => {
+export const fetchTestCases = async (statusFilter?: TestStatus | null): Promise<ApiResponse<TestCase[]>> => {
   await delay(500);
-  return createApiSuccessResponse(testCases);
+  
+  // Apply status filter if provided
+  let filteredTestCases = testCases;
+  if (statusFilter) {
+    // Handle compatibility between different status formats
+    const compatibleStatuses = getCompatibleStatuses(statusFilter);
+    filteredTestCases = testCases.filter(tc => 
+      compatibleStatuses.includes(tc.status as TestStatus)
+    );
+  }
+  
+  return createApiSuccessResponse(filteredTestCases);
+};
+
+// Helper function to handle status format compatibility
+const getCompatibleStatuses = (status: TestStatus): TestStatus[] => {
+  switch (status) {
+    case 'pass':
+      return ['pass', 'passed'];
+    case 'fail':
+      return ['fail', 'failed'];
+    case 'blocked':
+      return ['blocked'];
+    case 'not-run':
+      return ['not-run', 'draft', 'ready'];
+    default:
+      return [status];
+  }
 };
 
 export const fetchTestCaseById = async (id: string): Promise<ApiResponse<TestCase | null>> => {
