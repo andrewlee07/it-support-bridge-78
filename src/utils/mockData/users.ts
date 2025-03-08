@@ -10,7 +10,8 @@ export const mockUsers = [
     department: 'IT',
     title: 'System Administrator',
     active: true,
-    lastActive: new Date('2023-05-10T12:30:00')
+    lastActive: new Date('2023-05-10T12:30:00'),
+    createdAt: new Date('2023-01-01T10:00:00')
   },
   {
     id: 'user-2',
@@ -20,7 +21,8 @@ export const mockUsers = [
     department: 'Support',
     title: 'Support Team Lead',
     active: true,
-    lastActive: new Date('2023-05-09T16:45:00')
+    lastActive: new Date('2023-05-09T16:45:00'),
+    createdAt: new Date('2023-01-15T11:30:00')
   },
   {
     id: 'user-3',
@@ -30,7 +32,8 @@ export const mockUsers = [
     department: 'Support',
     title: 'Support Specialist',
     active: true,
-    lastActive: new Date('2023-05-10T10:15:00')
+    lastActive: new Date('2023-05-10T10:15:00'),
+    createdAt: new Date('2023-02-01T09:00:00')
   },
   {
     id: 'user-4',
@@ -40,7 +43,8 @@ export const mockUsers = [
     department: 'Engineering',
     title: 'Software Engineer',
     active: true,
-    lastActive: new Date('2023-05-10T09:30:00')
+    lastActive: new Date('2023-05-10T09:30:00'),
+    createdAt: new Date('2023-02-15T14:00:00')
   },
   {
     id: 'user-5',
@@ -50,7 +54,8 @@ export const mockUsers = [
     department: 'Support',
     title: 'Support Specialist',
     active: false,
-    lastActive: new Date('2023-05-01T14:20:00')
+    lastActive: new Date('2023-05-01T14:20:00'),
+    createdAt: new Date('2023-03-01T10:30:00')
   }
 ];
 

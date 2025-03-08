@@ -19,7 +19,7 @@ interface WatchersListProps {
   onAddWatcher: (userId: string) => void;
   onRemoveWatcher: (userId: string) => void;
   isCurrentUserWatching: boolean;
-  availableUsers: User[];
+  availableUsers: any[]; // Using any[] here to avoid strict typing as the data comes from multiple sources
 }
 
 const WatchersList: React.FC<WatchersListProps> = ({
@@ -30,10 +30,12 @@ const WatchersList: React.FC<WatchersListProps> = ({
   isCurrentUserWatching,
   availableUsers
 }) => {
+  // Get the users from watchers IDs, ensure they're compatible with User type
   const watchers = watcherIds
     .map(id => getUserById(id))
-    .filter(user => user !== null) as User[];
+    .filter(user => user !== undefined) as User[];
   
+  // Only show users that aren't already watchers
   const nonWatchingUsers = availableUsers.filter(
     user => !watcherIds.includes(user.id)
   );

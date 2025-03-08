@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
+        setUser(parsedUser as User);
       } catch (error) {
         console.error('Failed to parse saved user', error);
         localStorage.removeItem('currentUser');
@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (foundUser) {
       // Update last login time
-      const userWithUpdatedLogin = {
+      const userWithUpdatedLogin: User = {
         ...foundUser,
         lastLogin: new Date()
       };

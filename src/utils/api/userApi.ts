@@ -1,3 +1,4 @@
+
 import { User, ApiResponse } from '../types';
 import { mockUsers, delay } from '../mockData';
 import { createApiErrorResponse, createApiSuccessResponse } from '../mockData/apiHelpers';
@@ -12,10 +13,14 @@ export const getUsers = async (page: number = 1, limit: number = USERS_PER_PAGE)
   const endIndex = startIndex + limit;
 
   const paginatedUsers = mockUsers.slice(startIndex, endIndex);
-  const totalUsers = mockUsers.length;
-  const totalPages = Math.ceil(totalUsers / limit);
+  
+  // Convert to User[] type
+  const typedUsers: User[] = paginatedUsers.map(user => ({
+    ...user,
+    createdAt: user.createdAt || new Date() // Ensure createdAt exists
+  }));
 
-  return createApiSuccessResponse(paginatedUsers);
+  return createApiSuccessResponse(typedUsers);
 };
 
 // Simulate fetching a user by ID
@@ -25,23 +30,31 @@ export const getUserById = async (id: string): Promise<ApiResponse<User | null>>
   const user = mockUsers.find(user => user.id === id);
 
   if (user) {
-    return createApiSuccessResponse(user);
+    // Convert to User type
+    const typedUser: User = {
+      ...user,
+      createdAt: user.createdAt || new Date() // Ensure createdAt exists
+    };
+    
+    return createApiSuccessResponse(typedUser);
   } else {
     return createApiErrorResponse<User | null>('User not found', 404);
   }
 };
 
 // Simulate creating a new user
-export const createUser = async (user: Omit<User, 'id' | 'createdAt'>): Promise<ApiResponse<User>> => {
+export const createUser = async (userData: Omit<User, 'id' | 'createdAt'>): Promise<ApiResponse<User>> => {
   await delay(500); // Simulate network delay
 
   const newUser: User = {
     id: Math.random().toString(36).substring(2, 15), // Generate a random ID
-    ...user,
+    ...userData,
     createdAt: new Date(),
   };
 
-  mockUsers.push(newUser);
+  // Add the new user to our mock data
+  (mockUsers as User[]).push(newUser as any);
+  
   return createApiSuccessResponse(newUser);
 };
 
@@ -55,8 +68,16 @@ export const updateUser = async (id: string, updates: Partial<User>): Promise<Ap
     return createApiErrorResponse<User | null>('User not found', 404);
   }
 
+  // Update the user
   mockUsers[userIndex] = { ...mockUsers[userIndex], ...updates };
-  return createApiSuccessResponse(mockUsers[userIndex]);
+  
+  // Convert to User type
+  const updatedUser: User = {
+    ...mockUsers[userIndex],
+    createdAt: mockUsers[userIndex].createdAt || new Date() // Ensure createdAt exists
+  };
+
+  return createApiSuccessResponse(updatedUser);
 };
 
 // Simulate deleting a user
