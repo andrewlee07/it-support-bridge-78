@@ -1,94 +1,106 @@
 
 import React, { useState } from 'react';
-import { mockUsers } from '@/utils/mockData';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus } from 'lucide-react';
 import PageTransition from '@/components/shared/PageTransition';
-import { useNavigate } from 'react-router-dom';
 import UserList from '@/components/users/UserList';
-import UserSearchBar from '@/components/users/UserSearchBar';
-import { User } from '@/utils/types/user';
+import { UserRole } from '@/utils/types/user';
+import { useUserManagement } from '@/hooks/useUserManagement';
 
 const Users = () => {
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [users] = useState(mockUsers);
+  const { 
+    users, 
+    handleViewUser, 
+    handleRemoveUser,
+    handleChangeRole,
+    handleToggleUserStatus,
+    handleUpdateUser,
+    selectedUserId,
+    setSelectedUserId,
+    selectedRole,
+    setSelectedRole
+  } = useUserManagement();
+
+  // Add the necessary callback functions
+  const onEditUser = (userId: string) => {
+    setSelectedUserId(userId);
+    // Here you would typically open an edit dialog or navigate to edit page
+    console.log(`Editing user: ${userId}`);
+  };
   
-  const handleViewUser = (userId: string) => {
-    // In a real app, this would navigate to the user profile page
-    console.log(`Viewing user profile: ${userId}`);
-    // navigate(`/users/${userId}`); // Commented out as we don't have this route yet
+  const onRemoveUser = (userId: string) => {
+    setSelectedUserId(userId);
+    // Here you would typically open a confirmation dialog
+    console.log(`Removing user: ${userId}`);
+  };
+  
+  const onChangeRole = (userId: string) => {
+    setSelectedUserId(userId);
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      setSelectedRole(user.role);
+    }
+    // Here you would typically open a role change dialog
+    console.log(`Changing role for user: ${userId}`);
   };
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    // In a real app, this would filter the users based on the search term
-    console.log(`Searching for: ${term}`);
-  };
-
-  const filteredUsers = (role?: string): User[] => {
-    let filtered = users;
-    
-    if (role && role !== 'all') {
-      filtered = filtered.filter(user => user.role === role);
-    }
-    
-    if (searchTerm) {
-      filtered = filtered.filter(user => 
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.department.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    return filtered;
+  const filterUsersByRole = (role: UserRole | 'all'): Array<any> => {
+    if (role === 'all') return users;
+    return users.filter(user => user.role === role);
   };
 
   return (
     <PageTransition>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Users</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage users and their access levels
-            </p>
-          </div>
-          <Button className="shrink-0">
-            <Plus className="mr-2 h-4 w-4" />
-            Add User
-          </Button>
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight">Users</h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <UserSearchBar onChange={handleSearch} />
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-3">All Users</h2>
+          <UserList 
+            users={users} 
+            onViewUser={handleViewUser} 
+            onRemoveUser={onRemoveUser}
+            onChangeRole={onChangeRole}
+            onToggleStatus={handleToggleUserStatus}
+            onEditUser={onEditUser}
+          />
         </div>
 
-        <Tabs defaultValue="all" className="animate-fade-in">
-          <TabsList className="mb-4">
-            <TabsTrigger value="all">All Users</TabsTrigger>
-            <TabsTrigger value="admin">Admins</TabsTrigger>
-            <TabsTrigger value="it">IT Staff</TabsTrigger>
-            <TabsTrigger value="user">End Users</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="all" className="mt-0">
-            <UserList users={filteredUsers()} onViewUser={handleViewUser} />
-          </TabsContent>
-          
-          <TabsContent value="admin" className="mt-0">
-            <UserList users={filteredUsers('admin')} onViewUser={handleViewUser} />
-          </TabsContent>
-          
-          <TabsContent value="it" className="mt-0">
-            <UserList users={filteredUsers('it')} onViewUser={handleViewUser} />
-          </TabsContent>
-          
-          <TabsContent value="user" className="mt-0">
-            <UserList users={filteredUsers('user')} onViewUser={handleViewUser} />
-          </TabsContent>
-        </Tabs>
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-3">Administrators</h2>
+          <UserList 
+            users={filterUsersByRole('admin')} 
+            onViewUser={handleViewUser} 
+            onRemoveUser={onRemoveUser}
+            onChangeRole={onChangeRole}
+            onToggleStatus={handleToggleUserStatus}
+            onEditUser={onEditUser}
+          />
+        </div>
+
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-3">IT Staff</h2>
+          <UserList 
+            users={filterUsersByRole('it')} 
+            onViewUser={handleViewUser} 
+            onRemoveUser={onRemoveUser}
+            onChangeRole={onChangeRole}
+            onToggleStatus={handleToggleUserStatus}
+            onEditUser={onEditUser}
+          />
+        </div>
+
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-3">End Users</h2>
+          <UserList 
+            users={filterUsersByRole('user')} 
+            onViewUser={handleViewUser} 
+            onRemoveUser={onRemoveUser}
+            onChangeRole={onChangeRole}
+            onToggleStatus={handleToggleUserStatus}
+            onEditUser={onEditUser}
+          />
+        </div>
       </div>
     </PageTransition>
   );
