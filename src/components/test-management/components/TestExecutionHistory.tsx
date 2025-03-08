@@ -1,127 +1,126 @@
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { TestExecution } from '@/utils/types/test/testExecution';
-import { Badge } from '@/components/ui/badge';
-import { formatDistanceToNow } from 'date-fns';
-import { CircleAlert, CircleCheck, CircleSlash } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from 'date-fns';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import StatusBadge from '@/components/test-management/ui/StatusBadge';
+import { Link } from 'react-router-dom';
+import { AlertTriangle, LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TestExecution } from '@/utils/types/test/testExecution';
+import { Bug } from '@/utils/types/test/bug';
 
 interface TestExecutionHistoryProps {
-  testCaseId: string;
+  executions: TestExecution[];
+  linkedBugs?: Bug[];
 }
 
-const TestExecutionHistory: React.FC<TestExecutionHistoryProps> = ({ testCaseId }) => {
-  // Fetch test execution history
-  const { data: executions, isLoading } = useQuery({
-    queryKey: ['testExecutions', testCaseId],
-    queryFn: async () => {
-      // In a real app, fetch from API
-      // For now, returning mock data
-      const { testExecutions } = await import('@/utils/mockData/testData');
-      return testExecutions.filter(execution => execution.testCaseId === testCaseId);
-    },
+const TestExecutionHistory: React.FC<TestExecutionHistoryProps> = ({ executions, linkedBugs = [] }) => {
+  // Sort executions by date descending
+  const sortedExecutions = [...executions].sort((a, b) => {
+    const dateA = a.executionDate || a.executedAt || new Date();
+    const dateB = b.executionDate || b.executedAt || new Date();
+    return new Date(dateB).getTime() - new Date(dateA).getTime();
   });
 
-  // Render status badge with icon
-  const renderStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pass':
-      case 'passed':
-        return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-            <CircleCheck className="h-3 w-3 mr-1" /> Passed
-          </Badge>
-        );
-      case 'fail':
-      case 'failed':
-        return (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-            <CircleAlert className="h-3 w-3 mr-1" /> Failed
-          </Badge>
-        );
-      case 'blocked':
-        return (
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-            <CircleSlash className="h-3 w-3 mr-1" /> Blocked
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="outline">
-            {status}
-          </Badge>
-        );
-    }
-  };
-
-  if (isLoading) {
-    return <div className="py-10 text-center">Loading execution history...</div>;
-  }
-
-  if (!executions || executions.length === 0) {
+  if (sortedExecutions.length === 0) {
     return (
-      <div className="py-10 text-center">
-        <p className="text-muted-foreground mb-4">No execution history found for this test case.</p>
-        <Button variant="outline">Run Test Now</Button>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Test Execution History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <AlertTriangle className="h-10 w-10 text-muted-foreground mb-2" />
+            <h3 className="text-lg font-medium">No execution history</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              This test case has not been executed yet.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
+  // Helper function to get linked bugs for an execution
+  const getBugsForExecution = (execution: TestExecution) => {
+    if (!execution.linkedBugs || execution.linkedBugs.length === 0) {
+      return [];
+    }
+    
+    return linkedBugs.filter(bug => execution.linkedBugs?.includes(bug.id));
+  };
+
   return (
-    <div>
-      <h3 className="text-lg font-medium mb-4">Execution History</h3>
-      <div className="rounded-md border">
+    <Card>
+      <CardHeader>
+        <CardTitle>Test Execution History</CardTitle>
+      </CardHeader>
+      <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Cycle</TableHead>
               <TableHead>Executed By</TableHead>
-              <TableHead>Comments</TableHead>
               <TableHead>Linked Bugs</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {executions.map((execution: TestExecution) => (
-              <TableRow key={execution.id}>
-                <TableCell>
-                  {formatDistanceToNow(
-                    new Date(execution.executionDate || execution.executedAt || Date.now()),
-                    { addSuffix: true }
-                  )}
-                </TableCell>
-                <TableCell>{renderStatusBadge(execution.status)}</TableCell>
-                <TableCell>{execution.executedBy}</TableCell>
-                <TableCell>{execution.comments || execution.notes || '-'}</TableCell>
-                <TableCell>
-                  {execution.linkedBugs && execution.linkedBugs.length > 0 ? (
-                    <div className="flex gap-1">
-                      {execution.linkedBugs.map(bugId => (
-                        <Badge key={bugId} variant="outline" className="bg-red-50">
-                          <Bug className="h-3 w-3 mr-1" />
-                          {bugId.substring(0, 8)}
-                        </Badge>
-                      ))}
+            {sortedExecutions.map((execution) => {
+              const executionDate = execution.executionDate || execution.executedAt;
+              const bugs = getBugsForExecution(execution);
+              
+              return (
+                <TableRow key={execution.id}>
+                  <TableCell>
+                    {executionDate ? format(new Date(executionDate), 'MMM d, yyyy, h:mm a') : 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={execution.status} size="xs" />
+                  </TableCell>
+                  <TableCell>
+                    {execution.testCycleId ? (
+                      <Link to={`/test-cycles/${execution.testCycleId}`} className="text-sm text-blue-600 hover:underline">
+                        <span className="flex items-center gap-1">
+                          <LinkIcon className="h-3 w-3" />
+                          {execution.testCycleId.substring(0, 8)}
+                        </span>
+                      </Link>
+                    ) : (
+                      <span className="text-muted-foreground">Ad-hoc</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{execution.executedBy}</span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {bugs.length > 0 ? (
+                        bugs.map(bug => (
+                          <Button
+                            key={bug.id}
+                            variant="outline"
+                            size="sm"
+                            className="h-6 px-2 py-0 text-xs bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                            asChild
+                          >
+                            <Link to={`/bugs/${bug.id}`}>{bug.title.substring(0, 20)}{bug.title.length > 20 ? '...' : ''}</Link>
+                          </Button>
+                        ))
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No bugs linked</span>
+                      )}
                     </div>
-                  ) : (
-                    '-'
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

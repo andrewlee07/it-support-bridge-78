@@ -3,11 +3,18 @@ import { delay } from '@/utils/mockData/apiHelpers';
 import { createApiSuccessResponse, createApiErrorResponse } from '@/utils/mockData/apiHelpers';
 import { ApiResponse } from '@/utils/types/api';
 import { TestCase } from '@/utils/types/test/testCase';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import { BacklogItem, BacklogTestCoverage } from '@/utils/types/backlogTypes';
+import { Bug } from '@/utils/types/test/bug';
+import { v4 as uuidv4 } from 'uuid';
 
 // Mock data for test-backlog integration
 export const testCases: TestCase[] = [];
 export const backlogItems: BacklogItem[] = [];
+export const bugs: Bug[] = [];
+
+// Export types for use in other modules
+export type { TestCase, BacklogItem, BacklogTestCoverage, Bug };
+export { uuidv4 };
 
 // Mock test-backlog relationships for traceability
 export interface TestCoverageRelationship {

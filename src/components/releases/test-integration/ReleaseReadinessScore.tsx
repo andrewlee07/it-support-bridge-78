@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from '@/components/ui/progress';
 import { BadgeCheck, AlertTriangle, ShieldAlert, Shield, CheckCircle2, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -61,12 +61,11 @@ const ReleaseReadinessScore: React.FC<ReleaseReadinessScoreProps> = ({ testCover
             </div>
             <Progress 
               value={readinessScore} 
-              className="h-2"
-              indicatorClassName={
-                readinessScore >= 90 ? 'bg-green-500' : 
-                readinessScore >= 70 ? 'bg-yellow-500' : 
-                'bg-red-500'
-              }
+              className={`h-2 ${
+                readinessScore >= 90 ? 'bg-green-500/20' : 
+                readinessScore >= 70 ? 'bg-yellow-500/20' : 
+                'bg-red-500/20'
+              }`}
             />
           </div>
 

@@ -44,7 +44,7 @@ const BacklogItemDetailTabs: React.FC<BacklogItemDetailTabsProps> = ({
       
       <TabsContent value="tests">
         <TestCoverageTab 
-          backlogItemId={backlogItem.id}
+          backlogItem={backlogItem}
           onViewTestCase={handleViewTestCase}
         />
       </TabsContent>

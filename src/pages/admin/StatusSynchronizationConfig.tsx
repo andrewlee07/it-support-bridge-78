@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useStatusSynchronization } from '@/hooks/useStatusSynchronization';
-import StatusMappingTable from '@/components/admin/status-sync/StatusMappingTable';
+import { StatusMappingTable } from '@/components/admin/status-sync/StatusMappingTable';
 import PageTransition from '@/components/shared/PageTransition';
 import Breadcrumb from '@/components/shared/Breadcrumb';
 
