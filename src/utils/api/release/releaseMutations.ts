@@ -4,7 +4,6 @@ import { delay, createApiErrorResponse, createApiSuccessResponse } from '../../m
 import { v4 as uuidv4 } from 'uuid';
 import { validateReleaseExists, addReleaseAuditEntry, generateReleaseId, findReleaseItemByRelation } from './releaseHelpers';
 import { mockReleases as releases, mockReleaseItems } from './mockData';
-import { synchronizeReleaseDependencies } from '../../statusSynchronization/syncService';
 
 // Reference to the mock data - we get it from mockData and update it here
 // This ensures we're all working with the same data
@@ -90,8 +89,6 @@ export const updateReleaseStatus = async (
     return createApiErrorResponse("Release not found", 404);
   }
   
-  const previousStatus = mockReleases[index].status;
-  
   const updatedRelease = {
     ...mockReleases[index],
     status,
@@ -106,22 +103,6 @@ export const updateReleaseStatus = async (
   );
   
   mockReleases[index] = updatedRelease;
-  
-  // Synchronize status changes with related items if status has changed
-  if (previousStatus !== status) {
-    try {
-      // Run synchronization in the background - don't await
-      synchronizeReleaseDependencies(
-        id, 
-        status, 
-        updatedRelease.plannedDate,
-        userId
-      );
-    } catch (error) {
-      console.error("Error synchronizing release dependencies:", error);
-      // Continue with release update even if sync fails
-    }
-  }
   
   return createApiSuccessResponse(updatedRelease, `Release status updated to ${status}`);
 };
