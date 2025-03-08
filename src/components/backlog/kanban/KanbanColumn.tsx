@@ -53,8 +53,13 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
         <CardContent className="p-2 flex-grow overflow-hidden">
           <Droppable droppableId={columnConfig.statusValue}>
             {(provided, snapshot) => (
-              <div className="h-full" style={{ height: columnSize === 'compact' ? '320px' : '520px' }}>
-                <ScrollArea className="h-full">
+              <div 
+                className="h-full relative" 
+                style={{ 
+                  height: columnSize === 'compact' ? '320px' : '520px' 
+                }}
+              >
+                <ScrollArea className="h-full w-full" orientation="vertical">
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
