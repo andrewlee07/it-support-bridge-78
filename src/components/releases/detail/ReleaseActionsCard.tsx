@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Clock, CheckCircle, XCircle } from 'lucide-react';
 
 interface ReleaseActionsCardProps {
+  releaseId: string;
   status: string;
   onChangeStatus: (status: string) => void;
 }
 
 const ReleaseActionsCard: React.FC<ReleaseActionsCardProps> = ({
+  releaseId,
   status,
   onChangeStatus
 }) => {

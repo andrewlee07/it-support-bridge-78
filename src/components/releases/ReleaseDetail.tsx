@@ -77,6 +77,7 @@ const ReleaseDetail: React.FC<ReleaseDetailProps> = ({
         />
 
         <ReleaseActionsCard 
+          releaseId={release.id}
           status={release.status}
           onChangeStatus={onChangeStatus}
         />
