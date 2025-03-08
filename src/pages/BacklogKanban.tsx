@@ -1,13 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 import PageTransition from '@/components/shared/PageTransition';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { fetchBacklogItems, updateBacklogItem } from '@/utils/api/backlogApi';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
 import BacklogKanbanHeader from '@/components/backlog/kanban/BacklogKanbanHeader';
+import { KanbanBoardConfig } from '@/utils/types/kanbanTypes';
 
 const BacklogKanban: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +18,19 @@ const BacklogKanban: React.FC = () => {
   const [columnSize, setColumnSize] = useState<'compact' | 'standard'>('standard');
   const [searchQuery, setSearchQuery] = useState('');
   const [newItemDialogOpen, setNewItemDialogOpen] = useState(false);
+  const [boardConfig, setBoardConfig] = useState<KanbanBoardConfig | null>(null);
+
+  // Load board configuration from localStorage if available
+  useEffect(() => {
+    const savedConfig = localStorage.getItem('kanbanBoardConfig');
+    if (savedConfig) {
+      try {
+        setBoardConfig(JSON.parse(savedConfig));
+      } catch (e) {
+        console.error('Failed to parse saved kanban config:', e);
+      }
+    }
+  }, []);
 
   // Fetch all backlog items
   const { data: backlogItemsResponse, isLoading, refetch } = useQuery({
@@ -90,11 +105,17 @@ const BacklogKanban: React.FC = () => {
   };
 
   const handleAddBucket = () => {
-    // This is a pass-through function that will be handled by the KanbanBoard component
-    // The bucket creation logic is now in the KanbanBoard component
-    const kanbanBoardComponent = document.querySelector('[data-kanban-board]');
-    const event = new CustomEvent('add-bucket');
-    kanbanBoardComponent?.dispatchEvent(event);
+    // Directly interact with the KanbanBoard component
+    // by dispatching a custom event to add a new bucket
+    const kanbanBoardElement = document.querySelector('[data-kanban-board]');
+    if (kanbanBoardElement) {
+      // Create and dispatch a custom event
+      const event = new CustomEvent('addBucket');
+      kanbanBoardElement.dispatchEvent(event);
+      toast.success('Adding new bucket...');
+    } else {
+      toast.error('Could not find the kanban board element');
+    }
   };
 
   return (

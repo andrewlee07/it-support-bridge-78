@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DropResult } from 'react-beautiful-dnd';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { defaultKanbanConfig, KanbanBoardConfig } from '@/utils/types/kanbanTypes';
@@ -35,6 +35,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const [configOpen, setConfigOpen] = useState(false);
   const [newItemDialogOpen, setNewItemDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<BacklogItem | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
 
   // Load configuration from localStorage if available
   useEffect(() => {
@@ -52,6 +53,24 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   useEffect(() => {
     localStorage.setItem('kanbanBoardConfig', JSON.stringify(boardConfig));
   }, [boardConfig]);
+
+  // Setup event listener for the custom addBucket event
+  useEffect(() => {
+    const handleAddBucketEvent = () => {
+      handleAddBucket();
+    };
+
+    const boardElement = document.querySelector('[data-kanban-board]');
+    if (boardElement) {
+      boardElement.addEventListener('addBucket', handleAddBucketEvent);
+    }
+
+    return () => {
+      if (boardElement) {
+        boardElement.removeEventListener('addBucket', handleAddBucketEvent);
+      }
+    };
+  }, [boardConfig]); // Re-attach when boardConfig changes
 
   const toggleColumn = (columnId: string) => {
     setCollapsedColumns(prev => 
@@ -113,7 +132,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   }
 
   return (
-    <>
+    <div ref={boardRef} className="h-full">
       <KanbanBoardHeader 
         onConfigOpen={handleOpenConfigDialog} 
         onCreateItem={handleCreateItem}
@@ -146,7 +165,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         onFormSuccess={handleNewItemSuccess}
         onFormCancel={handleNewItemCancel}
       />
-    </>
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Settings, Plus } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 interface KanbanBoardHeaderProps {
   onConfigOpen: () => void;
@@ -13,17 +13,7 @@ const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({
   onCreateItem
 }) => {
   return (
-    <div className="flex justify-between mb-4">
-      <Button 
-        variant="default" 
-        size="sm" 
-        onClick={onCreateItem}
-        className="flex items-center gap-1"
-      >
-        <Plus className="h-4 w-4" />
-        Create Backlog Item
-      </Button>
-      
+    <div className="flex justify-end mb-4">
       <Button 
         variant="outline" 
         size="sm" 

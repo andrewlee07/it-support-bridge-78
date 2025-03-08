@@ -6,10 +6,8 @@ import {
   LayoutGrid, 
   List, 
   Search, 
-  Plus, 
   Maximize, 
   Minimize,
-  Settings,
   FolderKanban
 } from 'lucide-react';
 
@@ -89,14 +87,6 @@ const BacklogKanbanHeader: React.FC<BacklogKanbanHeaderProps> = ({
           >
             <FolderKanban className="h-4 w-4 mr-1" />
             Add Bucket
-          </Button>
-          
-          <Button 
-            size="sm"
-            onClick={onCreateItem}
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Create Item
           </Button>
         </div>
       </div>
