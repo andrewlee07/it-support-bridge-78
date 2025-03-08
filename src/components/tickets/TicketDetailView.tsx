@@ -47,7 +47,12 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold">{ticket.title}</DialogTitle>
+        <p className="text-sm text-muted-foreground">{ticket.id}</p>
+      </DialogHeader>
+      
       {/* Ticket Header */}
       <div className="border-b pb-4">
         <div className="flex justify-between items-start">
@@ -68,8 +73,8 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
       </div>
 
       {/* Tabs Navigation */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="min-h-[350px]">
-        <TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="h-[calc(100%-150px)]">
+        <TabsList className="mb-4">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
           {!['resolved', 'closed', 'fulfilled'].includes(ticket.status) && (
@@ -82,7 +87,7 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
         </TabsList>
         
         {/* Tab Contents with fixed height */}
-        <div className="mt-4 min-h-[350px]">
+        <div className="mt-4 h-full overflow-y-auto">
           {/* Details Tab */}
           <TabsContent value="details" className="h-full">
             <TicketDetails ticket={ticket} />
@@ -130,7 +135,7 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
                   <h3 className="text-md font-medium">Add Note</h3>
                   <Textarea 
                     placeholder="Add a note to this ticket..." 
-                    className="min-h-[120px]"
+                    className="min-h-[200px]"
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                   />
