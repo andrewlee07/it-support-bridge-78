@@ -18,7 +18,8 @@ const RiskThresholdsTab = () => {
 
   // Mutation for updating thresholds
   const { mutate: updateThresholds, isPending: isSubmitting } = useMutation({
-    mutationFn: (thresholds: RiskThreshold[]) => changeApi.updateRiskThresholds(thresholds, 'current-user'),
+    mutationFn: (data: { thresholds: RiskThreshold[], userId: string }) => 
+      changeApi.updateRiskThresholds(data.thresholds, data.userId),
     onSuccess: () => {
       toast({
         title: "Success",
@@ -38,7 +39,7 @@ const RiskThresholdsTab = () => {
 
   // Handle submitting thresholds form
   const handleThresholdsSubmit = (thresholds: RiskThreshold[]) => {
-    updateThresholds(thresholds);
+    updateThresholds({ thresholds, userId: 'current-user' });
   };
 
   return (

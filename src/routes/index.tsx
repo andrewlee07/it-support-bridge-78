@@ -51,7 +51,9 @@ const routes: RouteObject[] = [
     path: '/',
     element: (
       <ProtectedRoute>
-        <MainLayout />
+        <MainLayout>
+          <></>
+        </MainLayout>
       </ProtectedRoute>
     ),
     children: [
