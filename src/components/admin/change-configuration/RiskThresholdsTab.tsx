@@ -18,7 +18,7 @@ const RiskThresholdsTab = () => {
 
   // Mutation for updating thresholds
   const { mutate: updateThresholds, isPending: isSubmitting } = useMutation({
-    mutationFn: (thresholds: RiskThreshold[]) => changeApi.updateRiskThresholds(thresholds),
+    mutationFn: (thresholds: RiskThreshold[]) => changeApi.updateRiskThresholds(thresholds, 'current-user'),
     onSuccess: () => {
       toast({
         title: "Success",

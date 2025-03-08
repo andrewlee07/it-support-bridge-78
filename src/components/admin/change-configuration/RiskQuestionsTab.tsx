@@ -1,19 +1,45 @@
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { changeApi } from '@/utils/api/change';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import RiskAssessmentQuestionForm from '@/components/settings/risk/RiskAssessmentQuestionForm';
+import { RiskAssessmentQuestion } from '@/utils/types';
+import { useToast } from '@/hooks/use-toast';
 
 const RiskQuestionsTab = () => {
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Risk assessment questions
   const { data: riskQuestions, isLoading: isLoadingQuestions, refetch: refetchQuestions } = useQuery({
     queryKey: ['riskAssessmentQuestions'],
     queryFn: () => changeApi.getRiskAssessmentQuestions(),
+  });
+
+  // Mutation for updating questions
+  const { mutate: updateQuestion, isPending: isSubmittingQuestion } = useMutation({
+    mutationFn: (question: RiskAssessmentQuestion) => 
+      changeApi.updateRiskAssessmentQuestions([question], 'current-user'),
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Risk assessment question saved successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['riskAssessmentQuestions'] });
+      handleQuestionFormClose();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to save risk assessment question",
+        variant: "destructive",
+      });
+      console.error("Failed to save question:", error);
+    }
   });
 
   const handleAddQuestion = () => {
@@ -29,13 +55,11 @@ const RiskQuestionsTab = () => {
   const handleQuestionFormClose = () => {
     setIsAddingQuestion(false);
     setSelectedQuestionId(null);
-    refetchQuestions();
   };
 
   // Handle submitting question form
-  const handleQuestionSubmit = (questionData: any) => {
-    console.log('Saving question:', questionData);
-    handleQuestionFormClose();
+  const handleQuestionSubmit = (questionData: RiskAssessmentQuestion) => {
+    updateQuestion(questionData);
   };
 
   return (
@@ -82,7 +106,7 @@ const RiskQuestionsTab = () => {
             initialData={selectedQuestionId ? riskQuestions?.data?.find(q => q.id === selectedQuestionId) : undefined}
             onSubmit={handleQuestionSubmit}
             onCancel={handleQuestionFormClose}
-            isSubmitting={false}
+            isSubmitting={isSubmittingQuestion}
           />
         )}
         {!isAddingQuestion && !selectedQuestionId && (
