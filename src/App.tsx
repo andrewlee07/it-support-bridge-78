@@ -11,7 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import MainLayout from "./layouts/MainLayout";
 import Login from "./pages/Login";
-import { isHighPriority } from "./pages/Dashboard";
+import { Dashboard } from "./pages/Dashboard";
 import Incidents from "./pages/Incidents";
 import ServiceRequests from "./pages/ServiceRequests";
 import Changes from "./pages/Changes";
@@ -49,12 +49,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Create a Dashboard component to use with the router
-const Dashboard = () => {
-  // Using the isHighPriority function properly
-  return <div>Dashboard</div>;
-};
-
 function App() {
   useEffect(() => {
     document.title = "ITSM Portal";
@@ -67,7 +61,7 @@ function App() {
           index
           element={
             <ProtectedRoute redirectPath="/login">
-              <Index />
+              <Navigate to="/dashboard" replace />
             </ProtectedRoute>
           }
         />

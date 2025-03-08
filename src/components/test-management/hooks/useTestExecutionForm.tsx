@@ -1,9 +1,13 @@
 
 import { useState } from 'react';
-import { TestCase, TestStatus } from '@/utils/types/test';
+import { TestCase, TestStatus } from '@/utils/types/testTypes';
 import { useToast } from '@/hooks/use-toast';
 import type { Bug } from '@/utils/types/test';
 import type { BacklogItem } from '@/utils/types/backlogTypes';
+import { 
+  createBugFromTestExecution, 
+  createBacklogItemFromBug 
+} from '@/utils/api/testBacklogIntegrationApi';
 
 interface UseTestExecutionFormProps {
   testCase: TestCase;
@@ -21,6 +25,7 @@ export const useTestExecutionForm = ({
   const [comments, setComments] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
+  const [isCreatingBacklogItem, setIsCreatingBacklogItem] = useState(false);
   const { toast } = useToast();
 
   const handleExecute = async (status: TestStatus) => {
@@ -50,6 +55,50 @@ export const useTestExecutionForm = ({
     }
   };
 
+  const handleCreateBug = async (bugData: any) => {
+    setIsSubmitting(true);
+    try {
+      const result = await createBugFromTestExecution(testCase.id, bugData);
+      if (result.success) {
+        toast({
+          title: "Bug created",
+          description: `Bug "${result.data.title}" has been created.`,
+        });
+        
+        // Create backlog item if requested
+        let backlogItem = undefined;
+        if (isCreatingBacklogItem) {
+          const backlogResult = await createBacklogItemFromBug(result.data.id);
+          if (backlogResult.success) {
+            backlogItem = backlogResult.data;
+            toast({
+              title: "Backlog item created",
+              description: `Backlog item "${backlogResult.data.title}" has been created.`,
+            });
+          }
+        }
+        
+        if (onBugCreated) {
+          onBugCreated(result.data, backlogItem);
+        }
+        
+        setIsBugDialogOpen(false);
+        return { success: true, bug: result.data, backlogItem };
+      }
+      return { success: false };
+    } catch (error) {
+      toast({
+        title: "Error creating bug",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return { success: false };
+    } finally {
+      setIsSubmitting(false);
+      setIsCreatingBacklogItem(false);
+    }
+  };
+
   const handleBugCreated = (bug: Bug, backlogItem?: BacklogItem) => {
     if (onBugCreated) {
       onBugCreated(bug, backlogItem);
@@ -62,7 +111,10 @@ export const useTestExecutionForm = ({
     isSubmitting,
     isBugDialogOpen,
     setIsBugDialogOpen,
+    isCreatingBacklogItem,
+    setIsCreatingBacklogItem,
     handleExecute,
+    handleCreateBug,
     handleBugCreated,
     handleLinkBug: onLinkBug
   };

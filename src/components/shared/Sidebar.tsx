@@ -9,6 +9,7 @@ import { UserRole } from '@/utils/types';
 import NavLink from './sidebar/NavLink';
 import SettingsMenu from './sidebar/SettingsMenu';
 import { navigationItems, settingsItems } from './sidebar/navigationItems';
+import GlobalSearch from './search/GlobalSearch';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -54,7 +55,13 @@ const Sidebar = () => {
       </div>
       
       <div className="py-4 flex flex-col h-[calc(100vh-4rem)] justify-between">
-        <div className="space-y-1 px-3">
+        {!collapsed && (
+          <div className="px-3 mb-4">
+            <GlobalSearch placeholder="Search..." />
+          </div>
+        )}
+        
+        <div className="space-y-1 px-3 overflow-y-auto flex-grow">
           {navigationItems.map((item) => (
             // Only render if user has permission
             hasPermission(item.allowedRoles || []) && (
@@ -81,7 +88,7 @@ const Sidebar = () => {
         </div>
         
         <div className="space-y-1 px-3">
-          {/* Help menu item would go here */}
+          {/* Help and support links would go here */}
         </div>
       </div>
     </div>
