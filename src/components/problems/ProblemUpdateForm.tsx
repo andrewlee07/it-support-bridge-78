@@ -42,26 +42,23 @@ const ProblemUpdateForm: React.FC<ProblemUpdateFormProps> = ({
       status: problem.status,
       priority: problem.priority,
       category: problem.category,
-      assignedTo: problem.assignedTo || '',
+      assignedTo: problem.assignedTo || 'unassigned', // Use 'unassigned' instead of empty string
       resolutionPlan: problem.resolutionPlan || '',
       relatedIncidents: problem.relatedIncidents?.join(', ') || '',
-      pendingSubStatus: problem.pendingSubStatus || '',
+      pendingSubStatus: problem.pendingSubStatus || 'none', // Use 'none' instead of empty string
       notes: '',
     },
   });
 
   return (
-    <div className="border p-4 rounded-md bg-muted/30">
-      <h3 className="text-lg font-medium mb-4">Update Problem</h3>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <BasicInfoSection form={form} />
-          <StatusSection form={form} />
-          <DetailSection form={form} />
-          <FormActions onCancel={onCancel} />
-        </form>
-      </Form>
-    </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <BasicInfoSection form={form} />
+        <StatusSection form={form} />
+        <DetailSection form={form} />
+        <FormActions onCancel={onCancel} />
+      </form>
+    </Form>
   );
 };
 
