@@ -38,7 +38,7 @@ const StatusSynchronizationConfig: React.FC = () => {
     setIsSubmitting(true);
     
     // Validate the configuration
-    if (validateConfiguration(data as StatusSynchronizationSettings)) {
+    if (validateConfiguration()) { // Fix: Remove the argument here
       updateSettings(data as StatusSynchronizationSettings);
       toast.success('Status synchronization settings saved successfully');
     } else {

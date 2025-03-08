@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -56,19 +55,18 @@ const getStatusBadgeVariant = (status: TestStatus) => {
   switch (status) {
     case 'pass':
     case 'passed':
-      return 'success';
+      return 'default';
     case 'fail':
     case 'failed':
       return 'destructive';
     case 'blocked':
-      return 'warning';
+      return 'secondary';
     default:
       return 'outline';
   }
 };
 
 export const TestExecutionHistory: React.FC<TestExecutionHistoryProps> = ({ testCaseId }) => {
-  // In a real app, fetch these based on the testCaseId
   const executions = mockTestExecutions.filter(exec => exec.testCaseId === testCaseId);
   
   if (executions.length === 0) {
@@ -91,7 +89,6 @@ export const TestExecutionHistory: React.FC<TestExecutionHistoryProps> = ({ test
       </CardHeader>
       <CardContent className="space-y-4">
         {executions.map((execution) => {
-          // Find linked bugs for this execution
           const linkedBugs = execution.linkedBugs?.map(bugId => 
             mockBugs.find(bug => bug.id === bugId)
           ).filter(Boolean) as Bug[];
