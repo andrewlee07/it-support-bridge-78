@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 
 interface BacklogHeaderProps {
   onCreateItem: () => void;
@@ -15,7 +15,7 @@ const BacklogHeader: React.FC<BacklogHeaderProps> = ({ onCreateItem }) => {
         <p className="text-muted-foreground">Manage and plan your work items</p>
       </div>
       <Button onClick={onCreateItem}>
-        <PlusIcon className="h-4 w-4 mr-2" />
+        <PlusCircle className="h-4 w-4 mr-2" />
         New Item
       </Button>
     </div>

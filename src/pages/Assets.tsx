@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AssetList from '@/components/assets/AssetList';
 import AssetSearchBar from '@/components/assets/AssetSearchBar';
@@ -41,8 +42,8 @@ const Assets = () => {
             </p>
           </div>
           <Button className="shrink-0">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Asset
+            <PlusCircle className="mr-2 h-4 w-4" />
+            New Asset
           </Button>
         </div>
 

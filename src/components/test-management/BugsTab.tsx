@@ -12,7 +12,7 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, X } from 'lucide-react';
 import BugForm from './BugForm';
 import { useToast } from '@/hooks/use-toast';
 
@@ -70,8 +70,17 @@ const BugsTab = () => {
           <CardDescription>Track and manage bugs</CardDescription>
         </div>
         <Button size="sm" onClick={() => setShowBugForm(!showBugForm)}>
-          <PlusCircle className="h-4 w-4 mr-2" />
-          {showBugForm ? "Cancel" : "New Bug"}
+          {showBugForm ? (
+            <>
+              <X className="h-4 w-4 mr-2" />
+              Cancel
+            </>
+          ) : (
+            <>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              New Bug
+            </>
+          )}
         </Button>
       </CardHeader>
       <CardContent>
