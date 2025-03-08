@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { AuditEntry } from '@/utils/types/audit';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle, Clock, RefreshCw, MessageSquare } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, RefreshCw, MessageSquare, User, Settings } from 'lucide-react';
 
 interface ActivityHistoryProps {
   auditEntries: AuditEntry[];
@@ -12,15 +12,19 @@ interface ActivityHistoryProps {
 
 const ActivityHistory: React.FC<ActivityHistoryProps> = ({ auditEntries }) => {
   // Sort entries by timestamp in descending order (newest first)
-  const sortedEntries = [...auditEntries].sort((a, b) => 
-    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-  );
+  const sortedEntries = [...auditEntries].sort((a, b) => {
+    // Handle both Date objects and string timestamps
+    const dateA = a.timestamp instanceof Date ? a.timestamp : new Date(a.timestamp);
+    const dateB = b.timestamp instanceof Date ? b.timestamp : new Date(b.timestamp);
+    return dateB.getTime() - dateA.getTime();
+  });
 
   const getActivityIcon = (message: string) => {
-    if (message.includes('closed')) return <CheckCircle className="h-4 w-4 text-green-500" />;
-    if (message.includes('reopened')) return <RefreshCw className="h-4 w-4 text-blue-500" />;
-    if (message.includes('Note added')) return <MessageSquare className="h-4 w-4 text-indigo-500" />;
-    if (message.includes('updated')) return <Clock className="h-4 w-4 text-amber-500" />;
+    if (message?.includes('closed')) return <CheckCircle className="h-4 w-4 text-green-500" />;
+    if (message?.includes('reopened')) return <RefreshCw className="h-4 w-4 text-blue-500" />;
+    if (message?.includes('Note added')) return <MessageSquare className="h-4 w-4 text-indigo-500" />;
+    if (message?.includes('updated')) return <Settings className="h-4 w-4 text-amber-500" />;
+    if (message?.includes('assigned')) return <User className="h-4 w-4 text-purple-500" />;
     return <Clock className="h-4 w-4 text-gray-500" />;
   };
 
@@ -47,7 +51,7 @@ const ActivityHistory: React.FC<ActivityHistoryProps> = ({ auditEntries }) => {
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div>
-                        <span className="font-medium">{entry.performedBy}</span>
+                        <span className="font-medium">{entry.performedBy || entry.userName || 'System'}</span>
                         <span className="text-muted-foreground text-sm ml-2">
                           {format(new Date(entry.timestamp), 'MMM d, yyyy')}
                         </span>
@@ -56,7 +60,7 @@ const ActivityHistory: React.FC<ActivityHistoryProps> = ({ auditEntries }) => {
                         {format(new Date(entry.timestamp), 'HH:mm')}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm">{entry.message}</p>
+                    <p className="mt-1 text-sm">{entry.message || entry.action || 'Activity recorded'}</p>
                     
                     {entry.details && (
                       <p className="mt-1 text-xs text-muted-foreground">{entry.details}</p>

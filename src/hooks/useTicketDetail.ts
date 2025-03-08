@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { getTicketById } from '@/utils/mockData/tickets';
 import { Ticket, TicketStatus, RelatedItem, PendingSubStatus, TicketNote } from '@/utils/types/ticket';
@@ -6,6 +7,7 @@ import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
 import { toast } from 'sonner';
 import { createAuditEntry } from '@/utils/auditUtils';
 import { AuditEntry } from '@/utils/types/audit';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TicketWithNotes extends Ticket {
   notes: TicketNote[];
@@ -111,7 +113,7 @@ export const useTicketDetail = (id: string | undefined) => {
       // Add a new note to the notes array with the close information
       const closeNote: TicketNote = {
         id: `note-close-${Date.now()}`,
-        ticketId: ticket.id, // Add the required ticketId
+        ticketId: ticket.id,
         text: values.notes,
         createdAt: new Date(),
         createdBy: 'current-user',
@@ -147,10 +149,10 @@ export const useTicketDetail = (id: string | undefined) => {
   };
 
   const handleAddNote = (note: string) => {
-    if (ticket) {
+    if (ticket && note.trim()) {
       const noteItem: TicketNote = {
         id: `note-${Date.now()}`,
-        ticketId: ticket.id, // Add the required ticketId
+        ticketId: ticket.id,
         text: note,
         createdAt: new Date(),
         createdBy: 'current-user',
@@ -180,7 +182,7 @@ export const useTicketDetail = (id: string | undefined) => {
     if (ticket) {
       const reopenNote: TicketNote = {
         id: `note-reopen-${Date.now()}`,
-        ticketId: ticket.id, // Add the required ticketId
+        ticketId: ticket.id,
         text: `Ticket reopened: ${reason}`,
         createdAt: new Date(),
         createdBy: 'current-user',

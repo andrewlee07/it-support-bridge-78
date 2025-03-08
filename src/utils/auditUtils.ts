@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { AuditEntry } from './types';
+import { AuditEntry, AuditEntityType } from './types/audit';
 
 /**
  * Creates a new audit entry
@@ -13,7 +13,7 @@ import { AuditEntry } from './types';
  */
 export const createAuditEntry = (
   entityId: string,
-  entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release' | 'problem',
+  entityType: AuditEntityType,
   message: string,
   performedBy: string
 ): AuditEntry => {
@@ -23,7 +23,8 @@ export const createAuditEntry = (
     entityType,
     message,
     performedBy,
-    timestamp: new Date()
+    timestamp: new Date(),
+    action: message.split(':')[0]
   };
 };
 
@@ -40,7 +41,7 @@ export const createAuditEntry = (
 export const addAuditEntry = (
   existingEntries: AuditEntry[],
   entityId: string,
-  entityType: 'ticket' | 'asset' | 'user' | 'change' | 'release' | 'problem',
+  entityType: AuditEntityType,
   message: string,
   performedBy: string
 ): AuditEntry[] => {
