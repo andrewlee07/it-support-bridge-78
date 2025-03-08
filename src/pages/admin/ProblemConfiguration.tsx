@@ -7,6 +7,7 @@ import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
 import { ConfigurableEntityType } from '@/utils/types';
 import DropdownConfigList from '@/components/settings/dropdowns/DropdownConfigList';
 import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigForm';
+import Breadcrumb from '@/components/shared/Breadcrumb';
 
 const ProblemConfiguration = () => {
   const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
@@ -34,9 +35,16 @@ const ProblemConfiguration = () => {
     refetch();
   };
 
+  const breadcrumbItems = [
+    { label: 'Admin Settings', path: '/admin-settings' },
+    { label: 'Problem Configuration' }
+  ];
+
   return (
     <PageTransition>
       <div className="space-y-6">
+        <Breadcrumb items={breadcrumbItems} />
+        
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Problem Configuration</h1>
           <p className="text-muted-foreground mt-1">

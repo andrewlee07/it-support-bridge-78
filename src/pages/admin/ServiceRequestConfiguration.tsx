@@ -7,6 +7,9 @@ import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
 import { ConfigurableEntityType } from '@/utils/types';
 import DropdownConfigList from '@/components/settings/dropdowns/DropdownConfigList';
 import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigForm';
+import SLAConfigurationTab from '@/components/admin/SLAConfigurationTab';
+import AutoCloseConfigurationTab from '@/components/admin/AutoCloseConfigurationTab';
+import Breadcrumb from '@/components/shared/Breadcrumb';
 
 const ServiceRequestConfiguration = () => {
   const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
@@ -34,9 +37,16 @@ const ServiceRequestConfiguration = () => {
     refetch();
   };
 
+  const breadcrumbItems = [
+    { label: 'Admin Settings', path: '/admin-settings' },
+    { label: 'Service Request Configuration' }
+  ];
+
   return (
     <PageTransition>
       <div className="space-y-6">
+        <Breadcrumb items={breadcrumbItems} />
+        
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Service Request Configuration</h1>
           <p className="text-muted-foreground mt-1">
@@ -87,27 +97,11 @@ const ServiceRequestConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="sla" className="space-y-4">
-            {/* SLA Configuration Component will go here */}
-            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-              <div className="text-center">
-                <h3 className="text-lg font-medium">SLA Configuration</h3>
-                <p className="text-muted-foreground mt-1">
-                  Configure service level agreements for service requests
-                </p>
-              </div>
-            </div>
+            <SLAConfigurationTab ticketType="service" />
           </TabsContent>
           
           <TabsContent value="autoclose" className="space-y-4">
-            {/* Auto-Close Configuration will go here */}
-            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-              <div className="text-center">
-                <h3 className="text-lg font-medium">Auto-Close Configuration</h3>
-                <p className="text-muted-foreground mt-1">
-                  Configure automatic closing of fulfilled service requests
-                </p>
-              </div>
-            </div>
+            <AutoCloseConfigurationTab moduleType="service-request" />
           </TabsContent>
         </Tabs>
       </div>

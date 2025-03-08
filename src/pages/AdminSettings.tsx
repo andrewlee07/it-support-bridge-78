@@ -15,6 +15,7 @@ import {
   DatabaseIcon,
   ListIcon
 } from 'lucide-react';
+import Breadcrumb from '@/components/shared/Breadcrumb';
 
 const AdminSettings = () => {
   const navigate = useNavigate();
@@ -81,8 +82,14 @@ const AdminSettings = () => {
     }
   ];
 
+  const breadcrumbItems = [
+    { label: 'Admin Settings' }
+  ];
+
   return (
     <div className="container mx-auto p-4 space-y-8">
+      <Breadcrumb items={breadcrumbItems} />
+      
       <h1 className="text-3xl font-bold">Admin Configuration</h1>
       <p className="text-muted-foreground">
         Configure system settings and module-specific configurations.

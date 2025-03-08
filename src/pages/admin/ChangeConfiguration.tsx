@@ -6,11 +6,18 @@ import PageHeader from '@/components/admin/change-configuration/PageHeader';
 import DropdownFieldsTab from '@/components/admin/change-configuration/DropdownFieldsTab';
 import RiskAssessmentTabs from '@/components/admin/change-configuration/RiskAssessmentTabs';
 import WorkflowSettingsTab from '@/components/admin/change-configuration/WorkflowSettingsTab';
+import Breadcrumb from '@/components/shared/Breadcrumb';
 
 const ChangeConfiguration = () => {
+  const breadcrumbItems = [
+    { label: 'Admin Settings', path: '/admin-settings' },
+    { label: 'Change Configuration' }
+  ];
+
   return (
     <PageTransition>
       <div className="space-y-6">
+        <Breadcrumb items={breadcrumbItems} />
         <PageHeader />
 
         <Tabs defaultValue="dropdowns">
