@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigurableDropdown, DropdownOption, ConfigurableEntityType } from '../types';
 
@@ -132,6 +131,58 @@ export const mockDropdownConfigurations: ConfigurableDropdown[] = [
       { id: 'ast-sts-2', label: 'In Use', value: 'in-use', isActive: true, sortOrder: 2 },
       { id: 'ast-sts-3', label: 'Maintenance', value: 'maintenance', isActive: true, sortOrder: 3 },
       { id: 'ast-sts-4', label: 'Retired', value: 'retired', isActive: true, sortOrder: 4 },
+    ],
+    isRequired: true,
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  
+  // Bug configurations
+  {
+    id: 'dropdown-bug-severity',
+    entityType: 'bug',
+    fieldName: 'severity',
+    displayName: 'Bug Severity',
+    options: [
+      { id: 'bug-sev-1', label: 'Critical', value: 'critical', isActive: true, sortOrder: 1 },
+      { id: 'bug-sev-2', label: 'Major', value: 'major', isActive: true, sortOrder: 2 },
+      { id: 'bug-sev-3', label: 'Minor', value: 'minor', isActive: true, sortOrder: 3 },
+      { id: 'bug-sev-4', label: 'Trivial', value: 'trivial', isActive: true, sortOrder: 4 },
+    ],
+    isRequired: true,
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'dropdown-bug-priority',
+    entityType: 'bug',
+    fieldName: 'priority',
+    displayName: 'Bug Priority',
+    options: [
+      { id: 'bug-pri-1', label: 'Urgent', value: 'urgent', isActive: true, sortOrder: 1 },
+      { id: 'bug-pri-2', label: 'High', value: 'high', isActive: true, sortOrder: 2 },
+      { id: 'bug-pri-3', label: 'Medium', value: 'medium', isActive: true, sortOrder: 3 },
+      { id: 'bug-pri-4', label: 'Low', value: 'low', isActive: true, sortOrder: 4 },
+    ],
+    isRequired: true,
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'dropdown-bug-status',
+    entityType: 'bug',
+    fieldName: 'status',
+    displayName: 'Bug Status',
+    options: [
+      { id: 'bug-sts-1', label: 'New', value: 'new', isActive: true, sortOrder: 1 },
+      { id: 'bug-sts-2', label: 'Open', value: 'open', isActive: true, sortOrder: 2 },
+      { id: 'bug-sts-3', label: 'In Progress', value: 'in-progress', isActive: true, sortOrder: 3 },
+      { id: 'bug-sts-4', label: 'Fixed', value: 'fixed', isActive: true, sortOrder: 4 },
+      { id: 'bug-sts-5', label: 'Verified', value: 'verified', isActive: true, sortOrder: 5 },
+      { id: 'bug-sts-6', label: 'Closed', value: 'closed', isActive: true, sortOrder: 6 },
     ],
     isRequired: true,
     isActive: true,

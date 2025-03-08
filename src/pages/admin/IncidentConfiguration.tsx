@@ -8,6 +8,7 @@ import AutoCloseConfigurationTab from '@/components/admin/AutoCloseConfiguration
 import SLAConfigurationTab from '@/components/admin/SLAConfigurationTab';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
+import DropdownFieldsTab from '@/components/admin/change-configuration/DropdownFieldsTab';
 
 const IncidentConfiguration = () => {
   const breadcrumbItems = [
@@ -34,6 +35,7 @@ const IncidentConfiguration = () => {
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="sla">SLA Settings</TabsTrigger>
             <TabsTrigger value="autoclose">Auto-Close</TabsTrigger>
+            <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
             <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
           </TabsList>
           
@@ -55,6 +57,18 @@ const IncidentConfiguration = () => {
           
           <TabsContent value="autoclose">
             <AutoCloseConfigurationTab moduleType="incident" />
+          </TabsContent>
+          
+          <TabsContent value="dropdowns">
+            <Card>
+              <CardHeader>
+                <CardTitle>Incident Dropdown Fields</CardTitle>
+                <CardDescription>Configure dropdown fields for incident management</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DropdownFieldsTab />
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="mandatoryfields">
