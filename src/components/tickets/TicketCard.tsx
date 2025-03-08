@@ -42,7 +42,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
   };
 
   return (
-    <Card className="shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+    <Card className="shadow-sm hover:shadow-md transition-shadow h-full">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start gap-2">
           <div>

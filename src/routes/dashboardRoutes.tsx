@@ -1,18 +1,5 @@
-
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import MainLayout from '@/layouts/MainLayout';
-import Dashboard from '@/pages/Dashboard';
-import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
-export const DashboardRoutes: React.FC = () => {
-  return (
-    <ProtectedRoute>
-      <MainLayout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-        </Routes>
-      </MainLayout>
-    </ProtectedRoute>
-  );
-};
+// This file is now deprecated as routes are defined directly in index.tsx
+// Keeping as a placeholder to avoid build errors until fully refactored
+export const DashboardRoutes: React.FC = () => null;

@@ -48,6 +48,7 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, type }) => {
 
   const handleCardClick = (ticketId: string) => {
     const basePath = type === 'incident' ? '/incidents' : '/service-requests';
+    console.log(`Navigating to ${basePath}/${ticketId}`);
     navigate(`${basePath}/${ticketId}`);
   };
 
@@ -107,7 +108,7 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, type }) => {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredTickets.map((ticket) => (
-            <div key={ticket.id} onClick={() => handleCardClick(ticket.id)}>
+            <div key={ticket.id} onClick={() => handleCardClick(ticket.id)} className="cursor-pointer">
               <TicketCard ticket={ticket} />
             </div>
           ))}
