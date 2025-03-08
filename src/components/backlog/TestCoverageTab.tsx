@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Card,
@@ -39,28 +38,26 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { TestCoverageIndicator } from "@/components/backlog/TestCoverageIndicator"; // Changed path
-import { LinkTestCaseDialog } from "@/components/backlog/LinkTestCaseDialog"; // Changed path
+import TestCoverageIndicator from "@/components/backlog/TestCoverageIndicator";
+import LinkTestCaseDialog from "@/components/backlog/LinkTestCaseDialog";
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import { TestCase } from '@/utils/types/test/testCase';
 import { TestStatus } from '@/utils/types/test/testStatus';
 import { BacklogTestCoverage } from '@/utils/types/backlogTypes';
 
-// Update the props interface to match BacklogItemDetailTabs expectations
 interface TestCoverageTabProps {
   backlogItemId: string;
   riskLevel?: "high" | "medium" | "low";
-  backlogItem?: BacklogItem; // Added to match usage in BacklogItemDetailTabs
-  onViewTestCase?: (testCase: TestCase) => void; // Added to match usage in BacklogItemDetailTabs
+  backlogItem?: BacklogItem;
+  onViewTestCase?: (testCase: TestCase) => void;
 }
 
-// Fix the BacklogCoverage interface to match BacklogTestCoverage
 interface BacklogCoverage {
-  totalTestCases: number; // Changed from totalTests
-  passedTests: number; // Changed from passed
-  failedTests: number; // Changed from failed
-  notExecutedTests: number; // Changed from notRun
-  coveragePercentage: number; // Changed from coverage
+  totalTestCases: number;
+  passedTests: number;
+  failedTests: number;
+  notExecutedTests: number;
+  coveragePercentage: number;
 }
 
 const TestCoverageTab: React.FC<TestCoverageTabProps> = ({ 
@@ -73,13 +70,10 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [overallCoverage, setOverallCoverage] = useState(0);
   
-  // Use the backlogItem prop if provided, otherwise use backlogItemId
   const itemId = backlogItem?.id || backlogItemId;
 
   useEffect(() => {
-    // Mock function to simulate coverage calculation
     const calculateCoverage = () => {
-      // Mock data for demonstration
       const mockTotalTests = 10;
       const mockPassedTests = 7;
       const mockFailedTests = 2;
@@ -107,7 +101,6 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
     });
   };
 
-  // Fix the props for TestCoverageIndicator
   return (
     <Card>
       <CardHeader>
@@ -170,7 +163,6 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
         </div>
       </CardContent>
 
-      {/* Updated LinkTestCaseDialog props */}
       {backlogItem && (
         <LinkTestCaseDialog
           isOpen={isLinkDialogOpen}
@@ -183,10 +175,7 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
   );
 };
 
-export default TestCoverageTab;
-
 const TestCaseTable: React.FC<{onViewTestCase?: (testCase: TestCase) => void}> = ({ onViewTestCase }) => {
-  // Mock data for demonstration
   const mockTestCases = [
     {
       id: "1",
@@ -208,7 +197,6 @@ const TestCaseTable: React.FC<{onViewTestCase?: (testCase: TestCase) => void}> =
     },
   ];
 
-  // Fix the mock data structure to match BacklogTestCoverage
   const mockCoverage: BacklogTestCoverage = {
     totalTestCases: 5,
     passedTests: 3,
@@ -230,7 +218,6 @@ const TestCaseTable: React.FC<{onViewTestCase?: (testCase: TestCase) => void}> =
       </TableHeader>
       <TableBody>
         {mockTestCases.map((mockTest) => {
-          // For the test case conversion error, apply proper type casting:
           const testCase = {
             id: mockTest.id,
             title: mockTest.title,
@@ -335,3 +322,5 @@ const TestCaseActions: React.FC<TestCaseActionsProps> = ({ testCase, onViewTestC
     </DropdownMenu>
   );
 };
+
+export default TestCoverageTab;
