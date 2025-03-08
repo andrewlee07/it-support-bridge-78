@@ -14,7 +14,8 @@ import {
   updateComment,
   deleteComment,
   addWatcher,
-  removeWatcher
+  removeWatcher,
+  deleteBacklogItem
 } from '../mockData/backlog';
 
 import { BacklogItem, BacklogItemStatus, BacklogStats } from '../types/backlogTypes';
@@ -36,7 +37,8 @@ export {
   updateComment,
   deleteComment,
   addWatcher,
-  removeWatcher
+  removeWatcher,
+  deleteBacklogItem
 };
 
 // Create a default export with all functions
@@ -54,5 +56,6 @@ export default {
   updateComment,
   deleteComment,
   addWatcher,
-  removeWatcher
+  removeWatcher,
+  deleteBacklogItem
 };

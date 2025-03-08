@@ -11,8 +11,14 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon, ChevronRightIcon } from 'lucide-react';
+import { CalendarIcon, EllipsisVertical } from 'lucide-react';
 import { BacklogItem } from '@/utils/types/backlogTypes';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface Release {
   id: string;
@@ -23,12 +29,16 @@ interface BacklogItemTableProps {
   backlogItems: BacklogItem[];
   releases: Release[];
   onViewItem: (item: BacklogItem) => void;
+  onEditItem?: (item: BacklogItem) => void;
+  onDeleteItem?: (id: string) => void;
 }
 
 const BacklogItemTable: React.FC<BacklogItemTableProps> = ({
   backlogItems,
   releases,
-  onViewItem
+  onViewItem,
+  onEditItem,
+  onDeleteItem
 }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -116,12 +126,43 @@ const BacklogItemTable: React.FC<BacklogItemTableProps> = ({
                   )}
                 </TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon" onClick={(e) => {
-                    e.stopPropagation();
-                    onViewItem(item);
-                  }}>
-                    <ChevronRightIcon className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                        <EllipsisVertical className="h-4 w-4" />
+                        <span className="sr-only">More actions</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-popover">
+                      <DropdownMenuItem onClick={(e) => {
+                        e.stopPropagation();
+                        onViewItem(item);
+                      }}>
+                        View Details
+                      </DropdownMenuItem>
+                      {onEditItem && (
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          onEditItem(item);
+                        }}>
+                          Edit
+                        </DropdownMenuItem>
+                      )}
+                      {onDeleteItem && (
+                        <DropdownMenuItem 
+                          className="text-red-600 hover:text-red-700 focus:text-red-700"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`Are you sure you want to delete "${item.title}"?`)) {
+                              onDeleteItem(item.id);
+                            }
+                          }}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             );

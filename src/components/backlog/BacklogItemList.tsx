@@ -17,18 +17,20 @@ import BacklogItemDetail from './BacklogItemDetail';
 interface BacklogItemListProps {
   onCreateItem: () => void;
   onEditItem: (backlogItem: BacklogItem) => void;
+  onDeleteItem: (id: string) => void;
 }
 
 const BacklogItemList: React.FC<BacklogItemListProps> = ({
   onCreateItem,
   onEditItem,
+  onDeleteItem,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedReleaseId, setSelectedReleaseId] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<BacklogItemStatus[]>([]);
   const [selectedBacklogItem, setSelectedBacklogItem] = useState<BacklogItem | null>(null);
 
-  const { data: backlogItemsResponse, isLoading } = useQuery({
+  const { data: backlogItemsResponse, isLoading, refetch } = useQuery({
     queryKey: ['backlogItems', selectedReleaseId, selectedStatus, searchQuery],
     queryFn: () => fetchBacklogItems(
       selectedReleaseId === 'unassigned' ? 'unassigned' : selectedReleaseId, 
@@ -60,8 +62,9 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
     }
   };
 
-  const handleDeleteItem = (id: string) => {
-    console.log('Delete item:', id);
+  const handleDeleteItem = async (id: string) => {
+    await onDeleteItem(id);
+    refetch();
     setSelectedBacklogItem(null);
   };
 
@@ -102,6 +105,8 @@ const BacklogItemList: React.FC<BacklogItemListProps> = ({
               backlogItems={backlogItems}
               releases={releases}
               onViewItem={handleViewItem}
+              onEditItem={onEditItem}
+              onDeleteItem={handleDeleteItem}
             />
           )}
         </CardContent>

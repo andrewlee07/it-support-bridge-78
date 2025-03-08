@@ -7,7 +7,7 @@ import BacklogItemForm from '@/components/backlog/BacklogItemForm';
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { updateBacklogItem } from '@/utils/api/backlogApi';
+import { updateBacklogItem, deleteBacklogItem } from '@/utils/api/backlogApi';
 
 const Backlog: React.FC = () => {
   const { user } = useAuth();
@@ -32,6 +32,16 @@ const Backlog: React.FC = () => {
     }
   };
 
+  const handleDeleteItem = async (id: string) => {
+    try {
+      await deleteBacklogItem(id);
+      toast.success('Backlog item deleted successfully');
+    } catch (error) {
+      console.error('Error deleting backlog item:', error);
+      toast.error('Failed to delete backlog item');
+    }
+  };
+
   const handleFormSuccess = (item: BacklogItem) => {
     toast.success(isCreating ? 'Backlog item created' : 'Backlog item updated', {
       description: `${item.title} has been ${isCreating ? 'created' : 'updated'} successfully.`,
@@ -51,6 +61,7 @@ const Backlog: React.FC = () => {
         <BacklogItemList 
           onCreateItem={handleCreateItem} 
           onEditItem={handleEditItem}
+          onDeleteItem={handleDeleteItem}
         />
 
         <Dialog open={isCreating} onOpenChange={setIsCreating}>
