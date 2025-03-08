@@ -1,4 +1,3 @@
-
 import { Suspense, useEffect, useState } from "react";
 import {
   Outlet,
@@ -9,7 +8,6 @@ import {
 import Layout from "./components/layout";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
 import Errors from "./pages/Errors";
 import Settings from "./pages/Settings";
 import Releases from "./pages/Releases";
@@ -145,10 +143,6 @@ function App() {
         {
           path: "login",
           element: <Login />,
-        },
-        {
-          path: "register",
-          element: <Register />,
         },
       ],
     },

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { getUserByEmail } from '@/utils/mockData/users';
 
@@ -61,39 +60,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setLoading(true);
       
-      // First check if the user exists in our mock data
-      const existingUser = getUserByEmail(email);
+      // Accept any user input for this demo
+      // This ensures anyone can log in with any credentials
+      const mockUser: User = {
+        id: '1',
+        name: 'Test User',
+        email,
+        role: 'admin',
+        department: 'IT',
+        sessionTimeout: 30,
+        sessionStartTime: new Date(),
+      };
       
+      // Also check if a specific user from mock data was used
+      const existingUser = getUserByEmail(email);
       if (existingUser) {
-        // Use the existing user data
-        const authenticatedUser = {
-          ...existingUser,
-          sessionStartTime: new Date(),
-        };
-        
-        setUser(authenticatedUser);
-        setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(authenticatedUser));
-        setLoading(false);
-        return true;
-      } else {
-        // Fallback to the mock user if the email doesn't match any existing user
-        const mockUser: User = {
-          id: '1',
-          name: 'Test User',
-          email,
-          role: 'admin',
-          department: 'IT',
-          sessionTimeout: 30,
-          sessionStartTime: new Date(),
-        };
-        
-        setUser(mockUser);
-        setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        setLoading(false);
-        return true;
+        // Use existing user data if found
+        mockUser.id = existingUser.id;
+        mockUser.name = existingUser.name;
+        mockUser.role = existingUser.role;
+        mockUser.department = existingUser.department;
       }
+      
+      setUser(mockUser);
+      setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      setLoading(false);
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       setLoading(false);

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -111,10 +111,7 @@ const Login: React.FC = () => {
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">
-            <span className="text-[#42284e]/60">Don't have an account? </span>
-            <Link to="/auth/register" className="text-[#b047c9] hover:text-[#42284e] hover:underline font-medium">
-              Register
-            </Link>
+            <p className="text-[#42284e]/60">Internal Application</p>
           </div>
         </CardContent>
       </Card>
