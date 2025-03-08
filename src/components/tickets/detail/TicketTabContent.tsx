@@ -69,7 +69,8 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
             status: isServiceRequest ? 'fulfilled' : 'resolved',
             notes: '',
             rootCause: '',
-            closureReason: ''
+            closureReason: '',
+            resolution: '' // Added missing resolution property
           }}
           onSubmit={onClose}
           onCancel={() => onTabChange('details')}
