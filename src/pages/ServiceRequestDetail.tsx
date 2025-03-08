@@ -1,23 +1,96 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
-import { useTicketDetail } from '@/components/tickets/hooks/useTicketDetail';
 import TicketDetailView from '@/components/tickets/TicketDetailView';
+import { getTicketById } from '@/utils/mockData/tickets';
+import { Ticket } from '@/utils/types/ticket';
+import { UpdateTicketValues } from '@/components/tickets/TicketUpdateForm';
+import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
 
 const ServiceRequestDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
-  const {
-    ticket,
-    loading,
-    error,
-    handleUpdateTicket,
-    handleCloseTicket,
-    handleAddNote,
-    handleReopenTicket,
-  } = useTicketDetail(id || '', 'service');
+  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTicket = async () => {
+      try {
+        setLoading(true);
+        if (id) {
+          const fetchedTicket = getTicketById(id);
+          if (fetchedTicket) {
+            setTicket(fetchedTicket);
+          } else {
+            setError('Service Request not found');
+          }
+        } else {
+          setError('Invalid service request ID');
+        }
+      } catch (err) {
+        setError('Failed to load service request');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTicket();
+  }, [id]);
+
+  const handleUpdateTicket = (values: UpdateTicketValues) => {
+    if (ticket) {
+      const updatedTicket = {
+        ...ticket,
+        ...values,
+        updatedAt: new Date()
+      };
+      setTicket(updatedTicket);
+    }
+  };
+
+  const handleCloseTicket = (values: CloseTicketValues) => {
+    if (ticket) {
+      const updatedTicket = {
+        ...ticket,
+        ...values,
+        status: 'closed',
+        updatedAt: new Date(),
+        closedAt: new Date()
+      };
+      setTicket(updatedTicket);
+    }
+  };
+
+  const handleAddNote = (note: string) => {
+    if (ticket) {
+      const updatedTicket = {
+        ...ticket,
+        notes: [...ticket.notes, {
+          id: `note-${Date.now()}`,
+          text: note,
+          createdAt: new Date(),
+          createdBy: 'current-user',
+          isInternal: false
+        }],
+        updatedAt: new Date()
+      };
+      setTicket(updatedTicket);
+    }
+  };
+
+  const handleReopenTicket = () => {
+    if (ticket) {
+      const updatedTicket = {
+        ...ticket,
+        status: 'open',
+        updatedAt: new Date(),
+        reopenedAt: new Date()
+      };
+      setTicket(updatedTicket);
+    }
+  };
 
   if (loading) {
     return (

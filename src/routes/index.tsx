@@ -104,6 +104,10 @@ const routes: RouteObject[] = [
         element: <Assets />,
       },
       {
+        path: 'assets/:id',
+        element: <Assets />,
+      },
+      {
         path: 'backlog',
         element: <Backlog />,
       },

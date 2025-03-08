@@ -14,20 +14,30 @@ const Assets: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
-  const [isViewingAsset, setIsViewingAsset] = useState<boolean>(!!id);
+  const [isViewingAsset, setIsViewingAsset] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadAsset = async () => {
       if (id) {
         try {
+          setLoading(true);
           const response = await assetApi.getAssetById(id);
-          if (response.data) {
+          if (response.success && response.data) {
             setSelectedAsset(response.data);
             setIsViewingAsset(true);
+            setError(null);
+          } else {
+            setError(response.message || 'Failed to load asset details');
+            setIsViewingAsset(false);
           }
         } catch (error) {
           console.error('Failed to fetch asset details:', error);
+          setError('An unexpected error occurred');
           setIsViewingAsset(false);
+        } finally {
+          setLoading(false);
         }
       } else {
         setIsViewingAsset(false);
@@ -62,6 +72,14 @@ const Assets: React.FC = () => {
         return <Info className="h-5 w-5" />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

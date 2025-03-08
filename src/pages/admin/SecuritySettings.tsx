@@ -3,13 +3,13 @@ import React from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { SecuritySettings as SecuritySettingsComponent } from '@/components/admin/SecuritySettings';
-import { UserMFASettings } from '@/components/admin/UserMFASettings';
+import SecuritySettingsComponent from '@/components/admin/SecuritySettings';
+import UserMFASettingsComponent from '@/components/admin/UserMFASettings';
 import Breadcrumb from '@/components/shared/Breadcrumb';
 
 const SecuritySettings = () => {
   const breadcrumbItems = [
-    { label: 'Admin Settings', href: '/admin-settings' },
+    { label: 'Admin Settings', path: '/admin-settings' },
     { label: 'Security Settings' },
   ];
 
@@ -48,7 +48,7 @@ const SecuritySettings = () => {
                 <CardTitle>User MFA Management</CardTitle>
               </CardHeader>
               <CardContent>
-                <UserMFASettings />
+                <UserMFASettingsComponent />
               </CardContent>
             </Card>
           </TabsContent>
