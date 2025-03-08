@@ -4,6 +4,7 @@ import { RouteObject } from 'react-router-dom';
 import UserManagement from '@/pages/UserManagement';
 import Reports from '@/pages/Reports';
 import Calendar from '@/pages/Calendar';
+import ProblemManagement from '@/pages/ProblemManagement';
 
 const otherRoutes: RouteObject[] = [
   {
@@ -17,6 +18,10 @@ const otherRoutes: RouteObject[] = [
   {
     path: 'user-management',
     element: <UserManagement />,
+  },
+  {
+    path: 'problems',
+    element: <ProblemManagement />,
   },
 ];
 
