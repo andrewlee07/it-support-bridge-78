@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   getTestCoverageByReleaseId, 
   getTestExecutionProgressByReleaseId, 
-  getTestCyclesByReleaseId // Now correctly imported 
+  getTestCyclesByReleaseId 
 } from '@/utils/api/test-release';
 
 export const useTestReleaseCoverage = (releaseId: string | undefined) => {

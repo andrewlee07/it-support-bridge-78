@@ -13,8 +13,7 @@ export interface NavigationItem {
 
 export interface NavItem {
   name: string;
-  path?: string;
+  path: string;
   icon: React.ElementType;
   allowedRoles?: string[];
-  children?: NavItem[];
 }

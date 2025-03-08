@@ -1,83 +1,98 @@
 
-import { 
-  LayoutDashboard, 
-  GitPullRequest, 
-  Package, 
-  Inbox, 
-  ListTodo, 
-  Settings, 
-  Bell, 
-  FileCode, 
-  TestTube, 
-  AreaChart,
-  Network
-} from 'lucide-react';
 import { NavItem } from './types';
+import {
+  BarChart4,
+  Boxes,
+  Bug,
+  Calendar,
+  Clock,
+  FileText,
+  Gauge,
+  GitBranch,
+  GitPullRequest,
+  LayoutDashboard,
+  List,
+  Relationship,
+  Settings,
+  TestTube,
+  Ticket,
+} from 'lucide-react';
 
 export const navigationItems: NavItem[] = [
   {
-    name: "Dashboard",
-    path: "/",
+    title: 'Dashboard',
     icon: LayoutDashboard,
-    allowedRoles: ["admin", "user", "it"]
+    href: '/',
   },
   {
-    name: "Changes",
-    path: "/changes",
+    title: 'Integrated Dashboard',
+    icon: Relationship,
+    href: '/integrated-dashboard',
+  },
+  {
+    title: 'Change Management',
     icon: GitPullRequest,
-    allowedRoles: ["admin", "it"]
+    href: '/changes',
   },
   {
-    name: "Releases",
-    path: "/releases",
-    icon: Package,
-    allowedRoles: ["admin", "it"]
+    title: 'Release Management',
+    icon: GitBranch,
+    href: '/releases',
   },
   {
-    name: "Backlog",
-    path: "/backlog",
-    icon: ListTodo,
-    allowedRoles: ["admin", "it", "developer"]
+    title: 'Backlog',
+    icon: List,
+    href: '/backlog',
   },
   {
-    name: "Assets",
-    path: "/assets",
-    icon: Inbox,
-    allowedRoles: ["admin", "it"]
-  },
-  {
-    name: "Test Management",
-    path: "/tests",
+    title: 'Test Management',
     icon: TestTube,
-    allowedRoles: ["admin", "it", "qa"]
-  },
-  {
-    name: "Test Coverage",
-    path: "/test-coverage",
-    icon: FileCode,
-    allowedRoles: ["admin", "it", "qa"]
-  },
-  {
-    name: "Integrated Dashboard",
-    path: "/integrated-dashboard",
-    icon: Network, // Using Network instead of Relationship
-    allowedRoles: ["admin", "it", "manager"]
-  },
-  {
-    name: "Admin",
-    icon: Settings,
-    allowedRoles: ["admin"],
-    children: [
+    items: [
       {
-        name: "Risk Assessment",
-        path: "/admin/risk-assessment",
-        icon: AreaChart
+        title: 'Test Tracking',
+        icon: Bug,
+        href: '/test-tracking',
       },
       {
-        name: "Change Dropdowns",
-        path: "/admin/change-dropdowns",
-        icon: GitPullRequest
-      }
-    ]
-  }
+        title: 'Coverage & Traceability',
+        icon: Gauge,
+        href: '/test-coverage',
+      },
+    ],
+  },
+  {
+    title: 'Assets',
+    icon: Boxes,
+    href: '/assets',
+  },
+  {
+    title: 'Admin',
+    icon: Settings,
+    items: [
+      {
+        title: 'Risk Assessment',
+        href: '/admin/risk-assessment',
+      },
+      {
+        title: 'Change Dropdowns',
+        href: '/admin/change-dropdowns',
+      },
+      {
+        title: 'SLA Configuration',
+        href: '/admin/sla-configuration',
+      },
+      {
+        title: 'Error Logs',
+        href: '/admin/error-logs',
+      },
+      {
+        title: 'Security Settings',
+        href: '/admin/security-settings',
+      },
+      {
+        title: 'Status Sync',
+        href: '/admin/status-synchronization',
+      },
+    ],
+  },
 ];

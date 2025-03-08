@@ -4,47 +4,34 @@ import { delay, createApiSuccessResponse, createApiErrorResponse } from './apiHe
 import { ApiResponse } from '../types';
 import { Bug, BugPriority, BugSeverity, BugStatus } from '../types/testTypes';
 
-// Mock Bugs data with updated imports
+// Mock Bugs data
 export let bugs: Bug[] = [
   {
     id: 'bug-1',
-    title: 'Login button not working on mobile',
-    description: 'Users cannot log in using the mobile interface',
-    stepsToReproduce: [
-      'Open the application on a mobile device',
-      'Enter valid credentials',
-      'Tap the login button',
-      'Observe that nothing happens'
-    ],
-    severity: 'high',
+    title: 'Login button not working',
+    description: 'Login button is not responding when clicked',
+    stepsToReproduce: ['Open login page', 'enter credentials', 'click login button'],
+    severity: 'critical',
     priority: 'high',
     status: 'open',
+    reportedBy: 'user-1',
+    createdBy: 'user-1',
     createdAt: new Date(),
     updatedAt: new Date(),
-    createdBy: 'user-1',
-    reportedBy: 'user-1',
-    assignedTo: 'user-2',
-    relatedTestCase: 'tc-1'
   },
   {
     id: 'bug-2',
-    title: 'Incorrect calculation in expense report',
-    description: 'The total sum in expense reports is calculated incorrectly',
-    stepsToReproduce: [
-      'Create a new expense report',
-      'Add multiple expense items',
-      'Save the report',
-      'Observe that the total is wrong'
-    ],
+    title: 'Incorrect error message',
+    description: 'Error message is not clear',
+    stepsToReproduce: ['Attempt login with invalid credentials'],
     severity: 'medium',
     priority: 'medium',
-    status: 'in_progress',
+    status: 'open',
+    reportedBy: 'user-2',
+    createdBy: 'user-2',
     createdAt: new Date(),
     updatedAt: new Date(),
-    createdBy: 'user-1',
-    reportedBy: 'user-3',
-    assignedTo: 'user-2'
-  }
+  },
 ];
 
 // Bug API functions
@@ -53,11 +40,11 @@ export const fetchBugs = async (): Promise<ApiResponse<Bug[]>> => {
   return createApiSuccessResponse(bugs);
 };
 
-export const fetchBugById = async (id: string): Promise<ApiResponse<Bug>> => {
+export const fetchBugById = async (id: string): Promise<ApiResponse<Bug | null>> => {
   await delay(500);
-  const bug = bugs.find(bug => bug.id === id);
+  const bug = bugs.find(b => b.id === id);
   if (!bug) {
-    return createApiErrorResponse('Bug not found');
+    return createApiErrorResponse<Bug | null>('Bug not found', 404);
   }
   return createApiSuccessResponse(bug);
 };
@@ -74,16 +61,12 @@ export const createBug = async (bug: Omit<Bug, 'id' | 'createdAt' | 'updatedAt'>
   return createApiSuccessResponse(newBug);
 };
 
-export const updateBug = async (id: string, updates: Partial<Bug>): Promise<ApiResponse<Bug>> => {
+export const updateBug = async (id: string, updates: Partial<Bug>): Promise<ApiResponse<Bug | null>> => {
   await delay(500);
-  const index = bugs.findIndex(bug => bug.id === id);
+  const index = bugs.findIndex(b => b.id === id);
   if (index === -1) {
-    return createApiErrorResponse('Bug not found');
+    return createApiErrorResponse<Bug | null>('Bug not found', 404);
   }
-  bugs[index] = {
-    ...bugs[index],
-    ...updates,
-    updatedAt: new Date()
-  };
+  bugs[index] = { ...bugs[index], ...updates, updatedAt: new Date() };
   return createApiSuccessResponse(bugs[index]);
 };

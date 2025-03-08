@@ -9,6 +9,7 @@ import {
 import Layout from "./components/layout";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
 import Errors from "./pages/Errors";
 import Settings from "./pages/Settings";
 import Releases from "./pages/Releases";
@@ -34,7 +35,7 @@ import dashboardRoutes from "./routes/dashboardRoutes";
 
 import BugDetail from "./pages/BugDetail";
 import { useSessionTimeout } from "./hooks/useSessionTimeout";
-import { useAuth } from "./contexts/auth";
+import { useAuth } from "./contexts/AuthContext";
 import { Toaster } from "sonner";
 
 function App() {
@@ -144,6 +145,10 @@ function App() {
         {
           path: "login",
           element: <Login />,
+        },
+        {
+          path: "register",
+          element: <Register />,
         },
       ],
     },

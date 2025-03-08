@@ -5,8 +5,7 @@ import * as z from 'zod';
 const bugSeverityEnum = z.enum(['critical', 'major', 'minor', 'trivial', 'high', 'medium', 'low'] as const);
 const bugPriorityEnum = z.enum(['high', 'medium', 'low', 'urgent'] as const);
 const bugStatusEnum = z.enum([
-  'open', 'in_progress', 'resolved', 'closed', 'fixed', 'verified', 'new', 'in-progress',
-  'rejected', 'reopened', 'deferred'
+  'open', 'in_progress', 'resolved', 'closed', 'fixed', 'verified', 'new', 'in-progress'
 ] as const);
 
 // Form schema for bug report
