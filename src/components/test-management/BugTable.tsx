@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Bug, BugStatus } from '@/utils/types/testTypes';
+import { Bug } from '@/utils/types/test/bug';
+import { BugStatus } from '@/utils/types/test/testStatus';
 import { StatusBadge, SeverityBadge } from './ui/BugBadges';
 import { Bug as BugIcon } from 'lucide-react';
 import {

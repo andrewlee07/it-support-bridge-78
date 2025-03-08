@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBugs, updateBug } from '@/utils/mockData/testData';
-import { Bug, BugStatus } from '@/utils/types/testTypes';
+import { Bug } from '@/utils/types/test/bug';
+import { BugStatus } from '@/utils/types/test/testStatus';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Bug as BugIcon } from 'lucide-react';
@@ -49,8 +50,8 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
       assignedDeveloper: bug.assignedTo,
       relatedTestCase: bug.relatedTestCase,
       attachment: bug.attachment,
-      createdAt: bug.createdAt,
-      updatedAt: bug.updatedAt,
+      createdAt: new Date(bug.createdAt),
+      updatedAt: new Date(bug.updatedAt),
       createdBy: bug.createdBy || bug.reportedBy || '',
       reportedBy: bug.reportedBy
     }));

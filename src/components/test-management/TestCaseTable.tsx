@@ -9,7 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { File } from 'lucide-react';
-import { TestCase } from '@/utils/types/testTypes';
+import { TestCase } from '@/utils/types/test/testCase';
 import StatusBadge from './ui/StatusBadge';
 
 interface TestCaseTableProps {
