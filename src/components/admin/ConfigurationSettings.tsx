@@ -107,7 +107,9 @@ const ConfigurationSettings = () => {
         <DialogContent className="sm:max-w-[500px]">
           <DropdownConfigForm 
             onClose={handleCloseForm} 
-            entityType={activeTab} 
+            entityType={activeTab}
+            isNew={!selectedConfigId}
+            configId={selectedConfigId}
           />
         </DialogContent>
       </Dialog>

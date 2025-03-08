@@ -1,6 +1,6 @@
 
 // Configuration types for dropdown fields
-export type ConfigurableEntityType = 'incident' | 'service-request' | 'change' | 'asset' | 'backlog' | 'release';
+export type ConfigurableEntityType = 'ticket' | 'asset' | 'change' | 'user' | 'incident' | 'service-request' | 'backlog' | 'release';
 
 export interface DropdownOption {
   id: string;

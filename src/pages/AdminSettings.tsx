@@ -1,96 +1,34 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 import SecuritySettings from '@/components/admin/SecuritySettings';
 import UserMFASettings from '@/components/admin/UserMFASettings';
 import ConfigurationSettings from '@/components/admin/ConfigurationSettings';
-import { Card } from '@/components/ui/card';
-import { AlertTriangle } from 'lucide-react';
+import { ConfigurableEntityType } from '@/utils/types';
 
 const AdminSettings = () => {
-  const { user, hasPermission } = useAuth();
-  
-  // Check if user is authenticated and has admin role
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  // Check if user has admin permissions
-  if (!hasPermission(['admin'])) {
-    return (
-      <div className="container mx-auto p-6">
-        <Card className="p-6 border-red-300 bg-red-50 dark:bg-red-950/20">
-          <div className="flex items-center space-x-2 text-red-600">
-            <AlertTriangle className="h-5 w-5" />
-            <h1 className="text-xl font-semibold">Access Denied</h1>
-          </div>
-          <p className="mt-2">You don't have permission to access this page. This page is restricted to administrators only.</p>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">System Administration</h1>
+    <div className="container mx-auto p-4 space-y-8">
+      <h1 className="text-3xl font-bold">Admin Settings</h1>
       
-      <Tabs defaultValue="overall" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="overall">Overall System Settings</TabsTrigger>
-          <TabsTrigger value="incident">Incidents</TabsTrigger>
-          <TabsTrigger value="service-request">Service Requests</TabsTrigger>
-          <TabsTrigger value="change">Change Management</TabsTrigger>
-          <TabsTrigger value="release">Releases</TabsTrigger>
-          <TabsTrigger value="asset">Asset Management</TabsTrigger>
-          <TabsTrigger value="backlog">Backlog</TabsTrigger>
+      <Tabs defaultValue="security" className="w-full">
+        <TabsList className="grid grid-cols-3 mb-8">
+          <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="configurations">Configurations</TabsTrigger>
+          <TabsTrigger value="mfa">MFA Management</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="overall">
-          <Tabs defaultValue="security" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="security">Security Settings</TabsTrigger>
-              <TabsTrigger value="mfa">User MFA Management</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="security">
-              <SecuritySettings />
-            </TabsContent>
-            
-            <TabsContent value="mfa">
-              <UserMFASettings />
-            </TabsContent>
-          </Tabs>
+        <TabsContent value="security" className="mt-0">
+          <SecuritySettings />
         </TabsContent>
         
-        <TabsContent value="incident">
-          <ConfigurationSettings entityType="incident" />
+        <TabsContent value="configurations" className="mt-0">
+          <ConfigurationSettings />
         </TabsContent>
         
-        <TabsContent value="service-request">
-          <ConfigurationSettings entityType="service-request" />
-        </TabsContent>
-        
-        <TabsContent value="change">
-          <ConfigurationSettings entityType="change" />
-        </TabsContent>
-        
-        <TabsContent value="release">
-          <ConfigurationSettings entityType="release" />
-        </TabsContent>
-        
-        <TabsContent value="asset">
-          <ConfigurationSettings entityType="asset" />
-        </TabsContent>
-        
-        <TabsContent value="backlog">
-          <ConfigurationSettings entityType="backlog" />
+        <TabsContent value="mfa" className="mt-0">
+          <UserMFASettings />
         </TabsContent>
       </Tabs>
     </div>
