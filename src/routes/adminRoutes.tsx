@@ -1,72 +1,48 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import MainLayout from '@/layouts/MainLayout';
-import AdminSettings from '@/pages/AdminSettings';
-import SLASettings from '@/pages/SLASettings';
-import DropdownConfigurations from '@/pages/settings/DropdownConfigurations';
-import RiskAssessment from '@/pages/settings/RiskAssessmentSettings';
-import ErrorLogs from '@/pages/admin/ErrorLogs';
-import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
-export const AdminRoutes: React.FC = () => {
-  return (
-    <Routes>
-      {/* Settings routes */}
-      <Route
-        path="/settings/sla"
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <MainLayout>
-              <SLASettings />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/settings/dropdown-configurations"
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <MainLayout>
-              <DropdownConfigurations />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/settings/risk-assessment"
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <MainLayout>
-              <RiskAssessment />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* Admin routes */}
-      <Route
-        path="/admin/settings"
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <MainLayout>
-              <AdminSettings />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route 
-        path="/admin/error-logs" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <MainLayout>
-              <ErrorLogs />
-            </MainLayout>
-          </ProtectedRoute>
-        } 
-      />
-    </Routes>
-  );
-};
+import { lazy } from 'react';
+import { Navigate, RouteObject } from 'react-router-dom';
+
+const AdminSettings = lazy(() => import('@/pages/AdminSettings'));
+const ErrorLogs = lazy(() => import('@/pages/admin/ErrorLogs'));
+const IncidentConfiguration = lazy(() => import('@/pages/admin/IncidentConfiguration'));
+const ServiceRequestConfiguration = lazy(() => import('@/pages/admin/ServiceRequestConfiguration'));
+// For now, these can redirect to AdminSettings
+const SystemConfiguration = () => <Navigate to="/admin/settings" replace />;
+const ChangeConfiguration = () => <Navigate to="/admin/settings" replace />;
+const ProblemConfiguration = () => <Navigate to="/admin/settings" replace />;
+const AssetConfiguration = () => <Navigate to="/admin/settings" replace />;
+
+export const adminRoutes: RouteObject[] = [
+  {
+    path: '/admin/settings',
+    element: <AdminSettings />,
+  },
+  {
+    path: '/admin/error-logs',
+    element: <ErrorLogs />,
+  },
+  {
+    path: '/admin/system-configuration',
+    element: <SystemConfiguration />,
+  },
+  {
+    path: '/admin/incident-configuration',
+    element: <IncidentConfiguration />,
+  },
+  {
+    path: '/admin/service-request-configuration',
+    element: <ServiceRequestConfiguration />,
+  },
+  {
+    path: '/admin/change-configuration',
+    element: <ChangeConfiguration />,
+  },
+  {
+    path: '/admin/problem-configuration',
+    element: <ProblemConfiguration />,
+  },
+  {
+    path: '/admin/asset-configuration',
+    element: <AssetConfiguration />,
+  },
+];

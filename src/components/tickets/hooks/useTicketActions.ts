@@ -26,10 +26,8 @@ export const useTicketActions = ({
     if (!selectedTicket) return;
     
     try {
-      // In a real app, we would call an API to update the ticket
       const updatedTickets = tickets.map(ticket => {
         if (ticket.id === selectedTicket.id) {
-          // Check if this is a service request being assigned for the first time
           const isServiceRequestBeingAssigned = 
             type === 'service' && 
             !ticket.assignedTo && 
@@ -37,9 +35,7 @@ export const useTicketActions = ({
             ticket.status === 'open' && 
             data.status === 'in-progress';
           
-          // Show notification if service request is being assigned
           if (isServiceRequestBeingAssigned) {
-            // In a real app, this would send an email, not just a toast
             toast.info(`User ${ticket.createdBy} has been notified that their request ${ticket.id} has been assigned.`);
           }
           
@@ -79,7 +75,6 @@ export const useTicketActions = ({
     if (!selectedTicket) return;
     
     try {
-      // In a real app, we would call an API to close the ticket
       const status = data.status as TicketStatus;
       const updatedTickets = tickets.map(ticket => {
         if (ticket.id === selectedTicket.id) {
@@ -121,30 +116,30 @@ export const useTicketActions = ({
     }
   };
 
-  const handleReopenTicket = () => {
+  const handleReopenTicket = (reopenReason: string) => {
     if (!selectedTicket) return;
     
     try {
-      // In a real app, we would call an API to reopen the ticket
       const updatedTickets = tickets.map(ticket => {
         if (ticket.id === selectedTicket.id) {
           const isServiceRequest = type === 'service';
           const fromStatus = isServiceRequest ? 'fulfilled' : 'resolved';
           
-          if (ticket.status !== fromStatus) {
-            toast.error(`Can only reopen tickets in ${fromStatus} status`);
+          if (ticket.status !== fromStatus && ticket.status !== 'closed') {
+            toast.error(`Can only reopen tickets in ${fromStatus} or closed status`);
             return ticket;
           }
           
+          const reasonText = reopenReason ? ` Reason: ${reopenReason}` : '';
           const auditMessage = isServiceRequest
-            ? 'Service request reopened by customer'
-            : 'Incident reopened by customer';
+            ? `Service request reopened by customer.${reasonText}`
+            : `Incident reopened by customer.${reasonText}`;
             
           const updatedTicket = {
             ...ticket,
             status: 'in-progress' as TicketStatus,
             updatedAt: new Date(),
-            resolvedAt: undefined, // Clear the resolved date
+            resolvedAt: undefined,
             audit: addAuditEntry(
               ticket.audit,
               ticket.id,

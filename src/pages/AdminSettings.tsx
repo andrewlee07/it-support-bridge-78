@@ -1,36 +1,93 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import SecuritySettings from '@/components/admin/SecuritySettings';
-import UserMFASettings from '@/components/admin/UserMFASettings';
-import ConfigurationSettings from '@/components/admin/ConfigurationSettings';
-import { ConfigurableEntityType } from '@/utils/types';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { 
+  ServerCogIcon, 
+  AlertCircleIcon, 
+  MessageSquareIcon,
+  PanelRightIcon,
+  OctagonAlertIcon,
+  BoxIcon,
+  AlertTriangleIcon
+} from 'lucide-react';
 
 const AdminSettings = () => {
+  const navigate = useNavigate();
+  
+  const configurationModules = [
+    {
+      title: 'System Configuration',
+      description: 'Manage global system settings',
+      icon: ServerCogIcon,
+      path: '/admin/system-configuration'
+    },
+    {
+      title: 'Incident Configuration',
+      description: 'Configure incident management settings',
+      icon: AlertCircleIcon,
+      path: '/admin/incident-configuration'
+    },
+    {
+      title: 'Service Request Configuration',
+      description: 'Configure service request settings',
+      icon: MessageSquareIcon,
+      path: '/admin/service-request-configuration'
+    },
+    {
+      title: 'Change Configuration',
+      description: 'Configure change management settings',
+      icon: PanelRightIcon,
+      path: '/admin/change-configuration'
+    },
+    {
+      title: 'Problem Configuration',
+      description: 'Configure problem management settings',
+      icon: OctagonAlertIcon,
+      path: '/admin/problem-configuration'
+    },
+    {
+      title: 'Asset Configuration',
+      description: 'Configure asset management settings',
+      icon: BoxIcon,
+      path: '/admin/asset-configuration'
+    },
+    {
+      title: 'Error Logs',
+      description: 'View system error logs',
+      icon: AlertTriangleIcon,
+      path: '/admin/error-logs'
+    }
+  ];
+
   return (
     <div className="container mx-auto p-4 space-y-8">
-      <h1 className="text-3xl font-bold">Admin Settings</h1>
+      <h1 className="text-3xl font-bold">Admin Configuration</h1>
+      <p className="text-muted-foreground">
+        Configure system settings and module-specific configurations.
+      </p>
       
-      <Tabs defaultValue="security" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-8">
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="configurations">Configurations</TabsTrigger>
-          <TabsTrigger value="mfa">MFA Management</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="security" className="mt-0">
-          <SecuritySettings />
-        </TabsContent>
-        
-        <TabsContent value="configurations" className="mt-0">
-          <ConfigurationSettings />
-        </TabsContent>
-        
-        <TabsContent value="mfa" className="mt-0">
-          <UserMFASettings />
-        </TabsContent>
-      </Tabs>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {configurationModules.map((module, index) => (
+          <Card 
+            key={index} 
+            className="hover:bg-accent/50 cursor-pointer transition-colors"
+            onClick={() => navigate(module.path)}
+          >
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-primary/10">
+                  <module.icon className="h-5 w-5 text-primary" />
+                </div>
+                <CardTitle className="text-lg">{module.title}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>{module.description}</CardDescription>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };

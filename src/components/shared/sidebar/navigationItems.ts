@@ -17,6 +17,11 @@ import {
   CalendarIcon,
   PlayIcon,
   AlertTriangleIcon,
+  WrenchIcon,
+  CogIcon,
+  FolderCogIcon,
+  ServerCogIcon,
+  Settings2Icon,
 } from "lucide-react";
 import { NavigationItem } from './types';
 
@@ -123,24 +128,45 @@ export const navigationItems: NavigationItem[] = [
 
 export const settingsItems = [
   {
-    name: "SLA Settings",
-    path: "/settings/sla",
-    href: "/settings/sla",
-    icon: SettingsIcon,
+    name: "System Configuration",
+    path: "/admin/system-configuration",
+    href: "/admin/system-configuration",
+    icon: ServerCogIcon,
     allowedRoles: ['admin']
   },
   {
-    name: "Dropdown Configurations",
-    path: "/settings/dropdown-configurations",
-    href: "/settings/dropdown-configurations",
-    icon: SettingsIcon,
+    name: "Incident Configuration",
+    path: "/admin/incident-configuration",
+    href: "/admin/incident-configuration",
+    icon: AlertCircleIcon,
     allowedRoles: ['admin']
   },
   {
-    name: "Risk Assessment",
-    path: "/settings/risk-assessment",
-    href: "/settings/risk-assessment",
-    icon: BarChart2Icon,
+    name: "Service Request Configuration",
+    path: "/admin/service-request-configuration",
+    href: "/admin/service-request-configuration",
+    icon: MessageSquareIcon,
+    allowedRoles: ['admin']
+  },
+  {
+    name: "Change Configuration",
+    path: "/admin/change-configuration",
+    href: "/admin/change-configuration",
+    icon: PanelRightIcon,
+    allowedRoles: ['admin']
+  },
+  {
+    name: "Problem Configuration",
+    path: "/admin/problem-configuration",
+    href: "/admin/problem-configuration",
+    icon: OctagonAlertIcon,
+    allowedRoles: ['admin']
+  },
+  {
+    name: "Asset Configuration",
+    path: "/admin/asset-configuration",
+    href: "/admin/asset-configuration",
+    icon: BoxIcon,
     allowedRoles: ['admin']
   },
   {

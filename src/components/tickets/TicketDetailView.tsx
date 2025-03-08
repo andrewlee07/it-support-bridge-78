@@ -3,13 +3,17 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Ticket } from '@/utils/types/ticket';
-import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { UserPlus, CheckCircle2, MessageSquare } from 'lucide-react';
+import { DialogHeader, DialogTitle, Dialog, DialogContent, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { UserPlus, CheckCircle2, MessageSquare, RefreshCcw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TicketDetails from './TicketDetails';
 import ActivityHistory from './ActivityHistory';
 import TicketUpdateForm, { UpdateTicketValues } from './TicketUpdateForm';
 import TicketCloseForm, { CloseTicketValues } from './TicketCloseForm';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 interface TicketDetailViewProps {
   ticket: Ticket;
@@ -17,8 +21,14 @@ interface TicketDetailViewProps {
   onUpdate: (data: UpdateTicketValues) => void;
   onClose: (data: CloseTicketValues) => void;
   onAddNote?: (note: string) => void;
-  onReopen?: () => void;
+  onReopen?: (reason: string) => void;
 }
+
+const reopenFormSchema = z.object({
+  reason: z.string().min(5, { message: "Reason must be at least 5 characters" }),
+});
+
+type ReopenFormValues = z.infer<typeof reopenFormSchema>;
 
 const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   ticket,
@@ -30,6 +40,14 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
 }) => {
   const [note, setNote] = useState('');
   const [activeTab, setActiveTab] = useState('details');
+  const [isReopenDialogOpen, setIsReopenDialogOpen] = useState(false);
+
+  const reopenForm = useForm<ReopenFormValues>({
+    resolver: zodResolver(reopenFormSchema),
+    defaultValues: {
+      reason: "",
+    },
+  });
 
   const handleUpdateSubmit = (data: UpdateTicketValues) => {
     onUpdate(data);
@@ -48,10 +66,18 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
     }
   };
 
+  const handleReopenSubmit = (data: ReopenFormValues) => {
+    if (onReopen) {
+      onReopen(data.reason);
+      setIsReopenDialogOpen(false);
+      reopenForm.reset();
+    }
+  };
+
   // Service request specific states
   const isServiceRequest = type === 'service';
   const isResolved = ['resolved', 'closed', 'fulfilled'].includes(ticket.status);
-  const canReopen = ticket.status === (isServiceRequest ? 'fulfilled' : 'resolved');
+  const canReopen = ticket.status === (isServiceRequest ? 'fulfilled' : 'resolved') || ticket.status === 'closed';
   const resolveTabLabel = isServiceRequest ? 'fulfill' : 'resolve';
   const resolveButtonLabel = isServiceRequest ? 'Fulfill Request' : 'Resolve';
 
@@ -69,15 +95,26 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
             <h2 className="text-xl font-bold">{ticket.title}</h2>
             <p className="text-sm text-muted-foreground">{ticket.id}</p>
           </div>
-          {!isResolved && (
-            <Button 
-              variant="destructive" 
-              onClick={() => setActiveTab(resolveTabLabel)}
-            >
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              {isServiceRequest ? 'Fulfill' : 'Resolve'}
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {canReopen && (
+              <Button 
+                variant="outline" 
+                onClick={() => setIsReopenDialogOpen(true)}
+              >
+                <RefreshCcw className="h-4 w-4 mr-2" />
+                Reopen
+              </Button>
+            )}
+            {!isResolved && (
+              <Button 
+                variant="destructive" 
+                onClick={() => setActiveTab(resolveTabLabel)}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                {resolveButtonLabel}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -102,7 +139,7 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
             <TicketDetails 
               ticket={ticket} 
               type={type} 
-              onReopen={canReopen ? onReopen : undefined} 
+              onReopen={() => setIsReopenDialogOpen(true)} 
             />
           </TabsContent>
           
@@ -164,6 +201,51 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
           )}
         </div>
       </Tabs>
+
+      {/* Reopen Dialog */}
+      <Dialog open={isReopenDialogOpen} onOpenChange={setIsReopenDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reopen {isServiceRequest ? 'Service Request' : 'Incident'}</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for reopening this {isServiceRequest ? 'service request' : 'incident'}.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...reopenForm}>
+            <form onSubmit={reopenForm.handleSubmit(handleReopenSubmit)} className="space-y-4">
+              <FormField
+                control={reopenForm.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reopen Reason</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enter reason for reopening..." 
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsReopenDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Reopen</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
