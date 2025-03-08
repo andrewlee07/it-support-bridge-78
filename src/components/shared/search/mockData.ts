@@ -68,3 +68,16 @@ export const mockSearchResults: SearchResult[] = [
     priority: 'medium'
   }
 ];
+
+// Mock search function that filters results based on query
+export const mockSearch = async (query: string): Promise<SearchResult[]> => {
+  const lowerCaseQuery = query.toLowerCase();
+  
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  return mockSearchResults.filter(result => 
+    result.title.toLowerCase().includes(lowerCaseQuery) || 
+    (result.description && result.description.toLowerCase().includes(lowerCaseQuery))
+  );
+};
