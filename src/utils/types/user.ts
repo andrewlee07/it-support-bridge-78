@@ -8,9 +8,9 @@ export interface User {
   email: string;
   role: UserRole;
   department: string;
-  title?: string; // Make optional to accommodate both formats
-  active?: boolean; // Make optional
-  lastActive?: Date; // Make optional
-  createdAt?: Date; // Make optional to accommodate existing mockUsers
+  title?: string;
+  active?: boolean;
+  lastActive?: Date;
+  createdAt?: Date;
   lastLogin?: Date;
 }

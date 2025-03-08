@@ -33,7 +33,7 @@ const WatchersList: React.FC<WatchersListProps> = ({
   // Get the users from watchers IDs and ensure they're compatible with User type
   const watchers = watcherIds
     .map(id => getUserById(id))
-    .filter((user): user is User => user !== undefined); // Type predicate to ensure non-undefined values
+    .filter((user): user is User => user !== undefined); // Fixed type predicate to just check for undefined
   
   // Only show users that aren't already watchers
   const nonWatchingUsers = availableUsers.filter(

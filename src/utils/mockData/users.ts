@@ -1,7 +1,7 @@
 
 import { User, UserRole } from '../types/user';
 
-export const mockUsers = [
+export const mockUsers: User[] = [
   {
     id: 'user-1',
     name: 'John Doe',
@@ -59,11 +59,11 @@ export const mockUsers = [
   }
 ];
 
-export const getUserById = (userId: string) => {
+export const getUserById = (userId: string): User | undefined => {
   return mockUsers.find(user => user.id === userId);
 };
 
 // Add the missing getAllUsers function
-export const getAllUsers = () => {
+export const getAllUsers = (): User[] => {
   return [...mockUsers];
 };
