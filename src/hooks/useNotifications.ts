@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { notificationApi } from '@/utils/api/notificationApi';
 import { NotificationTemplate, WebhookConfig, NotificationLog, EventType } from '@/utils/types/notification';
@@ -180,17 +181,11 @@ export const useWebhookConfigurations = () => {
   const testWebhook = useCallback(async (webhookData: { url: string; authType: string; authCredentials?: string }) => {
     try {
       const response = await notificationApi.testWebhook(webhookData);
-      if (response.success && response.data) {
-        toast.success('Webhook test successful');
-        return true;
-      } else {
-        toast.error(response.message || 'Webhook test failed');
-        return false;
-      }
+      return response;
     } catch (error) {
       console.error('Error testing webhook:', error);
       toast.error('An error occurred while testing webhook');
-      return false;
+      throw error;
     }
   }, []);
 
@@ -266,7 +261,7 @@ export const useNotificationSystemHealth = () => {
   const [healthData, setHealthData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchHealthData = useCallback(async () => {
+  const refreshHealthData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await notificationApi.getSystemHealth();
@@ -284,16 +279,16 @@ export const useNotificationSystemHealth = () => {
   }, []);
 
   useEffect(() => {
-    fetchHealthData();
+    refreshHealthData();
     // Set up polling for health data (every 30 seconds)
-    const intervalId = setInterval(fetchHealthData, 30000);
+    const intervalId = setInterval(refreshHealthData, 30000);
     return () => clearInterval(intervalId);
-  }, [fetchHealthData]);
+  }, [refreshHealthData]);
 
   return {
     healthData,
     loading,
-    refreshHealthData: fetchHealthData
+    refreshHealthData
   };
 };
 

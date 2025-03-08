@@ -11,22 +11,22 @@ interface NotificationSystemHealthProps {
 }
 
 const NotificationSystemHealth: React.FC<NotificationSystemHealthProps> = ({ className }) => {
-  const { health, loading, fetchSystemHealth } = useNotificationSystem();
+  const { healthData, loading, refreshHealthData } = useNotificationSystem();
 
   useEffect(() => {
-    fetchSystemHealth();
+    refreshHealthData();
     // Set up polling every 30 seconds
     const interval = setInterval(() => {
-      fetchSystemHealth();
+      refreshHealthData();
     }, 30000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [fetchSystemHealth]);
+  }, [refreshHealthData]);
 
   const getStatusBadge = () => {
-    switch (health.status) {
+    switch (healthData?.status) {
       case 'operational':
         return (
           <Badge variant="success" className="text-xs">
@@ -77,16 +77,16 @@ const NotificationSystemHealth: React.FC<NotificationSystemHealthProps> = ({ cla
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm">Success Rate</span>
                   <span className="text-sm font-semibold">
-                    {health.metrics.successRate.toFixed(1)}%
+                    {healthData?.metrics.successRate.toFixed(1)}%
                   </span>
                 </div>
                 <Progress
-                  value={health.metrics.successRate}
+                  value={healthData?.metrics.successRate}
                   className="h-2"
                   indicatorColor={
-                    health.metrics.successRate > 98
+                    healthData?.metrics.successRate > 98
                       ? 'bg-emerald-500'
-                      : health.metrics.successRate > 90
+                      : healthData?.metrics.successRate > 90
                       ? 'bg-amber-500'
                       : 'bg-red-500'
                   }
@@ -99,13 +99,13 @@ const NotificationSystemHealth: React.FC<NotificationSystemHealthProps> = ({ cla
                     Total Notifications (24h)
                   </div>
                   <div className="text-2xl font-semibold">
-                    {health.metrics.totalNotifications}
+                    {healthData?.metrics.totalNotifications}
                   </div>
                 </div>
                 <div className="bg-muted/30 rounded-md p-3">
                   <div className="text-sm text-muted-foreground">Processing Time</div>
                   <div className="text-2xl font-semibold">
-                    {formatTime(health.metrics.processingTime)}
+                    {healthData?.metrics.processingTime ? formatTime(healthData.metrics.processingTime) : '-'}
                   </div>
                 </div>
               </div>
@@ -114,22 +114,22 @@ const NotificationSystemHealth: React.FC<NotificationSystemHealthProps> = ({ cla
                 <div className="text-sm text-muted-foreground mb-1">Current Queue</div>
                 <div className="flex justify-between items-center">
                   <div className="text-2xl font-semibold">
-                    {health.metrics.queueSize} messages
+                    {healthData?.metrics.queueSize} messages
                   </div>
                   <Badge
-                    variant={health.metrics.queueSize > 20 ? 'warning' : 'success'}
+                    variant={healthData?.metrics.queueSize > 20 ? 'warning' : 'success'}
                     className="text-xs"
                   >
-                    {health.metrics.queueSize > 20 ? 'High' : 'Normal'}
+                    {healthData?.metrics.queueSize > 20 ? 'High' : 'Normal'}
                   </Badge>
                 </div>
               </div>
 
-              {health.errors.length > 0 && (
+              {healthData?.errors && healthData.errors.length > 0 && (
                 <div>
                   <h3 className="font-medium mb-2">Recent Errors</h3>
                   <div className="space-y-2">
-                    {health.errors.map((error, index) => (
+                    {healthData.errors.map((error, index) => (
                       <div
                         key={index}
                         className="bg-destructive/10 text-destructive text-sm p-2 rounded-md flex justify-between items-center"
@@ -143,7 +143,7 @@ const NotificationSystemHealth: React.FC<NotificationSystemHealthProps> = ({ cla
               )}
 
               <div className="flex justify-end">
-                <Button variant="outline" size="sm" onClick={() => fetchSystemHealth()}>
+                <Button variant="outline" size="sm" onClick={refreshHealthData}>
                   Refresh
                 </Button>
               </div>
