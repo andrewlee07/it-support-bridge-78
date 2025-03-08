@@ -1,100 +1,116 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Sliders, Database, AlertTriangle } from 'lucide-react';
-import { ConfigurableEntityType } from '@/utils/types/configuration';
-
-// Import relevant configuration components
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DropdownConfigList from '@/components/settings/dropdowns/DropdownConfigList';
-import RiskAssessmentQuestionForm from '@/components/settings/risk/RiskAssessmentQuestionForm';
-import SLAList from '@/components/sla/SLAList';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigForm';
+import OptionsList from '@/components/settings/dropdowns/OptionsList';
+import { ConfigurableEntityType } from '@/utils/types';
+import { useQuery } from '@tanstack/react-query';
+import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
 
-type ConfigurationSettingsProps = {
-  entityType: ConfigurableEntityType | 'backlog' | 'release';
-};
+const ConfigurationSettings = () => {
+  const [activeTab, setActiveTab] = useState<ConfigurableEntityType>('ticket');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
 
-const ConfigurationSettings = ({ entityType }: ConfigurationSettingsProps) => {
-  const [currentTab, setCurrentTab] = useState('dropdown-fields');
-  
-  const getEntityTitle = () => {
-    switch (entityType) {
-      case 'incident': return 'Incident Management';
-      case 'service-request': return 'Service Request Management';
-      case 'change': return 'Change Management';
-      case 'asset': return 'Asset Management';
-      case 'backlog': return 'Backlog Management';
-      case 'release': return 'Release Management';
-      default: return 'Process Configuration';
-    }
+  // Fetch dropdown configurations based on active tab
+  const { data: configurations, isLoading } = useQuery({
+    queryKey: ['dropdownConfigurations', activeTab],
+    queryFn: () => dropdownConfigurationApi.getDropdownConfigurationsByEntity(activeTab),
+  });
+
+  const handleAddNew = () => {
+    setSelectedConfigId(null);
+    setIsFormOpen(true);
   };
 
-  // Only show risk assessment for change management
-  const showRiskAssessment = entityType === 'change';
-  
-  // Only show SLAs for incident and service request
-  const showSLA = entityType === 'incident' || entityType === 'service-request';
+  const handleSelectConfig = (id: string) => {
+    setSelectedConfigId(id);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+  };
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center space-x-2">
-            <Settings className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>{getEntityTitle()} Configuration</CardTitle>
-          </div>
-          <CardDescription>
-            Configure settings specific to {getEntityTitle().toLowerCase()}
-          </CardDescription>
+          <CardTitle>Field Configurations</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs 
-            value={currentTab} 
-            onValueChange={setCurrentTab}
-            className="w-full"
-          >
-            <TabsList className="mb-4">
-              <TabsTrigger value="dropdown-fields">
-                <Database className="h-4 w-4 mr-2" />
-                Field Configurations
-              </TabsTrigger>
-              
-              {showSLA && (
-                <TabsTrigger value="sla">
-                  <Sliders className="h-4 w-4 mr-2" />
-                  SLA Configuration
-                </TabsTrigger>
-              )}
-              
-              {showRiskAssessment && (
-                <TabsTrigger value="risk">
-                  <AlertTriangle className="h-4 w-4 mr-2" />
-                  Risk Assessment
-                </TabsTrigger>
-              )}
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ConfigurableEntityType)}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="ticket">Tickets</TabsTrigger>
+              <TabsTrigger value="asset">Assets</TabsTrigger>
+              <TabsTrigger value="change">Changes</TabsTrigger>
+              <TabsTrigger value="user">Users</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="dropdown-fields">
-              <DropdownConfigList entityType={entityType as ConfigurableEntityType} />
-            </TabsContent>
-            
-            {showSLA && (
-              <TabsContent value="sla">
-                <SLAList entityType={entityType} />
-              </TabsContent>
-            )}
-            
-            {showRiskAssessment && (
-              <TabsContent value="risk">
-                <RiskAssessmentQuestionForm 
-                  onSubmit={() => {}} 
-                  onCancel={() => {}}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+              <TabsContent value="ticket" className="mt-0">
+                <DropdownConfigList 
+                  entityType="ticket" 
+                  configurations={configurations?.data}
+                  isLoading={isLoading}
+                  onAddNew={handleAddNew}
+                  onSelectConfig={handleSelectConfig}
+                  selectedConfigId={selectedConfigId}
                 />
               </TabsContent>
-            )}
+              <TabsContent value="asset" className="mt-0">
+                <DropdownConfigList 
+                  entityType="asset" 
+                  configurations={configurations?.data}
+                  isLoading={isLoading}
+                  onAddNew={handleAddNew}
+                  onSelectConfig={handleSelectConfig}
+                  selectedConfigId={selectedConfigId}
+                />
+              </TabsContent>
+              <TabsContent value="change" className="mt-0">
+                <DropdownConfigList 
+                  entityType="change" 
+                  configurations={configurations?.data}
+                  isLoading={isLoading}
+                  onAddNew={handleAddNew}
+                  onSelectConfig={handleSelectConfig}
+                  selectedConfigId={selectedConfigId}
+                />
+              </TabsContent>
+              <TabsContent value="user" className="mt-0">
+                <DropdownConfigList 
+                  entityType="user" 
+                  configurations={configurations?.data}
+                  isLoading={isLoading}
+                  onAddNew={handleAddNew}
+                  onSelectConfig={handleSelectConfig}
+                  selectedConfigId={selectedConfigId}
+                />
+              </TabsContent>
+              
+              {selectedConfigId && (
+                <div className="col-span-1 md:col-span-2">
+                  <OptionsList 
+                    configId={selectedConfigId} 
+                    entityType={activeTab} 
+                  />
+                </div>
+              )}
+            </div>
           </Tabs>
         </CardContent>
       </Card>
+
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DropdownConfigForm 
+            onClose={handleCloseForm} 
+            entityType={activeTab} 
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { slaApi } from "@/utils/api/slaApi";
 
-type SLAListProps = {
+export type SLAListProps = {
   entityType?: string;
   showActive?: boolean;
 };
@@ -22,10 +23,12 @@ const SLAList = ({ entityType, showActive }: SLAListProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Fetch SLAs
-  const { data: slas = [], isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['slas'],
     queryFn: () => slaApi.getAllSLAs()
   });
+
+  const slas = data?.data || [];
 
   const openCreateModal = () => {
     setSelectedSLA(null);
