@@ -18,8 +18,8 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useWebhooks } from '@/hooks/useNotifications';
-import { WebhookConfig } from '@/utils/types/notification';
-import { toast } from '@/hooks/use-toast';
+import { WebhookConfig, EventType } from '@/utils/types/notification';
+import { useToast } from '@/hooks/use-toast';
 
 const eventTypes = [
   { id: 'incident-created', label: 'Incident Created' },
@@ -41,6 +41,8 @@ const webhookSchema = z.object({
   retryInterval: z.number().int().min(1).max(60),
 });
 
+type FormValues = z.infer<typeof webhookSchema>;
+
 interface WebhookConfigFormProps {
   webhook?: WebhookConfig;
   onClose: () => void;
@@ -50,16 +52,17 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({ webhook, onClose 
   const [loading, setLoading] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const { createWebhook, updateWebhook, testWebhook } = useWebhooks();
+  const { toast } = useToast();
   const isEditing = !!webhook;
 
   // Initialize form with webhook data or defaults
-  const form = useForm<z.infer<typeof webhookSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(webhookSchema),
     defaultValues: {
       name: webhook?.name || '',
       url: webhook?.url || '',
       isActive: webhook?.isActive !== undefined ? webhook.isActive : true,
-      eventTypes: webhook?.eventTypes || [],
+      eventTypes: webhook?.eventTypes.map(et => et) || [],
       authType: webhook?.authType || 'none',
       authCredentials: webhook?.authCredentials || '',
       retryCount: webhook?.retryCount || 3,
@@ -67,26 +70,31 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({ webhook, onClose 
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof webhookSchema>) => {
+  const onSubmit = async (data: FormValues) => {
     try {
       setLoading(true);
+      
+      // Cast the eventTypes to EventType[]
+      const webhookData = {
+        name: data.name,
+        url: data.url,
+        isActive: data.isActive,
+        eventTypes: data.eventTypes as EventType[],
+        authType: data.authType,
+        authCredentials: data.authCredentials,
+        retryCount: data.retryCount,
+        retryInterval: data.retryInterval,
+      };
+      
       if (isEditing && webhook) {
-        await updateWebhook(webhook.id, data);
+        await updateWebhook(webhook.id, webhookData);
       } else {
-        await createWebhook(data);
+        await createWebhook(webhookData);
       }
       onClose();
-      toast({
-        title: `Webhook ${isEditing ? 'updated' : 'created'} successfully`,
-        description: `The webhook ${data.name} has been ${isEditing ? 'updated' : 'created'}.`,
-      });
     } catch (error) {
       console.error('Error saving webhook:', error);
-      toast({
-        variant: "destructive",
-        title: "Error saving webhook",
-        description: "An unexpected error occurred. Please try again.",
-      });
+      // Error handling is done in the hooks
     } finally {
       setLoading(false);
     }

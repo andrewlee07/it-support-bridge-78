@@ -1,5 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -8,201 +11,180 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useNotificationLogs } from '@/hooks/useNotifications';
-import { formatDistanceToNow } from 'date-fns';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog';
-import { Eye, RefreshCw } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { NotificationLog } from '@/utils/types/notification';
+import { useNotificationLogs } from '@/hooks/useNotifications';
 
-const NotificationLogsList: React.FC = () => {
-  const { logs, loading, error, refreshLogs, retryNotification } = useNotificationLogs();
-  const [selectedLog, setSelectedLog] = useState<any | null>(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+interface NotificationLogsListProps {
+  className?: string;
+}
 
-  const handleViewDetails = (log: any) => {
-    setSelectedLog(log);
-    setDetailsOpen(true);
-  };
+const NotificationLogsList: React.FC<NotificationLogsListProps> = ({ className }) => {
+  const { logs, loading, fetchLogs, retryNotification } = useNotificationLogs();
+  const [selectedLog, setSelectedLog] = useState<NotificationLog | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
 
-  const handleRetry = async (id: string) => {
-    await retryNotification(id);
-    setDetailsOpen(false);
-  };
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
-  // Helper function to get status badge
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'sent':
-        return <Badge variant="success">Sent</Badge>;
-      case 'queued':
-        return <Badge variant="secondary">Queued</Badge>;
-      case 'processing':
-        return <Badge variant="secondary">Processing</Badge>;
+        return <Badge variant="success">{status}</Badge>;
       case 'failed':
-        return <Badge variant="destructive">Failed</Badge>;
+        return <Badge variant="destructive">{status}</Badge>;
       case 'retrying':
-        return <Badge variant="warning">Retrying</Badge>;
+      case 'queued':
+        return <Badge variant="warning">{status}</Badge>;
       default:
-        if (status.startsWith('Retrying')) {
-          return <Badge variant="warning">{status}</Badge>;
-        }
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge>{status}</Badge>;
     }
   };
 
-  if (error) {
-    return (
-      <div className="bg-destructive/10 p-4 rounded-md text-destructive">
-        Error loading notification logs: {error}
-        <Button
-          variant="outline"
-          size="sm"
-          className="ml-2"
-          onClick={refreshLogs}
-        >
-          <RefreshCw className="h-4 w-4 mr-2" /> Retry
-        </Button>
-      </div>
-    );
-  }
+  const handleViewDetail = (log: NotificationLog) => {
+    setSelectedLog(log);
+    setIsDetailOpen(true);
+  };
+
+  const handleRetry = async () => {
+    if (!selectedLog) return;
+    
+    setIsRetrying(true);
+    try {
+      await retryNotification(selectedLog.id);
+      await fetchLogs();
+      setIsDetailOpen(false);
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return format(new Date(date), 'MMM dd, yyyy HH:mm:ss');
+  };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Notification Logs</h2>
-        <Button variant="outline" size="sm" onClick={refreshLogs}>
-          <RefreshCw className="h-4 w-4 mr-2" /> Refresh
-        </Button>
-      </div>
+    <div className={className}>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl">Notification Logs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="py-4 text-center">Loading logs...</div>
+          ) : logs.length === 0 ? (
+            <div className="py-4 text-center text-muted-foreground">
+              No notification logs found
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Time</TableHead>
+                    <TableHead>Event</TableHead>
+                    <TableHead>Recipient</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {logs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="font-medium">
+                        {formatDate(log.timestamp)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{log.eventType}</Badge>
+                      </TableCell>
+                      <TableCell>{log.recipientEmail}</TableCell>
+                      <TableCell>{getStatusBadge(log.status)}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewDetail(log)}
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      {loading ? (
-        <div className="space-y-2">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-      ) : logs.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          No notification logs found
-        </div>
-      ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Time</TableHead>
-                <TableHead>Event Type</TableHead>
-                <TableHead>Recipient</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {logs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell className="font-mono text-xs">
-                    {format(new Date(log.timestamp), 'MM/dd HH:mm:ss')}
-                  </TableCell>
-                  <TableCell>{log.eventType}</TableCell>
-                  <TableCell className="truncate max-w-[200px]">
-                    {log.recipientEmail}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(log.status)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleViewDetails(log)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-
-      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Notification Details</DialogTitle>
-            <DialogDescription>
-              Detailed information about this notification
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedLog && (
+      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+        {selectedLog && (
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Notification Details</DialogTitle>
+            </DialogHeader>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="font-medium">Event Type:</div>
+              <div>
+                <div className="text-sm text-muted-foreground">Event Type</div>
                 <div>{selectedLog.eventType}</div>
-
-                <div className="font-medium">Time:</div>
-                <div>
-                  {format(
-                    new Date(selectedLog.timestamp),
-                    'yyyy-MM-dd HH:mm:ss'
-                  )}
-                </div>
-
-                <div className="font-medium">Recipient:</div>
-                <div>{selectedLog.recipientEmail}</div>
-
-                <div className="font-medium">Status:</div>
-                <div>{getStatusBadge(selectedLog.status)}</div>
-
-                <div className="font-medium">Channel:</div>
-                <div className="capitalize">{selectedLog.channel}</div>
-
-                <div className="font-medium">Record:</div>
-                <div>{selectedLog.recordId}</div>
               </div>
-
+              <div>
+                <div className="text-sm text-muted-foreground">Time</div>
+                <div>{formatDate(selectedLog.timestamp)}</div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Recipient</div>
+                <div>{selectedLog.recipientEmail}</div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Status</div>
+                <div>{getStatusBadge(selectedLog.status)}</div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Channel</div>
+                <div className="capitalize">{selectedLog.channel}</div>
+              </div>
               {selectedLog.error && (
-                <div className="mt-4">
-                  <div className="font-medium">Error:</div>
-                  <div className="text-destructive bg-destructive/10 p-2 rounded text-sm mt-1">
-                    {selectedLog.error}
-                  </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">Error</div>
+                  <div className="text-destructive text-sm">{selectedLog.error}</div>
                 </div>
               )}
-
-              {selectedLog.retryCount > 0 && (
-                <div className="text-sm">
-                  Retry {selectedLog.retryCount} of 3
+              {selectedLog.retryCount !== undefined && (
+                <div>
+                  <div className="text-sm text-muted-foreground">Retry Count</div>
+                  <div>{selectedLog.retryCount}</div>
                 </div>
               )}
             </div>
-          )}
-
-          <DialogFooter>
-            {selectedLog && selectedLog.status === 'failed' && (
+            <DialogFooter>
+              {selectedLog.status === 'failed' && (
+                <Button
+                  onClick={handleRetry}
+                  disabled={isRetrying}
+                  className="mr-auto"
+                >
+                  {isRetrying ? 'Retrying...' : 'Retry Now'}
+                </Button>
+              )}
               <Button
-                onClick={() => handleRetry(selectedLog.id)}
-                variant="default"
+                variant="outline"
+                onClick={() => setIsDetailOpen(false)}
               >
-                Retry Now
+                Close
               </Button>
-            )}
-            <DialogClose asChild>
-              <Button variant="outline">Close</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
     </div>
   );

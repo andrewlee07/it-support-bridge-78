@@ -1,299 +1,267 @@
 
+import { ApiResponse } from '../types/api';
 import { 
   NotificationTemplate, 
-  NotificationLog, 
   WebhookConfig, 
-  NotificationRule,
-  EventType
-} from '@/utils/types/notification';
-import { mockEmailTemplates } from '@/utils/mockData/emailTemplates';
+  NotificationLog, 
+  EventType 
+} from '../types/notification';
+import { EmailTemplate } from '../types/email';
+import { emailNotificationApi } from './emailNotificationApi';
+import { simulateApiResponse } from '../mockData/apiHelpers';
 
-// Mock templates data
-const mockTemplates: NotificationTemplate[] = mockEmailTemplates.map(template => ({
-  id: template.id,
-  name: template.name,
-  eventType: template.triggerOn as EventType, // Map triggerOn to eventType
-  subject: template.subject,
-  body: template.body,
-  isActive: template.isActive,
-  lastModified: new Date(),
-  lastModifiedBy: 'admin@example.com',
-}));
+// Mock data for the API
+const mockWebhooks: WebhookConfig[] = [
+  {
+    id: 'webhook-1',
+    name: 'Slack Integration',
+    url: 'https://hooks.slack.com/services/T00000/B00000/XXXX',
+    eventTypes: ['incident-created', 'incident-resolved'] as EventType[],
+    authType: 'token',
+    authCredentials: 'xoxb-123456789',
+    isActive: true,
+    retryCount: 3,
+    retryInterval: 5
+  },
+  {
+    id: 'webhook-2',
+    name: 'External System',
+    url: 'https://api.external-system.com/webhooks/itsm',
+    eventTypes: ['incident-created', 'incident-assigned', 'incident-resolved', 'service-request-completed'] as EventType[],
+    authType: 'basic',
+    authCredentials: 'user:password',
+    isActive: false,
+    retryCount: 5,
+    retryInterval: 10
+  }
+];
 
-// Mock notification logs
 const mockLogs: NotificationLog[] = [
   {
     id: 'log-1',
-    eventType: 'incident-created',
+    eventType: 'incident-created' as EventType,
     recipientId: 'user-1',
     recipientEmail: 'john@example.com',
     channel: 'email',
     status: 'sent',
-    timestamp: new Date(Date.now() - 900000), // 15 minutes ago
-    templateId: 'email-1',
-    recordId: 'INC00001',
+    timestamp: new Date(Date.now() - 3600000), // 1 hour ago
+    templateId: 'template-1',
+    recordId: 'INC00001'
   },
   {
     id: 'log-2',
-    eventType: 'incident-assigned',
+    eventType: 'incident-assigned' as EventType,
     recipientId: 'user-2',
     recipientEmail: 'jane@example.com',
     channel: 'email',
     status: 'sent',
     timestamp: new Date(Date.now() - 1800000), // 30 minutes ago
-    templateId: 'email-2',
-    recordId: 'INC00002',
+    templateId: 'template-2',
+    recordId: 'INC00001'
   },
   {
     id: 'log-3',
-    eventType: 'service-request-approval-required',
+    eventType: 'service-request-approval-required' as EventType,
     recipientId: 'user-3',
-    recipientEmail: 'mike@example.com',
+    recipientEmail: 'manager@example.com',
     channel: 'email',
     status: 'failed',
-    timestamp: new Date(Date.now() - 3600000), // 1 hour ago
-    error: 'SMTP connection error',
-    retryCount: 2,
-    templateId: 'email-3',
+    timestamp: new Date(Date.now() - 900000), // 15 minutes ago
+    error: 'SMTP connection timeout',
+    templateId: 'template-3',
     recordId: 'SR00001',
-  },
-  {
-    id: 'log-4',
-    eventType: 'incident-resolved',
-    recipientId: 'user-1',
-    recipientEmail: 'john@example.com',
-    channel: 'webhook',
-    status: 'sent',
-    timestamp: new Date(Date.now() - 7200000), // 2 hours ago
-    templateId: 'email-1',
-    recordId: 'INC00001',
-  },
+    retryCount: 1
+  }
 ];
 
-// Mock webhooks
-const mockWebhooks: WebhookConfig[] = [
-  {
-    id: 'webhook-1',
-    name: 'Slack Notifications',
-    url: 'https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/XXXXXXXXXX',
-    eventTypes: ['incident-created', 'incident-resolved'],
-    authType: 'token',
-    authCredentials: 'xoxb-xxxxxxxxxxxx-xxxxxxxxxxxx-xxxxxxxxxxxx',
-    isActive: true,
-    retryCount: 3,
-    retryInterval: 5,
+// Mock system health data
+const mockSystemHealth = {
+  status: 'operational' as 'operational' | 'degraded' | 'down',
+  metrics: {
+    totalNotifications: 328,
+    successRate: 99.1,
+    queueSize: 5,
+    processingTime: 1200 // in milliseconds
   },
-  {
-    id: 'webhook-2',
-    name: 'External Service',
-    url: 'https://api.external-service.com/webhooks',
-    eventTypes: ['incident-created', 'incident-assigned', 'incident-resolved'],
-    authType: 'basic',
-    authCredentials: 'username:password',
-    isActive: false,
-    retryCount: 2,
-    retryInterval: 10,
-  },
-];
-
-// Mock notification rules
-const mockRules: NotificationRule[] = [
-  {
-    id: 'rule-1',
-    eventType: 'incident-created',
-    recipients: ['requester', 'manager'],
-    isActive: true,
-  },
-  {
-    id: 'rule-2',
-    eventType: 'incident-assigned',
-    recipients: ['assignee'],
-    isActive: true,
-  },
-  {
-    id: 'rule-3',
-    eventType: 'incident-resolved',
-    recipients: ['requester'],
-    isActive: true,
-  },
-  {
-    id: 'rule-4',
-    eventType: 'service-request-approval-required',
-    recipients: ['manager'],
-    isActive: true,
-  },
-];
-
-// API functions for notification templates
-export const fetchNotificationTemplates = async (): Promise<NotificationTemplate[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return [...mockTemplates];
+  errors: [
+    {
+      time: new Date(),
+      type: 'SMTP Connection Error',
+      count: 3
+    }
+  ]
 };
 
-export const fetchNotificationTemplateById = async (id: string): Promise<NotificationTemplate | null> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  const template = mockTemplates.find(t => t.id === id);
-  return template || null;
-};
+// Notification API service
+export const notificationApi = {
+  // Convert EmailTemplate to NotificationTemplate
+  mapEmailToNotificationTemplate: (emailTemplate: EmailTemplate): NotificationTemplate => {
+    return {
+      id: emailTemplate.id,
+      name: emailTemplate.name,
+      eventType: emailTemplate.triggerOn as unknown as EventType, // Map triggerOn to eventType
+      subject: emailTemplate.subject,
+      body: emailTemplate.body,
+      isActive: emailTemplate.isActive,
+      lastModified: new Date(),
+      lastModifiedBy: 'admin@example.com'
+    };
+  },
 
-export const createNotificationTemplate = async (template: Omit<NotificationTemplate, 'id' | 'lastModified' | 'lastModifiedBy'>): Promise<NotificationTemplate> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const newTemplate: NotificationTemplate = {
-    id: `template-${Date.now()}`,
-    ...template,
-    lastModified: new Date(),
-    lastModifiedBy: 'admin@example.com',
-  };
-  mockTemplates.push(newTemplate);
-  return newTemplate;
-};
-
-export const updateNotificationTemplate = async (id: string, template: Partial<NotificationTemplate>): Promise<NotificationTemplate> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const index = mockTemplates.findIndex(t => t.id === id);
-  if (index === -1) {
-    throw new Error('Template not found');
-  }
+  // Get all notification templates
+  getNotificationTemplates: async (): Promise<ApiResponse<NotificationTemplate[]>> => {
+    const emailTemplatesResponse = await emailNotificationApi.getEmailTemplates();
+    
+    if (!emailTemplatesResponse.success) {
+      return emailTemplatesResponse as ApiResponse<NotificationTemplate[]>;
+    }
+    
+    const notificationTemplates = emailTemplatesResponse.data.map(
+      template => notificationApi.mapEmailToNotificationTemplate(template)
+    );
+    
+    return simulateApiResponse(notificationTemplates);
+  },
   
-  const updatedTemplate = {
-    ...mockTemplates[index],
-    ...template,
-    lastModified: new Date(),
-    lastModifiedBy: 'admin@example.com',
-  };
-  mockTemplates[index] = updatedTemplate;
-  return updatedTemplate;
-};
-
-export const deleteNotificationTemplate = async (id: string): Promise<void> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const index = mockTemplates.findIndex(t => t.id === id);
-  if (index !== -1) {
-    mockTemplates.splice(index, 1);
-  }
-};
-
-// API functions for notification logs
-export const fetchNotificationLogs = async (): Promise<NotificationLog[]> => {
-  await new Promise(resolve => setTimeout(resolve, 700));
-  return [...mockLogs];
-};
-
-export const retryNotification = async (id: string): Promise<NotificationLog> => {
-  await new Promise(resolve => setTimeout(resolve, 800));
-  const index = mockLogs.findIndex(log => log.id === id);
-  if (index === -1) {
-    throw new Error('Log not found');
-  }
+  // Update a notification template
+  updateNotificationTemplate: async (
+    id: string, 
+    updates: Partial<NotificationTemplate>
+  ): Promise<ApiResponse<NotificationTemplate>> => {
+    // Convert NotificationTemplate updates to EmailTemplate updates
+    const emailUpdates: Partial<EmailTemplate> = {
+      ...updates,
+      triggerOn: updates.eventType as any // Map eventType back to triggerOn
+    };
+    
+    delete (emailUpdates as any).eventType; // Remove eventType as it's not in EmailTemplate
+    
+    const response = await emailNotificationApi.updateEmailTemplate(id, emailUpdates);
+    
+    if (!response.success) {
+      return response as ApiResponse<NotificationTemplate>;
+    }
+    
+    return simulateApiResponse(notificationApi.mapEmailToNotificationTemplate(response.data));
+  },
   
-  // Simulate retry
-  mockLogs[index] = {
-    ...mockLogs[index],
-    status: 'queued',
-    retryCount: (mockLogs[index].retryCount || 0) + 1,
-  };
+  // Create a new notification template
+  createNotificationTemplate: async (
+    template: Omit<NotificationTemplate, 'id' | 'lastModified' | 'lastModifiedBy'>
+  ): Promise<ApiResponse<NotificationTemplate>> => {
+    // Convert NotificationTemplate to EmailTemplate
+    const emailTemplate: Omit<EmailTemplate, 'id'> = {
+      name: template.name,
+      subject: template.subject,
+      body: template.body,
+      triggerOn: template.eventType as any, // Map eventType to triggerOn
+      isActive: template.isActive
+    };
+    
+    const response = await emailNotificationApi.createEmailTemplate(emailTemplate);
+    
+    if (!response.success) {
+      return response as ApiResponse<NotificationTemplate>;
+    }
+    
+    return simulateApiResponse(notificationApi.mapEmailToNotificationTemplate(response.data));
+  },
   
-  return mockLogs[index];
-};
-
-// API functions for webhooks
-export const fetchWebhooks = async (): Promise<WebhookConfig[]> => {
-  await new Promise(resolve => setTimeout(resolve, 600));
-  return [...mockWebhooks];
-};
-
-export const fetchWebhookById = async (id: string): Promise<WebhookConfig | null> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  const webhook = mockWebhooks.find(w => w.id === id);
-  return webhook || null;
-};
-
-export const createWebhook = async (webhook: Omit<WebhookConfig, 'id'>): Promise<WebhookConfig> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const newWebhook: WebhookConfig = {
-    id: `webhook-${Date.now()}`,
-    ...webhook,
-  };
-  mockWebhooks.push(newWebhook);
-  return newWebhook;
-};
-
-export const updateWebhook = async (id: string, webhook: Partial<WebhookConfig>): Promise<WebhookConfig> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const index = mockWebhooks.findIndex(w => w.id === id);
-  if (index === -1) {
-    throw new Error('Webhook not found');
-  }
+  // Webhook-related API methods
+  getWebhookConfigurations: async (): Promise<ApiResponse<WebhookConfig[]>> => {
+    return simulateApiResponse(mockWebhooks);
+  },
   
-  const updatedWebhook = {
-    ...mockWebhooks[index],
-    ...webhook,
-  };
-  mockWebhooks[index] = updatedWebhook;
-  return updatedWebhook;
-};
-
-export const deleteWebhook = async (id: string): Promise<void> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const index = mockWebhooks.findIndex(w => w.id === id);
-  if (index !== -1) {
-    mockWebhooks.splice(index, 1);
-  }
-};
-
-export const testWebhook = async (config: { url: string; authType: string; authCredentials?: string }): Promise<{ success: boolean; message?: string }> => {
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  // Simulate a webhook test (always success for demo)
-  return {
-    success: true,
-    message: 'Webhook test successful. Server responded with 200 OK.',
-  };
-};
-
-// API functions for notification rules
-export const fetchNotificationRules = async (): Promise<NotificationRule[]> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return [...mockRules];
-};
-
-export const updateNotificationRule = async (id: string, rule: Partial<NotificationRule>): Promise<NotificationRule> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const index = mockRules.findIndex(r => r.id === id);
-  if (index === -1) {
-    throw new Error('Rule not found');
-  }
+  updateWebhookConfiguration: async (
+    id: string, 
+    updates: Partial<WebhookConfig>
+  ): Promise<ApiResponse<WebhookConfig>> => {
+    const webhookIndex = mockWebhooks.findIndex(w => w.id === id);
+    
+    if (webhookIndex === -1) {
+      return {
+        success: false,
+        message: 'Webhook configuration not found',
+        data: null
+      };
+    }
+    
+    const updatedWebhook = {
+      ...mockWebhooks[webhookIndex],
+      ...updates
+    };
+    
+    mockWebhooks[webhookIndex] = updatedWebhook;
+    
+    return simulateApiResponse(updatedWebhook);
+  },
   
-  const updatedRule = {
-    ...mockRules[index],
-    ...rule,
-  };
-  mockRules[index] = updatedRule;
-  return updatedRule;
-};
-
-// System health monitoring
-export const fetchSystemHealth = async (): Promise<any> => {
-  await new Promise(resolve => setTimeout(resolve, 800));
-  return {
-    status: 'operational', // 'operational', 'degraded', 'down'
-    metrics: {
-      totalNotifications: 1248,
-      successRate: 98.7,
-      queueSize: 3,
-      averageProcessingTime: 1.2,
-    },
-    recentErrors: [
-      {
-        timestamp: new Date(Date.now() - 3600000),
-        errorType: 'SMTP Connection Error',
-        count: 3,
-      },
-      {
-        timestamp: new Date(Date.now() - 86400000),
-        errorType: 'Webhook Timeout',
-        count: 5,
-      },
-    ],
-  };
+  createWebhookConfiguration: async (webhook: Omit<WebhookConfig, 'id'>): Promise<ApiResponse<WebhookConfig>> => {
+    const newWebhook: WebhookConfig = {
+      ...webhook,
+      id: `webhook-${mockWebhooks.length + 1}`
+    };
+    
+    mockWebhooks.push(newWebhook);
+    
+    return simulateApiResponse(newWebhook);
+  },
+  
+  testWebhook: async (webhookData: { 
+    url: string; 
+    authType: string; 
+    authCredentials?: string 
+  }): Promise<ApiResponse<boolean>> => {
+    // Simulate webhook test (80% success rate)
+    const success = Math.random() > 0.2;
+    
+    return {
+      success,
+      message: success 
+        ? 'Webhook test successful' 
+        : 'Failed to connect to webhook endpoint',
+      data: success
+    };
+  },
+  
+  // Notification logs API methods
+  getNotificationLogs: async (): Promise<ApiResponse<NotificationLog[]>> => {
+    return simulateApiResponse(mockLogs);
+  },
+  
+  retryNotification: async (id: string): Promise<ApiResponse<boolean>> => {
+    const logIndex = mockLogs.findIndex(l => l.id === id);
+    
+    if (logIndex === -1) {
+      return {
+        success: false,
+        message: 'Notification log not found',
+        data: false
+      };
+    }
+    
+    // Simulate retry (90% success rate)
+    const success = Math.random() > 0.1;
+    
+    // Update the log status
+    mockLogs[logIndex] = {
+      ...mockLogs[logIndex],
+      status: success ? 'sent' : 'failed',
+      timestamp: new Date(),
+      retryCount: (mockLogs[logIndex].retryCount || 0) + 1
+    };
+    
+    return {
+      success: true,
+      message: success 
+        ? 'Notification retry successful' 
+        : 'Notification retry queued',
+      data: true
+    };
+  },
+  
+  // System health
+  getSystemHealth: async (): Promise<ApiResponse<typeof mockSystemHealth>> => {
+    return simulateApiResponse(mockSystemHealth);
+  }
 };

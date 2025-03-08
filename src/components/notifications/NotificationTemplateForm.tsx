@@ -31,7 +31,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useNotificationTemplates } from '@/hooks/useNotifications';
-import { NotificationTemplate } from '@/utils/types/notification';
+import { NotificationTemplate, EventType } from '@/utils/types/notification';
 
 // Schema for the notification template form
 const templateSchema = z.object({
@@ -41,6 +41,8 @@ const templateSchema = z.object({
   body: z.string().min(10, { message: 'Body must be at least 10 characters.' }),
   isActive: z.boolean().default(true),
 });
+
+type FormValues = z.infer<typeof templateSchema>;
 
 interface NotificationTemplateFormProps {
   template?: NotificationTemplate;
@@ -56,7 +58,7 @@ const NotificationTemplateForm: React.FC<NotificationTemplateFormProps> = ({
   const isEditing = !!template;
 
   // Initialize form with template data or defaults
-  const form = useForm<z.infer<typeof templateSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(templateSchema),
     defaultValues: {
       name: template?.name || '',
@@ -67,17 +69,26 @@ const NotificationTemplateForm: React.FC<NotificationTemplateFormProps> = ({
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof templateSchema>) => {
+  const onSubmit = async (data: FormValues) => {
     try {
+      // Cast the form data to appropriate types
+      const templateData = {
+        name: data.name,
+        eventType: data.eventType as EventType,
+        subject: data.subject,
+        body: data.body,
+        isActive: data.isActive,
+      };
+
       if (isEditing && template) {
-        await updateTemplate(template.id, data);
+        await updateTemplate(template.id, templateData);
       } else {
-        await createTemplate(data);
+        await createTemplate(templateData);
       }
       onClose();
     } catch (error) {
       console.error('Error saving template:', error);
-      // Add error handling here
+      // Error handling is done in the hooks
     }
   };
 
