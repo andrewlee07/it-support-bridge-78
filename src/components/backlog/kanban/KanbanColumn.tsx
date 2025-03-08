@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { KanbanColumnConfig } from '@/utils/types/kanbanTypes';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface KanbanColumnProps {
   columnConfig: KanbanColumnConfig;
@@ -47,41 +48,43 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       </CardHeader>
       
       {!isCollapsed && (
-        <CardContent className="p-2 flex-grow overflow-y-auto">
+        <CardContent className="p-2 flex-grow overflow-hidden">
           <Droppable droppableId={columnConfig.statusValue}>
             {(provided, snapshot) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className={cn(
-                  "min-h-[200px] transition-colors duration-200 rounded p-1",
-                  snapshot.isDraggingOver ? "bg-muted/50" : "transparent"
-                )}
-              >
-                {items.map((item, index) => (
-                  <Draggable key={item.id} draggableId={item.id} index={index}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={cn(
-                          "mb-2 transition-transform",
-                          snapshot.isDragging ? "rotate-1 scale-105" : ""
-                        )}
-                      >
-                        <KanbanCard
-                          item={item}
-                          onEdit={() => onEditItem(item)}
-                          onStatusChange={(newStatus) => onQuickStatusChange(item.id, newStatus)}
-                          columnSize={columnSize}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
+              <ScrollArea className="h-full max-h-[calc(100vh-220px)]">
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className={cn(
+                    "min-h-[200px] transition-colors duration-200 rounded p-1",
+                    snapshot.isDraggingOver ? "bg-muted/50" : "transparent"
+                  )}
+                >
+                  {items.map((item, index) => (
+                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={cn(
+                            "mb-2 transition-transform",
+                            snapshot.isDragging ? "rotate-1 scale-105" : ""
+                          )}
+                        >
+                          <KanbanCard
+                            item={item}
+                            onEdit={() => onEditItem(item)}
+                            onStatusChange={(newStatus) => onQuickStatusChange(item.id, newStatus)}
+                            columnSize={columnSize}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              </ScrollArea>
             )}
           </Droppable>
         </CardContent>

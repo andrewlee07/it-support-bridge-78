@@ -117,29 +117,31 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       </div>
 
       <DragDropContext onDragEnd={onDragEnd}>
-        <ScrollArea className="w-full">
-          <div className={cn(
-            "grid gap-4 pb-4 min-w-full",
-            boardConfig.layout === 'horizontal' 
-              ? "grid-flow-col auto-cols-[300px]" 
-              : columnSize === 'compact' 
-                ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-6" 
-                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-          )}>
-            {sortedColumns.map((column) => (
-              <KanbanColumn
-                key={column.id}
-                columnConfig={column}
-                items={itemsByStatus[column.statusValue as BacklogItemStatus] || []}
-                isCollapsed={collapsedColumns.includes(column.id)}
-                onToggleCollapse={() => toggleColumn(column.id)}
-                onEditItem={onEditItem}
-                onQuickStatusChange={onQuickStatusChange}
-                columnSize={columnSize}
-              />
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="relative w-full overflow-hidden">
+          <ScrollArea className="w-full h-full" orientation="horizontal">
+            <div className={cn(
+              "grid gap-4 pb-4 min-w-max",
+              boardConfig.layout === 'horizontal' 
+                ? "grid-flow-col auto-cols-[300px]" 
+                : columnSize === 'compact' 
+                  ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-6" 
+                  : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            )}>
+              {sortedColumns.map((column) => (
+                <KanbanColumn
+                  key={column.id}
+                  columnConfig={column}
+                  items={itemsByStatus[column.statusValue as BacklogItemStatus] || []}
+                  isCollapsed={collapsedColumns.includes(column.id)}
+                  onToggleCollapse={() => toggleColumn(column.id)}
+                  onEditItem={onEditItem}
+                  onQuickStatusChange={onQuickStatusChange}
+                  columnSize={columnSize}
+                />
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
       </DragDropContext>
 
       <KanbanConfigDialog
