@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,17 +17,16 @@ const Login = () => {
   const { login, user, pendingUser } = useAuth();
   const navigate = useNavigate();
 
-  // Move the early return inside the useEffect to avoid React hooks errors
   useEffect(() => {
-    // If user is already logged in, redirect to dashboard
     if (user) {
+      console.log("User already logged in, redirecting to dashboard");
       navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
 
-  // If there's a pending user requiring MFA verification, redirect to MFA page
   useEffect(() => {
     if (pendingUser) {
+      console.log("Pending user requires MFA, redirecting to MFA verification");
       navigate('/mfa-verification');
     }
   }, [pendingUser, navigate]);
@@ -50,7 +48,6 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Final password validation before submission
     const passwordValidation = isPasswordValid(password);
     if (!passwordValidation.valid) {
       setPasswordError(passwordValidation.reason || 'Invalid password');
@@ -62,10 +59,8 @@ const Login = () => {
     try {
       const success = await login(email, password);
       if (success && pendingUser) {
-        // If login was successful but requires MFA, we'll be redirected by the useEffect
-        // No need to navigate here
+        navigate('/mfa-verification');
       } else if (success) {
-        // If login was successful and doesn't require MFA, redirect to dashboard
         navigate('/dashboard');
       }
     } finally {
@@ -73,9 +68,10 @@ const Login = () => {
     }
   };
 
+  console.log("Login component rendering, user state:", !!user);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#b047c9]/10 to-[#05b2e6]/5 flex flex-col">
-      {/* Header with Logo */}
       <header className="w-full py-4 px-6 md:px-12 bg-white shadow-sm">
         <div className="max-w-screen-xl mx-auto">
           <div className="flex items-center">
@@ -188,7 +184,6 @@ const Login = () => {
         </motion.div>
       </div>
       
-      {/* Footer */}
       <footer className="py-4 text-center text-sm text-gray-500">
         <p>© 2023 We Are Group. All rights reserved.</p>
       </footer>

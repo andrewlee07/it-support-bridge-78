@@ -57,16 +57,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check for saved user in localStorage on mount
   useEffect(() => {
     const checkSavedUser = async () => {
+      console.log("Checking for saved user in localStorage");
       const savedUser = localStorage.getItem('currentUser');
       if (savedUser) {
         try {
+          console.log("Found saved user, parsing...");
           const parsedUser = JSON.parse(savedUser) as User;
           
           // Verify token and session validity
           if (isSessionValid(parsedUser)) {
+            console.log("Saved user session is valid, setting user state");
             setUser(parsedUser);
           } else {
             // Invalid session, clear it
+            console.log("Saved user session is invalid, clearing localStorage");
             localStorage.removeItem('currentUser');
             toast({
               title: "Session expired",
@@ -77,12 +81,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error('Failed to parse saved user', error);
           localStorage.removeItem('currentUser');
         }
+      } else {
+        console.log("No saved user found in localStorage");
       }
       setLoading(false);
     };
     
     checkSavedUser();
   }, []);
+
+  // Debug user state changes
+  useEffect(() => {
+    console.log("Auth context user state changed:", user ? `User ${user.id} (${user.name})` : "No user");
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ 
