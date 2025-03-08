@@ -24,11 +24,15 @@ const Sidebar = () => {
   // Function to check if user has permission for the menu item
   const hasPermission = (allowedRoles: string[]): boolean => {
     if (!user) return false;
+    if (allowedRoles.length === 0) return true; // If no roles specified, allow access
     return allowedRoles.includes(user.role);
   };
 
   // Check if any settings items are accessible to the current user
   const hasSettingsAccess = settingsItems.some(item => hasPermission(item.allowedRoles));
+
+  console.log('Current pathname:', location.pathname);
+  console.log('Navigation items:', navigationItems);
 
   return (
     <div 

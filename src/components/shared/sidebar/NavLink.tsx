@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { NavigationItem } from './types';
 
@@ -11,6 +11,8 @@ interface NavLinkProps {
 }
 
 const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
+  const location = useLocation();
+  
   // Handle items with nested navigation
   if (item.items && item.items.length > 0 && !collapsed) {
     return (
@@ -25,11 +27,11 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
         <div className="pl-8 space-y-1">
           {item.items.map((subItem) => (
             <Link
-              key={subItem.path}
+              key={subItem.path || subItem.name}
               to={subItem.href || subItem.path || '#'}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
-                isActive && subItem.path && location.pathname.startsWith(subItem.path) && "bg-primary/10 text-primary font-medium"
+                location.pathname.startsWith(subItem.path || '') && "bg-primary/10 text-primary font-medium"
               )}
             >
               <subItem.icon className="h-4 w-4 flex-shrink-0" />
