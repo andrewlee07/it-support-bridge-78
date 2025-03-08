@@ -92,6 +92,10 @@ const routes: RouteObject[] = [
         element: <Backlog />,
       },
       {
+        path: 'test-tracking',
+        element: <TestTracking />,
+      },
+      {
         path: 'bugs',
         element: <Bugs />,
       },
@@ -102,10 +106,6 @@ const routes: RouteObject[] = [
       {
         path: 'calendar',
         element: <Calendar />,
-      },
-      {
-        path: 'tests',
-        element: <TestTracking />,
       },
       {
         path: 'user-management',

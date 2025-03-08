@@ -62,7 +62,7 @@ export const navigationItems: NavItem[] = [
   {
     name: 'Testing',
     icon: FlaskConical,
-    path: '/tests',
+    path: '/test-tracking',  // Updated to match the route that has the actual component
   },
   {
     name: 'Bugs',
