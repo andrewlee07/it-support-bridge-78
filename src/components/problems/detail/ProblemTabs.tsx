@@ -5,11 +5,10 @@ import { Database } from 'lucide-react';
 
 interface ProblemTabsProps {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
   isClosed: boolean;
 }
 
-const ProblemTabs = ({ activeTab, setActiveTab, isClosed }: ProblemTabsProps) => {
+const ProblemTabs = ({ activeTab, isClosed }: ProblemTabsProps) => {
   return (
     <TabsList>
       <TabsTrigger value="details">Details</TabsTrigger>

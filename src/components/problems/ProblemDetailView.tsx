@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Problem } from '@/utils/types/problem';
+import { Tabs } from '@/components/ui/tabs';
 import ProblemHeader from './detail/ProblemHeader';
 import ProblemActionButtons from './detail/ProblemActionButtons';
 import ProblemTabs from './detail/ProblemTabs';
@@ -49,24 +50,25 @@ const ProblemDetailView: React.FC<ProblemDetailViewProps> = ({
         />
       </div>
 
-      {/* Tab Navigation */}
-      <ProblemTabs 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        isClosed={isClosed} 
-      />
-      
-      {/* Tab Content */}
-      <ProblemTabContent 
-        activeTab={activeTab}
-        problem={problem}
-        isClosed={isClosed}
-        onUpdateProblem={onUpdateProblem}
-        onResolveProblem={onResolveProblem}
-        onAddNote={onAddNote}
-        onCreateKnownError={onCreateKnownError}
-        setActiveTab={setActiveTab}
-      />
+      {/* Tabs Section */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <ProblemTabs 
+          activeTab={activeTab}
+          isClosed={isClosed} 
+        />
+        
+        {/* Tab Content */}
+        <ProblemTabContent 
+          activeTab={activeTab}
+          problem={problem}
+          isClosed={isClosed}
+          onUpdateProblem={onUpdateProblem}
+          onResolveProblem={onResolveProblem}
+          onAddNote={onAddNote}
+          onCreateKnownError={onCreateKnownError}
+          setActiveTab={setActiveTab}
+        />
+      </Tabs>
     </div>
   );
 };

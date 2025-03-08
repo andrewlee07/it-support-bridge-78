@@ -5,6 +5,7 @@ import UserManagement from '@/pages/UserManagement';
 import Reports from '@/pages/Reports';
 import Calendar from '@/pages/Calendar';
 import ProblemManagement from '@/pages/ProblemManagement';
+import ProblemDetail from '@/pages/ProblemDetail';
 
 const otherRoutes: RouteObject[] = [
   {
@@ -22,6 +23,10 @@ const otherRoutes: RouteObject[] = [
   {
     path: 'problems',
     element: <ProblemManagement />,
+  },
+  {
+    path: 'problems/:id',
+    element: <ProblemDetail />,
   },
 ];
 
