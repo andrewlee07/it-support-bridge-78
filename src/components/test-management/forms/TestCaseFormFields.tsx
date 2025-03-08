@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import StepsSection from './StepsSection';
-import { useTestCaseStatus } from '../hooks/useTestCases';
+import { useTestCaseStatus } from '../hooks/useTestCaseStatus';
 
 const TestCaseFormFields = () => {
   const form = useFormContext();
@@ -51,9 +51,7 @@ const TestCaseFormFields = () => {
 
       <div className="grid gap-6 mb-6">
         <StepsSection 
-          label="Steps to Reproduce" 
-          name="stepsToReproduce" 
-          placeholder="E.g., Open login page, Enter credentials, etc."
+          steps={form.getValues('stepsToReproduce') || ['']} 
         />
 
         <FormField
