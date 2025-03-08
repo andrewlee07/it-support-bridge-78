@@ -1,41 +1,11 @@
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { RiskThreshold } from '@/utils/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormDescription } from '@/components/ui/form';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ensureThresholdId } from '@/utils/api/change';
-
-// Schema for the thresholds form
-const thresholdsFormSchema = z.object({
-  lowMin: z.number().min(1).max(5),
-  lowMax: z.number().min(1).max(5),
-  mediumMin: z.number().min(1).max(5),
-  mediumMax: z.number().min(1).max(5),
-  highMin: z.number().min(1).max(5),
-  highMax: z.number().min(1).max(5),
-}).refine(data => data.lowMax >= data.lowMin, {
-  message: "Low max must be greater than or equal to low min",
-  path: ["lowMax"],
-}).refine(data => data.mediumMax >= data.mediumMin, {
-  message: "Medium max must be greater than or equal to medium min",
-  path: ["mediumMax"],
-}).refine(data => data.highMax >= data.highMin, {
-  message: "High max must be greater than or equal to high min",
-  path: ["highMax"],
-}).refine(data => data.mediumMin > data.lowMax, {
-  message: "Medium min must be greater than low max",
-  path: ["mediumMin"],
-}).refine(data => data.highMin > data.mediumMax, {
-  message: "High min must be greater than medium max",
-  path: ["highMin"],
-});
-
-type ThresholdsFormValues = z.infer<typeof thresholdsFormSchema>;
+import { useRiskThresholdsForm, ThresholdsFormValues } from './hooks/useRiskThresholdsForm';
+import RiskThresholdsGrid from './components/RiskThresholdsGrid';
 
 interface RiskThresholdsFormProps {
   thresholds: RiskThreshold[];
@@ -48,45 +18,10 @@ const RiskThresholdsForm: React.FC<RiskThresholdsFormProps> = ({
   onSubmit,
   isSubmitting = false,
 }) => {
-  // Find the thresholds for each risk level
-  const lowThreshold = thresholds.find(t => t.level === 'low') || { id: '', minScore: 1, maxScore: 2, level: 'low' as const };
-  const mediumThreshold = thresholds.find(t => t.level === 'medium') || { id: '', minScore: 2, maxScore: 4, level: 'medium' as const };
-  const highThreshold = thresholds.find(t => t.level === 'high') || { id: '', minScore: 4, maxScore: 5, level: 'high' as const };
-
-  const form = useForm<ThresholdsFormValues>({
-    resolver: zodResolver(thresholdsFormSchema),
-    defaultValues: {
-      lowMin: lowThreshold.minScore,
-      lowMax: lowThreshold.maxScore,
-      mediumMin: mediumThreshold.minScore,
-      mediumMax: mediumThreshold.maxScore,
-      highMin: highThreshold.minScore,
-      highMax: highThreshold.maxScore,
-    },
-  });
+  const { form, formValuesToThresholds } = useRiskThresholdsForm(thresholds);
 
   const handleSubmit = (values: ThresholdsFormValues) => {
-    const updatedThresholds: RiskThreshold[] = [
-      ensureThresholdId({ 
-        id: lowThreshold.id, 
-        level: 'low', 
-        minScore: values.lowMin, 
-        maxScore: values.lowMax 
-      }),
-      ensureThresholdId({ 
-        id: mediumThreshold.id, 
-        level: 'medium', 
-        minScore: values.mediumMin, 
-        maxScore: values.mediumMax 
-      }),
-      ensureThresholdId({ 
-        id: highThreshold.id, 
-        level: 'high', 
-        minScore: values.highMin, 
-        maxScore: values.highMax 
-      }),
-    ];
-    
+    const updatedThresholds = formValuesToThresholds(values);
     onSubmit(updatedThresholds);
   };
 
@@ -98,151 +33,7 @@ const RiskThresholdsForm: React.FC<RiskThresholdsFormProps> = ({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Low Risk Thresholds */}
-              <div className="space-y-4 border p-4 rounded-md">
-                <h3 className="font-medium">Low Risk</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="lowMin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Min Score</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            min="1"
-                            max="5"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="lowMax"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Max Score</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            min="1"
-                            max="5"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              
-              {/* Medium Risk Thresholds */}
-              <div className="space-y-4 border p-4 rounded-md">
-                <h3 className="font-medium">Medium Risk</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="mediumMin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Min Score</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            min="1"
-                            max="5"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="mediumMax"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Max Score</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            min="1"
-                            max="5"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              
-              {/* High Risk Thresholds */}
-              <div className="space-y-4 border p-4 rounded-md">
-                <h3 className="font-medium">High Risk</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="highMin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Min Score</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            min="1"
-                            max="5"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="highMax"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Max Score</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            min="1"
-                            max="5"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
+            <RiskThresholdsGrid form={form} />
             
             <FormDescription>
               Configure the risk score ranges for Low, Medium, and High risk levels. 
