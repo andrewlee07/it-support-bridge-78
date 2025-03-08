@@ -169,8 +169,15 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
           <CardContent className="flex justify-center items-center pt-4">
             <TestCoverageIndicator 
               coverage={{
+                totalTestCases: testCaseCount,
+                passedTests: passedTestsCount,
+                failedTests: failedTestsCount,
+                notExecutedTests: notExecutedCount,
+                coveragePercentage: coveragePercentage,
+                lastUpdated: new Date(),
+                // Add backward compatibility properties
                 total: testCaseCount,
-                covered: testCaseCount > 0 ? passedTestsCount : 0,
+                covered: testCaseCount > 0 ? passedTestsCount + failedTestsCount : 0,
                 passed: passedTestsCount,
                 failed: failedTestsCount
               }}
