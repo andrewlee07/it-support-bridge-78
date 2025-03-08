@@ -14,7 +14,7 @@ interface ProblemCardProps {
 }
 
 const ProblemCard: React.FC<ProblemCardProps> = ({ problem, onClick }) => {
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: ProblemStatus) => {
     switch (status) {
       case 'new': return 'bg-blue-500 hover:bg-blue-500';
       case 'under-investigation': return 'bg-purple-500 hover:bg-purple-500';

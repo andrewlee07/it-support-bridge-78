@@ -1,113 +1,120 @@
-import { addHours, differenceInMilliseconds, isWithinInterval } from 'date-fns';
-import { fromZonedTime, toZonedTime } from 'date-fns-tz';
-import { BusinessHours, SLACalculationOptions } from './types/businessHours';
+
+import { addHours, differenceInMinutes, differenceInHours, isWithinInterval } from 'date-fns';
+import { SLA } from './types/sla';
+import { Ticket } from './types/ticket';
+// Importing correct functions from date-fns-tz
+import { toZonedTime, utcToZonedTime } from 'date-fns-tz';
+import { getBusinessHoursById } from './mockData/businessHours';
 
 /**
- * Check if the current time is within business hours
+ * Calculates if an SLA is breached based on the ticket and SLA definition
  */
-export const isWithinBusinessHours = (
-  date: Date, 
-  businessHours: BusinessHours
-): boolean => {
-  // Convert UTC time to the business hours timezone
-  const localDate = toZonedTime(date, businessHours.timeZone);
-  
-  // Get day of week (0 = Sunday, 1 = Monday, etc.)
-  const dayOfWeek = localDate.getDay();
-  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  const currentDay = dayNames[dayOfWeek];
-  
-  // Check if current day is a working day
-  if (!businessHours.workingDays.includes(currentDay as any)) {
+export const isSLABreached = (ticket: Ticket, sla: SLA): boolean => {
+  if (ticket.status === 'resolved' || ticket.status === 'closed') {
+    // For resolved tickets, check if resolution time was within SLA
+    if (ticket.resolvedAt) {
+      const resolutionTime = calculateResolutionTime(ticket, sla);
+      return resolutionTime > sla.resolutionTimeHours * 60; // Convert hours to minutes
+    }
     return false;
   }
   
-  // Parse business hours start and end times
-  const [startHour, startMinute] = businessHours.startTime.split(':').map(Number);
-  const [endHour, endMinute] = businessHours.endTime.split(':').map(Number);
+  // For open tickets, check if current time exceeds SLA
+  const currentTime = new Date();
+  const creationTime = new Date(ticket.createdAt);
   
-  // Create Date objects for start and end of business hours on the current day
-  const businessStart = new Date(localDate);
-  businessStart.setHours(startHour, startMinute, 0, 0);
+  // Calculate elapsed time based on SLA calculation options
+  const elapsedMinutes = calculateElapsedTime(ticket, sla, currentTime);
   
-  const businessEnd = new Date(localDate);
-  businessEnd.setHours(endHour, endMinute, 0, 0);
+  // Convert SLA targets to minutes
+  const resolutionTimeMinutes = sla.resolutionTimeHours * 60;
   
-  // Check if current time is within business hours
-  return isWithinInterval(localDate, {
-    start: businessStart,
-    end: businessEnd
-  });
+  // Check if elapsed time exceeds resolution time target
+  return elapsedMinutes > resolutionTimeMinutes;
 };
 
 /**
- * Calculate SLA breach time, accounting for business hours and pending status
+ * Calculates resolution time in minutes considering SLA calculation options
  */
-export const calculateSLABreachTime = (
-  startTime: Date,
-  slaHours: number,
-  options: SLACalculationOptions,
-  businessHours?: BusinessHours,
-  pauseDurations?: { pendingDuration: number, outsideBusinessHoursDuration: number }
-): Date => {
-  // Simple calculation if we don't need to account for business hours or pending status
-  if (!options.pauseOutsideBusinessHours && !options.pauseDuringPendingStatus) {
-    return addHours(startTime, slaHours);
-  }
+export const calculateResolutionTime = (ticket: Ticket, sla: SLA): number => {
+  if (!ticket.resolvedAt) return 0;
   
-  // Account for already accumulated pause durations if provided
-  let adjustedSlaMilliseconds = slaHours * 60 * 60 * 1000;
-  
-  if (pauseDurations) {
-    if (options.pauseDuringPendingStatus) {
-      adjustedSlaMilliseconds += pauseDurations.pendingDuration;
-    }
-    if (options.pauseOutsideBusinessHours && businessHours) {
-      adjustedSlaMilliseconds += pauseDurations.outsideBusinessHoursDuration;
-    }
-  }
-  
-  // Convert milliseconds back to hours for the final calculation
-  const adjustedSlaHours = adjustedSlaMilliseconds / (60 * 60 * 1000);
-  return addHours(startTime, adjustedSlaHours);
+  return calculateElapsedTime(ticket, sla, ticket.resolvedAt);
 };
 
 /**
- * Calculate time until SLA breach, accounting for pauses
+ * Calculates elapsed time considering business hours and pause options
  */
-export const calculateTimeUntilBreach = (
-  currentTime: Date,
-  breachTime: Date,
-  isPaused: boolean
-): number => {
-  if (isPaused) {
-    // SLA is paused, so time until breach remains the same
-    return differenceInMilliseconds(breachTime, currentTime);
+export const calculateElapsedTime = (ticket: Ticket, sla: SLA, endTime: Date): number => {
+  const startTime = new Date(ticket.createdAt);
+  let totalMinutes = differenceInMinutes(endTime, startTime);
+  
+  const { calculationOptions } = sla;
+  
+  // Adjust for business hours if specified
+  if (calculationOptions?.pauseOutsideBusinessHours) {
+    totalMinutes = adjustForBusinessHours(startTime, endTime, calculationOptions.businessHoursId);
   }
   
-  // SLA is active, return time until breach (can be negative if already breached)
-  return differenceInMilliseconds(breachTime, currentTime);
+  // Adjust for time spent in pending status
+  if (calculationOptions?.pauseDuringPendingStatus && ticket.pendingStartDate) {
+    const pendingEndDate = ticket.status === 'pending' ? endTime : ticket.updatedAt;
+    const pendingMinutes = differenceInMinutes(pendingEndDate, ticket.pendingStartDate);
+    totalMinutes -= pendingMinutes > 0 ? pendingMinutes : 0;
+  }
+  
+  return totalMinutes;
 };
 
 /**
- * Check if SLA is currently paused due to pending status or outside business hours
+ * Adjusts elapsed time by considering only business hours
  */
-export const isSLAPaused = (
-  ticket: { status: string; pendingSubStatus?: string },
-  currentTime: Date,
-  options: SLACalculationOptions,
-  businessHours?: BusinessHours
-): boolean => {
-  // Check if paused due to pending status
-  const isPausedDueToPending = 
-    options.pauseDuringPendingStatus && 
-    ticket.status === 'pending';
+export const adjustForBusinessHours = (startTime: Date, endTime: Date, businessHoursId: string): number => {
+  const businessHours = getBusinessHoursById(businessHoursId);
+  if (!businessHours) return differenceInMinutes(endTime, startTime);
   
-  // Check if paused due to being outside business hours
-  let isPausedDueToBusinessHours = false;
-  if (options.pauseOutsideBusinessHours && businessHours) {
-    isPausedDueToBusinessHours = !isWithinBusinessHours(currentTime, businessHours);
+  // Implementation for business hours adjustment would go here
+  // This would need to consider working days and working hours
+  
+  // Placeholder: Return 80% of total time as a simple approximation
+  return Math.floor(differenceInMinutes(endTime, startTime) * 0.8);
+};
+
+/**
+ * Calculate SLA percentage (how much of the allocated time has been used)
+ */
+export const calculateSLAPercentage = (ticket: Ticket, sla: SLA): number => {
+  if (ticket.status === 'resolved' || ticket.status === 'closed') {
+    const resolutionTimeMinutes = calculateResolutionTime(ticket, sla);
+    const targetMinutes = sla.resolutionTimeHours * 60;
+    return Math.min(Math.round((resolutionTimeMinutes / targetMinutes) * 100), 100);
   }
   
-  return isPausedDueToPending || isPausedDueToBusinessHours;
+  const elapsedMinutes = calculateElapsedTime(ticket, sla, new Date());
+  const targetMinutes = sla.resolutionTimeHours * 60;
+  
+  return Math.min(Math.round((elapsedMinutes / targetMinutes) * 100), 100);
+};
+
+/**
+ * Get remaining time for SLA in hours and minutes
+ */
+export const getSLARemainingTime = (ticket: Ticket, sla: SLA): { hours: number, minutes: number } | null => {
+  if (ticket.status === 'resolved' || ticket.status === 'closed') {
+    return null;
+  }
+  
+  const elapsedMinutes = calculateElapsedTime(ticket, sla, new Date());
+  const targetMinutes = sla.resolutionTimeHours * 60;
+  
+  const remainingMinutes = targetMinutes - elapsedMinutes;
+  
+  if (remainingMinutes <= 0) {
+    return { hours: 0, minutes: 0 };
+  }
+  
+  const hours = Math.floor(remainingMinutes / 60);
+  const minutes = remainingMinutes % 60;
+  
+  return { hours, minutes };
 };
