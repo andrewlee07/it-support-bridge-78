@@ -1,4 +1,3 @@
-
 import { ApiResponse } from '../types/api';
 import { 
   NotificationTemplate, 
@@ -16,7 +15,7 @@ const mockWebhooks: WebhookConfig[] = [
     id: 'webhook-1',
     name: 'Slack Integration',
     url: 'https://hooks.slack.com/services/T00000/B00000/XXXX',
-    eventTypes: ['incident-created', 'incident-resolved'] as EventType[],
+    eventTypes: ['incident-created', 'incident-assigned', 'incident-resolved'] as EventType[],
     authType: 'token',
     authCredentials: 'xoxb-123456789',
     isActive: true,
@@ -92,32 +91,38 @@ const mockSystemHealth = {
   ]
 };
 
+// Helper function to convert EmailTemplate to NotificationTemplate
+const mapEmailToNotificationTemplate = (emailTemplate: EmailTemplate): NotificationTemplate => {
+  return {
+    id: emailTemplate.id,
+    name: emailTemplate.name,
+    eventType: emailTemplate.triggerOn as unknown as EventType, // Map triggerOn to eventType
+    subject: emailTemplate.subject,
+    body: emailTemplate.body,
+    isActive: emailTemplate.isActive,
+    lastModified: new Date(),
+    lastModifiedBy: 'admin@example.com'
+  };
+};
+
 // Notification API service
 export const notificationApi = {
-  // Convert EmailTemplate to NotificationTemplate
-  mapEmailToNotificationTemplate: (emailTemplate: EmailTemplate): NotificationTemplate => {
-    return {
-      id: emailTemplate.id,
-      name: emailTemplate.name,
-      eventType: emailTemplate.triggerOn as unknown as EventType, // Map triggerOn to eventType
-      subject: emailTemplate.subject,
-      body: emailTemplate.body,
-      isActive: emailTemplate.isActive,
-      lastModified: new Date(),
-      lastModifiedBy: 'admin@example.com'
-    };
-  },
+  // Keep the conversion helper as part of the API
+  mapEmailToNotificationTemplate,
 
   // Get all notification templates
   getNotificationTemplates: async (): Promise<ApiResponse<NotificationTemplate[]>> => {
     const emailTemplatesResponse = await emailNotificationApi.getEmailTemplates();
     
     if (!emailTemplatesResponse.success) {
-      return emailTemplatesResponse as ApiResponse<NotificationTemplate[]>;
+      return {
+        ...emailTemplatesResponse,
+        data: undefined
+      } as ApiResponse<NotificationTemplate[]>;
     }
     
     const notificationTemplates = emailTemplatesResponse.data.map(
-      template => notificationApi.mapEmailToNotificationTemplate(template)
+      template => mapEmailToNotificationTemplate(template)
     );
     
     return simulateApiResponse(notificationTemplates);
@@ -135,14 +140,19 @@ export const notificationApi = {
     };
     
     delete (emailUpdates as any).eventType; // Remove eventType as it's not in EmailTemplate
+    delete (emailUpdates as any).lastModified; // Remove lastModified
+    delete (emailUpdates as any).lastModifiedBy; // Remove lastModifiedBy
     
     const response = await emailNotificationApi.updateEmailTemplate(id, emailUpdates);
     
     if (!response.success) {
-      return response as ApiResponse<NotificationTemplate>;
+      return {
+        ...response,
+        data: undefined
+      } as ApiResponse<NotificationTemplate>;
     }
     
-    return simulateApiResponse(notificationApi.mapEmailToNotificationTemplate(response.data));
+    return simulateApiResponse(mapEmailToNotificationTemplate(response.data));
   },
   
   // Create a new notification template
@@ -161,10 +171,20 @@ export const notificationApi = {
     const response = await emailNotificationApi.createEmailTemplate(emailTemplate);
     
     if (!response.success) {
-      return response as ApiResponse<NotificationTemplate>;
+      return {
+        ...response,
+        data: undefined
+      } as ApiResponse<NotificationTemplate>;
     }
     
-    return simulateApiResponse(notificationApi.mapEmailToNotificationTemplate(response.data));
+    return simulateApiResponse(mapEmailToNotificationTemplate(response.data));
+  },
+  
+  // Delete a notification template
+  deleteNotificationTemplate: async (id: string): Promise<ApiResponse<boolean>> => {
+    // Here we would delete the template in a real implementation
+    // For this mock API, we'll just return a success response
+    return simulateApiResponse(true);
   },
   
   // Webhook-related API methods
@@ -182,7 +202,7 @@ export const notificationApi = {
       return {
         success: false,
         message: 'Webhook configuration not found',
-        data: null
+        data: undefined
       };
     }
     
@@ -205,6 +225,22 @@ export const notificationApi = {
     mockWebhooks.push(newWebhook);
     
     return simulateApiResponse(newWebhook);
+  },
+  
+  deleteWebhookConfiguration: async (id: string): Promise<ApiResponse<boolean>> => {
+    const webhookIndex = mockWebhooks.findIndex(w => w.id === id);
+    
+    if (webhookIndex === -1) {
+      return {
+        success: false,
+        message: 'Webhook configuration not found',
+        data: false
+      };
+    }
+    
+    mockWebhooks.splice(webhookIndex, 1);
+    
+    return simulateApiResponse(true);
   },
   
   testWebhook: async (webhookData: { 

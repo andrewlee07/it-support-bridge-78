@@ -1,20 +1,13 @@
 
-import { useState, useCallback } from 'react';
-import { useToast } from './use-toast';
-import { 
-  NotificationTemplate, 
-  WebhookConfig, 
-  NotificationLog, 
-  EventType 
-} from '@/utils/types/notification';
+import { useState, useEffect, useCallback } from 'react';
 import { notificationApi } from '@/utils/api/notificationApi';
-import { emailNotificationApi } from '@/utils/api/emailNotificationApi';
+import { NotificationTemplate, WebhookConfig, NotificationLog, EventType } from '@/utils/types/notification';
+import { toast } from 'sonner';
 
-// Hook for notification templates
+// Hook for managing notification templates
 export const useNotificationTemplates = () => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
@@ -23,93 +16,90 @@ export const useNotificationTemplates = () => {
       if (response.success && response.data) {
         setTemplates(response.data);
       } else {
-        toast({
-          title: 'Error',
-          description: response.message || 'Failed to fetch notification templates',
-          variant: 'destructive',
-        });
+        toast.error('Failed to load notification templates');
       }
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred',
-        variant: 'destructive',
-      });
+      console.error('Error fetching notification templates:', error);
+      toast.error('An error occurred while loading templates');
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
+
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
 
   const updateTemplate = useCallback(async (id: string, updates: Partial<NotificationTemplate>) => {
-    setLoading(true);
     try {
       const response = await notificationApi.updateNotificationTemplate(id, updates);
       if (response.success && response.data) {
-        // Update local state
-        setTemplates(prev => prev.map(t => t.id === id ? response.data : t));
-        toast({
-          title: 'Success',
-          description: 'Notification template updated successfully',
-        });
+        setTemplates(templates => templates.map(template => 
+          template.id === id ? response.data : template
+        ));
+        toast.success('Template updated successfully');
         return response.data;
       } else {
-        throw new Error(response.message || 'Failed to update template');
+        toast.error(response.message || 'Failed to update template');
+        return null;
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw error;
-    } finally {
-      setLoading(false);
+      console.error('Error updating notification template:', error);
+      toast.error('An error occurred while updating template');
+      return null;
     }
-  }, [toast]);
+  }, []);
 
   const createTemplate = useCallback(async (template: Omit<NotificationTemplate, 'id' | 'lastModified' | 'lastModifiedBy'>) => {
-    setLoading(true);
     try {
       const response = await notificationApi.createNotificationTemplate(template);
       if (response.success && response.data) {
-        // Update local state
-        setTemplates(prev => [...prev, response.data]);
-        toast({
-          title: 'Success',
-          description: 'Notification template created successfully',
-        });
+        setTemplates(templates => [...templates, response.data]);
+        toast.success('Template created successfully');
         return response.data;
       } else {
-        throw new Error(response.message || 'Failed to create template');
+        toast.error(response.message || 'Failed to create template');
+        return null;
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw error;
-    } finally {
-      setLoading(false);
+      console.error('Error creating notification template:', error);
+      toast.error('An error occurred while creating template');
+      return null;
     }
-  }, [toast]);
+  }, []);
+
+  const deleteTemplate = useCallback(async (id: string) => {
+    try {
+      const response = await notificationApi.deleteNotificationTemplate(id);
+      if (response.success && response.data) {
+        setTemplates(templates => templates.filter(template => template.id !== id));
+        toast.success('Template deleted successfully');
+        return true;
+      } else {
+        toast.error(response.message || 'Failed to delete template');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error deleting notification template:', error);
+      toast.error('An error occurred while deleting template');
+      return false;
+    }
+  }, []);
 
   return {
     templates,
     loading,
     fetchTemplates,
     updateTemplate,
-    createTemplate
+    createTemplate,
+    deleteTemplate
   };
 };
 
-// Hook for webhook configurations
-export const useWebhooks = () => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+// Hook for managing webhook configurations
+export const useWebhookConfigurations = () => {
   const [webhooks, setWebhooks] = useState<WebhookConfig[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchWebhooks = useCallback(async () => {
     setLoading(true);
@@ -118,108 +108,92 @@ export const useWebhooks = () => {
       if (response.success && response.data) {
         setWebhooks(response.data);
       } else {
-        toast({
-          title: 'Error',
-          description: response.message || 'Failed to fetch webhook configurations',
-          variant: 'destructive',
-        });
+        toast.error('Failed to load webhook configurations');
       }
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred',
-        variant: 'destructive',
-      });
+      console.error('Error fetching webhook configurations:', error);
+      toast.error('An error occurred while loading webhooks');
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
+
+  useEffect(() => {
+    fetchWebhooks();
+  }, [fetchWebhooks]);
 
   const updateWebhook = useCallback(async (id: string, updates: Partial<WebhookConfig>) => {
-    setLoading(true);
     try {
       const response = await notificationApi.updateWebhookConfiguration(id, updates);
       if (response.success && response.data) {
-        // Update local state
-        setWebhooks(prev => prev.map(w => w.id === id ? response.data : w));
-        toast({
-          title: 'Success',
-          description: 'Webhook configuration updated successfully',
-        });
+        setWebhooks(webhooks => webhooks.map(webhook => 
+          webhook.id === id ? response.data : webhook
+        ));
+        toast.success('Webhook updated successfully');
         return response.data;
       } else {
-        throw new Error(response.message || 'Failed to update webhook');
+        toast.error(response.message || 'Failed to update webhook');
+        return null;
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw error;
-    } finally {
-      setLoading(false);
+      console.error('Error updating webhook configuration:', error);
+      toast.error('An error occurred while updating webhook');
+      return null;
     }
-  }, [toast]);
+  }, []);
 
   const createWebhook = useCallback(async (webhook: Omit<WebhookConfig, 'id'>) => {
-    setLoading(true);
     try {
       const response = await notificationApi.createWebhookConfiguration(webhook);
       if (response.success && response.data) {
-        // Update local state
-        setWebhooks(prev => [...prev, response.data]);
-        toast({
-          title: 'Success',
-          description: 'Webhook configuration created successfully',
-        });
+        setWebhooks(webhooks => [...webhooks, response.data]);
+        toast.success('Webhook created successfully');
         return response.data;
       } else {
-        throw new Error(response.message || 'Failed to create webhook');
+        toast.error(response.message || 'Failed to create webhook');
+        return null;
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      throw error;
-    } finally {
-      setLoading(false);
+      console.error('Error creating webhook configuration:', error);
+      toast.error('An error occurred while creating webhook');
+      return null;
     }
-  }, [toast]);
+  }, []);
+
+  const deleteWebhook = useCallback(async (id: string) => {
+    try {
+      const response = await notificationApi.deleteWebhookConfiguration(id);
+      if (response.success && response.data) {
+        setWebhooks(webhooks => webhooks.filter(webhook => webhook.id !== id));
+        toast.success('Webhook deleted successfully');
+        return true;
+      } else {
+        toast.error(response.message || 'Failed to delete webhook');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error deleting webhook configuration:', error);
+      toast.error('An error occurred while deleting webhook');
+      return false;
+    }
+  }, []);
 
   const testWebhook = useCallback(async (webhookData: { url: string; authType: string; authCredentials?: string }) => {
-    setLoading(true);
     try {
       const response = await notificationApi.testWebhook(webhookData);
-      if (response.success) {
-        toast({
-          title: 'Success',
-          description: 'Webhook test successful',
-        });
+      if (response.success && response.data) {
+        toast.success('Webhook test successful');
+        return true;
       } else {
-        toast({
-          title: 'Warning',
-          description: response.message || 'Webhook test failed',
-          variant: 'destructive',
-        });
+        toast.error(response.message || 'Webhook test failed');
+        return false;
       }
-      return response;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      return { success: false, message: errorMessage };
-    } finally {
-      setLoading(false);
+      console.error('Error testing webhook:', error);
+      toast.error('An error occurred while testing webhook');
+      return false;
     }
-  }, [toast]);
+  }, []);
 
   return {
     webhooks,
@@ -227,14 +201,18 @@ export const useWebhooks = () => {
     fetchWebhooks,
     updateWebhook,
     createWebhook,
+    deleteWebhook,
     testWebhook
   };
 };
 
+// Alias for backward compatibility
+export const useWebhookConfigs = useWebhookConfigurations;
+
 // Hook for notification logs
 export const useNotificationLogs = () => {
-  const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<NotificationLog[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
@@ -242,25 +220,35 @@ export const useNotificationLogs = () => {
       const response = await notificationApi.getNotificationLogs();
       if (response.success && response.data) {
         setLogs(response.data);
+      } else {
+        toast.error('Failed to load notification logs');
       }
     } catch (error) {
-      console.error('Failed to fetch notification logs:', error);
+      console.error('Error fetching notification logs:', error);
+      toast.error('An error occurred while loading logs');
     } finally {
       setLoading(false);
     }
   }, []);
 
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
+
   const retryNotification = useCallback(async (id: string) => {
     try {
       const response = await notificationApi.retryNotification(id);
       if (response.success) {
-        // Update the log in the local state
-        fetchLogs();
+        fetchLogs(); // Refresh logs after retry
+        toast.success('Notification retry initiated');
         return true;
+      } else {
+        toast.error(response.message || 'Failed to retry notification');
+        return false;
       }
-      return false;
     } catch (error) {
-      console.error('Failed to retry notification:', error);
+      console.error('Error retrying notification:', error);
+      toast.error('An error occurred while retrying notification');
       return false;
     }
   }, [fetchLogs]);
@@ -274,52 +262,37 @@ export const useNotificationLogs = () => {
 };
 
 // Hook for system health
-export const useNotificationSystem = () => {
-  const [loading, setLoading] = useState(false);
-  const [health, setHealth] = useState<{
-    status: 'operational' | 'degraded' | 'down';
-    metrics: {
-      totalNotifications: number;
-      successRate: number;
-      queueSize: number;
-      processingTime: number;
-    };
-    errors: Array<{
-      time: Date;
-      type: string;
-      count: number;
-    }>;
-  }>({
-    status: 'operational',
-    metrics: {
-      totalNotifications: 0,
-      successRate: 0,
-      queueSize: 0,
-      processingTime: 0,
-    },
-    errors: [],
-  });
+export const useNotificationSystemHealth = () => {
+  const [healthData, setHealthData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const fetchSystemHealth = useCallback(async () => {
+  const fetchHealthData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await notificationApi.getSystemHealth();
       if (response.success && response.data) {
-        setHealth(response.data);
+        setHealthData(response.data);
+      } else {
+        toast.error('Failed to load system health data');
       }
     } catch (error) {
-      console.error('Failed to fetch notification system health:', error);
+      console.error('Error fetching system health data:', error);
+      toast.error('An error occurred while loading health data');
     } finally {
       setLoading(false);
     }
   }, []);
 
+  useEffect(() => {
+    fetchHealthData();
+    // Set up polling for health data (every 30 seconds)
+    const intervalId = setInterval(fetchHealthData, 30000);
+    return () => clearInterval(intervalId);
+  }, [fetchHealthData]);
+
   return {
-    health,
+    healthData,
     loading,
-    fetchSystemHealth
+    refreshHealthData: fetchHealthData
   };
 };
-
-// Aliased hook for backward compatibility
-export const useWebhookConfigs = useWebhooks;
