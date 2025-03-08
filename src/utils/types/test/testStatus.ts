@@ -1,45 +1,33 @@
 
-// Define all possible test statuses
-export type TestStatus = 
-  | 'pass' | 'passed' 
-  | 'fail' | 'failed' 
-  | 'blocked' 
-  | 'not-run' | 'draft' | 'ready'
-  | 'in_progress' | 'in-progress';
+// Test status and severity type definitions
 
-// Test case priority levels
-export type TestPriority = 'high' | 'medium' | 'low';
+// Status types
+export type TestStatus = 'not-run' | 'pass' | 'fail' | 'blocked' | 'passed' | 'failed' | 'draft' | 'ready' | 'in_progress' | 'in-progress';
+export type BugSeverity = 'critical' | 'major' | 'minor' | 'trivial' | 'high' | 'medium' | 'low'; // Updated with new values while keeping old ones for compatibility
+export type BugPriority = 'urgent' | 'high' | 'medium' | 'low';
+export type BugStatus = 
+  'new' | 'in-progress' | 'fixed' | 'verified' | 'closed' | 
+  'open' | 'in_progress' | 'resolved'; // Including all values used in the codebase
 
-// Test case types
-export type TestType = 'functional' | 'integration' | 'performance' | 'security' | 'usability' | 'regression';
+// For test cycles - updated to include both formats for consistency
+export type TestCycleStatus = 'planned' | 'in_progress' | 'in-progress' | 'completed' | 'aborted';
 
-// Bug severity levels
-export type BugSeverity = 'critical' | 'high' | 'medium' | 'low';
+// For backwards compatibility with testData.ts
+export type TestCaseStatus = TestStatus;
+export type TestPriority = BugPriority;
+export type TestType = 'integration' | 'unit' | 'e2e' | 'performance' | 'security';
 
-// Bug priority levels
-export type BugPriority = 'high' | 'medium' | 'low';
-
-// Bug status types 
-export type BugStatus = 'open' | 'in_progress' | 'fixed' | 'closed' | 'verified' | 'rejected' | 'reopened' | 'deferred';
-
-// Function to map between different status representations
+// Helper function to map between different status format versions
 export const mapTestStatus = (status: string): TestStatus => {
-  // Handle status format differences
-  if (status === 'passed') return 'pass';
-  if (status === 'failed') return 'fail';
-  if (status === 'in-progress' || status === 'in_progress') return 'in_progress';
-  if (status === 'draft' || status === 'ready') return 'not-run';
-  
-  return status as TestStatus;
+  switch (status) {
+    case 'passed': return 'pass';
+    case 'failed': return 'fail';
+    case 'draft': return 'not-run';
+    case 'ready': return 'not-run';
+    default: return status as TestStatus;
+  }
 };
 
-// Function to normalize status for display
-export const getNormalizedStatus = (status: string): string => {
-  if (status === 'pass' || status === 'passed') return 'Passed';
-  if (status === 'fail' || status === 'failed') return 'Failed';
-  if (status === 'in-progress' || status === 'in_progress') return 'In Progress';
-  if (status === 'not-run' || status === 'draft' || status === 'ready') return 'Not Run';
-  if (status === 'blocked') return 'Blocked';
-  
-  return status.charAt(0).toUpperCase() + status.slice(1);
+export const mapBugStatus = (status: string): BugStatus => {
+  return status as BugStatus;
 };

@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
-import AdminDashboard from '@/pages/admin/AdminDashboard';
-import SecuritySettings from '@/pages/admin/SecuritySettings';
-import ErrorLogs from '@/pages/admin/ErrorLogs';
-import UserMFASettings from '@/pages/admin/UserMFASettings';
-import DropdownConfig from '@/pages/settings/DropdownConfigurations';
-import RiskAssessmentConfig from '@/pages/settings/RiskAssessmentSettings';
+import AdminDashboard from '@/pages/AdminDashboard';
+import SecuritySettings from '@/pages/SecuritySettings';
+import ErrorLogs from '@/pages/ErrorLogs';
+import UserMFASettings from '@/pages/UserMFASettings';
+import DropdownConfig from '@/pages/DropdownConfig';
+import RiskAssessmentConfig from '@/pages/RiskAssessmentConfig';
 import StatusSynchronizationSettings from '@/pages/StatusSynchronizationSettings';
 
 const adminRoutes: RouteObject[] = [

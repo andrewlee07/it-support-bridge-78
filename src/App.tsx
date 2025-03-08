@@ -1,168 +1,40 @@
-import { Suspense, useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Outlet,
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
 
-import Layout from "@/components/layout";
-import Dashboard from "@/pages/Dashboard";
-import Login from "@/pages/auth/Login";
-import Register from "@/pages/auth/Register";
-import Errors from "@/pages/Errors";
-import Settings from "@/pages/Settings";
-import Releases from "@/pages/Releases";
-import Assets from "@/pages/Assets";
-import NewRelease from "@/pages/NewRelease";
-import ReleaseDetail from "@/pages/ReleaseDetail";
-import ErrorBoundary from "@/components/errors/ErrorBoundary";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import AuthLayout from "@/components/auth/AuthLayout";
-import Backlog from "@/pages/Backlog";
-import BacklogKanban from "@/pages/BacklogKanban";
-import Changes from "@/pages/Changes";
-import NewChange from "@/pages/NewChange";
-import RiskAssessmentConfiguration from "@/pages/admin/RiskAssessmentConfiguration";
-import ChangeDropdowns from "@/pages/admin/ChangeDropdowns";
-import ErrorLogs from "@/pages/admin/ErrorLogs";
-import SLAConfiguration from "@/pages/admin/SLAConfiguration";
-import SecuritySettings from "@/pages/admin/SecuritySettings";
-import StatusSynchronizationSettings from "@/pages/StatusSynchronizationSettings";
-import testManagementRoutes from "./routes/testManagementRoutes";
-import testCoverageRoutes from "./routes/testCoverageRoutes";
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { useRoutes } from 'react-router-dom';
+import routes from '@/routes';
+import { Toaster } from "@/components/ui/toaster";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import BugDetail from "@/pages/BugDetail";
-import { useSessionTimeout } from "@/hooks/useSessionTimeout";
-import { useAuth } from "@/contexts/AuthContext";
-import { Toaster } from "sonner";
-
-function App() {
-  const { initializeSessionTimeout } = useSessionTimeout();
-  const { authState } = useAuth();
-
-  useEffect(() => {
-    if (authState.isAuthenticated) {
-      initializeSessionTimeout();
-    }
-  }, [authState.isAuthenticated, initializeSessionTimeout]);
-
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <Outlet />
-          </Layout>
-        </ProtectedRoute>
-      ),
-      errorElement: <ErrorBoundary />,
-      children: [
-        {
-          index: true,
-          element: <Dashboard />,
-        },
-        {
-          path: "changes",
-          element: <Changes />,
-        },
-        {
-          path: "changes/new",
-          element: <NewChange />,
-        },
-        {
-          path: "releases",
-          element: <Releases />,
-        },
-        {
-          path: "releases/new",
-          element: <NewRelease />,
-        },
-        {
-          path: "releases/:id",
-          element: <ReleaseDetail />,
-        },
-        {
-          path: "backlog",
-          element: <Backlog />,
-        },
-        {
-          path: "backlog/kanban",
-          element: <BacklogKanban />,
-        },
-        {
-          path: "settings",
-          element: <Settings />,
-        },
-        {
-          path: "assets",
-          element: <Assets />,
-        },
-        {
-          path: "errors",
-          element: <Errors />,
-        },
-        ...testManagementRoutes,
-        ...testCoverageRoutes,
-        {
-          path: "admin",
-          children: [
-            {
-              path: "risk-assessment",
-              element: <RiskAssessmentConfiguration />,
-            },
-            {
-              path: "change-dropdowns",
-              element: <ChangeDropdowns />,
-            },
-            {
-              path: "error-logs",
-              element: <ErrorLogs />,
-            },
-            {
-              path: "sla-configuration",
-              element: <SLAConfiguration />,
-            },
-            {
-              path: "security-settings",
-              element: <SecuritySettings />,
-            },
-            {
-              path: "status-synchronization",
-              element: <StatusSynchronizationSettings />,
-            },
-          ],
-        },
-      ],
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     },
-    {
-      path: "/auth",
-      element: <AuthLayout />,
-      children: [
-        {
-          path: "login",
-          element: <Login />,
-        },
-        {
-          path: "register",
-          element: <Register />,
-        },
-      ],
-    },
-  ]);
+  },
+});
 
-  // Check if authState is available before accessing isAuthenticated
-  const isAuthenticated = authState ? authState.isAuthenticated : false;
+const AppRoutes = () => {
+  const element = useRoutes(routes);
+  return element;
+};
 
+const App: React.FC = () => {
   return (
-    <>
-      <Toaster />
-      <RouterProvider router={router} />
-    </>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+          <Toaster />
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   );
-}
+};
 
 export default App;

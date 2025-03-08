@@ -3,9 +3,6 @@ import { ReleaseStatus } from '@/utils/types/release';
 import { BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { BugStatus } from '@/utils/types/test/testStatus';
 
-// Export ReleaseStatus for use in other components
-export type { ReleaseStatus } from '@/utils/types/release';
-
 // Default mappings between release status and backlog item status
 export const defaultReleaseToBacklogStatusMapping: Record<ReleaseStatus, BacklogItemStatus> = {
   'Planned': 'open',

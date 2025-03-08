@@ -2,43 +2,66 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { TestStatus } from '@/utils/types/test/testStatus';
+import { cn } from '@/lib/utils';
 
 interface StatusBadgeProps {
   status: TestStatus;
 }
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  let badgeClass = '';
-  let displayText = '';
+  // Normalize status to handle different formats
+  const normalizedStatus = status?.toString().toLowerCase().replace('_', '-') || 'unknown';
+  
+  // Badge styling based on status
+  const getBadgeStyle = () => {
+    switch (normalizedStatus) {
+      case 'pass':
+      case 'passed':
+        return 'bg-green-500 hover:bg-green-600';
+      case 'fail':
+      case 'failed':
+        return 'bg-red-500 hover:bg-red-600';
+      case 'blocked':
+        return 'bg-yellow-500 hover:bg-yellow-600';
+      case 'not-run':
+      case 'draft':
+        return 'bg-gray-500 hover:bg-gray-600';
+      case 'ready':
+        return 'bg-blue-500 hover:bg-blue-600';
+      case 'in-progress':
+        return 'bg-purple-500 hover:bg-purple-600';
+      default:
+        return 'bg-gray-500 hover:bg-gray-600';
+    }
+  };
 
-  switch (status) {
-    case 'pass':
-    case 'passed':
-      badgeClass = 'bg-green-100 text-green-800 border-green-200';
-      displayText = 'Passed';
-      break;
-    case 'fail':
-    case 'failed':
-      badgeClass = 'bg-red-100 text-red-800 border-red-200';
-      displayText = 'Failed';
-      break;
-    case 'blocked':
-      badgeClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      displayText = 'Blocked';
-      break;
-    case 'in_progress':
-    case 'in-progress':
-      badgeClass = 'bg-blue-100 text-blue-800 border-blue-200';
-      displayText = 'In Progress';
-      break;
-    default:
-      badgeClass = 'bg-gray-100 text-gray-800 border-gray-200';
-      displayText = 'Not Run';
-  }
+  // Status display text
+  const getStatusText = () => {
+    switch (normalizedStatus) {
+      case 'pass':
+      case 'passed':
+        return 'Passed';
+      case 'fail':
+      case 'failed':
+        return 'Failed';
+      case 'blocked':
+        return 'Blocked';
+      case 'not-run':
+        return 'Not Run';
+      case 'draft':
+        return 'Draft';
+      case 'ready':
+        return 'Ready';
+      case 'in-progress':
+        return 'In Progress';
+      default:
+        return status || 'Unknown';
+    }
+  };
 
   return (
-    <Badge variant="outline" className={badgeClass}>
-      {displayText}
+    <Badge className={getBadgeStyle()}>
+      {getStatusText()}
     </Badge>
   );
 };
