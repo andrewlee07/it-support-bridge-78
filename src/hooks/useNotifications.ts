@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { notificationApi } from '@/utils/api/notificationApi';
 import { NotificationTemplate, WebhookConfig, NotificationLog, EventType } from '@/utils/types/notification';
@@ -206,7 +205,8 @@ export const useWebhookConfigurations = () => {
   };
 };
 
-// Alias for backward compatibility
+// Export with multiple aliases for backward compatibility
+export const useWebhooks = useWebhookConfigurations;
 export const useWebhookConfigs = useWebhookConfigurations;
 
 // Hook for notification logs
@@ -296,3 +296,6 @@ export const useNotificationSystemHealth = () => {
     refreshHealthData: fetchHealthData
   };
 };
+
+// Export with multiple aliases for backward compatibility
+export const useNotificationSystem = useNotificationSystemHealth;
