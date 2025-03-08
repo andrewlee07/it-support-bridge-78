@@ -65,9 +65,8 @@ const Assets: React.FC = () => {
   };
 
   const handleAddDialogChange = (open: boolean) => {
-    if (!open) {
-      setIsAddingAsset(false);
-    }
+    console.log("Add dialog change:", open);
+    setIsAddingAsset(open);
   };
 
   const handleEditClick = () => {
@@ -79,6 +78,7 @@ const Assets: React.FC = () => {
   };
 
   const handleAddAssetClick = () => {
+    console.log("Add asset button clicked");
     setIsAddingAsset(true);
   };
 

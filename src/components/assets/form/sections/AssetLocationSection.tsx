@@ -23,7 +23,7 @@ const AssetLocationSection: React.FC<AssetLocationSectionProps> = ({ users }) =>
           <FormItem>
             <FormLabel>Location</FormLabel>
             <FormControl>
-              <Input placeholder="Enter location" {...field} />
+              <Input placeholder="Enter location" {...field} value={field.value || ""} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -38,6 +38,7 @@ const AssetLocationSection: React.FC<AssetLocationSectionProps> = ({ users }) =>
             <FormLabel>Assigned To</FormLabel>
             <Select
               onValueChange={field.onChange}
+              value={field.value || ""}
               defaultValue={field.value || ""}
             >
               <FormControl>
@@ -46,7 +47,7 @@ const AssetLocationSection: React.FC<AssetLocationSectionProps> = ({ users }) =>
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="">Unassigned</SelectItem>
+                <SelectItem value="_unassigned">Unassigned</SelectItem>
                 {users.map(user => (
                   <SelectItem key={user.id} value={user.id}>
                     {user.name}
