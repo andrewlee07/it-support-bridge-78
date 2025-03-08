@@ -1,3 +1,4 @@
+
 // Configuration types for dropdown fields
 export type ConfigurableEntityType = 'ticket' | 'asset' | 'change' | 'user' | 'incident' | 'service-request' | 'backlog' | 'release' | 'problem' | 'bug';
 

@@ -87,6 +87,15 @@ let mandatoryFieldsConfig: Record<ConfigurableEntityType, MandatoryFieldConfig[]
     { fieldName: 'location', displayName: 'Location', isRequired: false, entityType: 'asset', description: 'The location of the asset' },
     { fieldName: 'assignedTo', displayName: 'Assigned To', isRequired: false, entityType: 'asset', description: 'The person this asset is assigned to' }
   ],
+  'bug': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'bug', description: 'The title of the bug' },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'bug', description: 'A detailed description of the bug' },
+    { fieldName: 'stepsToReproduce', displayName: 'Steps to Reproduce', isRequired: true, entityType: 'bug', description: 'Steps to reproduce the bug' },
+    { fieldName: 'severity', displayName: 'Severity', isRequired: true, entityType: 'bug', description: 'The severity level of the bug' },
+    { fieldName: 'priority', displayName: 'Priority', isRequired: false, entityType: 'bug', description: 'The priority level of the bug' },
+    { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'bug', description: 'The current status of the bug' },
+    { fieldName: 'assignedDeveloper', displayName: 'Assigned Developer', isRequired: false, entityType: 'bug', description: 'The developer assigned to fix the bug' }
+  ],
   'user': []
 };
 

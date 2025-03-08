@@ -15,7 +15,7 @@ const BugConfiguration = () => {
     { label: 'Bug Configuration' }
   ];
   
-  const { mandatoryFields, updateMandatoryFields, isLoading } = useMandatoryFields('backlog');
+  const { mandatoryFields, updateMandatoryFields, isLoading } = useMandatoryFields('bug');
 
   return (
     <PageTransition>
@@ -67,7 +67,7 @@ const BugConfiguration = () => {
           
           <TabsContent value="mandatoryfields">
             <MandatoryFieldsConfig
-              entityType="backlog"
+              entityType="bug"
               fields={mandatoryFields}
               onSave={updateMandatoryFields}
               isLoading={isLoading}

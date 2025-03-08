@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ConfigurableEntityType } from '@/utils/types';
+import { ConfigurableEntityType } from '@/utils/types/configuration';
 import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
 import DropdownConfigList from '@/components/settings/dropdowns/DropdownConfigList';
 import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigForm';
@@ -9,7 +9,7 @@ import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigFo
 const BugDropdownFieldsTab = () => {
   const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const entityType: ConfigurableEntityType = 'backlog'; // Using 'backlog' since bugs are part of backlog items
+  const entityType: ConfigurableEntityType = 'bug'; // Using 'bug' as the entity type
 
   // Dropdown configurations
   const { data: configurations, isLoading, refetch } = useQuery({
