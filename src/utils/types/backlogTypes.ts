@@ -1,3 +1,4 @@
+
 // Backlog Item Management Types
 
 // Status types
@@ -37,7 +38,7 @@ export interface BacklogTestCoverage {
   notExecutedTests: number;
   coveragePercentage: number;
   lastUpdated: Date;
-  // Additional properties for compatibility with TestCoverageIndicator
+  // Additional properties for backward compatibility with TestCoverageIndicator
   total?: number; // For backward compatibility with TestCoverageIndicator
   covered?: number; // For backward compatibility with TestCoverageIndicator
   passed?: number; // For backward compatibility with TestCoverageIndicator

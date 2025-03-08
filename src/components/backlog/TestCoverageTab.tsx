@@ -156,6 +156,21 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
     }
   };
 
+  // Create a properly shaped BacklogTestCoverage object
+  const coverageData = {
+    totalTestCases: testCaseCount,
+    passedTests: passedTestsCount,
+    failedTests: failedTestsCount,
+    notExecutedTests: notExecutedCount,
+    coveragePercentage: coveragePercentage,
+    lastUpdated: new Date(),
+    // Add backward compatibility properties
+    total: testCaseCount, 
+    covered: passedTestsCount + failedTestsCount,
+    passed: passedTestsCount,
+    failed: failedTestsCount
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -168,19 +183,7 @@ const TestCoverageTab: React.FC<TestCoverageTabProps> = ({
           </CardHeader>
           <CardContent className="flex justify-center items-center pt-4">
             <TestCoverageIndicator 
-              coverage={{
-                totalTestCases: testCaseCount,
-                passedTests: passedTestsCount,
-                failedTests: failedTestsCount,
-                notExecutedTests: notExecutedCount,
-                coveragePercentage: coveragePercentage,
-                lastUpdated: new Date(),
-                // Add backward compatibility properties
-                total: testCaseCount,
-                covered: testCaseCount > 0 ? passedTestsCount + failedTestsCount : 0,
-                passed: passedTestsCount,
-                failed: failedTestsCount
-              }}
+              coverage={coverageData}
               size="lg"
             />
           </CardContent>
