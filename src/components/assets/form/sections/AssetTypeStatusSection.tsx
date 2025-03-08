@@ -33,8 +33,8 @@ const AssetTypeStatusSection = () => {
             <FormLabel>Asset Type</FormLabel>
             <Select 
               onValueChange={field.onChange} 
-              value={field.value}
-              defaultValue="hardware"
+              value={field.value || "hardware"}
+              defaultValue={field.value || "hardware"}
             >
               <FormControl>
                 <SelectTrigger>
@@ -62,8 +62,8 @@ const AssetTypeStatusSection = () => {
             <FormLabel>Status</FormLabel>
             <Select 
               onValueChange={field.onChange} 
-              value={field.value}
-              defaultValue="available"
+              value={field.value || "available"}
+              defaultValue={field.value || "available"}
             >
               <FormControl>
                 <SelectTrigger>

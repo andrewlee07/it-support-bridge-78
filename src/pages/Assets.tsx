@@ -59,6 +59,8 @@ const Assets: React.FC = () => {
   const handleViewDialogChange = (open: boolean) => {
     if (!open) {
       navigate('/assets');
+      setIsViewingAsset(false);
+      setIsEditingAsset(false);
     }
   };
 
@@ -152,7 +154,7 @@ const Assets: React.FC = () => {
           {selectedAsset && !isEditingAsset && (
             <AssetDetailView 
               asset={selectedAsset} 
-              onClose={() => navigate('/assets')} 
+              onClose={() => handleViewDialogChange(false)} 
               onEditClick={handleEditClick} 
             />
           )}
