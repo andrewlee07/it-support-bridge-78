@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { Ticket, TicketStatus } from '@/utils/types/ticket';
 import { addAuditEntry } from '@/utils/auditUtils';
 import { addDays, isAfter } from 'date-fns';
@@ -44,4 +45,36 @@ export const applyAutoCloseLogic = (tickets: Ticket[], type: 'incident' | 'servi
     }
     return ticket;
   });
+};
+
+/**
+ * Hook to manage ticket auto-close settings
+ */
+export const useTicketAutoClose = (moduleType: 'incident' | 'service-request') => {
+  const [autoCloseEnabled, setAutoCloseEnabled] = useState(true);
+  const [autoCloseDays, setAutoCloseDays] = useState(5);
+  
+  // Load settings from configuration
+  useEffect(() => {
+    const enabled = getConfigurationValue(moduleType, 'autoCloseEnabled', 'true') === 'true';
+    const days = parseInt(getConfigurationValue(moduleType, 'autoCloseTimeframeInDays', '5'));
+    
+    setAutoCloseEnabled(enabled);
+    setAutoCloseDays(days);
+  }, [moduleType]);
+  
+  // Update settings
+  const updateAutoCloseSettings = async (enabled: boolean, days: number) => {
+    // In a real app, this would save to the configuration system
+    console.log(`Updating auto-close settings for ${moduleType}: enabled=${enabled}, days=${days}`);
+    setAutoCloseEnabled(enabled);
+    setAutoCloseDays(days);
+    return true;
+  };
+  
+  return {
+    autoCloseEnabled,
+    autoCloseDays,
+    updateAutoCloseSettings
+  };
 };

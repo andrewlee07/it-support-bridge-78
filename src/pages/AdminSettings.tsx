@@ -15,7 +15,6 @@ import {
   DatabaseIcon,
   ListIcon
 } from 'lucide-react';
-import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 const AdminSettings = () => {
   const navigate = useNavigate();
@@ -78,20 +77,8 @@ const AdminSettings = () => {
       title: 'SLA Settings',
       description: 'Configure service level agreements',
       icon: Settings2Icon,
-      path: '/settings/sla'
-    },
-    {
-      title: 'Dropdown Configurations',
-      description: 'Manage dropdown field options',
-      icon: ListIcon,
-      path: '/settings/dropdown-configurations'
-    },
-    {
-      title: 'Risk Assessment Settings',
-      description: 'Configure risk assessment questions and thresholds',
-      icon: AlertTriangleIcon,
-      path: '/settings/risk-assessment'
-    },
+      path: '/admin/sla-settings'
+    }
   ];
 
   return (

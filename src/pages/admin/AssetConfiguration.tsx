@@ -8,10 +8,10 @@ import { ConfigurableEntityType } from '@/utils/types';
 import DropdownConfigList from '@/components/settings/dropdowns/DropdownConfigList';
 import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigForm';
 
-const ServiceRequestConfiguration = () => {
+const AssetConfiguration = () => {
   const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const entityType: ConfigurableEntityType = 'service-request';
+  const entityType: ConfigurableEntityType = 'asset';
 
   const { data: configurations, isLoading, refetch } = useQuery({
     queryKey: ['dropdownConfigurations', entityType],
@@ -38,17 +38,16 @@ const ServiceRequestConfiguration = () => {
     <PageTransition>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Service Request Configuration</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Asset Configuration</h1>
           <p className="text-muted-foreground mt-1">
-            Configure service request settings, dropdowns, and SLAs
+            Configure asset management settings and fields
           </p>
         </div>
 
         <Tabs defaultValue="dropdowns">
           <TabsList className="mb-4">
             <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
-            <TabsTrigger value="sla">SLA Settings</TabsTrigger>
-            <TabsTrigger value="autoclose">Auto-Close Settings</TabsTrigger>
+            <TabsTrigger value="lifecycle">Lifecycle Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dropdowns" className="space-y-4">
@@ -86,25 +85,13 @@ const ServiceRequestConfiguration = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="sla" className="space-y-4">
-            {/* SLA Configuration Component will go here */}
+          <TabsContent value="lifecycle" className="space-y-4">
+            {/* Lifecycle Configuration Component will go here */}
             <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
               <div className="text-center">
-                <h3 className="text-lg font-medium">SLA Configuration</h3>
+                <h3 className="text-lg font-medium">Asset Lifecycle Configuration</h3>
                 <p className="text-muted-foreground mt-1">
-                  Configure service level agreements for service requests
-                </p>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="autoclose" className="space-y-4">
-            {/* Auto-Close Configuration will go here */}
-            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-              <div className="text-center">
-                <h3 className="text-lg font-medium">Auto-Close Configuration</h3>
-                <p className="text-muted-foreground mt-1">
-                  Configure automatic closing of fulfilled service requests
+                  Configure asset lifecycle stages and depreciation settings
                 </p>
               </div>
             </div>
@@ -115,4 +102,4 @@ const ServiceRequestConfiguration = () => {
   );
 };
 
-export default ServiceRequestConfiguration;
+export default AssetConfiguration;

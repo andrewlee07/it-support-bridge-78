@@ -1,86 +1,118 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useModuleConfigurations } from '@/hooks/useModuleConfigurations';
-import ModuleConfigurationCard from '@/components/admin/ModuleConfigurationCard';
+import PageTransition from '@/components/shared/PageTransition';
+import { useQuery } from '@tanstack/react-query';
+import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
+import { ConfigurableEntityType } from '@/utils/types';
+import DropdownConfigList from '@/components/settings/dropdowns/DropdownConfigList';
+import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigForm';
+import { useTicketAutoClose } from '@/components/tickets/hooks/useTicketAutoClose';
 
 const IncidentConfiguration = () => {
-  const { configurations, isLoading, updateConfiguration } = useModuleConfigurations('incident');
+  const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const entityType: ConfigurableEntityType = 'incident';
+
+  const { data: configurations, isLoading, refetch } = useQuery({
+    queryKey: ['dropdownConfigurations', entityType],
+    queryFn: () => dropdownConfigurationApi.getDropdownConfigurationsByEntity(entityType),
+  });
+
+  const handleAddNew = () => {
+    setIsAddingNew(true);
+    setSelectedConfigId(null);
+  };
+
+  const handleSelectConfig = (id: string) => {
+    setSelectedConfigId(id);
+    setIsAddingNew(false);
+  };
+
+  const handleFormClose = () => {
+    setIsAddingNew(false);
+    setSelectedConfigId(null);
+    refetch();
+  };
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
-      <h1 className="text-3xl font-bold">Incident Configuration</h1>
-      
-      <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="sla">SLA Settings</TabsTrigger>
-          <TabsTrigger value="workflow">Workflow</TabsTrigger>
-          <TabsTrigger value="autoClose">Auto-Close Settings</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="general" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>General Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Configure general incident settings.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="sla" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>SLA Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Configure SLA settings for incidents.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="workflow" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>Workflow Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Configure workflow settings for incidents.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="autoClose" className="mt-0">
-          <div className="grid gap-4">
-            <h2 className="text-xl font-semibold">Auto-Close Settings</h2>
-            <p className="text-muted-foreground">
-              Configure when incidents are automatically closed after resolution.
-            </p>
-            
-            {isLoading ? (
-              <div className="flex items-center justify-center p-8">
-                <div className="animate-spin h-8 w-8 border-t-2 border-primary rounded-full" />
+    <PageTransition>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Incident Configuration</h1>
+          <p className="text-muted-foreground mt-1">
+            Configure incident management settings, dropdowns, and SLAs
+          </p>
+        </div>
+
+        <Tabs defaultValue="dropdowns">
+          <TabsList className="mb-4">
+            <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
+            <TabsTrigger value="sla">SLA Settings</TabsTrigger>
+            <TabsTrigger value="autoclose">Auto-Close Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dropdowns" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-1">
+                <DropdownConfigList
+                  entityType={entityType}
+                  configurations={configurations?.data || []}
+                  isLoading={isLoading}
+                  onAddNew={handleAddNew}
+                  onSelectConfig={handleSelectConfig}
+                  selectedConfigId={selectedConfigId}
+                />
               </div>
-            ) : (
-              <div className="grid gap-4">
-                {configurations
-                  .filter(config => config.configType === 'autoClose')
-                  .map(config => (
-                    <ModuleConfigurationCard
-                      key={config.id}
-                      configuration={config}
-                      onUpdate={updateConfiguration}
-                    />
-                  ))}
+              <div className="md:col-span-2">
+                {(isAddingNew || selectedConfigId) && (
+                  <DropdownConfigForm
+                    entityType={entityType}
+                    configId={selectedConfigId}
+                    onClose={handleFormClose}
+                    isNew={isAddingNew}
+                  />
+                )}
+                {!isAddingNew && !selectedConfigId && (
+                  <div className="flex h-full items-center justify-center border rounded-lg p-8 bg-muted/30">
+                    <div className="text-center">
+                      <h3 className="text-lg font-medium">No Configuration Selected</h3>
+                      <p className="text-muted-foreground mt-1">
+                        Select a configuration to edit or add a new one
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="sla" className="space-y-4">
+            {/* SLA Configuration Component will go here */}
+            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+              <div className="text-center">
+                <h3 className="text-lg font-medium">SLA Configuration</h3>
+                <p className="text-muted-foreground mt-1">
+                  Configure service level agreements for incidents
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="autoclose" className="space-y-4">
+            {/* Auto-Close Configuration will go here */}
+            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+              <div className="text-center">
+                <h3 className="text-lg font-medium">Auto-Close Configuration</h3>
+                <p className="text-muted-foreground mt-1">
+                  Configure automatic closing of resolved incidents
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </PageTransition>
   );
 };
 

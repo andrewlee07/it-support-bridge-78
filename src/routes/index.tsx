@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Login from '@/pages/Login';
@@ -20,13 +19,21 @@ import Calendar from '@/pages/Calendar';
 import Backlog from '@/pages/Backlog';
 import AdminSettings from '@/pages/AdminSettings';
 
+import IncidentConfiguration from '@/pages/admin/IncidentConfiguration';
+import ServiceRequestConfiguration from '@/pages/admin/ServiceRequestConfiguration';
+import ChangeConfiguration from '@/pages/admin/ChangeConfiguration';
+import ProblemConfiguration from '@/pages/admin/ProblemConfiguration';
+import AssetConfiguration from '@/pages/admin/AssetConfiguration';
+import SLASettings from '@/pages/admin/SLASettings';
+import ErrorLogs from '@/pages/admin/ErrorLogs';
+import SecuritySettings from '@/components/admin/SecuritySettings';
+import ConfigurationSettings from '@/components/admin/ConfigurationSettings';
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Authentication routes */}
       <Route path="/login" element={<Login />} />
       
-      {/* Dashboard route */}
       <Route 
         path="/dashboard" 
         element={
@@ -38,7 +45,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Incident Management routes */}
       <Route 
         path="/incidents" 
         element={
@@ -60,7 +66,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Service Request routes */}
       <Route 
         path="/service-requests" 
         element={
@@ -82,7 +87,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Change Management routes */}
       <Route 
         path="/changes" 
         element={
@@ -104,7 +108,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Release Management routes */}
       <Route 
         path="/releases" 
         element={
@@ -126,7 +129,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Asset Management routes */}
       <Route 
         path="/assets" 
         element={
@@ -148,7 +150,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Test Management routes */}
       <Route 
         path="/test-tracking" 
         element={
@@ -180,7 +181,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* User Management route */}
       <Route 
         path="/users" 
         element={
@@ -192,7 +192,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Reporting route */}
       <Route 
         path="/reports" 
         element={
@@ -204,7 +203,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Problem Management route */}
       <Route 
         path="/problem-management" 
         element={
@@ -216,7 +214,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Calendar route */}
       <Route 
         path="/calendar" 
         element={
@@ -228,7 +225,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Backlog route */}
       <Route 
         path="/backlog" 
         element={
@@ -240,7 +236,6 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Admin routes - Make sure all are locked down to admin role */}
       <Route 
         path="/admin" 
         element={
@@ -251,28 +246,121 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         } 
       />
+      
       <Route 
-        path="/admin/*" 
+        path="/admin/system-configuration" 
         element={
           <ProtectedRoute requiredRoles={['admin']}>
             <MainLayout>
-              <AdminSettings />
-            </MainLayout>
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/settings/*" 
-        element={
-          <ProtectedRoute requiredRoles={['admin']}>
-            <MainLayout>
-              <AdminSettings />
+              <ConfigurationSettings />
             </MainLayout>
           </ProtectedRoute>
         } 
       />
       
-      {/* Default route */}
+      <Route 
+        path="/admin/security-settings" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <SecuritySettings />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/error-logs" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <ErrorLogs />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/incident-configuration" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <IncidentConfiguration />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/service-request-configuration" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <ServiceRequestConfiguration />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/change-configuration" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <ChangeConfiguration />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/problem-configuration" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <ProblemConfiguration />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/asset-configuration" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <AssetConfiguration />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/sla-settings" 
+        element={
+          <ProtectedRoute requiredRoles={['admin']}>
+            <MainLayout>
+              <SLASettings />
+            </MainLayout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/settings/sla" 
+        element={<Navigate to="/admin/sla-settings" replace />} 
+      />
+      
+      <Route 
+        path="/settings/dropdown-configurations" 
+        element={<Navigate to="/admin" replace />} 
+      />
+      
+      <Route 
+        path="/settings/risk-assessment" 
+        element={<Navigate to="/admin/change-configuration" replace />} 
+      />
+      
       <Route path="/" element={<Navigate to="/dashboard" />} />
     </Routes>
   );
