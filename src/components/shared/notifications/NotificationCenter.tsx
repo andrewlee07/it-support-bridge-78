@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, BellOff, Check, ChevronLeft, ChevronRight, Cog, X } from 'lucide-react';
@@ -23,7 +22,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { getIconForResultType } from './notificationHelpers';
+import { getIconForResultType } from './iconHelpers';
+import { formatTimestamp } from './timeHelpers';
 
 interface Notification {
   id: string;
@@ -42,7 +42,6 @@ interface Notification {
   };
 }
 
-// Sample notifications data
 const mockNotifications: Notification[] = [
   {
     id: 'n1',
@@ -119,7 +118,6 @@ const mockNotifications: Notification[] = [
   }
 ];
 
-// Format a timestamp relative to current time
 const formatTimestamp = (date: Date): string => {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();

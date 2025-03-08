@@ -2,7 +2,7 @@
 import React from 'react';
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { SearchResult } from '../types';
-import { getIconForResultType } from '../../notifications/notificationHelpers';
+import { getIconForResultType } from '../../notifications/iconHelpers';
 
 interface SearchResultsProps {
   results: SearchResult[];
