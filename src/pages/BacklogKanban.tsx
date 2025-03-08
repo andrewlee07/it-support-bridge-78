@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +17,7 @@ const BacklogKanban: React.FC = () => {
   const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
   const [columnSize, setColumnSize] = useState<'compact' | 'standard'>('standard');
   const [searchQuery, setSearchQuery] = useState('');
+  const [newItemDialogOpen, setNewItemDialogOpen] = useState(false);
 
   // Fetch all backlog items
   const { data: backlogItemsResponse, isLoading, refetch } = useQuery({
@@ -75,11 +77,18 @@ const BacklogKanban: React.FC = () => {
 
   const handleFormSuccess = () => {
     setEditingItem(null);
+    setNewItemDialogOpen(false);
     refetch();
+    toast.success('Backlog item created successfully');
   };
 
   const handleFormCancel = () => {
     setEditingItem(null);
+    setNewItemDialogOpen(false);
+  };
+
+  const handleCreateItem = () => {
+    setNewItemDialogOpen(true);
   };
 
   return (
@@ -93,6 +102,7 @@ const BacklogKanban: React.FC = () => {
           onViewTable={handleViewTable}
           columnSize={columnSize}
           setColumnSize={setColumnSize}
+          onCreateItem={handleCreateItem}
         />
         
         <KanbanBoard 
@@ -116,6 +126,18 @@ const BacklogKanban: React.FC = () => {
                 onCancel={handleFormCancel}
               />
             )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={newItemDialogOpen} onOpenChange={setNewItemDialogOpen}>
+          <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Create New Backlog Item</DialogTitle>
+            </DialogHeader>
+            <BacklogItemForm
+              onSuccess={handleFormSuccess}
+              onCancel={handleFormCancel}
+            />
           </DialogContent>
         </Dialog>
       </div>

@@ -20,6 +20,7 @@ interface BacklogKanbanHeaderProps {
   onViewTable: () => void;
   columnSize: 'compact' | 'standard';
   setColumnSize: (size: 'compact' | 'standard') => void;
+  onCreateItem: () => void;
 }
 
 const BacklogKanbanHeader: React.FC<BacklogKanbanHeaderProps> = ({
@@ -30,6 +31,7 @@ const BacklogKanbanHeader: React.FC<BacklogKanbanHeaderProps> = ({
   onViewTable,
   columnSize,
   setColumnSize,
+  onCreateItem,
 }) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -77,7 +79,10 @@ const BacklogKanbanHeader: React.FC<BacklogKanbanHeaderProps> = ({
             Table View
           </Button>
           
-          <Button size="sm">
+          <Button 
+            size="sm"
+            onClick={onCreateItem}
+          >
             <Plus className="h-4 w-4 mr-1" />
             Add Item
           </Button>

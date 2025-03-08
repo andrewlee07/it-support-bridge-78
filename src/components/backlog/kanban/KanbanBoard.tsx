@@ -6,8 +6,11 @@ import KanbanColumn from './KanbanColumn';
 import { cn } from '@/lib/utils';
 import { defaultKanbanConfig, KanbanBoardConfig, KanbanColumnConfig } from '@/utils/types/kanbanTypes';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { Settings, Plus } from 'lucide-react';
 import KanbanConfigDialog from './KanbanConfigDialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import BacklogItemForm from '@/components/backlog/BacklogItemForm';
 
 interface KanbanBoardProps {
   backlogItems: BacklogItem[];
@@ -28,7 +31,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 }) => {
   const [collapsedColumns, setCollapsedColumns] = useState<string[]>([]);
   const [boardConfig, setBoardConfig] = useState<KanbanBoardConfig>(defaultKanbanConfig);
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [configOpen, setConfigOpen] = useState(false);
+  const [newItemDialogOpen, setNewItemDialogOpen] = useState(false);
 
   // Load configuration from localStorage if available
   useEffect(() => {
@@ -57,7 +61,16 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   const updateBoardConfig = (newConfig: KanbanBoardConfig) => {
     setBoardConfig(newConfig);
-    setIsConfigOpen(false);
+    setConfigOpen(false);
+  };
+
+  const handleNewItemSuccess = (item: BacklogItem) => {
+    setNewItemDialogOpen(false);
+    // The parent component will refresh the list through the query invalidation
+  };
+
+  const handleNewItemCancel = () => {
+    setNewItemDialogOpen(false);
   };
 
   // Group items by status
@@ -81,11 +94,21 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between mb-4">
+        <Button 
+          variant="default" 
+          size="sm" 
+          onClick={() => setNewItemDialogOpen(true)}
+          className="flex items-center gap-1"
+        >
+          <Plus className="h-4 w-4" />
+          Create Backlog Item
+        </Button>
+        
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => setIsConfigOpen(true)}
+          onClick={() => setConfigOpen(true)}
           className="flex items-center gap-1"
         >
           <Settings className="h-4 w-4" />
@@ -94,35 +117,49 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       </div>
 
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className={cn(
-          "grid gap-4 overflow-x-auto pb-4",
-          boardConfig.layout === 'horizontal' 
-            ? "grid-flow-col auto-cols-fr" 
-            : columnSize === 'compact' 
-              ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-6" 
-              : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-        )}>
-          {sortedColumns.map((column) => (
-            <KanbanColumn
-              key={column.id}
-              columnConfig={column}
-              items={itemsByStatus[column.statusValue as BacklogItemStatus] || []}
-              isCollapsed={collapsedColumns.includes(column.id)}
-              onToggleCollapse={() => toggleColumn(column.id)}
-              onEditItem={onEditItem}
-              onQuickStatusChange={onQuickStatusChange}
-              columnSize={columnSize}
-            />
-          ))}
-        </div>
+        <ScrollArea className="w-full" orientation="horizontal">
+          <div className={cn(
+            "grid gap-4 pb-4 min-w-full",
+            boardConfig.layout === 'horizontal' 
+              ? "grid-flow-col auto-cols-[300px]" 
+              : columnSize === 'compact' 
+                ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-6" 
+                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          )}>
+            {sortedColumns.map((column) => (
+              <KanbanColumn
+                key={column.id}
+                columnConfig={column}
+                items={itemsByStatus[column.statusValue as BacklogItemStatus] || []}
+                isCollapsed={collapsedColumns.includes(column.id)}
+                onToggleCollapse={() => toggleColumn(column.id)}
+                onEditItem={onEditItem}
+                onQuickStatusChange={onQuickStatusChange}
+                columnSize={columnSize}
+              />
+            ))}
+          </div>
+        </ScrollArea>
       </DragDropContext>
 
       <KanbanConfigDialog
-        isOpen={isConfigOpen}
-        onClose={() => setIsConfigOpen(false)}
+        open={configOpen}
+        onClose={() => setConfigOpen(false)}
         currentConfig={boardConfig}
         onSave={updateBoardConfig}
       />
+
+      <Dialog open={newItemDialogOpen} onOpenChange={setNewItemDialogOpen}>
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create New Backlog Item</DialogTitle>
+          </DialogHeader>
+          <BacklogItemForm
+            onSuccess={handleNewItemSuccess}
+            onCancel={handleNewItemCancel}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
