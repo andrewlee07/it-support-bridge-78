@@ -1,16 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -18,306 +11,243 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { NotificationTemplate, EventType } from '@/utils/types/notification';
-import { toast } from 'sonner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { useNotificationTemplates } from '@/hooks/useNotifications';
+import { NotificationTemplate } from '@/utils/types/notification';
 
+// Schema for the notification template form
 const templateSchema = z.object({
-  name: z.string().min(3, {
-    message: 'Template name must be at least 3 characters.',
-  }),
-  eventType: z.string({
-    required_error: 'Please select an event type.',
-  }),
-  subject: z.string().min(3, {
-    message: 'Subject must be at least 3 characters.',
-  }),
-  body: z.string().min(10, {
-    message: 'Body must be at least 10 characters.',
-  }),
+  name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
+  eventType: z.string().min(1, { message: 'Event type is required.' }),
+  subject: z.string().min(3, { message: 'Subject is required.' }),
+  body: z.string().min(10, { message: 'Body must be at least 10 characters.' }),
   isActive: z.boolean().default(true),
 });
 
-type FormValues = z.infer<typeof templateSchema>;
-
 interface NotificationTemplateFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  initialData?: NotificationTemplate;
-  onSave: (template: Omit<NotificationTemplate, 'id' | 'lastModified' | 'lastModifiedBy'>) => Promise<NotificationTemplate | null>;
+  template?: NotificationTemplate;
+  onClose: () => void;
 }
 
 const NotificationTemplateForm: React.FC<NotificationTemplateFormProps> = ({
-  open,
-  onOpenChange,
-  initialData,
-  onSave
+  template,
+  onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState('edit');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const form = useForm<FormValues>({
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const { createTemplate, updateTemplate } = useNotificationTemplates();
+  const isEditing = !!template;
+
+  // Initialize form with template data or defaults
+  const form = useForm<z.infer<typeof templateSchema>>({
     resolver: zodResolver(templateSchema),
     defaultValues: {
-      name: initialData?.name || '',
-      eventType: initialData?.eventType || '',
-      subject: initialData?.subject || '',
-      body: initialData?.body || '',
-      isActive: initialData?.isActive ?? true,
+      name: template?.name || '',
+      eventType: template?.eventType || '',
+      subject: template?.subject || '',
+      body: template?.body || '',
+      isActive: template?.isActive !== undefined ? template.isActive : true,
     },
   });
 
-  useEffect(() => {
-    if (open && initialData) {
-      form.reset({
-        name: initialData.name,
-        eventType: initialData.eventType,
-        subject: initialData.subject,
-        body: initialData.body,
-        isActive: initialData.isActive,
-      });
-    } else if (open) {
-      form.reset({
-        name: '',
-        eventType: '',
-        subject: '',
-        body: '',
-        isActive: true,
-      });
-    }
-  }, [open, initialData, form]);
-
-  const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
+  const onSubmit = async (data: z.infer<typeof templateSchema>) => {
     try {
-      const result = await onSave(data);
-      if (result) {
-        form.reset();
-        onOpenChange(false);
+      if (isEditing && template) {
+        await updateTemplate(template.id, data);
+      } else {
+        await createTemplate(data);
       }
+      onClose();
     } catch (error) {
-      toast.error('Failed to save template');
       console.error('Error saving template:', error);
-    } finally {
-      setIsSubmitting(false);
+      // Add error handling here
     }
   };
 
-  const placeholderValues = {
-    ticketId: 'INC00001',
-    ticketTitle: 'Email Service Unavailable',
-    status: 'In Progress',
-    assignee: 'Jane Smith',
-    link: 'https://example.com/tickets/INC00001',
-    requester: 'John Doe'
-  };
-
-  const replacePlaceholders = (text: string) => {
-    return text
-      .replace(/\{ticketId\}/g, placeholderValues.ticketId)
-      .replace(/\{ticketTitle\}/g, placeholderValues.ticketTitle)
-      .replace(/\{status\}/g, placeholderValues.status)
-      .replace(/\{assignee\}/g, placeholderValues.assignee)
-      .replace(/\{link\}/g, placeholderValues.link)
-      .replace(/\{requester\}/g, placeholderValues.requester);
+  const handlePreview = () => {
+    setPreviewOpen(true);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit Template' : 'Create Template'}</DialogTitle>
-          <DialogDescription>
-            {initialData 
-              ? 'Update the notification template settings and content.' 
-              : 'Create a new notification template for sending alerts.'}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 mb-4">
-            <TabsTrigger value="edit">Edit Template</TabsTrigger>
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="edit">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Template Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter template name" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        A descriptive name for this notification template.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="eventType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Event Type</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select an event type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="incident-created">Incident Created</SelectItem>
-                          <SelectItem value="incident-assigned">Incident Assigned</SelectItem>
-                          <SelectItem value="incident-resolved">Incident Resolved</SelectItem>
-                          <SelectItem value="service-request-created">Service Request Created</SelectItem>
-                          <SelectItem value="service-request-approval-required">Service Request Approval Required</SelectItem>
-                          <SelectItem value="service-request-completed">Service Request Completed</SelectItem>
-                          <SelectItem value="asset-created">Asset Created</SelectItem>
-                          <SelectItem value="asset-updated">Asset Updated</SelectItem>
-                          <SelectItem value="asset-assigned">Asset Assigned</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        When this notification should be sent.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="subject"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Subject</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Email subject line" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        The subject line of the email notification.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="body"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Body</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Email body content" 
-                          className="min-h-32" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Available placeholders: {'{ticketId}'}, {'{ticketTitle}'}, {'{status}'}, {'{assignee}'}, {'{link}'}, {'{requester}'}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Active Status</FormLabel>
-                        <FormDescription>
-                          Enable or disable this notification template.
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <DialogFooter>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => onOpenChange(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Saving...' : 'Save Template'}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </TabsContent>
-          
-          <TabsContent value="preview" className="space-y-4">
-            <div className="border rounded-md p-4 space-y-2">
-              <div className="font-medium">Subject Preview:</div>
-              <div className="p-2 bg-muted rounded-md">
-                {replacePlaceholders(form.watch('subject'))}
-              </div>
-            </div>
-            
-            <div className="border rounded-md p-4 space-y-2">
-              <div className="font-medium">Email Body Preview:</div>
-              <div className="p-3 bg-muted rounded-md whitespace-pre-line">
-                {replacePlaceholders(form.watch('body'))}
-              </div>
-            </div>
-            
-            <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setActiveTab('edit')}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Template Name</FormLabel>
+              <FormControl>
+                <Input placeholder="New Incident Notification" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="eventType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Event Type</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
               >
-                Back to Edit
-              </Button>
-              <Button 
-                type="button"
-                onClick={form.handleSubmit(onSubmit)}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Template'}
-              </Button>
-            </DialogFooter>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select event type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="incident-created">Incident Created</SelectItem>
+                  <SelectItem value="incident-assigned">Incident Assigned</SelectItem>
+                  <SelectItem value="incident-resolved">Incident Resolved</SelectItem>
+                  <SelectItem value="service-request-created">Service Request Created</SelectItem>
+                  <SelectItem value="service-request-approval-required">Service Request Approval Required</SelectItem>
+                  <SelectItem value="service-request-completed">Service Request Completed</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Determines when this notification will be sent
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="subject"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Subject</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="New Incident: {ticketId} - {ticketTitle}"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                You can use placeholders like {'{ticketId}'}, {'{ticketTitle}'}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="body"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Body</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Hello,
+
+A new incident has been created:
+
+ID: {ticketId}
+Title: {ticketTitle}
+Status: {status}
+
+You can view the incident here: {link}
+
+Regards,
+IT Support Team"
+                  className="min-h-[200px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Available placeholders: {'{ticketId}'}, {'{ticketTitle}'}, {'{status}'}, {'{assignee}'}, {'{link}'}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="isActive"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Active</FormLabel>
+                <FormDescription>
+                  Enable or disable this notification template
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-between">
+          <Button type="button" variant="outline" onClick={handlePreview}>
+            Preview
+          </Button>
+          <div className="space-x-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              {isEditing ? 'Update Template' : 'Create Template'}
+            </Button>
+          </div>
+        </div>
+      </form>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Template Preview</DialogTitle>
+            <DialogDescription>
+              This is how your notification will appear with sample data
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="font-semibold">
+              Subject: {form.watch('subject')
+                .replace('{ticketId}', 'INC00001')
+                .replace('{ticketTitle}', 'Email Service Unavailable')}
+            </div>
+            <div className="whitespace-pre-wrap border rounded-md p-4 bg-muted/30">
+              {form.watch('body')
+                .replace('{ticketId}', 'INC00001')
+                .replace('{ticketTitle}', 'Email Service Unavailable')
+                .replace('{status}', 'New')
+                .replace('{assignee}', 'Jane Smith')
+                .replace('{link}', 'http://example.com/incidents/INC00001')}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </Form>
   );
 };
 

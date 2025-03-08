@@ -7,10 +7,7 @@ export type EventType =
   | 'incident-resolved'
   | 'service-request-created'
   | 'service-request-approval-required'
-  | 'service-request-completed'
-  | 'asset-created'
-  | 'asset-updated'
-  | 'asset-assigned';
+  | 'service-request-completed';
 
 export type RecipientType = 'requester' | 'assignee' | 'manager';
 

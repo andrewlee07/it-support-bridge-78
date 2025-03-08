@@ -52,6 +52,13 @@ const NotificationSystemHealth: React.FC = () => {
     }
   };
 
+  // Helper function to get progress indicator color based on value
+  const getProgressIndicatorClass = (value: number) => {
+    if (value > 90) return "bg-emerald-500";
+    if (value > 70) return "bg-amber-500";
+    return "bg-red-500";
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -104,7 +111,7 @@ const NotificationSystemHealth: React.FC = () => {
                   <Progress 
                     value={health.metrics.successRate} 
                     className="mt-2"
-                    indicator={health.metrics.successRate > 90 ? 'success' : health.metrics.successRate > 70 ? 'warning' : 'danger'}
+                    indicatorColor={getProgressIndicatorClass(health.metrics.successRate)}
                   />
                 </CardContent>
               </Card>
