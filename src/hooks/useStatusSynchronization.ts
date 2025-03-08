@@ -38,6 +38,20 @@ export function useStatusSynchronization() {
     updateMutation.mutate(newSettings);
   }, [updateMutation]);
 
+  // Function to validate configuration
+  const validateConfiguration = useCallback((config: StatusSynchronizationSettings): boolean => {
+    // Check if all required release statuses have mappings
+    const requiredStatuses: ReleaseStatus[] = ['Planned', 'In Progress', 'Deployed', 'Cancelled'];
+    
+    for (const status of requiredStatuses) {
+      if (!config.releaseToBacklogMapping[status] || !config.releaseToBugMapping[status]) {
+        return false;
+      }
+    }
+    
+    return true;
+  }, []);
+
   // Function to handle status synchronization
   const handleStatusChange = useCallback(async (
     releaseId: string, 
@@ -66,6 +80,7 @@ export function useStatusSynchronization() {
     handleStatusChange,
     getBacklogStatusForRelease,
     getBugStatusForRelease,
+    validateConfiguration,
     refresh: refetch
   };
 }
