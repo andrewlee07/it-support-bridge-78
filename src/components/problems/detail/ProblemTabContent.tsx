@@ -8,7 +8,6 @@ import ProblemUpdateForm from '../ProblemUpdateForm';
 import ProblemResolveForm from '../ProblemResolveForm';
 import ProblemNoteForm from '../ProblemNoteForm';
 import KnownErrorForm from '../KnownErrorForm';
-import { Database } from 'lucide-react';
 
 interface ProblemTabContentProps {
   activeTab: string;
@@ -44,40 +43,48 @@ const ProblemTabContent = ({
       {!isClosed && (
         <>
           <TabsContent value="update" className="pt-6">
-            <ProblemUpdateForm 
-              problem={problem} 
-              onSubmit={onUpdateProblem} 
-              onCancel={() => setActiveTab('details')}
-            />
+            <div className="border p-4 rounded-md bg-muted/30">
+              <ProblemUpdateForm 
+                problem={problem} 
+                onSubmit={onUpdateProblem} 
+                onCancel={() => setActiveTab('details')}
+              />
+            </div>
           </TabsContent>
           
           <TabsContent value="resolve" className="pt-6">
-            <ProblemResolveForm 
-              problem={problem} 
-              onSubmit={onResolveProblem} 
-              onCancel={() => setActiveTab('details')}
-            />
+            <div className="border p-4 rounded-md bg-muted/30">
+              <ProblemResolveForm 
+                problem={problem} 
+                onSubmit={onResolveProblem} 
+                onCancel={() => setActiveTab('details')}
+              />
+            </div>
           </TabsContent>
           
           <TabsContent value="note" className="pt-6">
-            <ProblemNoteForm 
-              onSubmit={(note) => {
-                onAddNote(note);
-                setActiveTab('details');
-              }} 
-              onCancel={() => setActiveTab('details')}
-            />
+            <div className="border p-4 rounded-md bg-muted/30">
+              <ProblemNoteForm 
+                onSubmit={(note) => {
+                  onAddNote(note);
+                  setActiveTab('details');
+                }} 
+                onCancel={() => setActiveTab('details')}
+              />
+            </div>
           </TabsContent>
           
           <TabsContent value="kedb" className="pt-6">
-            <KnownErrorForm 
-              problem={problem} 
-              onSubmit={(data) => {
-                onCreateKnownError(data);
-                setActiveTab('details');
-              }} 
-              onCancel={() => setActiveTab('details')}
-            />
+            <div className="border p-4 rounded-md bg-muted/30">
+              <KnownErrorForm 
+                problem={problem} 
+                onSubmit={(data) => {
+                  onCreateKnownError(data);
+                  setActiveTab('details');
+                }} 
+                onCancel={() => setActiveTab('details')}
+              />
+            </div>
           </TabsContent>
         </>
       )}

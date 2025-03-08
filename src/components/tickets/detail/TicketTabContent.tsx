@@ -73,17 +73,20 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
       </TabsContent>
       
       {/* Update Tab */}
-      <TabsContent value="update" className="h-full">
-        <TicketUpdateForm
-          defaultValues={{
-            status: ticket.status,
-            assignedTo: ticket.assignedTo || '',
-            notes: ''
-          }}
-          onSubmit={onUpdate}
-          onCancel={() => onTabChange('details')}
-          type={type}
-        />
+      <TabsContent value="update" className="h-full pb-6">
+        <div className="border p-4 rounded-md bg-muted/30">
+          <TicketUpdateForm
+            defaultValues={{
+              status: ticket.status,
+              assignedTo: ticket.assignedTo || '',
+              pendingSubStatus: ticket.pendingSubStatus,
+              notes: ''
+            }}
+            onSubmit={onUpdate}
+            onCancel={() => onTabChange('details')}
+            type={type}
+          />
+        </div>
       </TabsContent>
       
       {/* Resolve/Fulfill Tab */}
