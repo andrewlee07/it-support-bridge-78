@@ -10,6 +10,7 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   useEffect(() => {
     // Check for user's dark mode preference from localStorage or system preference
