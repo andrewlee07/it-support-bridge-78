@@ -62,7 +62,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
     e.preventDefault();
     // For tickets, use the right route based on ticket type
     let baseRoute = '/incidents'; 
-    if (ticket.type === 'service-request') {
+    if (ticket.type === 'service') {
       baseRoute = '/service-requests';
     } else if (ticket.type === 'change') {
       baseRoute = '/changes';
@@ -111,7 +111,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
           className="text-xs" 
           onClick={(e) => {
             e.stopPropagation(); // Prevent triggering the card click
-            const baseRoute = ticket.type === 'service-request' ? '/service-requests' : 
+            const baseRoute = ticket.type === 'service' ? '/service-requests' : 
                             ticket.type === 'change' ? '/changes' : '/incidents';
             navigate(`${baseRoute}/${ticket.id}`);
           }}
