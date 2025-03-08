@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -7,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Shield } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login, user } = useAuth();
+  const { login, user, pendingUser } = useAuth();
   const navigate = useNavigate();
 
   // If user is already logged in, redirect to dashboard
@@ -21,13 +21,24 @@ const Login = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // If there's a pending user requiring MFA verification, redirect to MFA page
+  useEffect(() => {
+    if (pendingUser) {
+      navigate('/mfa-verification');
+    }
+  }, [pendingUser, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
       const success = await login(email, password);
-      if (success) {
+      if (success && pendingUser) {
+        // If login was successful but requires MFA, we'll be redirected by the useEffect
+        // No need to navigate here
+      } else if (success) {
+        // If login was successful and doesn't require MFA, redirect to dashboard
         navigate('/dashboard');
       }
     } finally {
@@ -94,7 +105,7 @@ const Login = () => {
                   </Button>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex-col space-y-4">
                 <Button 
                   type="submit" 
                   className="w-full bg-[#b047c9] hover:bg-[#b047c9]/90 text-white" 
@@ -112,13 +123,17 @@ const Login = () => {
                     </>
                   )}
                 </Button>
+                <div className="w-full flex items-center justify-center text-sm text-muted-foreground">
+                  <Shield className="h-4 w-4 mr-1 text-[#b047c9]" />
+                  <span>Enhanced security with multi-factor authentication</span>
+                </div>
               </CardFooter>
             </form>
             <div className="p-4 text-center text-sm text-muted-foreground border-t">
               <p>Demo credentials:</p>
-              <p>Admin: john.doe@example.com</p>
-              <p>IT Staff: jane.smith@example.com</p>
-              <p>End User: bob.johnson@example.com</p>
+              <p>Admin: john.doe@example.com (Has MFA enabled)</p>
+              <p>IT Staff: jane.smith@example.com (Has MFA enabled)</p>
+              <p>End User: mike.johnson@example.com (No MFA)</p>
               <p>Password: Use any text (not validated in demo)</p>
             </div>
           </Card>
