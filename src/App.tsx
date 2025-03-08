@@ -25,6 +25,10 @@ import Reports from './pages/Reports';
 import SLASettings from './pages/SLASettings';
 import DropdownConfigurations from './pages/settings/DropdownConfigurations';
 import RiskAssessmentSettings from './pages/settings/RiskAssessmentSettings';
+import TestExecution from './pages/TestExecution';
+import Bugs from './pages/Bugs';
+import Calendar from './pages/Calendar';
+import ProblemManagement from './pages/ProblemManagement';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -56,6 +60,10 @@ function App() {
               <Route path="/backlog" element={<ProtectedRoute><Backlog /></ProtectedRoute>} />
               <Route path="/assets" element={<ProtectedRoute><Assets /></ProtectedRoute>} />
               <Route path="/test-tracking" element={<ProtectedRoute><TestTracking /></ProtectedRoute>} />
+              <Route path="/test-execution" element={<ProtectedRoute><TestExecution /></ProtectedRoute>} />
+              <Route path="/bugs" element={<ProtectedRoute><Bugs /></ProtectedRoute>} />
+              <Route path="/problem-management" element={<ProtectedRoute><ProblemManagement /></ProtectedRoute>} />
+              <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
               <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
               <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
               
