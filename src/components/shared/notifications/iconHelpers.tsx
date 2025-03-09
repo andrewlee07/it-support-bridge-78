@@ -7,7 +7,7 @@ import {
   FileText, 
   Package, 
   Search, 
-  Box, 
+  Package as BoxIcon, 
   Calendar 
 } from 'lucide-react';
 
@@ -25,7 +25,7 @@ export const getIconForResultType = (type: string) => {
     case 'release':
       return <Package className="h-4 w-4 text-green-500" />;
     case 'asset':
-      return <Box className="h-4 w-4 text-blue-500" />;
+      return <BoxIcon className="h-4 w-4 text-blue-500" />;
     case 'change':
       return <Calendar className="h-4 w-4 text-cyan-500" />;
     default:

@@ -5,11 +5,11 @@ import {
   ShieldAlert,
   MessageSquare,
   Clock3,
-  BoxesIcon,
+  Package,
   AlertCircle,
-  PanelRightIcon,
+  PanelRight,
   Users2,
-  OctagonAlert,
+  AlertOctagon,
   Headphones,
   FileSpreadsheet,
   CalendarDays,
@@ -24,7 +24,7 @@ import {
   Sliders,
   ArrowRightLeft,
   Link2,
-  LibraryIcon,
+  Library,
 } from 'lucide-react';
 
 import { NavItem } from './types';
@@ -47,22 +47,22 @@ export const navigationItems: NavItem[] = [
   },
   {
     name: 'Service Catalog',
-    icon: LibraryIcon,
+    icon: Library,
     path: '/service-catalog',
   },
   {
     name: 'Changes',
-    icon: PanelRightIcon,
+    icon: PanelRight,
     path: '/changes',
   },
   {
     name: 'Problems',
-    icon: OctagonAlert,
+    icon: AlertOctagon,
     path: '/problems',
   },
   {
     name: 'Assets',
-    icon: BoxesIcon,
+    icon: Package,
     path: '/assets',
   },
   {
