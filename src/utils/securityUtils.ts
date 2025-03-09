@@ -31,6 +31,8 @@ export const mockPermissions: Permission[] = [
   { id: 'perm-10', name: 'Reject Changes', description: 'Ability to reject changes', resource: 'changes', action: 'reject' },
   { id: 'perm-11', name: 'Approve Releases', description: 'Ability to approve releases', resource: 'releases', action: 'approve' },
   { id: 'perm-12', name: 'Reject Releases', description: 'Ability to reject releases', resource: 'releases', action: 'reject' },
+  { id: 'perm-13', name: 'Manage Service Catalog Config', description: 'Access to Service Catalog Configuration in admin settings', resource: 'service-catalog', action: 'configure' },
+  { id: 'perm-14', name: 'Manage Service Catalog Content', description: 'Access to manage service content within service catalog', resource: 'service-catalog', action: 'manage' },
 ];
 
 // Mock role permissions - in a real app, this would come from a database
@@ -73,6 +75,10 @@ export const mockRolePermissions: RolePermission[] = [
   { roleId: 'release-manager' as const, permissionId: 'perm-8' },
   { roleId: 'release-manager' as const, permissionId: 'perm-11' },
   { roleId: 'release-manager' as const, permissionId: 'perm-12' },
+  
+  // Service Catalog Manager permissions
+  { roleId: 'service-catalog-manager' as const, permissionId: 'perm-1' }, // View tickets
+  { roleId: 'service-catalog-manager' as const, permissionId: 'perm-14' }, // Manage service catalog content
 ];
 
 // Placeholder for security event log - in a real app, this would be stored in a database

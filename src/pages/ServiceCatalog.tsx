@@ -2,14 +2,20 @@
 import React, { useEffect, useState } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import ServiceList from '@/components/services/ServiceList';
+import ServiceManagement from '@/components/services/ServiceManagement';
 import { ServiceWithCategory } from '@/utils/types/service';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useServices } from '@/hooks/useServices';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ServiceCatalog: React.FC = () => {
   const { services, categories, isLoading } = useServices();
   const [activeTab, setActiveTab] = useState('all');
+  const { userHasPermission } = useAuth();
+  
+  const canManageContent = userHasPermission('Manage Service Catalog Content') || 
+                          userHasPermission('Manage Service Catalog Config');
 
   const handleServiceSelect = (service: ServiceWithCategory) => {
     console.log('Service selected:', service);
@@ -20,11 +26,15 @@ const ServiceCatalog: React.FC = () => {
   return (
     <PageTransition>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Service Catalog</h1>
-          <p className="text-muted-foreground mt-1">
-            Browse and request available IT services
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Service Catalog</h1>
+            <p className="text-muted-foreground mt-1">
+              Browse and request available IT services
+            </p>
+          </div>
+          
+          {canManageContent && <ServiceManagement />}
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>

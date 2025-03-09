@@ -1,3 +1,4 @@
+
 import { User, UserRole, MFAMethod } from '../types/user';
 
 // Mock user data
@@ -76,6 +77,21 @@ export const mockUsers: User[] = [
       {
         question: "What was the name of your elementary school?",
         answer: "Lincoln"
+      }
+    ]
+  },
+  { 
+    id: 'user-6', 
+    name: 'Alex Rivera', 
+    email: 'alex.rivera@example.com', 
+    role: 'service-catalog-manager' as UserRole,
+    department: 'IT Services',
+    active: true,
+    mfaEnabled: false,
+    securityQuestions: [
+      {
+        question: "What is your favorite book?",
+        answer: "The Great Gatsby"
       }
     ]
   }

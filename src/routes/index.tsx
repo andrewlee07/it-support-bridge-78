@@ -1,3 +1,4 @@
+
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
@@ -21,6 +22,7 @@ import SecurityQuestionRecovery from "@/pages/SecurityQuestionRecovery";
 // Other standalone pages
 import NotFound from "@/pages/NotFound";
 import ServiceCatalog from "@/pages/ServiceCatalog";
+import ServiceManagementPage from "@/pages/ServiceManagementPage";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "/service-catalog",
         element: <ServiceCatalog />,
+      },
+      {
+        path: "/service-management",
+        element: <ServiceManagementPage />,
       },
     ],
   },
