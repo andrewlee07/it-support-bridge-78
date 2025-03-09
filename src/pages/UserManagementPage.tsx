@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserList } from '@/components/users/UserList';
+import UserList from '@/components/users/UserList';
 import PageTransition from '@/components/shared/PageTransition';
 
 const UserManagementPage = () => {
