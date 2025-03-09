@@ -31,6 +31,8 @@ export const mockPermissions: Permission[] = [
   { id: 'perm-10', name: 'Reject Changes', description: 'Ability to reject changes', resource: 'changes', action: 'reject' },
   { id: 'perm-11', name: 'Approve Releases', description: 'Ability to approve releases', resource: 'releases', action: 'approve' },
   { id: 'perm-12', name: 'Reject Releases', description: 'Ability to reject releases', resource: 'releases', action: 'reject' },
+  { id: 'perm-13', name: 'manage_service_catalog_config', description: 'Access to system-wide service catalog configuration', resource: 'service-catalog', action: 'update' },
+  { id: 'perm-14', name: 'manage_service_catalog_content', description: 'Access to manage service content within service catalog', resource: 'service-catalog', action: 'update' },
 ];
 
 // Mock role permissions - in a real app, this would come from a database
@@ -73,6 +75,9 @@ export const mockRolePermissions: RolePermission[] = [
   { roleId: 'release-manager' as const, permissionId: 'perm-8' },
   { roleId: 'release-manager' as const, permissionId: 'perm-11' },
   { roleId: 'release-manager' as const, permissionId: 'perm-12' },
+  
+  // Service Catalog Manager permissions
+  { roleId: 'service-catalog-manager' as const, permissionId: 'perm-14' },
 ];
 
 // Placeholder for security event log - in a real app, this would be stored in a database
@@ -173,10 +178,24 @@ export const hasPermission = (user: User, permissionName: string): boolean => {
   const permission = mockPermissions.find(p => p.name === permissionName);
   if (!permission) return false;
   
-  // Check if user's role has this permission
-  return mockRolePermissions.some(rp => 
+  // Check if user's primary role has this permission
+  const hasPrimaryRolePermission = mockRolePermissions.some(rp => 
     rp.roleId === user.role && rp.permissionId === permission.id
   );
+  
+  // If user has the permission through primary role, return true
+  if (hasPrimaryRolePermission) return true;
+  
+  // Check if user has additional roles with this permission
+  if (user.roles && user.roles.length > 0) {
+    for (const role of user.roles) {
+      if (mockRolePermissions.some(rp => rp.roleId === role && rp.permissionId === permission.id)) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
 };
 
 // Check if a user can perform an action on a resource
@@ -186,12 +205,30 @@ export const canPerformAction = (user: User, resource: string, action: Permissio
   // Find permissions for this resource and action
   const permissions = mockPermissions.filter(p => p.resource === resource && p.action === action);
   
-  // Check if user's role has any of these permissions
-  return permissions.some(permission => 
+  // Check if user's primary role has any of these permissions
+  const hasPrimaryRolePermission = permissions.some(permission => 
     mockRolePermissions.some(rp => 
       rp.roleId === user.role && rp.permissionId === permission.id
     )
   );
+  
+  // If user has the permission through primary role, return true
+  if (hasPrimaryRolePermission) return true;
+  
+  // Check if user has additional roles with any of these permissions
+  if (user.roles && user.roles.length > 0) {
+    for (const role of user.roles) {
+      if (permissions.some(permission =>
+        mockRolePermissions.some(rp => 
+          rp.roleId === role && rp.permissionId === permission.id
+        )
+      )) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
 };
 
 // Check if user's session has expired

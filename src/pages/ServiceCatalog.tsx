@@ -1,92 +1,103 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
-import ServiceList from '@/components/services/ServiceList';
-import { ServiceWithCategory } from '@/utils/types/service';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useServices } from '@/hooks/useServices';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import ServiceList from '@/components/services/ServiceList';
+import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
+import ServiceCatalogManagerModal from '@/components/services/ServiceCatalogManagerModal';
 
-const ServiceCatalog: React.FC = () => {
-  const { services, categories, isLoading } = useServices();
-  const [activeTab, setActiveTab] = useState('all');
-
-  const handleServiceSelect = (service: ServiceWithCategory) => {
-    console.log('Service selected:', service);
-    // In a real application, this would navigate to a service detail page
-    // or open a modal with service details
-  };
+const ServiceCatalog = () => {
+  const { services, categories, isLoading, error } = useServices();
+  const { userHasPermission } = useAuth();
+  const [isManagerModalOpen, setIsManagerModalOpen] = useState(false);
+  
+  const hasContentPermission = userHasPermission('manage_service_catalog_content');
 
   return (
     <PageTransition>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Service Catalog</h1>
-          <p className="text-muted-foreground mt-1">
-            Browse and request available IT services
-          </p>
-        </div>
+      <div className="container mx-auto py-6">
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Service Catalog</h1>
+              <p className="text-muted-foreground mt-1">
+                Browse and request available services
+              </p>
+            </div>
+            
+            {hasContentPermission && (
+              <Button variant="outline" onClick={() => setIsManagerModalOpen(true)}>
+                <Settings className="mr-2 h-4 w-4" />
+                Manage Services
+              </Button>
+            )}
+          </div>
 
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="all">All Services</TabsTrigger>
-            <TabsTrigger value="popular">Popular</TabsTrigger>
-            <TabsTrigger value="new">New</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="all" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Available Services</CardTitle>
-                <CardDescription>Browse all available IT services</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ServiceList 
-                  services={services || []} 
-                  categories={categories || []}
-                  onSelect={handleServiceSelect}
-                  isLoading={isLoading}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="popular" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Popular Services</CardTitle>
-                <CardDescription>Most frequently requested services</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* For demo purposes, we'll show the same service list */}
-                <ServiceList 
-                  services={(services || []).slice(0, 3)} 
-                  categories={categories || []}
-                  onSelect={handleServiceSelect}
-                  isLoading={isLoading}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="new" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>New Services</CardTitle>
-                <CardDescription>Recently added services</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* For demo purposes, we'll show the same service list */}
-                <ServiceList 
-                  services={(services || []).slice(0, 2)} 
-                  categories={categories || []}
-                  onSelect={handleServiceSelect}
-                  isLoading={isLoading}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          <Tabs defaultValue="all" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="all">All Services</TabsTrigger>
+              {categories?.map((category) => (
+                <TabsTrigger key={category.id} value={category.id}>
+                  {category.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            <TabsContent value="all" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Services</CardTitle>
+                  <CardDescription>Browse all available services</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {services ? (
+                    <ServiceList services={services} isLoading={isLoading} />
+                  ) : (
+                    <p className="text-muted-foreground">
+                      {isLoading ? "Loading services..." : "No services found."}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {categories?.map((category) => (
+              <TabsContent key={category.id} value={category.id} className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{category.name}</CardTitle>
+                    <CardDescription>{category.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {services ? (
+                      <ServiceList 
+                        services={services.filter(service => service.categoryId === category.id)} 
+                        isLoading={isLoading} 
+                      />
+                    ) : (
+                      <p className="text-muted-foreground">
+                        {isLoading ? "Loading services..." : "No services found in this category."}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+        
+        {hasContentPermission && (
+          <ServiceCatalogManagerModal 
+            isOpen={isManagerModalOpen} 
+            setIsOpen={setIsManagerModalOpen} 
+            services={services || []}
+            categories={categories || []}
+          />
+        )}
       </div>
     </PageTransition>
   );
