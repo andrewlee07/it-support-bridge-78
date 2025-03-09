@@ -18,7 +18,7 @@ const StatusSection: React.FC<StatusSectionProps> = ({ form }) => {
           <FormItem>
             <FormLabel>Status</FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value || "new"}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -45,7 +45,7 @@ const StatusSection: React.FC<StatusSectionProps> = ({ form }) => {
           <FormItem>
             <FormLabel>Priority</FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value || "P3"}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
@@ -70,7 +70,7 @@ const StatusSection: React.FC<StatusSectionProps> = ({ form }) => {
             <FormControl>
               <Select
                 onValueChange={field.onChange}
-                defaultValue={field.value || "none"}
+                value={field.value || "none"}
                 disabled={form.watch("status") !== "pending"}
               >
                 <SelectTrigger>

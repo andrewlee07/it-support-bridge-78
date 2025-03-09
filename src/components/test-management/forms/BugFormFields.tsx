@@ -156,7 +156,7 @@ const BugFormFields: React.FC<BugFormFieldsProps> = ({
             <FormLabel>Related Test Case (Optional)</FormLabel>
             <Select
               onValueChange={field.onChange}
-              defaultValue={field.value}
+              defaultValue={field.value || "none"}
             >
               <FormControl>
                 <SelectTrigger>
@@ -164,7 +164,6 @@ const BugFormFields: React.FC<BugFormFieldsProps> = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {/* Fix: Using "none" instead of an empty string for the placeholder option */}
                 <SelectItem value="none">None</SelectItem>
                 {testCases.map((testCase) => (
                   <SelectItem key={testCase.id} value={testCase.id}>

@@ -43,8 +43,7 @@ const AssignmentFields: React.FC<AssignmentFieldsProps> = ({ form, releases }) =
             <FormLabel>Release</FormLabel>
             <Select 
               onValueChange={field.onChange} 
-              defaultValue={field.value} 
-              value={field.value}
+              value={field.value || "none"}
             >
               <FormControl>
                 <SelectTrigger>

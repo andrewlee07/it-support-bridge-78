@@ -26,7 +26,7 @@ const StatusAndPriorityFields: React.FC<StatusAndPriorityFieldsProps> = ({ form 
             <FormLabel>Status</FormLabel>
             <Select 
               onValueChange={field.onChange} 
-              defaultValue={field.value}
+              value={field.value || "open"}
             >
               <FormControl>
                 <SelectTrigger>
@@ -55,7 +55,7 @@ const StatusAndPriorityFields: React.FC<StatusAndPriorityFieldsProps> = ({ form 
             <FormLabel>Priority</FormLabel>
             <Select 
               onValueChange={field.onChange} 
-              defaultValue={field.value}
+              value={field.value || "medium"}
             >
               <FormControl>
                 <SelectTrigger>

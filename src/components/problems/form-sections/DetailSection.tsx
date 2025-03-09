@@ -20,7 +20,7 @@ const DetailSection: React.FC<DetailSectionProps> = ({ form }) => {
           <FormItem>
             <FormLabel>Assigned To</FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value || "unassigned"}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select assignee" />
                 </SelectTrigger>
@@ -45,7 +45,7 @@ const DetailSection: React.FC<DetailSectionProps> = ({ form }) => {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value || "software"}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>

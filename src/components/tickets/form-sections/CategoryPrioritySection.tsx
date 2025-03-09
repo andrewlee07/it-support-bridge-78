@@ -40,7 +40,7 @@ const CategoryPrioritySection: React.FC<CategoryPrioritySectionProps> = ({
         render={({ field }) => (
           <FormItem>
             <FormLabel>{isFieldRequired('category') && <span className="text-red-500 mr-1">*</span>}Category</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} value={field.value || "hardware"}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a category" />
@@ -69,7 +69,7 @@ const CategoryPrioritySection: React.FC<CategoryPrioritySectionProps> = ({
         render={({ field }) => (
           <FormItem>
             <FormLabel>{isFieldRequired('priority') && <span className="text-red-500 mr-1">*</span>}Priority</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} value={field.value || "P3"}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a priority" />

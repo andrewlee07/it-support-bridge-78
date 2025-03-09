@@ -32,13 +32,13 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
   servicesByCategory,
   type
 }) => {
-  const [selectedServiceId, setSelectedServiceId] = useState<string>('');
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('none');
 
   // Update the selected service when the form value changes
   useEffect(() => {
     const subscription = form.watch((value) => {
       if (value.serviceId !== selectedServiceId) {
-        setSelectedServiceId(value.serviceId || '');
+        setSelectedServiceId(value.serviceId || 'none');
       }
     });
     
@@ -55,10 +55,10 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
             <FormLabel>Service</FormLabel>
             <Select 
               onValueChange={(value) => {
-                field.onChange(value);
+                field.onChange(value === 'none' ? '' : value);
                 setSelectedServiceId(value);
               }} 
-              value={field.value}
+              value={field.value || 'none'}
             >
               <FormControl>
                 <SelectTrigger>
@@ -66,7 +66,7 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="">-- No service selected --</SelectItem>
+                <SelectItem value="none">-- No service selected --</SelectItem>
                 
                 {Object.entries(servicesByCategory).map(([category, services]) => (
                   <SelectGroup key={category}>
@@ -93,7 +93,7 @@ const ServiceSelection: React.FC<ServiceSelectionProps> = ({
       />
       
       {/* Show service context information when a service is selected */}
-      {selectedServiceId && <ServiceContextInfo serviceId={selectedServiceId} />}
+      {selectedServiceId && selectedServiceId !== 'none' && <ServiceContextInfo serviceId={selectedServiceId} />}
     </>
   );
 };

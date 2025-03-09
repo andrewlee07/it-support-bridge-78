@@ -21,10 +21,10 @@ export const useTicketForm = ({ onSubmit, type }: UseTicketFormProps) => {
   const defaultValues = {
     title: '',
     description: '',
-    category: '' as TicketCategory,
+    category: 'hardware' as TicketCategory, // Default to hardware instead of empty string
     priority: 'P3' as TicketPriority, // Default to P3 (medium priority)
     type: type,
-    serviceId: '',
+    serviceId: '', // This is okay as we handle it in the component
   };
   
   const form = useForm({ defaultValues });
