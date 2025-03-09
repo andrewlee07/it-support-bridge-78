@@ -5,6 +5,7 @@ import { Ticket, TicketPriority, TicketType, TicketCategory } from '@/utils/type
 import { toast } from 'sonner';
 import { getMandatoryFieldsConfig } from '@/api/statusSynchronization';
 import { getServicesByCategory } from '@/utils/mockData/services';
+import { ConfigurableEntityType } from '@/utils/types/configuration';
 
 interface UseTicketFormProps {
   onSubmit: (data: Partial<Ticket>) => void;
@@ -34,7 +35,7 @@ export const useTicketForm = ({ onSubmit, type }: UseTicketFormProps) => {
       setIsLoading(true);
       try {
         // Map ticket type to entity type
-        let entityType: string;
+        let entityType: ConfigurableEntityType;
         switch (type) {
           case 'incident':
             entityType = 'incident';
@@ -43,7 +44,7 @@ export const useTicketForm = ({ onSubmit, type }: UseTicketFormProps) => {
             entityType = 'service-request';
             break;
           case 'change':
-            entityType = 'change-request';
+            entityType = 'change';
             break;
           default:
             entityType = 'incident';
