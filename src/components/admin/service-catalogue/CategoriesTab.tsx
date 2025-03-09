@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useServices } from '@/hooks/useServices';
 
 const CategoriesTab = () => {
-  const { categories, isLoading } = useServices();
+  const { categories, services, isLoading } = useServices();
 
   const handleAddCategory = () => {
     console.log('Add category clicked');
@@ -22,6 +22,12 @@ const CategoriesTab = () => {
   const handleDeleteCategory = (categoryId: string) => {
     console.log('Delete category clicked', categoryId);
     // Implementation for deleting a category will be added in future
+  };
+
+  // Calculate services count for each category
+  const getCategoryServicesCount = (categoryId: string) => {
+    if (!services) return 0;
+    return services.filter(service => service.categoryId === categoryId).length;
   };
 
   return (
@@ -58,7 +64,7 @@ const CategoriesTab = () => {
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">{category.name}</TableCell>
                   <TableCell>{category.description || 'No description'}</TableCell>
-                  <TableCell>{category.servicesCount || 0}</TableCell>
+                  <TableCell>{getCategoryServicesCount(category.id)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Button variant="ghost" size="sm" onClick={() => handleEditCategory(category.id)}>
