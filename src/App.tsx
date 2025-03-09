@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { useRoutes } from 'react-router-dom';
-import routes from '@/routes';
+import router from '@/routes';
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -19,19 +18,12 @@ const queryClient = new QueryClient({
   },
 });
 
-const AppRoutes = () => {
-  const element = useRoutes(routes);
-  return element;
-};
-
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
-          <AppRoutes />
-          <Toaster />
-        </Router>
+        <RouterProvider router={router} />
+        <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   );
