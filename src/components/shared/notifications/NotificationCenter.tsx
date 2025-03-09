@@ -1,6 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, BellOff, Check, ChevronLeft, ChevronRight, Cog, X } from 'lucide-react';
+import { 
+  Bell, 
+  BellOff, 
+  Check, 
+  ChevronLeft, 
+  ChevronRight, 
+  Cog, 
+  X,
+  AlertCircle, 
+  Bug, 
+  FileText, 
+  ClipboardList, 
+  Package, 
+  Box, 
+  Calendar, 
+  Mail,
+  BellRing,
+  CheckCircle,
+  Clock,
+  AlarmClock,
+  AlertOctagon
+} from 'lucide-react';
 import {
   Popover,
   PopoverContent,
@@ -24,6 +45,8 @@ import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getIconForResultType } from './iconHelpers';
 import { formatTimestamp } from './timeHelpers';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 interface Notification {
   id: string;
@@ -176,11 +199,64 @@ interface NotificationCenterProps {
 const NotificationCenter: React.FC<NotificationCenterProps> = ({
   initialNotifications = mockNotifications
 }) => {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [notifications, setNotifications] = useState(initialNotifications);
   const [currentPage, setCurrentPage] = useState(1);
   const [showSettings, setShowSettings] = useState(false);
+  
+  const [notificationSettings, setNotificationSettings] = useState({
+    categories: {
+      incidents: true,
+      bugs: true,
+      testCases: true,
+      backlogItems: true,
+      releases: true,
+      assets: true,
+      changes: true
+    },
+    deliveryMethods: {
+      inApp: true,
+      email: true
+    },
+    priorityLevels: {
+      critical: true,
+      high: true,
+      medium: false,
+      low: false
+    }
+  });
+  
+  const handleNotificationToggle = (category, value) => {
+    setNotificationSettings(prev => {
+      if (category.includes('.')) {
+        const [mainCategory, subCategory] = category.split('.');
+        return {
+          ...prev,
+          [mainCategory]: {
+            ...prev[mainCategory],
+            [subCategory]: value
+          }
+        };
+      }
+      return {
+        ...prev,
+        [category]: {
+          ...prev[category],
+          [value]: !prev[category][value]
+        }
+      };
+    });
+  };
+  
+  const handleSaveSettings = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your notification preferences have been updated",
+    });
+    setShowSettings(false);
+  };
   
   const itemsPerPage = 5;
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -239,68 +315,286 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
       >
         {showSettings ? (
           <div>
-            <div className="flex items-center border-b p-3">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 mr-2" 
-                onClick={() => setShowSettings(false)}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <h2 className="font-semibold">Notification Settings</h2>
+            <div className="flex items-center justify-between border-b p-3">
+              <div className="flex items-center space-x-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8" 
+                  onClick={() => setShowSettings(false)}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <h2 className="font-semibold">Notification Settings</h2>
+              </div>
+              <Link to="/settings" className="text-sm text-blue-500 hover:underline">
+                All Settings
+              </Link>
             </div>
             
-            <div className="p-3 space-y-4">
-              <h3 className="font-medium text-sm mb-2">Notification Categories</h3>
-              
-              {[
-                { id: 'incident', label: 'Incidents' },
-                { id: 'bug', label: 'Bugs' },
-                { id: 'testCase', label: 'Test Cases' },
-                { id: 'backlogItem', label: 'Backlog Items' },
-                { id: 'release', label: 'Releases' },
-                { id: 'asset', label: 'Assets' },
-                { id: 'change', label: 'Changes' }
-              ].map(category => (
-                <div key={category.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getIconForResultType(category.id)}
-                    <span>{category.label}</span>
+            <div className="p-3 space-y-6">
+              <div className="space-y-4">
+                <h3 className="font-medium text-sm">Notification Categories</h3>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <AlertCircle className="h-5 w-5 text-red-500" />
+                    <Label>Incidents</Label>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={notificationSettings.categories.incidents} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        categories: {
+                          ...prev.categories,
+                          incidents: checked
+                        }
+                      }));
+                    }}
+                  />
                 </div>
-              ))}
-              
-              <h3 className="font-medium text-sm mt-4 mb-2">Delivery Methods</h3>
-              
-              <div className="flex items-center justify-between">
-                <span>In-app notifications</span>
-                <Switch defaultChecked />
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Bug className="h-5 w-5 text-red-500" />
+                    <Label>Bugs</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.categories.bugs} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        categories: {
+                          ...prev.categories,
+                          bugs: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <FileText className="h-5 w-5 text-purple-500" />
+                    <Label>Test Cases</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.categories.testCases} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        categories: {
+                          ...prev.categories,
+                          testCases: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <ClipboardList className="h-5 w-5 text-orange-500" />
+                    <Label>Backlog Items</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.categories.backlogItems} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        categories: {
+                          ...prev.categories,
+                          backlogItems: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Package className="h-5 w-5 text-green-500" />
+                    <Label>Releases</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.categories.releases} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        categories: {
+                          ...prev.categories,
+                          releases: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Box className="h-5 w-5 text-blue-500" />
+                    <Label>Assets</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.categories.assets} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        categories: {
+                          ...prev.categories,
+                          assets: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-5 w-5 text-cyan-500" />
+                    <Label>Changes</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.categories.changes} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        categories: {
+                          ...prev.categories,
+                          changes: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
               </div>
               
-              <div className="flex items-center justify-between">
-                <span>Email notifications</span>
-                <Switch defaultChecked />
+              <div className="space-y-4">
+                <h3 className="font-medium text-sm">Delivery Methods</h3>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <BellRing className="h-5 w-5 text-indigo-500" />
+                    <Label>In-app notifications</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.deliveryMethods.inApp} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        deliveryMethods: {
+                          ...prev.deliveryMethods,
+                          inApp: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Mail className="h-5 w-5 text-blue-500" />
+                    <Label>Email notifications</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.deliveryMethods.email} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        deliveryMethods: {
+                          ...prev.deliveryMethods,
+                          email: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
               </div>
               
-              <h3 className="font-medium text-sm mt-4 mb-2">Priority Levels</h3>
-              
-              {[
-                { id: 'critical', label: 'Critical' },
-                { id: 'high', label: 'High' },
-                { id: 'medium', label: 'Medium' },
-                { id: 'low', label: 'Low' }
-              ].map(priority => (
-                <div key={priority.id} className="flex items-center justify-between">
-                  <span>{priority.label}</span>
-                  <Switch defaultChecked={['critical', 'high'].includes(priority.id)} />
+              <div className="space-y-4">
+                <h3 className="font-medium text-sm">Priority Levels</h3>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <AlertOctagon className="h-5 w-5 text-red-500" />
+                    <Label>Critical</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.priorityLevels.critical} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        priorityLevels: {
+                          ...prev.priorityLevels,
+                          critical: checked
+                        }
+                      }));
+                    }}
+                  />
                 </div>
-              ))}
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <AlarmClock className="h-5 w-5 text-orange-500" />
+                    <Label>High</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.priorityLevels.high} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        priorityLevels: {
+                          ...prev.priorityLevels,
+                          high: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-5 w-5 text-yellow-500" />
+                    <Label>Medium</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.priorityLevels.medium} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        priorityLevels: {
+                          ...prev.priorityLevels,
+                          medium: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-5 w-5 text-blue-500" />
+                    <Label>Low</Label>
+                  </div>
+                  <Switch 
+                    checked={notificationSettings.priorityLevels.low} 
+                    onCheckedChange={(checked) => {
+                      setNotificationSettings(prev => ({
+                        ...prev,
+                        priorityLevels: {
+                          ...prev.priorityLevels,
+                          low: checked
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+              </div>
             </div>
             
             <div className="border-t p-3">
-              <Button className="w-full">Save Settings</Button>
+              <Button className="w-full" onClick={handleSaveSettings}>Save Settings</Button>
             </div>
           </div>
         ) : (
