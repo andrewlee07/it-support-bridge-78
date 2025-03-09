@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Moon, Search, Settings, Sun, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +46,14 @@ const Navbar: React.FC<NavbarProps> = ({ toggleDarkMode, isDarkMode }) => {
     logout();
     navigate('/login');
   };
+  
+  const handleNavigateToProfile = () => {
+    navigate('/profile');
+  };
+  
+  const handleNavigateToSettings = () => {
+    navigate('/settings');
+  };
 
   return (
     <div className="h-16 px-4 border-b border-border/40 bg-background/80 backdrop-blur-md flex items-center justify-between">
@@ -87,11 +94,21 @@ const Navbar: React.FC<NavbarProps> = ({ toggleDarkMode, isDarkMode }) => {
                 <div className="text-sm text-muted-foreground">{getRoleDisplay(user.role)}</div>
               </div>
               <div className="p-2">
-                <Button variant="ghost" className="w-full justify-start text-sm" size="sm">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-sm" 
+                  size="sm"
+                  onClick={handleNavigateToProfile}
+                >
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </Button>
-                <Button variant="ghost" className="w-full justify-start text-sm" size="sm">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-sm" 
+                  size="sm"
+                  onClick={handleNavigateToSettings}
+                >
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </Button>

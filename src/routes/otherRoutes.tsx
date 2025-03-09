@@ -1,33 +1,36 @@
 
 import React from 'react';
-import { RouteObject } from 'react-router-dom';
-import UserManagement from '@/pages/UserManagement';
-import Reports from '@/pages/Reports';
-import Calendar from '@/pages/Calendar';
-import ProblemManagement from '@/pages/ProblemManagement';
-import ProblemDetail from '@/pages/ProblemDetail';
+import { Navigate, RouteObject } from 'react-router-dom';
+import Login from '@/pages/Login';
+import MFAVerification from '@/pages/MFAVerification';
+import SecurityQuestionRecovery from '@/pages/SecurityQuestionRecovery';
+import NotFound from '@/pages/NotFound';
+import UserProfile from '@/pages/UserProfile';
+import UserSettings from '@/pages/UserSettings';
 
-const otherRoutes: RouteObject[] = [
+export const otherRoutes: RouteObject[] = [
   {
-    path: 'reports',
-    element: <Reports />,
+    path: '/login',
+    element: <Login />,
   },
   {
-    path: 'calendar',
-    element: <Calendar />,
+    path: '/mfa-verification',
+    element: <MFAVerification />,
   },
   {
-    path: 'user-management',
-    element: <UserManagement />,
+    path: '/security-question-recovery',
+    element: <SecurityQuestionRecovery />,
   },
   {
-    path: 'problems',
-    element: <ProblemManagement />,
+    path: '/profile',
+    element: <UserProfile />,
   },
   {
-    path: 'problems/:id',
-    element: <ProblemDetail />,
+    path: '/settings',
+    element: <UserSettings />,
+  },
+  {
+    path: '*',
+    element: <NotFound />,
   },
 ];
-
-export default otherRoutes;
