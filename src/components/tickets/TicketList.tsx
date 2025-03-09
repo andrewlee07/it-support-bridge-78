@@ -64,6 +64,20 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
     localStorage.setItem(`ticket-view-${type}`, view);
   };
 
+  // Effect to sync with localStorage if it changes elsewhere
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === `ticket-view-${type}` && e.newValue) {
+        setViewType(e.newValue as ViewType);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [type]);
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
