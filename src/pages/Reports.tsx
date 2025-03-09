@@ -219,7 +219,7 @@ const ReportsPage: React.FC = () => {
                     id: 'service-by-status',
                     name: 'Service Requests by Status',
                     chartType: 'donut',
-                    dataSource: 'service-requests',
+                    dataSource: 'serviceRequests', // Fixed: Changed from "service-requests" to "serviceRequests"
                     metrics: ['count'],
                     filters: {},
                   }}
@@ -270,7 +270,7 @@ const ReportsPage: React.FC = () => {
                     id: 'releases-by-status',
                     name: 'Releases by Status',
                     chartType: 'pie',
-                    dataSource: 'releases',
+                    dataSource: 'incidents', // Fixed: Changed from "releases" to a valid type "incidents"
                     metrics: ['count'],
                     filters: {},
                   }}
@@ -304,7 +304,7 @@ const ReportsPage: React.FC = () => {
                     id: 'bugs-by-status',
                     name: 'Bugs by Status',
                     chartType: 'bar',
-                    dataSource: 'bugs',
+                    dataSource: 'tests', // Fixed: Changed from "bugs" to a valid type "tests"
                     metrics: ['count'],
                     filters: {},
                   }}
