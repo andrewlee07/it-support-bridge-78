@@ -4,7 +4,7 @@ import DynamicChartRenderer from '@/components/reports/DynamicChartRenderer';
 import InteractiveTable from '@/components/reports/InteractiveTable';
 import { incidentChartConfig } from '@/utils/reports/chartConfigs';
 import { mockIncidentData, mockIncidentTableData } from '@/utils/mockData/reportData';
-import { calculateSLAStatus } from '@/utils/sla/slaCalculations';
+import { calculateSLAStatus, SLAType } from '@/utils/sla/slaCalculations';
 import TicketSLAIndicator from '@/components/tickets/components/TicketSLAIndicator';
 
 interface IncidentsTabProps {
@@ -29,8 +29,12 @@ const IncidentsTab: React.FC<IncidentsTabProps> = ({ selectedSegment, onSegmentC
       key: 'sla', 
       header: 'SLA Status',
       formatSLA: true,
+      isSLAColumn: true, // Mark this as an SLA column
       render: (value: any, record: Record<string, any>) => {
-        // Instead of returning the SLAInfo object directly, we'll render a component
+        // Get the slaType from the record if passed from the parent
+        const currentSlaType = (record.slaType as SLAType) || 'resolution';
+        
+        // Calculate SLA using the current SLA type
         const slaInfo = calculateSLAStatus({
           id: record.id || '',
           title: record.title || '',
@@ -43,7 +47,7 @@ const IncidentsTab: React.FC<IncidentsTabProps> = ({ selectedSegment, onSegmentC
           createdAt: new Date(record.createdAt),
           updatedAt: new Date(),
           audit: []
-        });
+        }, currentSlaType);
         
         return slaInfo;
       }

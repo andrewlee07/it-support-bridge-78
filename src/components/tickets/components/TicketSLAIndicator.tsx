@@ -1,22 +1,20 @@
 
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
-import { calculateSLAStatus } from '@/utils/sla/slaCalculations';
+import { calculateSLAStatus, SLAType } from '@/utils/sla/slaCalculations';
 import { Ticket } from '@/utils/types/ticket';
 
 interface TicketSLAIndicatorProps {
   ticket: Ticket;
+  slaType?: SLAType;
 }
 
-const TicketSLAIndicator: React.FC<TicketSLAIndicatorProps> = ({ ticket }) => {
-  const slaInfo = calculateSLAStatus(ticket);
+const TicketSLAIndicator: React.FC<TicketSLAIndicatorProps> = ({ ticket, slaType = 'resolution' }) => {
+  const slaInfo = calculateSLAStatus(ticket, slaType);
   
   if (ticket.status === 'closed' || ticket.status === 'resolved') {
     return <div className="text-gray-500">Completed</div>;
   }
-  
-  // Get the SLA type (response or resolution)
-  const slaType = "Resolution";
   
   // Calculate gradient color based on percentage left
   const getGradientColor = (percentLeft: number) => {
@@ -31,7 +29,7 @@ const TicketSLAIndicator: React.FC<TicketSLAIndicatorProps> = ({ ticket }) => {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600">{slaType} SLA</span>
+        <span className="text-sm text-gray-600">{slaInfo.slaType} SLA</span>
         <span className="text-sm">{slaInfo.timeLeft}</span>
       </div>
       <Progress 

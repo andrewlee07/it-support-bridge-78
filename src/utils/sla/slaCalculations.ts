@@ -4,6 +4,7 @@ import { Ticket } from '@/utils/types/ticket';
 import { mockSLAs } from '@/utils/mockData/slas';
 
 export type SLAStatus = 'ok' | 'warning' | 'breached';
+export type SLAType = 'response' | 'resolution';
 
 export interface SLAInfo {
   status: SLAStatus;
@@ -17,7 +18,7 @@ export interface SLAInfo {
 /**
  * Calculate SLA status for a ticket
  */
-export const calculateSLAStatus = (ticket: Ticket): SLAInfo => {
+export const calculateSLAStatus = (ticket: Ticket, slaType: SLAType = 'resolution'): SLAInfo => {
   // Find the appropriate SLA for this ticket
   const sla = mockSLAs.find(
     s => s.ticketType === ticket.type && s.priorityLevel === ticket.priority
@@ -34,17 +35,18 @@ export const calculateSLAStatus = (ticket: Ticket): SLAInfo => {
   const now = new Date();
   const createdAt = new Date(ticket.createdAt);
   
-  // Calculate total resolution time in minutes
-  const totalResolutionTime = sla.resolutionTimeHours * 60;
+  // Calculate total resolution/response time in minutes based on the selected type
+  const totalTimeHours = slaType === 'resolution' ? sla.resolutionTimeHours : sla.responseTimeHours;
+  const totalTimeMinutes = totalTimeHours * 60;
   
   // Calculate elapsed time in minutes
   const elapsedMinutes = differenceInMinutes(now, createdAt);
   
   // Calculate minutes left
-  const minutesLeft = totalResolutionTime - elapsedMinutes;
+  const minutesLeft = totalTimeMinutes - elapsedMinutes;
   
   // Calculate percentage left (for progress bars)
-  const percentLeft = Math.max(0, Math.min(100, (minutesLeft / totalResolutionTime) * 100));
+  const percentLeft = Math.max(0, Math.min(100, (minutesLeft / totalTimeMinutes) * 100));
   
   // Format time left as hours and minutes
   const formatTimeLeft = (minutes: number): string => {
@@ -62,7 +64,7 @@ export const calculateSLAStatus = (ticket: Ticket): SLAInfo => {
   let status: SLAStatus = 'ok';
   if (minutesLeft < 0) {
     status = 'breached';
-  } else if (minutesLeft < totalResolutionTime * 0.2) { // Warning at 20% time left
+  } else if (minutesLeft < totalTimeMinutes * 0.2) { // Warning at 20% time left
     status = 'warning';
   }
   
@@ -71,7 +73,7 @@ export const calculateSLAStatus = (ticket: Ticket): SLAInfo => {
     timeLeft: formatTimeLeft(minutesLeft),
     percentLeft,
     completed: false,
-    slaType: 'Resolution', // This is a resolution SLA
+    slaType: slaType === 'resolution' ? 'Resolution' : 'Response', // Capitalize for display
     slaName: sla.name // Include the SLA policy name
   };
 };

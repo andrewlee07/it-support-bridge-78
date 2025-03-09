@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -10,16 +11,19 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { getUserNameById } from '@/utils/userUtils';
-import { SLAInfo } from '@/utils/sla/slaCalculations';
+import { SLAInfo, SLAType } from '@/utils/sla/slaCalculations';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Clock, CheckCircle2 } from 'lucide-react';
 
 interface InteractiveTableProps {
   data: Record<string, any>[];
   columns: {
     key: string;
     header: string;
-    render?: (value: any, record: Record<string, any>) => React.ReactNode | SLAInfo;
+    render?: (value: any, record: Record<string, any>) => React.ReactNode;
     formatUserName?: boolean;
     formatSLA?: boolean;
+    isSLAColumn?: boolean;
   }[];
   title: string;
   filterKey?: string;
@@ -33,6 +37,8 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
   filterKey,
   filterValue,
 }) => {
+  const [slaType, setSlaType] = useState<SLAType>('resolution');
+  
   // Filter data if filterKey and filterValue are provided
   const filteredData = filterKey && filterValue !== undefined
     ? data.filter(record => record[filterKey] === filterValue)
@@ -57,12 +63,12 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
     };
 
     const barColor = getGradientColor(slaInfo.percentLeft || 0);
-    const slaType = "Resolution"; // Default to Resolution SLA
+    const slaTypeDisplay = slaInfo.slaType || "Resolution"; // Default to Resolution SLA
 
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">{slaType} SLA</span>
+          <span className="text-sm text-gray-600">{slaTypeDisplay} SLA</span>
           <span className="text-sm">{slaInfo.timeLeft}</span>
         </div>
         <Progress 
@@ -74,17 +80,43 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
     );
   };
 
+  // Check if any column is an SLA column
+  const hasSLAColumn = columns.some(col => col.isSLAColumn || col.formatSLA);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">
-          {title}
-          {filterValue && filterKey && (
-            <span className="text-sm font-normal ml-2">
-              (Filtered by {filterKey}: {filterValue})
-            </span>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">
+            {title}
+            {filterValue && filterKey && (
+              <span className="text-sm font-normal ml-2">
+                (Filtered by {filterKey}: {filterValue})
+              </span>
+            )}
+          </CardTitle>
+          
+          {hasSLAColumn && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-muted-foreground">SLA Type:</span>
+              <ToggleGroup 
+                type="single" 
+                value={slaType} 
+                onValueChange={(value) => value && setSlaType(value as SLAType)}
+                className="border rounded-md"
+              >
+                <ToggleGroupItem value="response" size="sm" className="px-2 text-xs">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Response
+                </ToggleGroupItem>
+                <ToggleGroupItem value="resolution" size="sm" className="px-2 text-xs">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Resolution
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
           )}
-        </CardTitle>
+        </div>
       </CardHeader>
       <CardContent>
         {filteredData.length === 0 ? (
@@ -108,7 +140,11 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
                       <TableCell key={`${i}-${column.key}`}>
                         {column.render
                           ? (() => {
-                              const rendered = column.render(record[column.key], record);
+                              // Pass the current slaType to the render function if it's an SLA column
+                              const rendered = column.isSLAColumn 
+                                ? column.render(record[column.key], { ...record, slaType })
+                                : column.render(record[column.key], record);
+                                
                               // Check if rendered is SLAInfo object
                               if (rendered && typeof rendered === 'object' && 'status' in rendered) {
                                 return formatSLAStatus(rendered);

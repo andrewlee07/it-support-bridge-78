@@ -16,6 +16,9 @@ import SortableTableHeader from './components/SortableTableHeader';
 import TicketSLAIndicator from './components/TicketSLAIndicator';
 import { StatusBadge, PriorityBadge } from './utils/ticketDisplayUtils';
 import { getSortedTickets } from './utils/ticketSortUtils';
+import { SLAType } from '@/utils/sla/slaCalculations';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Clock, CheckCircle2 } from 'lucide-react';
 
 interface TicketTableProps {
   tickets: Ticket[];
@@ -25,6 +28,7 @@ interface TicketTableProps {
 const TicketTable: React.FC<TicketTableProps> = ({ tickets, onTicketClick }) => {
   const [sortKey, setSortKey] = useState<SortKey>('createdAt');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [slaType, setSlaType] = useState<SLAType>('resolution');
 
   // Handle sort click
   const handleSort = (key: SortKey) => {
@@ -86,13 +90,32 @@ const TicketTable: React.FC<TicketTableProps> = ({ tickets, onTicketClick }) => 
               sortDirection={sortDirection} 
               onSort={handleSort} 
             />
-            <SortableTableHeader 
-              keyName="sla" 
-              label="SLA Status" 
-              currentSortKey={sortKey} 
-              sortDirection={sortDirection} 
-              onSort={handleSort} 
-            />
+            <TableHead>
+              <div className="flex items-center space-x-2">
+                <SortableTableHeader 
+                  keyName="sla" 
+                  label="SLA Status" 
+                  currentSortKey={sortKey} 
+                  sortDirection={sortDirection} 
+                  onSort={handleSort} 
+                />
+                <ToggleGroup 
+                  type="single" 
+                  value={slaType} 
+                  onValueChange={(value) => value && setSlaType(value as SLAType)}
+                  className="border rounded-md h-6"
+                >
+                  <ToggleGroupItem value="response" size="sm" className="px-2 text-xs">
+                    <Clock className="h-3 w-3 mr-1" />
+                    Response
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="resolution" size="sm" className="px-2 text-xs">
+                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    Resolution
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -118,7 +141,7 @@ const TicketTable: React.FC<TicketTableProps> = ({ tickets, onTicketClick }) => 
                 {formatDistanceToNow(new Date(ticket.createdAt), { addSuffix: true })}
               </TableCell>
               <TableCell>
-                <TicketSLAIndicator ticket={ticket} />
+                <TicketSLAIndicator ticket={ticket} slaType={slaType} />
               </TableCell>
             </TableRow>
           ))}
