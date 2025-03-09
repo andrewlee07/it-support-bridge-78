@@ -2,7 +2,7 @@
 import { User, UserRole, MFAMethod } from '../types/user';
 
 // Mock user data
-export const mockUsers = [
+export const mockUsers: User[] = [
   { 
     id: 'user-1', 
     name: 'Alex Johnson', 
@@ -11,7 +11,19 @@ export const mockUsers = [
     department: 'IT',
     active: true,
     mfaEnabled: true,
-    mfaMethod: 'email' as MFAMethod
+    mfaMethod: 'email' as MFAMethod,
+    lockedUntil: undefined,
+    requirePasswordChange: false,
+    securityQuestions: [
+      {
+        question: "What was your first pet's name?",
+        answer: "Buddy"
+      },
+      {
+        question: "In what city were you born?",
+        answer: "Chicago"
+      }
+    ]
   },
   { 
     id: 'user-2', 
@@ -20,7 +32,13 @@ export const mockUsers = [
     role: 'support-manager' as UserRole,
     department: 'Support',
     active: true,
-    mfaEnabled: false
+    mfaEnabled: false,
+    securityQuestions: [
+      {
+        question: "What was your first pet's name?",
+        answer: "Max"
+      }
+    ]
   },
   { 
     id: 'user-3', 
@@ -30,7 +48,8 @@ export const mockUsers = [
     department: 'IT',
     active: true,
     mfaEnabled: true,
-    mfaMethod: 'totp' as MFAMethod
+    mfaMethod: 'totp' as MFAMethod,
+    securityQuestions: []
   },
   { 
     id: 'user-4', 
@@ -39,7 +58,8 @@ export const mockUsers = [
     role: 'agent' as UserRole,
     department: 'Support',
     active: true,
-    mfaEnabled: false
+    mfaEnabled: false,
+    securityQuestions: []
   },
   { 
     id: 'user-5', 
@@ -49,27 +69,37 @@ export const mockUsers = [
     department: 'Service',
     active: true,
     mfaEnabled: true,
-    mfaMethod: 'email' as MFAMethod
+    mfaMethod: 'email' as MFAMethod,
+    securityQuestions: [
+      {
+        question: "What is your mother's maiden name?",
+        answer: "Johnson"
+      },
+      {
+        question: "What was the name of your elementary school?",
+        answer: "Lincoln"
+      }
+    ]
   }
 ];
 
 // Helper function to get user by ID
-export const getUserById = (id: string) => {
+export const getUserById = (id: string): User | undefined => {
   return mockUsers.find(user => user.id === id);
 };
 
 // Helper function to get all users
-export const getAllUsers = () => {
+export const getAllUsers = (): User[] => {
   return [...mockUsers];
 };
 
 // Helper function to get user by email
-export const getUserByEmail = (email: string) => {
+export const getUserByEmail = (email: string): User | undefined => {
   return mockUsers.find(user => user.email === email);
 };
 
 // Helper function to update a user
-export const updateUser = (updatedUser: User) => {
+export const updateUser = (updatedUser: User): User | null => {
   const index = mockUsers.findIndex(user => user.id === updatedUser.id);
   if (index !== -1) {
     mockUsers[index] = { ...mockUsers[index], ...updatedUser };
@@ -79,13 +109,13 @@ export const updateUser = (updatedUser: User) => {
 };
 
 // Helper function to add a new user
-export const addUser = (user: User) => {
+export const addUser = (user: User): User => {
   mockUsers.push(user);
   return user;
 };
 
 // Helper function to remove a user
-export const removeUser = (id: string) => {
+export const removeUser = (id: string): User | null => {
   const index = mockUsers.findIndex(user => user.id === id);
   if (index !== -1) {
     const removedUser = mockUsers[index];
