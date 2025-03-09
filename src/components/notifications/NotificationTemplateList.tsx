@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { PencilIcon, EyeIcon, MoreVerticalIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useNotificationTemplates } from '@/hooks/useNotifications';
-import { NotificationTemplate } from '@/utils/types/notification';
+import { EmailTemplate } from '@/utils/types/email';
 import { format } from 'date-fns';
 import {
   AlertDialog,
@@ -41,8 +41,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 
 interface NotificationTemplateListProps {
-  onEdit: (template: NotificationTemplate) => void;
-  onPreview: (template: NotificationTemplate) => void;
+  onEdit: (template: EmailTemplate) => void;
+  onPreview: (template: EmailTemplate) => void;
   onAdd: () => void;
 }
 
@@ -51,39 +51,38 @@ const NotificationTemplateList: React.FC<NotificationTemplateListProps> = ({
   onPreview,
   onAdd
 }) => {
-  const { templates, loading, updateTemplate, deleteTemplate } = useNotificationTemplates();
+  const { templates, isLoading, updateTemplate, deleteTemplate } = useNotificationTemplates();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [templateToDelete, setTemplateToDelete] = useState<NotificationTemplate | null>(null);
+  const [templateToDelete, setTemplateToDelete] = useState<EmailTemplate | null>(null);
 
-  const handleToggleActive = async (template: NotificationTemplate) => {
-    await updateTemplate(template.id, { isActive: !template.isActive });
+  const handleToggleActive = async (template: EmailTemplate) => {
+    updateTemplate(template.id, { isActive: !template.isActive });
   };
 
-  const handleDelete = async (template: NotificationTemplate) => {
+  const handleDelete = async (template: EmailTemplate) => {
     setTemplateToDelete(template);
     setDeleteDialogOpen(true);
   };
 
   const confirmDelete = async () => {
     if (templateToDelete) {
-      await deleteTemplate(templateToDelete.id);
+      deleteTemplate(templateToDelete.id);
       setDeleteDialogOpen(false);
       setTemplateToDelete(null);
     }
   };
 
-  const getEventTypeLabel = (eventType: string) => {
-    switch (eventType) {
-      case 'incident-created': return 'Incident Created';
-      case 'incident-assigned': return 'Incident Assigned';
-      case 'incident-resolved': return 'Incident Resolved';
-      case 'service-request-created': return 'Service Request Created';
-      case 'service-request-approval-required': return 'Service Request Approval';
-      case 'service-request-completed': return 'Service Request Completed';
-      case 'asset-created': return 'Asset Created';
-      case 'asset-updated': return 'Asset Updated';
-      case 'asset-assigned': return 'Asset Assigned';
-      default: return eventType;
+  const getEventTypeLabel = (triggerOn: string) => {
+    switch (triggerOn) {
+      case 'ticket-created': return 'Ticket Created';
+      case 'ticket-assigned': return 'Ticket Assigned';
+      case 'ticket-resolved': return 'Ticket Resolved';
+      case 'sla-breach': return 'SLA Breach';
+      case 'change-submitted': return 'Change Submitted';
+      case 'change-approved': return 'Change Approved';
+      case 'problem-created': return 'Problem Created';
+      case 'problem-resolved': return 'Problem Resolved';
+      default: return triggerOn;
     }
   };
 
@@ -102,7 +101,7 @@ const NotificationTemplateList: React.FC<NotificationTemplateListProps> = ({
         </Button>
       </CardHeader>
       <CardContent>
-        {loading ? (
+        {isLoading ? (
           <div className="space-y-2">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center space-x-4">
@@ -132,7 +131,7 @@ const NotificationTemplateList: React.FC<NotificationTemplateListProps> = ({
                 templates.map(template => (
                   <TableRow key={template.id}>
                     <TableCell className="font-medium">{template.name}</TableCell>
-                    <TableCell>{getEventTypeLabel(template.eventType)}</TableCell>
+                    <TableCell>{getEventTypeLabel(template.triggerOn)}</TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Switch
@@ -145,7 +144,9 @@ const NotificationTemplateList: React.FC<NotificationTemplateListProps> = ({
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {format(new Date(template.lastModified), 'PPp')}
+                      {template.lastModified 
+                        ? format(new Date(template.lastModified), 'PPp')
+                        : 'Not available'}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>

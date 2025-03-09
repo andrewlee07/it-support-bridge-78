@@ -31,12 +31,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useNotificationTemplates } from '@/hooks/useNotifications';
-import { NotificationTemplate, EventType } from '@/utils/types/notification';
+import { EmailTemplate } from '@/utils/types/email';
 
 // Schema for the notification template form
 const templateSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
-  eventType: z.string().min(1, { message: 'Event type is required.' }),
+  triggerOn: z.string().min(1, { message: 'Event type is required.' }),
   subject: z.string().min(3, { message: 'Subject is required.' }),
   body: z.string().min(10, { message: 'Body must be at least 10 characters.' }),
   isActive: z.boolean().default(true),
@@ -45,7 +45,7 @@ const templateSchema = z.object({
 type FormValues = z.infer<typeof templateSchema>;
 
 interface NotificationTemplateFormProps {
-  template?: NotificationTemplate;
+  template?: EmailTemplate;
   onClose: () => void;
 }
 
@@ -62,7 +62,7 @@ const NotificationTemplateForm: React.FC<NotificationTemplateFormProps> = ({
     resolver: zodResolver(templateSchema),
     defaultValues: {
       name: template?.name || '',
-      eventType: template?.eventType || '',
+      triggerOn: template?.triggerOn || '',
       subject: template?.subject || '',
       body: template?.body || '',
       isActive: template?.isActive !== undefined ? template.isActive : true,
@@ -74,16 +74,16 @@ const NotificationTemplateForm: React.FC<NotificationTemplateFormProps> = ({
       // Cast the form data to appropriate types
       const templateData = {
         name: data.name,
-        eventType: data.eventType as EventType,
+        triggerOn: data.triggerOn as EmailTemplate['triggerOn'],
         subject: data.subject,
         body: data.body,
         isActive: data.isActive,
       };
 
       if (isEditing && template) {
-        await updateTemplate(template.id, templateData);
+        updateTemplate(template.id, templateData);
       } else {
-        await createTemplate(templateData);
+        createTemplate(templateData);
       }
       onClose();
     } catch (error) {
@@ -115,7 +115,7 @@ const NotificationTemplateForm: React.FC<NotificationTemplateFormProps> = ({
 
         <FormField
           control={form.control}
-          name="eventType"
+          name="triggerOn"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Event Type</FormLabel>
@@ -129,12 +129,14 @@ const NotificationTemplateForm: React.FC<NotificationTemplateFormProps> = ({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="incident-created">Incident Created</SelectItem>
-                  <SelectItem value="incident-assigned">Incident Assigned</SelectItem>
-                  <SelectItem value="incident-resolved">Incident Resolved</SelectItem>
-                  <SelectItem value="service-request-created">Service Request Created</SelectItem>
-                  <SelectItem value="service-request-approval-required">Service Request Approval Required</SelectItem>
-                  <SelectItem value="service-request-completed">Service Request Completed</SelectItem>
+                  <SelectItem value="ticket-created">Ticket Created</SelectItem>
+                  <SelectItem value="ticket-assigned">Ticket Assigned</SelectItem>
+                  <SelectItem value="ticket-resolved">Ticket Resolved</SelectItem>
+                  <SelectItem value="sla-breach">SLA Breach</SelectItem>
+                  <SelectItem value="change-submitted">Change Request Submitted</SelectItem>
+                  <SelectItem value="change-approved">Change Request Approved</SelectItem>
+                  <SelectItem value="problem-created">Problem Created</SelectItem>
+                  <SelectItem value="problem-resolved">Problem Resolved</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>

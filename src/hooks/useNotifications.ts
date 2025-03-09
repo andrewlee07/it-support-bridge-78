@@ -1,35 +1,14 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { emailNotificationApi } from '@/utils/api/emailNotificationApi';
-import { SystemHealthReport, EmailTemplate, NotificationEvent } from '@/utils/types/email';
-
-// Define webhook config type here to avoid circular dependencies
-export type EventType = 
-  | 'ticket-created' 
-  | 'ticket-updated' 
-  | 'ticket-assigned' 
-  | 'ticket-resolved' 
-  | 'sla-breach' 
-  | 'change-approved' 
-  | 'change-submitted' 
-  | 'problem-created' 
-  | 'problem-resolved'
-  | 'service-request-approval-required';
-
-export interface WebhookConfig {
-  id: string;
-  name: string;
-  url: string;
-  isActive: boolean;
-  eventTypes: EventType[];
-  secretKey?: string;
-  headers?: Record<string, string>;
-  lastDelivery?: {
-    timestamp: string;
-    status: 'success' | 'failure';
-    responseCode?: number;
-  };
-}
+import { 
+  SystemHealthReport, 
+  EmailTemplate, 
+  NotificationEvent, 
+  EventType, 
+  WebhookConfig 
+} from '@/utils/types/email';
+import { ApiResponse } from '@/utils/types/api';
 
 // Mock data for system health
 const mockSystemHealth: SystemHealthReport = {
@@ -110,7 +89,7 @@ const mockWebhookConfigs: WebhookConfig[] = [
 // Hook for notification system features
 export const useNotificationSystem = () => {
   // System stats could be fetched from an API endpoint
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalNotifications: 1245,
     failedDeliveries: 12,
     activeTemplates: 8,
@@ -173,9 +152,12 @@ export const useNotificationTemplates = () => {
     templates,
     isLoading,
     error,
-    createTemplate: createTemplateMutation.mutate,
-    updateTemplate: updateTemplateMutation.mutate,
-    deleteTemplate: deleteTemplateMutation.mutate,
+    createTemplate: (template: Omit<EmailTemplate, 'id'>) => 
+      createTemplateMutation.mutate(template),
+    updateTemplate: (id: string, updates: Partial<EmailTemplate>) => 
+      updateTemplateMutation.mutate({ id, updates }),
+    deleteTemplate: (id: string) => 
+      deleteTemplateMutation.mutate(id),
     isCreating: createTemplateMutation.isPending,
     isUpdating: updateTemplateMutation.isPending,
     isDeleting: deleteTemplateMutation.isPending,
@@ -273,9 +255,12 @@ export const useWebhookConfigs = () => {
   return {
     webhooks,
     isLoading,
-    createWebhook: createWebhookMutation.mutate,
-    updateWebhook: updateWebhookMutation.mutate,
-    deleteWebhook: deleteWebhookMutation.mutate,
+    createWebhook: (webhook: Omit<WebhookConfig, 'id'>) => 
+      createWebhookMutation.mutate(webhook),
+    updateWebhook: (id: string, updates: Partial<WebhookConfig>) => 
+      updateWebhookMutation.mutate({ id, updates }),
+    deleteWebhook: (id: string) => 
+      deleteWebhookMutation.mutate(id),
     isCreating: createWebhookMutation.isPending,
     isUpdating: updateWebhookMutation.isPending,
     isDeleting: deleteWebhookMutation.isPending,

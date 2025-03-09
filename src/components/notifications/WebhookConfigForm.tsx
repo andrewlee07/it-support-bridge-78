@@ -1,312 +1,206 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { AlertCircle } from 'lucide-react';
-import { MultiSelect } from '@/components/ui/multi-select';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { toast } from 'sonner';
-import { WebhookConfig, EventType, useWebhookConfigs } from '@/hooks/useNotifications';
+import { WebhookConfig, EventType } from '@/utils/types/email';
+import { useWebhookConfigs } from '@/hooks/useNotifications';
+import { MultiSelect } from '@/components/ui/multi-select';
+
+const webhookSchema = z.object({
+  name: z.string().min(3, {
+    message: 'Name must be at least 3 characters.',
+  }),
+  url: z.string().url({
+    message: 'Please enter a valid URL.',
+  }),
+  isActive: z.boolean().default(true),
+  secretKey: z.string().optional(),
+  headers: z.record(z.string()).optional(),
+});
+
+type FormValues = z.infer<typeof webhookSchema>;
 
 interface WebhookConfigFormProps {
   initialData?: WebhookConfig;
-  onSuccess?: () => void;
-  onCancel?: () => void;
+  onClose: () => void;
 }
 
-const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({ 
-  initialData, 
-  onSuccess, 
-  onCancel 
+const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
+  initialData,
+  onClose,
 }) => {
-  const { createWebhook, updateWebhook, isCreating, isUpdating } = useWebhookConfigs();
+  const { createWebhook, updateWebhook } = useWebhookConfigs();
   const isEditing = !!initialData;
-  
-  // Form state
-  const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    url: initialData?.url || '',
-    isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
-    secretKey: initialData?.secretKey || '',
-    eventTypes: initialData?.eventTypes || [],
-    headers: initialData?.headers || {},
-  });
-  
-  // Header form
-  const [headerKey, setHeaderKey] = useState('');
-  const [headerValue, setHeaderValue] = useState('');
-  
-  // Form validation
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!formData.url.trim()) {
-      newErrors.url = 'URL is required';
-    } else if (!formData.url.startsWith('http')) {
-      newErrors.url = 'URL must start with http:// or https://';
-    }
-    
-    if (formData.eventTypes.length === 0) {
-      newErrors.eventTypes = 'At least one event type must be selected';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-    
-    // Clear error when field is edited
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: '' });
-    }
-  };
-  
-  const handleEventTypesChange = (values: string[]) => {
-    setFormData({
-      ...formData,
-      eventTypes: values as EventType[],
-    });
-    
-    // Clear error when field is edited
-    if (errors.eventTypes) {
-      setErrors({ ...errors, eventTypes: '' });
-    }
-  };
-  
-  const addHeader = () => {
-    if (headerKey.trim() && headerValue.trim()) {
-      setFormData({
-        ...formData,
-        headers: {
-          ...formData.headers,
-          [headerKey]: headerValue,
-        },
-      });
-      setHeaderKey('');
-      setHeaderValue('');
-    }
-  };
-  
-  const removeHeader = (key: string) => {
-    const newHeaders = { ...formData.headers };
-    delete newHeaders[key];
-    setFormData({
-      ...formData,
-      headers: newHeaders,
-    });
-  };
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      toast.error('Please fix the errors in the form');
-      return;
-    }
-    
-    if (isEditing && initialData) {
-      updateWebhook(
-        { 
-          id: initialData.id, 
-          updates: formData as any
-        },
-        {
-          onSuccess: () => {
-            toast.success('Webhook configuration updated');
-            if (onSuccess) onSuccess();
-          },
-          onError: () => {
-            toast.error('Failed to update webhook configuration');
-          }
-        }
-      );
-    } else {
-      createWebhook(
-        formData as any,
-        {
-          onSuccess: () => {
-            toast.success('Webhook configuration created');
-            if (onSuccess) onSuccess();
-          },
-          onError: () => {
-            toast.error('Failed to create webhook configuration');
-          }
-        }
-      );
-    }
-  };
-  
-  const eventTypeOptions = [
-    { label: 'Ticket Created', value: 'ticket-created' },
-    { label: 'Ticket Updated', value: 'ticket-updated' },
-    { label: 'Ticket Assigned', value: 'ticket-assigned' },
-    { label: 'Ticket Resolved', value: 'ticket-resolved' },
-    { label: 'SLA Breach', value: 'sla-breach' },
-    { label: 'Change Submitted', value: 'change-submitted' },
-    { label: 'Change Approved', value: 'change-approved' },
-    { label: 'Problem Created', value: 'problem-created' },
-    { label: 'Problem Resolved', value: 'problem-resolved' },
+
+  // States for the multi-select component
+  const [selectedEvents, setSelectedEvents] = useState<string[]>(
+    initialData?.eventTypes.map(e => e.toString()) || []
+  );
+
+  // Event type options
+  const eventOptions = [
+    { value: 'ticket-created', label: 'Ticket Created' },
+    { value: 'ticket-updated', label: 'Ticket Updated' },
+    { value: 'ticket-assigned', label: 'Ticket Assigned' },
+    { value: 'ticket-resolved', label: 'Ticket Resolved' },
+    { value: 'sla-breach', label: 'SLA Breach' },
+    { value: 'change-approved', label: 'Change Approved' },
+    { value: 'change-submitted', label: 'Change Submitted' },
+    { value: 'problem-created', label: 'Problem Created' },
+    { value: 'problem-resolved', label: 'Problem Resolved' },
   ];
 
+  // Form initialization
+  const form = useForm<FormValues>({
+    resolver: zodResolver(webhookSchema),
+    defaultValues: {
+      name: initialData?.name || '',
+      url: initialData?.url || '',
+      isActive: initialData?.isActive ?? true,
+      secretKey: initialData?.secretKey || '',
+    },
+  });
+
+  // Function to handle form submission
+  const onSubmit = async (data: FormValues) => {
+    if (selectedEvents.length === 0) {
+      toast.error('Please select at least one event type');
+      return;
+    }
+
+    try {
+      // Prepare the webhook data
+      const webhookData = {
+        ...data,
+        eventTypes: selectedEvents as EventType[],
+      };
+
+      if (isEditing && initialData) {
+        await updateWebhook(initialData.id, webhookData);
+        toast.success('Webhook updated successfully');
+      } else {
+        await createWebhook(webhookData);
+        toast.success('Webhook created successfully');
+      }
+      onClose();
+    } catch (error) {
+      console.error('Error saving webhook:', error);
+      toast.error('Failed to save webhook');
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{isEditing ? 'Edit Webhook Configuration' : 'New Webhook Configuration'}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Webhook name"
-                  className={errors.name ? 'border-red-500' : ''}
-                />
-                {errors.name && (
-                  <p className="text-sm text-red-500 flex items-center mt-1">
-                    <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.name}
-                  </p>
-                )}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Webhook Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Incident Notifications" {...field} />
+              </FormControl>
+              <FormDescription>
+                A descriptive name to identify this webhook
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Webhook URL</FormLabel>
+              <FormControl>
+                <Input placeholder="https://example.com/webhook" {...field} />
+              </FormControl>
+              <FormDescription>
+                The URL where event notifications will be sent
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="space-y-3">
+          <FormLabel>Event Types</FormLabel>
+          <MultiSelect
+            options={eventOptions}
+            selected={selectedEvents}
+            onChange={setSelectedEvents}
+            placeholder="Select event types..."
+          />
+          <FormDescription>
+            Select which events should trigger this webhook
+          </FormDescription>
+        </div>
+
+        <FormField
+          control={form.control}
+          name="secretKey"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Secret Key (Optional)</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" {...field} />
+              </FormControl>
+              <FormDescription>
+                Used to sign webhook payloads for security verification
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="isActive"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Active</FormLabel>
+                <FormDescription>
+                  Enable or disable this webhook
+                </FormDescription>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="url">Webhook URL</Label>
-                <Input
-                  id="url"
-                  name="url"
-                  value={formData.url}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/webhook"
-                  className={errors.url ? 'border-red-500' : ''}
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
                 />
-                {errors.url && (
-                  <p className="text-sm text-red-500 flex items-center mt-1">
-                    <AlertCircle className="h-4 w-4 mr-1" />
-                    {errors.url}
-                  </p>
-                )}
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="secretKey">Secret Key (optional)</Label>
-              <Input
-                id="secretKey"
-                name="secretKey"
-                value={formData.secretKey}
-                onChange={handleInputChange}
-                placeholder="Secret key for webhook signature"
-              />
-              <p className="text-sm text-muted-foreground">
-                This key will be used to sign webhook payloads for security.
-              </p>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Event Types</Label>
-              <MultiSelect
-                options={eventTypeOptions}
-                onValueChange={handleEventTypesChange}
-                defaultValues={formData.eventTypes}
-                placeholder="Select event types..."
-                className={errors.eventTypes ? 'border-red-500' : ''}
-              />
-              {errors.eventTypes && (
-                <p className="text-sm text-red-500 flex items-center mt-1">
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  {errors.eventTypes}
-                </p>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Custom Headers</Label>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-5">
-                <Input
-                  placeholder="Header Name"
-                  value={headerKey}
-                  onChange={(e) => setHeaderKey(e.target.value)}
-                  className="sm:col-span-2"
-                />
-                <Input
-                  placeholder="Header Value"
-                  value={headerValue}
-                  onChange={(e) => setHeaderValue(e.target.value)}
-                  className="sm:col-span-2"
-                />
-                <Button type="button" onClick={addHeader} disabled={!headerKey || !headerValue}>
-                  Add
-                </Button>
-              </div>
-              
-              {Object.keys(formData.headers).length > 0 && (
-                <div className="mt-2 space-y-2">
-                  {Object.entries(formData.headers).map(([key, value]) => (
-                    <div key={key} className="flex justify-between items-center p-2 bg-muted rounded-md">
-                      <div>
-                        <span className="font-semibold">{key}:</span> {value}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeHeader(key)}
-                        className="h-7 text-red-500 hover:text-red-700 hover:bg-red-100"
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isActive"
-                name="isActive"
-                checked={formData.isActive}
-                onCheckedChange={(checked) => 
-                  setFormData({ ...formData, isActive: checked as boolean })
-                }
-              />
-              <Label htmlFor="isActive">Active</Label>
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-2">
-            {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel}>
-                Cancel
-              </Button>
-            )}
-            <Button type="submit" disabled={isCreating || isUpdating}>
-              {isEditing ? 'Update Webhook' : 'Create Webhook'}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end space-x-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="default">
+            {isEditing ? 'Update Webhook' : 'Create Webhook'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 

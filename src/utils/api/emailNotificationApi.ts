@@ -157,7 +157,7 @@ export const emailNotificationApi = {
   
   // Test if a template would render properly
   testEmailTemplate: async (
-    template: Pick<EmailTemplate, 'subject' | 'body'>,
+    template: { subject: string; body: string },
     testData: Record<string, string>
   ): Promise<ApiResponse<{ subject: string; body: string }>> => {
     try {

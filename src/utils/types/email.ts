@@ -7,6 +7,9 @@ export interface EmailTemplate {
   body: string;
   triggerOn: 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 'sla-breach' | 'change-approved' | 'change-submitted' | 'problem-created' | 'problem-resolved';
   isActive: boolean;
+  lastModified?: string;
+  lastModifiedBy?: string;
+  eventType?: string; // Added for compatibility with NotificationTemplate
 }
 
 export interface NotificationEvent {
@@ -49,4 +52,40 @@ export interface SystemHealthReport {
     queueLength?: number;
   };
   lastUpdated: string;
+}
+
+// Define NotificationTemplate for compatibility
+export interface NotificationTemplate extends Omit<EmailTemplate, 'triggerOn'> {
+  eventType: string;
+  lastModified: string;
+  lastModifiedBy: string;
+}
+
+// Define EventType for webhooks
+export type EventType = 
+  | 'ticket-created' 
+  | 'ticket-updated' 
+  | 'ticket-assigned' 
+  | 'ticket-resolved' 
+  | 'sla-breach' 
+  | 'change-approved' 
+  | 'change-submitted' 
+  | 'problem-created' 
+  | 'problem-resolved'
+  | 'service-request-approval-required';
+
+// Define WebhookConfig
+export interface WebhookConfig {
+  id: string;
+  name: string;
+  url: string;
+  isActive: boolean;
+  eventTypes: EventType[];
+  secretKey?: string;
+  headers?: Record<string, string>;
+  lastDelivery?: {
+    timestamp: string;
+    status: 'success' | 'failure';
+    responseCode?: number;
+  };
 }
