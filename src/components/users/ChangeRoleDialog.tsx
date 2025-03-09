@@ -50,6 +50,7 @@ const ChangeRoleDialog: React.FC<ChangeRoleDialogProps> = ({
                 <SelectItem value="user">User</SelectItem>
                 <SelectItem value="problem-manager">Problem Manager</SelectItem>
                 <SelectItem value="change-manager">Change Manager</SelectItem>
+                <SelectItem value="release-manager">Release Manager</SelectItem>
               </SelectContent>
             </Select>
           </div>

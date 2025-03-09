@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -48,7 +47,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
     onOpenChange(false);
   };
 
-  const roles = ['admin', 'manager', 'agent', 'it', 'user', 'problem-manager', 'change-manager'];
+  const roles = ['admin', 'manager', 'agent', 'it', 'user', 'problem-manager', 'change-manager', 'release-manager'];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

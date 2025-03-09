@@ -1,4 +1,3 @@
-
 import { Release, ReleaseStatus, ApiResponse, ReleaseItem } from '../../types';
 import { delay, createApiErrorResponse, createApiSuccessResponse } from '../../mockData/apiHelpers';
 import { v4 as uuidv4 } from 'uuid';
@@ -133,6 +132,17 @@ export const updateReleaseApproval = async (
   
   if (!exists) {
     return createApiErrorResponse("Release not found", 404);
+  }
+  
+  // Check if a release-manager has approved
+  const currentUser = getUserById(userId);
+  const isReleaseManager = currentUser?.role === 'release-manager';
+  
+  // If approving, validate if a release-manager has approved
+  if (approved && !isReleaseManager) {
+    // In a real app, we would check the approval history
+    // For this mock, we'll just prevent the approval if user is not a release-manager
+    return createApiErrorResponse('Release requires approval from a Release Manager', 403);
   }
   
   const updatedRelease = {

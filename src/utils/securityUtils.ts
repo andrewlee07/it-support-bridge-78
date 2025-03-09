@@ -29,6 +29,8 @@ export const mockPermissions: Permission[] = [
   { id: 'perm-8', name: 'View Reports', description: 'Ability to view reports', resource: 'reports', action: 'read' },
   { id: 'perm-9', name: 'Approve Changes', description: 'Ability to approve changes', resource: 'changes', action: 'approve' },
   { id: 'perm-10', name: 'Reject Changes', description: 'Ability to reject changes', resource: 'changes', action: 'reject' },
+  { id: 'perm-11', name: 'Approve Releases', description: 'Ability to approve releases', resource: 'releases', action: 'approve' },
+  { id: 'perm-12', name: 'Reject Releases', description: 'Ability to reject releases', resource: 'releases', action: 'reject' },
 ];
 
 // Mock role permissions - in a real app, this would come from a database
@@ -63,7 +65,14 @@ export const mockRolePermissions: RolePermission[] = [
   
   // User permissions
   { roleId: 'user' as const, permissionId: 'perm-1' },
-  { roleId: 'user' as const, permissionId: 'perm-2' }
+  { roleId: 'user' as const, permissionId: 'perm-2' },
+  
+  // Release Manager permissions
+  { roleId: 'release-manager' as const, permissionId: 'perm-1' },
+  { roleId: 'release-manager' as const, permissionId: 'perm-6' },
+  { roleId: 'release-manager' as const, permissionId: 'perm-8' },
+  { roleId: 'release-manager' as const, permissionId: 'perm-11' },
+  { roleId: 'release-manager' as const, permissionId: 'perm-12' },
 ];
 
 // Placeholder for security event log - in a real app, this would be stored in a database

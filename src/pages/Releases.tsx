@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,7 +29,6 @@ const Releases = () => {
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false);
   const [selectedReleaseId, setSelectedReleaseId] = useState<string | null>(null);
   
-  // Map tab values to release statuses
   const getStatusFromTab = (tab: string): ReleaseStatus | undefined => {
     switch (tab) {
       case 'planned': return 'Planned';
@@ -40,7 +38,6 @@ const Releases = () => {
     }
   };
   
-  // Release data query
   const { 
     data: releasesData, 
     isLoading, 
@@ -58,7 +55,6 @@ const Releases = () => {
     }
   });
   
-  // Release metrics query
   const {
     data: metricsData,
     isLoading: isLoadingMetrics
@@ -73,7 +69,6 @@ const Releases = () => {
     }
   });
   
-  // Approve release mutation
   const approveMutation = useMutation({
     mutationFn: async (releaseId: string) => {
       if (!user) throw new Error('User not authenticated');
@@ -100,7 +95,6 @@ const Releases = () => {
     }
   });
   
-  // Reject release mutation
   const rejectMutation = useMutation({
     mutationFn: async ({ releaseId, reason }: { releaseId: string, reason: string }) => {
       if (!user) throw new Error('User not authenticated');
@@ -127,13 +121,11 @@ const Releases = () => {
     }
   });
   
-  // Handle tab change
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setStatusFilter(undefined); // Reset status filter when changing tabs
+    setStatusFilter(undefined);
   };
   
-  // Handle approve/reject
   const handleApprove = (releaseId: string) => {
     approveMutation.mutate(releaseId);
   };
@@ -149,7 +141,6 @@ const Releases = () => {
     }
   };
   
-  // Navigation
   const handleCreateNew = () => {
     navigate('/releases/new');
   };
@@ -157,6 +148,8 @@ const Releases = () => {
   const handleViewRelease = (releaseId: string) => {
     navigate(`/releases/${releaseId}`);
   };
+  
+  const canApproveReleases = user?.role === 'admin' || user?.role === 'release-manager';
   
   return (
     <PageTransition>
@@ -196,6 +189,7 @@ const Releases = () => {
           userRole={user?.role}
           searchQuery={searchQuery}
           viewType={activeTab as any}
+          canApprove={canApproveReleases}
         />
         
         <RejectReleaseDialog

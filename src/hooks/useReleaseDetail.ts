@@ -115,7 +115,7 @@ export const useReleaseDetail = () => {
   };
 
   // Check if user can approve
-  const canApprove = user?.role === 'admin';
+  const canApprove = user?.role === 'admin' || user?.role === 'release-manager';
 
   return {
     id,
