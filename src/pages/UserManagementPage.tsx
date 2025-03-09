@@ -1,12 +1,11 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import UserList from '@/components/users/UserList';
-import UserTable from '@/components/users/UserTable';
+import { Tabs } from '@/components/ui/tabs';
 import UserViewToggle from '@/components/users/UserViewToggle';
 import PageTransition from '@/components/shared/PageTransition';
 import { useUserManagement } from '@/hooks/useUserManagement';
-import { ViewType } from '@/components/users/UserViewToggle';
+import UserTabsNavigation from '@/components/users/UserTabsNavigation';
+import UserTabContent from '@/components/users/UserTabContent';
 
 const UserManagementPage = () => {
   const {
@@ -19,7 +18,8 @@ const UserManagementPage = () => {
     handleToggleStatus,
     handleUpdateUser,
     viewType,
-    handleViewChange
+    handleViewChange,
+    handleUserRoleChange
   } = useUserManagement();
 
   const handleTabChange = (value: string) => {
@@ -40,77 +40,43 @@ const UserManagementPage = () => {
         </div>
         
         <Tabs defaultValue="all" className="space-y-4" onValueChange={handleTabChange}>
-          <TabsList>
-            <TabsTrigger value="all">All Users</TabsTrigger>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="inactive">Inactive</TabsTrigger>
-          </TabsList>
+          <UserTabsNavigation onTabChange={handleTabChange} />
           
-          <TabsContent value="all" className="space-y-4">
-            {viewType === 'grid' ? (
-              <UserList 
-                users={users}
-                onViewUser={handleViewUser}
-                onRemoveUser={handleRemoveUser}
-                onChangeRole={handleChangeRole}
-                onToggleStatus={handleToggleStatus}
-                onEditUser={handleUpdateUser}
-              />
-            ) : (
-              <UserTable 
-                users={users}
-                onViewUser={handleViewUser}
-                onRemoveUser={handleRemoveUser}
-                onToggleStatus={handleToggleStatus}
-                onEditUser={handleUpdateUser}
-                onRoleChange={handleChangeRole}
-              />
-            )}
-          </TabsContent>
+          <UserTabContent 
+            value="all" 
+            users={users}
+            viewType={viewType}
+            onViewUser={handleViewUser}
+            onRemoveUser={handleRemoveUser}
+            onChangeRole={handleChangeRole}
+            onToggleStatus={handleToggleStatus}
+            onEditUser={handleUpdateUser}
+            onRoleChange={handleUserRoleChange}
+          />
           
-          <TabsContent value="active" className="space-y-4">
-            {viewType === 'grid' ? (
-              <UserList 
-                users={users}
-                onViewUser={handleViewUser}
-                onRemoveUser={handleRemoveUser}
-                onChangeRole={handleChangeRole}
-                onToggleStatus={handleToggleStatus}
-                onEditUser={handleUpdateUser}
-              />
-            ) : (
-              <UserTable 
-                users={users}
-                onViewUser={handleViewUser}
-                onRemoveUser={handleRemoveUser}
-                onToggleStatus={handleToggleStatus}
-                onEditUser={handleUpdateUser}
-                onRoleChange={handleChangeRole}
-              />
-            )}
-          </TabsContent>
+          <UserTabContent 
+            value="active" 
+            users={users}
+            viewType={viewType}
+            onViewUser={handleViewUser}
+            onRemoveUser={handleRemoveUser}
+            onChangeRole={handleChangeRole}
+            onToggleStatus={handleToggleStatus}
+            onEditUser={handleUpdateUser}
+            onRoleChange={handleUserRoleChange}
+          />
           
-          <TabsContent value="inactive" className="space-y-4">
-            {viewType === 'grid' ? (
-              <UserList 
-                users={users}
-                onViewUser={handleViewUser}
-                onRemoveUser={handleRemoveUser}
-                onChangeRole={handleChangeRole}
-                onToggleStatus={handleToggleStatus}
-                onEditUser={handleUpdateUser}
-              />
-            ) : (
-              <UserTable 
-                users={users}
-                onViewUser={handleViewUser}
-                onRemoveUser={handleRemoveUser}
-                onToggleStatus={handleToggleStatus}
-                onEditUser={handleUpdateUser}
-                onRoleChange={handleChangeRole}
-              />
-            )}
-          </TabsContent>
+          <UserTabContent 
+            value="inactive" 
+            users={users}
+            viewType={viewType}
+            onViewUser={handleViewUser}
+            onRemoveUser={handleRemoveUser}
+            onChangeRole={handleChangeRole}
+            onToggleStatus={handleToggleStatus}
+            onEditUser={handleUpdateUser}
+            onRoleChange={handleUserRoleChange}
+          />
         </Tabs>
       </div>
     </PageTransition>

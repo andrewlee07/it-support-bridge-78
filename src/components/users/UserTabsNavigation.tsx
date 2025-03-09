@@ -2,13 +2,18 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const UserTabsNavigation: React.FC = () => {
+interface UserTabsNavigationProps {
+  onTabChange: (value: string) => void;
+}
+
+const UserTabsNavigation: React.FC<UserTabsNavigationProps> = ({
+  onTabChange,
+}) => {
   return (
-    <TabsList className="mb-4">
+    <TabsList>
       <TabsTrigger value="all">All Users</TabsTrigger>
-      <TabsTrigger value="admin">Admins</TabsTrigger>
-      <TabsTrigger value="it">IT Staff</TabsTrigger>
-      <TabsTrigger value="user">End Users</TabsTrigger>
+      <TabsTrigger value="active">Active</TabsTrigger>
+      <TabsTrigger value="inactive">Inactive</TabsTrigger>
     </TabsList>
   );
 };
