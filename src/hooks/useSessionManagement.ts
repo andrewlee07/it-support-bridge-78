@@ -4,9 +4,9 @@ import { User } from '@/utils/types/user';
 import { 
   isSessionValid,
   refreshJWTToken,
+  logSecurityEvent,
   getClientIPAddress 
-} from '@/utils/security/sessionManagement';
-import { logSecurityEvent } from '@/utils/security/securityEvents';
+} from '@/utils/securityUtils';
 import { updateUser } from '@/utils/mockData/users';
 
 export const useSessionManagement = (

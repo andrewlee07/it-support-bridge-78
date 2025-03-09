@@ -1,12 +1,11 @@
 
 import { ReactNode } from 'react';
-import { LucideIcon } from 'lucide-react';
 
 export interface NavigationItem {
   name: string;
   href?: string;
   path?: string;
-  icon: LucideIcon;
+  icon: React.ElementType;
   collapsed?: boolean;
   allowedRoles?: string[];
   items?: NavigationItem[];
@@ -15,6 +14,6 @@ export interface NavigationItem {
 export interface NavItem {
   name: string;
   path: string;
-  icon: LucideIcon;
+  icon: React.ElementType;
   allowedRoles?: string[];
 }

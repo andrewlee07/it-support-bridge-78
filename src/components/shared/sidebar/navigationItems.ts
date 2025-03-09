@@ -1,21 +1,30 @@
 
 import {
-  LayoutDashboard,
+  BarChart3,
+  Gauge,
+  ShieldAlert,
+  MessageSquare,
+  Clock3,
+  BoxesIcon,
   AlertCircle,
+  PanelRightIcon,
+  Users2,
+  OctagonAlert,
   Headphones,
-  PanelRight,
-  AlertOctagon,
-  Box as BoxIcon,
-  Library,
-  ListChecks,
-  GitPullRequest,
-  FlaskConical,
-  Link2,
-  Bug,
   FileSpreadsheet,
   CalendarDays,
-  Users2,
-  Settings
+  FlaskConical,
+  LayoutDashboard,
+  Settings2,
+  BookText,
+  Bug,
+  ListChecks,
+  GitPullRequest,
+  Settings,
+  Sliders,
+  ArrowRightLeft,
+  Link2,
+  LibraryIcon,
 } from 'lucide-react';
 
 import { NavItem } from './types';
@@ -38,22 +47,22 @@ export const navigationItems: NavItem[] = [
   },
   {
     name: 'Changes',
-    icon: PanelRight,
+    icon: PanelRightIcon,
     path: '/changes',
   },
   {
     name: 'Problems',
-    icon: AlertOctagon,
+    icon: OctagonAlert,
     path: '/problems',
   },
   {
     name: 'Assets',
-    icon: BoxIcon,
+    icon: BoxesIcon,
     path: '/assets',
   },
   {
     name: 'Service Catalog',
-    icon: Library,
+    icon: LibraryIcon,
     path: '/service-catalog',
   },
   {
@@ -98,7 +107,7 @@ export const navigationItems: NavItem[] = [
   },
   {
     name: 'Admin Settings',
-    icon: Settings,
+    icon: Settings2,
     path: '/admin-settings',
     allowedRoles: ['admin'],
   },
