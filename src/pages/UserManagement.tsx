@@ -8,6 +8,7 @@ import UserManagementHeader from '@/components/users/UserManagementHeader';
 import UserTabsNavigation from '@/components/users/UserTabsNavigation';
 import UserTabsContent from '@/components/users/UserTabsContent';
 import UserDialogs from '@/components/users/UserDialogs';
+import { User } from '@/utils/types/user';
 
 const UserManagement = () => {
   const {
@@ -19,13 +20,12 @@ const UserManagement = () => {
     newUser,
     setNewUser,
     handleSearch,
-    filteredUsers,
     handleViewUser,
     handleAddUser,
     handleRemoveUser,
     handleUpdateUser,
     handleChangeRole,
-    handleToggleUserStatus,
+    handleToggleStatus,
     handleImportUsers,
     handleExportUsers
   } = useUserManagement();
@@ -39,6 +39,53 @@ const UserManagement = () => {
 
   // Get selected user for editing
   const selectedUser = selectedUserId ? users.find(u => u.id === selectedUserId) || null : null;
+
+  // Wrapper functions to handle dialogs and update logic
+  const onRemoveUser = (id: string) => {
+    setSelectedUserId(id);
+    setRemoveUserDialogOpen(true);
+  };
+
+  const onChangeRole = (id: string) => {
+    setSelectedUserId(id);
+    const user = users.find(u => u.id === id);
+    if (user) {
+      setSelectedRole(user.role);
+    }
+    setChangeRoleDialogOpen(true);
+  };
+
+  const onEditUser = (id: string) => {
+    setSelectedUserId(id);
+    setEditUserDialogOpen(true);
+  };
+
+  // Empty wrapper functions for dialog handlers
+  const handleAddUserFromDialog = () => {
+    handleAddUser();
+  };
+
+  const handleRemoveUserFromDialog = () => {
+    if (selectedUserId) {
+      handleRemoveUser(selectedUserId);
+    }
+    setRemoveUserDialogOpen(false);
+  };
+
+  const handleChangeRoleFromDialog = () => {
+    if (selectedUserId) {
+      handleChangeRole(selectedUserId);
+    }
+    setChangeRoleDialogOpen(false);
+  };
+
+  const handleUpdateUserFromDialog = (updatedUser: Partial<User>) => {
+    if (selectedUserId) {
+      // Convert to the expected format by extracting the ID and passing it
+      handleUpdateUser(selectedUserId);
+    }
+    setEditUserDialogOpen(false);
+  };
 
   return (
     <PageTransition>
@@ -57,25 +104,12 @@ const UserManagement = () => {
           <UserTabsNavigation />
           
           <UserTabsContent 
-            users={filteredUsers()} 
+            users={users} 
             onViewUser={handleViewUser}
-            onRemoveUser={(id) => {
-              setSelectedUserId(id);
-              setRemoveUserDialogOpen(true);
-            }}
-            onChangeRole={(id) => {
-              setSelectedUserId(id);
-              const user = users.find(u => u.id === id);
-              if (user) {
-                setSelectedRole(user.role);
-              }
-              setChangeRoleDialogOpen(true);
-            }}
-            onToggleStatus={handleToggleUserStatus}
-            onEditUser={(id) => {
-              setSelectedUserId(id);
-              setEditUserDialogOpen(true);
-            }}
+            onRemoveUser={onRemoveUser}
+            onChangeRole={onChangeRole}
+            onToggleStatus={handleToggleStatus}
+            onEditUser={onEditUser}
           />
         </Tabs>
       </div>
@@ -96,11 +130,11 @@ const UserManagement = () => {
         setNewUser={setNewUser}
         selectedRole={selectedRole}
         setSelectedRole={setSelectedRole}
-        handleAddUser={handleAddUser}
-        handleRemoveUser={handleRemoveUser}
-        handleChangeRole={handleChangeRole}
+        handleAddUser={handleAddUserFromDialog}
+        handleRemoveUser={handleRemoveUserFromDialog}
+        handleChangeRole={handleChangeRoleFromDialog}
         handleImportUsers={handleImportUsers}
-        handleUpdateUser={handleUpdateUser}
+        handleUpdateUser={handleUpdateUserFromDialog}
       />
     </PageTransition>
   );
