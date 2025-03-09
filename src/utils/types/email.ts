@@ -1,11 +1,13 @@
-
 // Email notification
 export interface EmailTemplate {
   id: string;
   name: string;
   subject: string;
   body: string;
-  triggerOn: 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 'sla-breach' | 'change-approved' | 'change-submitted' | 'problem-created' | 'problem-resolved' | 'service-request-approval-required';
+  triggerOn: 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 
+    'sla-breach' | 'change-approved' | 'change-submitted' | 'problem-created' | 
+    'problem-resolved' | 'service-request-approval-required' | 'incident-created' | 
+    'incident-assigned' | 'incident-resolved' | 'service-request-completed';
   isActive: boolean;
   lastModified?: string;
   lastModifiedBy?: string;
@@ -72,7 +74,11 @@ export type EventType =
   | 'change-submitted' 
   | 'problem-created' 
   | 'problem-resolved'
-  | 'service-request-approval-required';
+  | 'service-request-approval-required'
+  | 'incident-created'
+  | 'incident-assigned'
+  | 'incident-resolved'
+  | 'service-request-completed';
 
 // Define WebhookConfig
 export interface WebhookConfig {

@@ -154,6 +154,9 @@ const EmailTemplateEditor: React.FC<EmailTemplateEditorProps> = ({
     { label: 'Change Approved', value: 'change-approved' },
     { label: 'Problem Created', value: 'problem-created' },
     { label: 'Problem Resolved', value: 'problem-resolved' },
+    { label: 'Incident Created', value: 'incident-created' },
+    { label: 'Incident Assigned', value: 'incident-assigned' },
+    { label: 'Incident Resolved', value: 'incident-resolved' },
   ];
 
   return (

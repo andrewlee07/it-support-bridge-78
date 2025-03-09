@@ -29,7 +29,7 @@ const mockWebhooks: WebhookConfig[] = [
     id: 'webhook-1',
     name: 'Slack Integration',
     url: 'https://hooks.slack.com/services/T00000/B00000/XXXX',
-    eventTypes: ['incident-created', 'incident-assigned', 'incident-resolved'] as EventType[],
+    eventTypes: ['ticket-created', 'ticket-assigned', 'ticket-resolved'] as EventType[],
     isActive: true,
     secretKey: 'xoxb-123456789',
     headers: { 'Content-Type': 'application/json' }
@@ -38,7 +38,7 @@ const mockWebhooks: WebhookConfig[] = [
     id: 'webhook-2',
     name: 'External System',
     url: 'https://api.external-system.com/webhooks/itsm',
-    eventTypes: ['incident-created', 'incident-assigned', 'incident-resolved', 'service-request-completed'] as EventType[],
+    eventTypes: ['ticket-created', 'ticket-assigned', 'ticket-resolved', 'service-request-completed'] as EventType[],
     isActive: false,
     secretKey: 'user:password'
   }
