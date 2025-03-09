@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge, SeverityBadge } from '@/components/test-management/ui/BugBadges';
 import { Badge } from '@/components/ui/badge';
 import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
+import TicketLoadingError from '@/components/tickets/TicketLoadingError';
 
 const BugDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,13 +63,22 @@ const BugDetail = () => {
 
   if (isError || !bug?.data) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <h2 className="text-xl font-semibold mb-4">Bug Not Found</h2>
-        <p className="text-muted-foreground mb-6">The bug you are looking for could not be found.</p>
-        <Button variant="default" onClick={() => navigate('/bugs')}>
-          Return to Bugs
-        </Button>
-      </div>
+      <PageTransition>
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] text-center">
+          <h2 className="text-2xl font-bold mb-4">Bug Not Found</h2>
+          <p className="text-muted-foreground mb-8">
+            The bug you are looking for could not be found.
+          </p>
+          <Button 
+            variant="default" 
+            size="lg"
+            className="px-6"
+            onClick={() => navigate('/bugs')}
+          >
+            Return to Bugs
+          </Button>
+        </div>
+      </PageTransition>
     );
   }
 

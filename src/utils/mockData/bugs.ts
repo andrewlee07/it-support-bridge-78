@@ -1,8 +1,8 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from './apiHelpers';
-import { ApiResponse } from '../types';
-import { Bug, BugPriority, BugSeverity, BugStatus } from '../types/testTypes';
+import { ApiResponse } from '../types/api';
+import { Bug, BugPriority, BugSeverity, BugStatus } from '../types/test/testStatus';
 
 // Mock Bugs data
 export let bugs: Bug[] = [
@@ -29,6 +29,20 @@ export let bugs: Bug[] = [
     status: 'open',
     reportedBy: 'user-2',
     createdBy: 'user-2',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  // Add BUG001 to match the URL in the screenshot
+  {
+    id: 'BUG001',
+    title: 'Navigation menu disappears on mobile',
+    description: 'The navigation menu disappears when viewed on mobile devices',
+    stepsToReproduce: ['Open the application on a mobile device', 'Observe the navigation menu', 'Notice it is not visible'],
+    severity: 'high',
+    priority: 'high',
+    status: 'open',
+    reportedBy: 'user-1',
+    createdBy: 'user-1',
     createdAt: new Date(),
     updatedAt: new Date(),
   },

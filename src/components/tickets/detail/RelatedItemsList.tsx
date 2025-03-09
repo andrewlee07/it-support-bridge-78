@@ -1,103 +1,93 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { AlertCircle, Bug, ListChecks, Link as LinkIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { getTicketById } from '@/utils/mockData/tickets';
-import { getProblemById } from '@/utils/mockData/problems';
-
-interface RelatedItem {
-  id: string;
-  title?: string;
-  type: string;
-  status?: string;
-}
+import { Paperclip, Bug, Package } from 'lucide-react';
+import { RelatedItem } from '@/utils/types/ticket';
+import { Badge } from '@/components/ui/badge';
 
 interface RelatedItemsListProps {
   items: RelatedItem[];
-  type?: 'incident' | 'service' | 'problem';
 }
 
-const RelatedItemsList: React.FC<RelatedItemsListProps> = ({ items, type }) => {
-  // Helper function to determine the link path based on item type
-  const getItemPath = (item: RelatedItem) => {
-    switch (item.type.toLowerCase()) {
+const RelatedItemsList: React.FC<RelatedItemsListProps> = ({ items }) => {
+  if (!items || items.length === 0) {
+    return null;
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'open':
+        return 'bg-blue-500 text-white';
+      case 'in progress':
+      case 'in-progress':
+        return 'bg-amber-500 text-white';
+      case 'closed':
+        return 'bg-green-500 text-white';
+      case 'resolved':
+        return 'bg-purple-500 text-white';
+      default:
+        return 'bg-gray-500 text-white';
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'bug':
+        return <Bug className="h-4 w-4" />;
+      case 'backlogItem':
+        return <Package className="h-4 w-4" />;
+      default:
+        return <Paperclip className="h-4 w-4" />;
+    }
+  };
+
+  const getItemUrl = (item: RelatedItem) => {
+    switch (item.type) {
       case 'bug':
         return `/bugs/${item.id}`;
-      case 'backlog':
-        return `/backlog/${item.id}`;
-      case 'problem':
-        return `/problems/${item.id}`;
-      case 'incident':
-        return `/incidents/${item.id}`;
-      case 'service':
-        return `/service-requests/${item.id}`;
+      case 'backlogItem':
+        return `/backlog?item=${item.id}`;
       default:
         return '#';
     }
   };
 
-  // Helper function to get the item title if not provided
-  const getItemTitle = (item: RelatedItem) => {
-    if (item.title) return item.title;
-    
-    // If no title provided, try to fetch it based on type
-    if (item.type.toLowerCase() === 'incident' || item.type.toLowerCase() === 'service') {
-      const ticket = getTicketById(item.id);
-      return ticket ? ticket.title : item.id;
-    } else if (item.type.toLowerCase() === 'problem') {
-      const problem = getProblemById(item.id);
-      return problem ? problem.title : item.id;
-    }
-    
-    return item.id;
-  };
-
-  // Helper function to get the appropriate icon based on item type
-  const getItemIcon = (itemType: string) => {
-    switch (itemType.toLowerCase()) {
-      case 'bug':
-        return <Bug className="h-4 w-4 text-red-500 flex-shrink-0" />;
-      case 'backlog':
-        return <ListChecks className="h-4 w-4 text-blue-500 flex-shrink-0" />;
-      case 'problem':
-        return <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0" />;
-      case 'incident':
-      case 'service':
-      default:
-        return <LinkIcon className="h-4 w-4 text-primary flex-shrink-0" />;
-    }
-  };
-  
   return (
-    <div className="space-y-2">
-      {items.map((item) => (
-        <div key={item.id} className="flex items-center gap-2 p-2 border rounded-md">
-          {getItemIcon(item.type)}
-          <div className="flex flex-col min-w-0">
-            <Link 
-              to={getItemPath(item)}
-              className="text-primary hover:underline truncate"
-            >
-              {item.id}: {getItemTitle(item)}
-            </Link>
-            {item.status && (
-              <span className={cn(
-                "text-xs",
-                item.status.toLowerCase().includes('closed') ? "text-green-600" : 
-                item.status.toLowerCase().includes('in progress') || item.status.toLowerCase().includes('under') ? "text-amber-600" : 
-                "text-gray-500"
-              )}>
-                {item.status}
-              </span>
-            )}
-          </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center space-x-2">
+          <Paperclip className="h-5 w-5" />
+          <span>Related Items</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {items.map((item) => (
+            <div key={item.id} className="flex items-center justify-between border-b pb-3">
+              <div className="flex items-center space-x-3">
+                <div className="rounded-full p-1.5 bg-muted">
+                  {getTypeIcon(item.type)}
+                </div>
+                <div>
+                  <div className="font-medium">{item.title}</div>
+                  <div className="text-sm text-muted-foreground flex space-x-2 items-center">
+                    <span>{item.id}</span>
+                    <Badge variant="secondary" className={getStatusColor(item.status)}>
+                      {item.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to={getItemUrl(item)}>View</Link>
+              </Button>
+            </div>
+          ))}
         </div>
-      ))}
-      {items.length === 0 && (
-        <p className="text-muted-foreground text-sm">No related items found.</p>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

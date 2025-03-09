@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Ticket, RelatedItem } from '@/utils/types/ticket';
