@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Table,
@@ -11,11 +10,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { User, UserRole } from '@/utils/types/user';
 import { Edit2, UserCheck, UserX, Trash2 } from 'lucide-react';
 
 interface Column {
-  key: keyof User | 'actions' | 'roleSelection';
+  key: keyof User | 'actions' | string;
   label: string;
   sortable?: boolean;
 }
@@ -42,15 +42,6 @@ const UserTable: React.FC<UserTableProps> = ({
     direction: 'ascending' | 'descending';
   } | null>(null);
 
-  const columns: Column[] = [
-    { key: 'name', label: 'Name', sortable: true },
-    { key: 'email', label: 'Email', sortable: true },
-    { key: 'department', label: 'Department', sortable: true },
-    { key: 'roleSelection', label: 'Roles' },
-    { key: 'active', label: 'Status', sortable: true },
-    { key: 'actions', label: 'Actions' },
-  ];
-
   const availableRoles: UserRole[] = [
     'admin',
     'manager',
@@ -62,6 +53,23 @@ const UserTable: React.FC<UserTableProps> = ({
     'change-manager',
     'release-manager',
   ];
+
+  // Generate columns dynamically - base columns plus one column per role
+  const baseColumns: Column[] = [
+    { key: 'name', label: 'Name', sortable: true },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'department', label: 'Department', sortable: true },
+    { key: 'active', label: 'Status', sortable: true },
+    { key: 'actions', label: 'Actions' },
+  ];
+  
+  // Add role columns
+  const roleColumns: Column[] = availableRoles.map(role => ({
+    key: `role-${role}`,
+    label: getRoleDisplayName(role),
+  }));
+  
+  const columns = [...baseColumns, ...roleColumns];
 
   const requestSort = (key: keyof User) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -110,6 +118,10 @@ const UserTable: React.FC<UserTableProps> = ({
     }
   };
 
+  const hasRole = (user: User, role: UserRole): boolean => {
+    return user.role === role || (user.roles && user.roles.includes(role));
+  };
+
   const handleRoleChange = (user: User, role: UserRole, checked: boolean) => {
     onRoleChange(user.id, role, checked);
   };
@@ -123,97 +135,97 @@ const UserTable: React.FC<UserTableProps> = ({
   }
 
   return (
-    <div className="border rounded-md overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column) => (
-              <TableHead 
-                key={String(column.key)}
-                className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
-                onClick={column.sortable ? () => requestSort(column.key as keyof User) : undefined}
-              >
-                {column.label}
-                {sortConfig?.key === column.key && (
-                  <span className="ml-1">
-                    {sortConfig.direction === 'ascending' ? '↑' : '↓'}
-                  </span>
-                )}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedUsers.map((user) => (
-            <TableRow 
-              key={user.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => onViewUser(user.id)}
-            >
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.department}</TableCell>
-              <TableCell onClick={(e) => e.stopPropagation()} className="space-y-1">
-                <div className="flex flex-wrap gap-2">
-                  {availableRoles.map((role) => (
-                    <div key={role} className="flex items-center space-x-1">
+    <div className="border rounded-md">
+      <ScrollArea className="w-full" orientation="horizontal" type="always">
+        <div className="min-w-[1000px]">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableHead 
+                    key={String(column.key)}
+                    className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
+                    onClick={column.sortable ? () => requestSort(column.key as keyof User) : undefined}
+                  >
+                    {column.label}
+                    {sortConfig?.key === column.key && (
+                      <span className="ml-1">
+                        {sortConfig.direction === 'ascending' ? '↑' : '↓'}
+                      </span>
+                    )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedUsers.map((user) => (
+                <TableRow 
+                  key={user.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => onViewUser(user.id)}
+                >
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.department}</TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={user.active ? "default" : "secondary"}
+                      className={user.active 
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" 
+                        : "bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300"
+                      }
+                    >
+                      {user.active ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <div className="flex space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => onEditUser(user.id)}
+                      >
+                        <Edit2 className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button 
+                        variant={user.active ? "ghost" : "outline"}
+                        size="sm" 
+                        onClick={() => onToggleStatus(user.id)}
+                      >
+                        {user.active ? <UserX className="h-3.5 w-3.5" /> : <UserCheck className="h-3.5 w-3.5" />}
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => onRemoveUser(user.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                  
+                  {/* Role columns - one checkbox per column */}
+                  {availableRoles.map(role => (
+                    <TableCell 
+                      key={`${user.id}-${role}`} 
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-center"
+                    >
                       <Checkbox 
                         id={`${user.id}-${role}`}
-                        checked={user.role === role || (user.roles && user.roles.includes(role))}
+                        checked={hasRole(user, role)}
                         onCheckedChange={(checked) => 
                           handleRoleChange(user, role, checked as boolean)
                         }
                       />
-                      <label 
-                        htmlFor={`${user.id}-${role}`}
-                        className="text-xs cursor-pointer"
-                      >
-                        {getRoleDisplayName(role)}
-                      </label>
-                    </div>
+                    </TableCell>
                   ))}
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge 
-                  variant={user.active ? "default" : "secondary"}
-                  className={user.active 
-                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" 
-                    : "bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300"
-                  }
-                >
-                  {user.active ? "Active" : "Inactive"}
-                </Badge>
-              </TableCell>
-              <TableCell onClick={(e) => e.stopPropagation()}>
-                <div className="flex space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => onEditUser(user.id)}
-                  >
-                    <Edit2 className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button 
-                    variant={user.active ? "ghost" : "outline"}
-                    size="sm" 
-                    onClick={() => onToggleStatus(user.id)}
-                  >
-                    {user.active ? <UserX className="h-3.5 w-3.5" /> : <UserCheck className="h-3.5 w-3.5" />}
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm" 
-                    onClick={() => onRemoveUser(user.id)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </ScrollArea>
     </div>
   );
 };
