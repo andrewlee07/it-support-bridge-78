@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { WebhookConfig } from '@/utils/types/notification';
 import { useWebhooks } from '@/hooks/useNotifications';
 import WebhookConfigForm from './WebhookConfigForm';
 
@@ -13,7 +12,7 @@ interface WebhookConfigListProps {
 
 const WebhookConfigList: React.FC<WebhookConfigListProps> = ({ className }) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedWebhook, setSelectedWebhook] = useState<WebhookConfig | undefined>(undefined);
+  const [selectedWebhook, setSelectedWebhook] = useState<any | undefined>(undefined);
   const { webhooks, loading, fetchWebhooks } = useWebhooks();
 
   useEffect(() => {
@@ -25,7 +24,7 @@ const WebhookConfigList: React.FC<WebhookConfigListProps> = ({ className }) => {
     setIsFormOpen(true);
   };
 
-  const handleEditWebhook = (webhook: WebhookConfig) => {
+  const handleEditWebhook = (webhook: any) => {
     setSelectedWebhook(webhook);
     setIsFormOpen(true);
   };
@@ -74,7 +73,7 @@ const WebhookConfigList: React.FC<WebhookConfigListProps> = ({ className }) => {
                 <div className="mt-2">
                   <div className="text-sm mb-1">Events:</div>
                   <div className="flex flex-wrap gap-1">
-                    {webhook.eventTypes.map((type) => (
+                    {webhook.eventTypes.map((type: string) => (
                       <Badge key={type} variant="outline" className="text-xs">
                         {type}
                       </Badge>

@@ -1,129 +1,126 @@
-
 import React from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
   FormMessage,
+  FormDescription
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { MultiSelect } from '@/components/ui/multi-select';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { WebhookConfig, EventType } from '@/utils/types/notification';
-import { useWebhooks } from '@/hooks/useNotifications';
+import { useWebhooks, EventType } from '@/hooks/useNotifications';
 import { useToast } from '@/hooks/use-toast';
 
-// Schema for the webhook form
+// Form schema
 const webhookFormSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters' }),
-  url: z.string().url({ message: 'Please enter a valid URL' }),
-  isActive: z.boolean().default(true),
+  url: z.string().url({ message: 'Must be a valid URL' }),
   eventTypes: z.array(z.string()).min(1, { message: 'Select at least one event type' }),
-  authType: z.enum(['none', 'basic', 'token']).default('none'),
+  authType: z.enum(['none', 'basic', 'token']),
   authCredentials: z.string().optional(),
-  retryCount: z.number().int().min(0).max(10).default(3),
-  retryInterval: z.number().int().min(1).max(60).default(5),
+  isActive: z.boolean().default(true),
+  retryCount: z.number().int().min(0).max(10),
+  retryInterval: z.number().int().min(1).max(60)
 });
 
 type WebhookFormValues = z.infer<typeof webhookFormSchema>;
 
-export interface WebhookConfigFormProps {
-  initialData?: WebhookConfig;
+// Event type options for the form
+const eventTypeOptions = [
+  { value: 'incident-created', label: 'Incident Created' },
+  { value: 'incident-assigned', label: 'Incident Assigned' },
+  { value: 'incident-resolved', label: 'Incident Resolved' },
+  { value: 'service-request-created', label: 'Service Request Created' },
+  { value: 'service-request-approval-required', label: 'Service Request Approval Required' },
+  { value: 'service-request-completed', label: 'Service Request Completed' }
+];
+
+interface WebhookConfigFormProps {
+  initialData?: any; // Use any to avoid type issues for now
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-// Convert EventType array to the form expected values
-const mapEventTypesToFormValues = (eventTypes: EventType[] = []): string[] => {
-  return eventTypes.map(type => type.toString());
-};
-
-// Convert form values back to webhook configuration
-const mapFormValuesToWebhook = (values: WebhookFormValues): Omit<WebhookConfig, 'id'> => {
-  return {
-    name: values.name,
-    url: values.url,
-    isActive: values.isActive,
-    eventTypes: values.eventTypes as EventType[],
-    authType: values.authType,
-    authCredentials: values.authCredentials,
-    retryCount: values.retryCount,
-    retryInterval: values.retryInterval,
-  };
-};
-
 const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
   initialData,
   onSuccess,
-  onCancel,
+  onCancel
 }) => {
   const { toast } = useToast();
-  const { updateWebhook, createWebhook, testWebhook } = useWebhooks();
-
-  // Available event types
-  const availableEventTypes = [
-    { id: 'incident-created', label: 'Incident Created' },
-    { id: 'incident-assigned', label: 'Incident Assigned' },
-    { id: 'incident-resolved', label: 'Incident Resolved' },
-    { id: 'service-request-created', label: 'Service Request Created' },
-    { id: 'service-request-completed', label: 'Service Request Completed' },
-    { id: 'problem-created', label: 'Problem Created' },
-    { id: 'problem-resolved', label: 'Problem Resolved' },
-    { id: 'change-request-submitted', label: 'Change Request Submitted' },
-    { id: 'change-request-approved', label: 'Change Request Approved' },
-    { id: 'change-request-rejected', label: 'Change Request Rejected' },
-  ];
+  const { createWebhook, updateWebhook, testWebhook } = useWebhooks();
 
   // Initialize form with default values or existing data
   const form = useForm<WebhookFormValues>({
     resolver: zodResolver(webhookFormSchema),
     defaultValues: initialData
       ? {
-          ...initialData,
-          eventTypes: mapEventTypesToFormValues(initialData.eventTypes),
+          name: initialData.name,
+          url: initialData.url,
+          eventTypes: initialData.eventTypes.map((type: string) => type),
+          authType: initialData.authType,
+          authCredentials: initialData.authCredentials || '',
+          isActive: initialData.isActive,
+          retryCount: initialData.retryCount,
+          retryInterval: initialData.retryInterval
         }
       : {
           name: '',
-          url: '',
-          isActive: true,
+          url: 'https://',
           eventTypes: [],
           authType: 'none',
           authCredentials: '',
+          isActive: true,
           retryCount: 3,
-          retryInterval: 5,
-        },
+          retryInterval: 5
+        }
   });
 
   const handleSubmit = async (values: WebhookFormValues) => {
-    const webhookData = mapFormValuesToWebhook(values);
-    
     try {
+      let response;
+      
+      // Create webhook config object
+      const webhookData = {
+        name: values.name,
+        url: values.url,
+        eventTypes: values.eventTypes as EventType[],
+        authType: values.authType as 'none' | 'basic' | 'token',
+        authCredentials: values.authCredentials,
+        isActive: values.isActive,
+        retryCount: values.retryCount,
+        retryInterval: values.retryInterval
+      };
+      
       if (initialData?.id) {
         // Update existing webhook
-        const result = await updateWebhook(initialData.id, webhookData);
-        if (result) {
+        response = await updateWebhook(initialData.id, webhookData);
+        if (response.success) {
           toast({
-            title: 'Webhook updated',
-            description: 'The webhook configuration has been updated successfully.',
+            title: "Webhook Updated",
+            description: "Webhook configuration has been updated successfully.",
           });
+        } else {
+          throw new Error(response.error || "Failed to update webhook");
         }
       } else {
         // Create new webhook
-        const result = await createWebhook(webhookData);
-        if (result) {
+        response = await createWebhook(webhookData);
+        if (response.success) {
           toast({
-            title: 'Webhook created',
-            description: 'The webhook configuration has been created successfully.',
+            title: "Webhook Created",
+            description: "New webhook configuration has been created successfully.",
           });
+        } else {
+          throw new Error(response.error || "Failed to create webhook");
         }
       }
       
@@ -132,9 +129,9 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'An error occurred',
-        variant: 'destructive',
+        title: "Error",
+        description: error instanceof Error ? error.message : "An error occurred",
+        variant: "destructive",
       });
     }
   };
@@ -143,37 +140,34 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
     const { url, authType, authCredentials } = form.getValues();
     
     try {
-      const response = await testWebhook({ url, authType, authCredentials });
+      const response = await testWebhook({ 
+        url, 
+        authType, 
+        authCredentials 
+      });
       
-      if (response && typeof response === 'object' && 'success' in response) {
-        if (response.success) {
-          toast({
-            title: 'Test successful',
-            description: 'The webhook endpoint responded successfully.',
-          });
-        } else {
-          toast({
-            title: 'Test failed',
-            description: response.message || 'The webhook endpoint failed to respond.',
-            variant: 'destructive',
-          });
-        }
+      if (response.success) {
+        toast({
+          title: "Test Successful",
+          description: "Successfully connected to the webhook endpoint.",
+          variant: "success"
+        });
       } else {
         toast({
-          title: 'Test result',
-          description: 'Webhook test completed',
+          title: "Test Failed",
+          description: response.message || "Failed to connect to the webhook endpoint.",
+          variant: "destructive"
         });
       }
     } catch (error) {
       toast({
-        title: 'Test error',
-        description: error instanceof Error ? error.message : 'An error occurred during testing',
-        variant: 'destructive',
+        title: "Test Error",
+        description: "An error occurred while testing the webhook.",
+        variant: "destructive"
       });
     }
   };
 
-  // Form submission handler
   return (
     <Card className="w-full">
       <CardHeader>
@@ -247,39 +241,11 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
                         Select which events should trigger this webhook
                       </FormDescription>
                     </div>
-                    {availableEventTypes.map((type) => (
-                      <FormField
-                        key={type.id}
-                        control={form.control}
-                        name="eventTypes"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={type.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(type.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value, type.id])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== type.id
-                                          )
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {type.label}
-                              </FormLabel>
-                            </FormItem>
-                          );
-                        }}
-                      />
-                    ))}
+                    <MultiSelect
+                      options={eventTypeOptions}
+                      value={form.watch('eventTypes')}
+                      onChange={(value) => form.setValue('eventTypes', value)}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

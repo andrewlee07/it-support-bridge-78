@@ -1,365 +1,289 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { notificationApi } from '@/utils/api/notificationApi';
 import { emailNotificationApi } from '@/utils/api/emailNotificationApi';
+import { 
+  NotificationTemplate, 
+  WebhookConfig,
+  NotificationLog,
+  EventType 
+} from '@/utils/types/notification';
 import { EmailTemplate } from '@/utils/types';
-import { ApiResponse } from '@/utils/types/api';
-import { logError } from '@/utils/logging/errorLogger';
 
-// Mock webhook related types
-export interface WebhookConfig {
-  id: string;
-  name: string;
-  url: string;
-  isActive: boolean;
-  eventTypes: EventType[];
-  authType: 'none' | 'basic' | 'token';
-  authCredentials?: string;
-  retryCount: number;
-  retryInterval: number;
-}
+// Re-export types from notification.ts to ensure consistency
+export type { NotificationTemplate, WebhookConfig, NotificationLog, EventType };
 
-export type EventType = 
-  | 'incident-created' 
-  | 'incident-assigned' 
-  | 'incident-resolved' 
-  | 'service-request-created' 
-  | 'service-request-completed' 
-  | 'problem-created' 
-  | 'problem-resolved' 
-  | 'change-request-submitted' 
-  | 'change-request-approved' 
-  | 'change-request-rejected';
-
-// Mock health data types
-interface SystemHealthData {
-  overallStatus: 'healthy' | 'degraded' | 'down' | 'unknown';
-  components: {
-    name: string;
-    status: 'healthy' | 'degraded' | 'down' | 'unknown';
-    latency?: number;
-  }[];
-  stats: {
-    notificationsSent: number;
-    successRate: number;
-    avgDeliveryTime: number;
-    queueLength?: number;
-  };
-  lastUpdated: string;
-}
-
-// Mock notification system health data
-const mockHealthData: SystemHealthData = {
-  overallStatus: 'healthy',
-  components: [
-    {
-      name: 'Email Service',
-      status: 'healthy',
-      latency: 230,
-    },
-    {
-      name: 'Webhooks',
-      status: 'healthy',
-      latency: 150,
-    },
-    {
-      name: 'Message Queue',
-      status: 'healthy',
-      latency: 12,
-    },
-    {
-      name: 'SMS Gateway',
-      status: 'degraded',
-      latency: 890,
-    },
-    {
-      name: 'Power Automate Integration',
-      status: 'healthy',
-      latency: 310,
-    },
-  ],
-  stats: {
-    notificationsSent: 1458,
-    successRate: 99.7,
-    avgDeliveryTime: 0.8,
-    queueLength: 5,
-  },
-  lastUpdated: new Date().toISOString(),
-};
-
-// Mock webhooks data
-const mockWebhooks: WebhookConfig[] = [
-  {
-    id: 'webhook-1',
-    name: 'ServiceNow Integration',
-    url: 'https://servicenow.example.com/webhook/incidents',
-    isActive: true,
-    eventTypes: ['incident-created', 'incident-resolved'],
-    authType: 'token',
-    authCredentials: 'token-xyz-123',
-    retryCount: 3,
-    retryInterval: 5,
-  },
-  {
-    id: 'webhook-2',
-    name: 'Teams Notification',
-    url: 'https://outlook.office.com/webhook/teams/channel',
-    isActive: true,
-    eventTypes: ['problem-created', 'incident-created', 'service-request-created'],
-    authType: 'none',
-    retryCount: 2,
-    retryInterval: 3,
-  },
-  {
-    id: 'webhook-3',
-    name: 'Slack Alerts',
-    url: 'https://hooks.slack.com/services/abc123',
-    isActive: false,
-    eventTypes: ['incident-created', 'incident-assigned'],
-    authType: 'token',
-    authCredentials: 'slack-token-123',
-    retryCount: 5,
-    retryInterval: 2,
-  },
-];
-
-// Email templates hook
-export const useEmailTemplates = () => {
-  const [templates, setTemplates] = useState<EmailTemplate[]>([]);
-  const [loading, setLoading] = useState(false);
+// System health hook
+export const useNotificationSystem = () => {
+  const [systemHealth, setSystemHealth] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTemplates = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchSystemHealth = useCallback(async () => {
     try {
-      const response = await emailNotificationApi.getEmailTemplates();
+      setLoading(true);
+      const response = await notificationApi.getSystemHealth();
       if (response.success) {
-        setTemplates(response.data);
+        setSystemHealth(response.data);
       } else {
-        setError(response.error || 'Failed to fetch email templates');
+        setError(response.error || 'Failed to load system health');
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      setError(errorMessage);
-      logError(errorMessage, { componentName: 'useEmailTemplates', severity: 'error' });
+    } catch (err) {
+      setError('An error occurred while fetching system health');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchSystemHealth();
+  }, [fetchSystemHealth]);
+
+  return {
+    systemHealth,
+    loading,
+    error,
+    refreshData: fetchSystemHealth
+  };
+};
+
+// Email templates hook
+export const useEmailTemplates = () => {
+  const [templates, setTemplates] = useState<EmailTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchTemplates = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await emailNotificationApi.getEmailTemplates();
+      if (response.success) {
+        setTemplates(response.data);
+      } else {
+        setError(response.error || 'Failed to load email templates');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching templates');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
+
+  const createTemplate = async (template: Omit<EmailTemplate, 'id'>) => {
+    const response = await emailNotificationApi.createEmailTemplate(template);
+    if (response.success) {
+      fetchTemplates();
+    }
+    return response;
+  };
+
+  const updateTemplate = async (id: string, updates: Partial<EmailTemplate>) => {
+    const response = await emailNotificationApi.updateEmailTemplate(id, updates);
+    if (response.success) {
+      fetchTemplates();
+    }
+    return response;
+  };
+
+  const deleteTemplate = async (id: string) => {
+    const response = await emailNotificationApi.deleteEmailTemplate(id);
+    if (response.success) {
+      fetchTemplates();
+    }
+    return response;
+  };
+
+  const testTemplate = async (template: Pick<EmailTemplate, 'subject' | 'body'>, testData: Record<string, string>) => {
+    return await emailNotificationApi.testEmailTemplate(template, testData);
+  };
 
   return {
     templates,
     loading,
     error,
     fetchTemplates,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate,
+    testTemplate
   };
 };
 
-// System health hook
-export const useNotificationSystemHealth = () => {
-  const [healthData, setHealthData] = useState<SystemHealthData | null>(null);
-  const [loading, setLoading] = useState(false);
+// Notification templates hook (using notificationApi adapter)
+export const useNotificationTemplates = () => {
+  const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const refreshHealthData = useCallback(async () => {
-    setLoading(true);
+  const fetchTemplates = useCallback(async () => {
     try {
-      // In a real implementation, this would be an API call
-      // For this mock, we'll simulate an API delay and return the mock data
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Randomly adjust the mock data to simulate changing health status
-      const updatedHealthData = { ...mockHealthData };
-      updatedHealthData.lastUpdated = new Date().toISOString();
-      
-      // Randomly adjust components status
-      updatedHealthData.components = updatedHealthData.components.map(component => {
-        const random = Math.random();
-        if (random > 0.9) {
-          return { 
-            ...component, 
-            status: 'degraded', 
-            latency: component.latency ? component.latency * 2 : 500 
-          };
-        } else if (random > 0.95) {
-          return { ...component, status: 'down', latency: 0 };
-        }
-        return component;
-      });
-      
-      // Calculate overall status based on components
-      const hasDown = updatedHealthData.components.some(c => c.status === 'down');
-      const hasDegraded = updatedHealthData.components.some(c => c.status === 'degraded');
-      
-      if (hasDown) {
-        updatedHealthData.overallStatus = 'down';
-      } else if (hasDegraded) {
-        updatedHealthData.overallStatus = 'degraded';
+      setLoading(true);
+      const response = await notificationApi.getNotificationTemplates();
+      if (response.success) {
+        setTemplates(response.data);
       } else {
-        updatedHealthData.overallStatus = 'healthy';
+        setError(response.error || 'Failed to load notification templates');
       }
-      
-      // Update stats
-      updatedHealthData.stats = {
-        ...updatedHealthData.stats,
-        notificationsSent: Math.floor(1000 + Math.random() * 1000),
-        successRate: 90 + Math.random() * 10,
-        avgDeliveryTime: 0.5 + Math.random() * 2,
-      };
-      
-      setHealthData(updatedHealthData);
-    } catch (error) {
-      logError('Failed to fetch notification system health data', {
-        componentName: 'useNotificationSystemHealth',
-        severity: 'error',
-      });
-      setHealthData(null);
+    } catch (err) {
+      setError('An error occurred while fetching templates');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   }, []);
 
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
+
+  const createTemplate = async (template: Omit<NotificationTemplate, 'id' | 'lastModified' | 'lastModifiedBy'>) => {
+    const response = await notificationApi.createNotificationTemplate(template);
+    if (response.success) {
+      fetchTemplates();
+    }
+    return response;
+  };
+
+  const updateTemplate = async (id: string, updates: Partial<NotificationTemplate>) => {
+    const response = await notificationApi.updateNotificationTemplate(id, updates);
+    if (response.success) {
+      fetchTemplates();
+    }
+    return response;
+  };
+
+  const deleteTemplate = async (id: string) => {
+    const response = await notificationApi.deleteNotificationTemplate(id);
+    if (response.success) {
+      fetchTemplates();
+    }
+    return response;
+  };
+
   return {
-    healthData,
+    templates,
     loading,
-    refreshHealthData,
+    error,
+    fetchTemplates,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate
   };
 };
 
 // Webhooks hook
 export const useWebhooks = () => {
-  const [webhooks, setWebhooks] = useState<WebhookConfig[]>(mockWebhooks);
-  const [loading, setLoading] = useState(false);
+  const [webhooks, setWebhooks] = useState<WebhookConfig[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchWebhooks = useCallback(async () => {
-    setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setWebhooks(mockWebhooks);
-    } catch (error) {
-      logError('Failed to fetch webhooks', {
-        componentName: 'useWebhooks',
-        severity: 'error',
-      });
+      setLoading(true);
+      const response = await notificationApi.getWebhookConfigurations();
+      if (response.success) {
+        setWebhooks(response.data);
+      } else {
+        setError(response.error || 'Failed to load webhook configurations');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching webhooks');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createWebhook = useCallback(async (webhookData: Omit<WebhookConfig, 'id'>): Promise<WebhookConfig | null> => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const newWebhook: WebhookConfig = {
-        ...webhookData,
-        id: `webhook-${Date.now()}`,
-      };
-      
-      setWebhooks(prev => [...prev, newWebhook]);
-      return newWebhook;
-    } catch (error) {
-      logError('Failed to create webhook', {
-        componentName: 'useWebhooks',
-        severity: 'error',
-      });
-      return null;
-    }
-  }, []);
+  useEffect(() => {
+    fetchWebhooks();
+  }, [fetchWebhooks]);
 
-  const updateWebhook = useCallback(async (
-    id: string,
-    updates: Partial<WebhookConfig>
-  ): Promise<WebhookConfig | null> => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      let updatedWebhook: WebhookConfig | null = null;
-      
-      setWebhooks(prev => {
-        const updated = prev.map(webhook => {
-          if (webhook.id === id) {
-            updatedWebhook = { ...webhook, ...updates };
-            return updatedWebhook;
-          }
-          return webhook;
-        });
-        return updated;
-      });
-      
-      return updatedWebhook;
-    } catch (error) {
-      logError('Failed to update webhook', {
-        componentName: 'useWebhooks',
-        severity: 'error',
-      });
-      return null;
+  const createWebhook = async (webhook: Omit<WebhookConfig, 'id'>) => {
+    const response = await notificationApi.createWebhookConfiguration(webhook);
+    if (response.success) {
+      fetchWebhooks();
     }
-  }, []);
+    return response;
+  };
 
-  const deleteWebhook = useCallback(async (id: string): Promise<boolean> => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setWebhooks(prev => prev.filter(webhook => webhook.id !== id));
-      return true;
-    } catch (error) {
-      logError('Failed to delete webhook', {
-        componentName: 'useWebhooks',
-        severity: 'error',
-      });
-      return false;
+  const updateWebhook = async (id: string, updates: Partial<WebhookConfig>) => {
+    const response = await notificationApi.updateWebhookConfiguration(id, updates);
+    if (response.success) {
+      fetchWebhooks();
     }
-  }, []);
+    return response;
+  };
 
-  const testWebhook = useCallback(async (
-    config: Pick<WebhookConfig, 'url' | 'authType' | 'authCredentials'>
-  ): Promise<ApiResponse<boolean>> => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Randomly succeed or fail to simulate real-world testing
-      const isSuccess = Math.random() > 0.3;
-      
-      if (isSuccess) {
-        return {
-          success: true,
-          data: true,
-          error: null,
-        };
-      } else {
-        return {
-          success: false,
-          data: false,
-          error: "Failed to connect to the webhook endpoint. Please check the URL and authentication settings.",
-        };
-      }
-    } catch (error) {
-      logError('Failed to test webhook', {
-        componentName: 'useWebhooks',
-        severity: 'error',
-      });
-      return {
-        success: false,
-        data: false,
-        error: "An unexpected error occurred during the test",
-      };
+  const deleteWebhook = async (id: string) => {
+    const response = await notificationApi.deleteWebhookConfiguration(id);
+    if (response.success) {
+      fetchWebhooks();
     }
-  }, []);
+    return response;
+  };
+
+  const testWebhook = async (webhook: { url: string; authType: string; authCredentials?: string }) => {
+    return await notificationApi.testWebhook(webhook);
+  };
 
   return {
     webhooks,
     loading,
+    error,
     fetchWebhooks,
     createWebhook,
     updateWebhook,
     deleteWebhook,
-    testWebhook,
+    testWebhook
   };
 };
 
-// Aliases for backward compatibility
-export const useNotificationSystem = useNotificationSystemHealth;
+// Notification logs hook
+export const useNotificationLogs = () => {
+  const [logs, setLogs] = useState<NotificationLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchLogs = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await notificationApi.getNotificationLogs();
+      if (response.success) {
+        setLogs(response.data);
+      } else {
+        setError(response.error || 'Failed to load notification logs');
+      }
+    } catch (err) {
+      setError('An error occurred while fetching logs');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
+
+  const retryNotification = async (id: string) => {
+    const response = await notificationApi.retryNotification(id);
+    if (response.success) {
+      fetchLogs();
+    }
+    return response;
+  };
+
+  return {
+    logs,
+    loading,
+    error,
+    fetchLogs,
+    retryNotification
+  };
+};

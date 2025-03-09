@@ -22,12 +22,21 @@ import { emailNotificationApi } from '@/utils/api/emailNotificationApi';
 import { EmailTemplate } from '@/utils/types';
 import { useToast } from '@/hooks/use-toast';
 
+// Event type for the template form schema needs to match the actual EmailTemplate triggerOn type
+type TriggerEventType = 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 
+                         'sla-breach' | 'change-approved' | 'change-submitted' | 
+                         'problem-created' | 'problem-resolved';
+
 // Template form schema
 const templateFormSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters' }),
   subject: z.string().min(3, { message: 'Subject must be at least 3 characters' }),
   body: z.string().min(10, { message: 'Body must be at least 10 characters' }),
-  triggerOn: z.string().min(1, { message: 'Trigger event is required' }),
+  triggerOn: z.enum([
+    'ticket-created', 'ticket-updated', 'ticket-assigned', 'ticket-resolved', 
+    'sla-breach', 'change-approved', 'change-submitted', 
+    'problem-created', 'problem-resolved'
+  ], { message: 'Trigger event is required' }),
   isActive: z.boolean().default(true),
 });
 
@@ -101,7 +110,7 @@ const EmailTemplateEditor: React.FC<EmailTemplateEditorProps> = ({
           name: '',
           subject: '',
           body: '',
-          triggerOn: '',
+          triggerOn: 'ticket-created',
           isActive: true,
         },
   });
@@ -110,7 +119,7 @@ const EmailTemplateEditor: React.FC<EmailTemplateEditorProps> = ({
     try {
       if (initialData?.id) {
         // Update existing template
-        const result = await emailNotificationApi.updateEmailTemplate(initialData.id, values);
+        const result = await emailNotificationApi.updateEmailTemplate(initialData.id, values as Partial<EmailTemplate>);
         if (result.success) {
           toast({
             title: "Template Updated",
@@ -121,7 +130,7 @@ const EmailTemplateEditor: React.FC<EmailTemplateEditorProps> = ({
         }
       } else {
         // Create new template
-        const result = await emailNotificationApi.createEmailTemplate(values);
+        const result = await emailNotificationApi.createEmailTemplate(values as Omit<EmailTemplate, 'id'>);
         if (result.success) {
           toast({
             title: "Template Created",
