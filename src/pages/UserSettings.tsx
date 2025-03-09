@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +20,11 @@ import {
   Package, 
   Box, 
   Calendar, 
-  Mail
+  Mail,
+  CheckCircle,
+  Clock,
+  AlarmClock,
+  AlertOctagon
 } from 'lucide-react';
 import PageTransition from '@/components/shared/PageTransition';
 import ReleasesErrorBoundary from '@/components/shared/ReleasesErrorBoundary';
@@ -34,7 +37,6 @@ const UserSettings = () => {
     document.documentElement.classList.contains('dark')
   );
   
-  // Notification settings state
   const [notificationSettings, setNotificationSettings] = useState({
     categories: {
       incidents: true,
@@ -165,7 +167,6 @@ const UserSettings = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Notification Categories */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">Notification Categories</h3>
                     
@@ -247,13 +248,12 @@ const UserSettings = () => {
                     </div>
                   </div>
                   
-                  {/* Delivery Methods */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">Delivery Methods</h3>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <BellRing className="h-5 w-5" />
+                        <BellRing className="h-5 w-5 text-indigo-500" />
                         <Label>In-app notifications</Label>
                       </div>
                       <Switch 
@@ -264,7 +264,7 @@ const UserSettings = () => {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <Mail className="h-5 w-5" />
+                        <Mail className="h-5 w-5 text-blue-500" />
                         <Label>Email notifications</Label>
                       </div>
                       <Switch 
@@ -274,13 +274,12 @@ const UserSettings = () => {
                     </div>
                   </div>
                   
-                  {/* Priority Levels */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">Priority Levels</h3>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="h-3 w-3 rounded-full bg-red-500"></span>
+                        <AlertOctagon className="h-5 w-5 text-red-500" />
                         <Label>Critical</Label>
                       </div>
                       <Switch 
@@ -291,7 +290,7 @@ const UserSettings = () => {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="h-3 w-3 rounded-full bg-orange-500"></span>
+                        <AlarmClock className="h-5 w-5 text-orange-500" />
                         <Label>High</Label>
                       </div>
                       <Switch 
@@ -302,7 +301,7 @@ const UserSettings = () => {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="h-3 w-3 rounded-full bg-yellow-500"></span>
+                        <Clock className="h-5 w-5 text-yellow-500" />
                         <Label>Medium</Label>
                       </div>
                       <Switch 
@@ -313,7 +312,7 @@ const UserSettings = () => {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="h-3 w-3 rounded-full bg-blue-500"></span>
+                        <CheckCircle className="h-5 w-5 text-blue-500" />
                         <Label>Low</Label>
                       </div>
                       <Switch 
