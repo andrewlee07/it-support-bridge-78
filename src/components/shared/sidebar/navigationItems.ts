@@ -13,7 +13,7 @@ import {
   Headphones,
   FileSpreadsheet,
   CalendarDays,
-  Flask,
+  FlaskConical,
   LayoutDashboard,
   Settings,
   BookText,
@@ -76,7 +76,7 @@ export const navigationItems: NavItem[] = [
   },
   {
     name: 'Testing',
-    icon: Flask,
+    icon: FlaskConical,
     path: '/test-tracking',
   },
   {
