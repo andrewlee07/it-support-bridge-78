@@ -11,12 +11,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Ticket } from '@/utils/types';
+import { TicketType } from '@/utils/types';
 
 interface BasicInfoSectionProps {
   form: UseFormReturn<any>;
   isFieldRequired: (fieldName: string) => boolean;
-  type: 'incident' | 'service';
+  type: TicketType;
 }
 
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
@@ -24,6 +24,33 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
   isFieldRequired,
   type
 }) => {
+  // Helper to get placeholder text based on ticket type
+  const getTitlePlaceholder = () => {
+    switch (type) {
+      case 'incident':
+        return "e.g., Can't access email";
+      case 'service':
+        return "e.g., Request new software";
+      case 'change':
+        return "e.g., Upgrade database server";
+      default:
+        return "Enter a title";
+    }
+  };
+
+  const getDescriptionPlaceholder = () => {
+    switch (type) {
+      case 'incident':
+        return "Describe what's happening...";
+      case 'service':
+        return "Describe what you need...";
+      case 'change':
+        return "Describe the change requested...";
+      default:
+        return "Enter a description";
+    }
+  };
+
   return (
     <>
       <FormField
@@ -35,7 +62,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
             <FormLabel>{isFieldRequired('title') && <span className="text-red-500 mr-1">*</span>}Title</FormLabel>
             <FormControl>
               <Input 
-                placeholder={type === 'incident' ? "e.g., Can't access email" : "e.g., Request new software"} 
+                placeholder={getTitlePlaceholder()} 
                 {...field} 
               />
             </FormControl>
@@ -56,7 +83,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
             <FormLabel>{isFieldRequired('description') && <span className="text-red-500 mr-1">*</span>}Description</FormLabel>
             <FormControl>
               <Textarea 
-                placeholder={type === 'incident' ? "Describe what's happening..." : "Describe what you need..."} 
+                placeholder={getDescriptionPlaceholder()} 
                 className="min-h-32"
                 {...field} 
               />

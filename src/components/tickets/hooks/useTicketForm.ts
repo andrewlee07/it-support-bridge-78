@@ -34,7 +34,21 @@ export const useTicketForm = ({ onSubmit, type }: UseTicketFormProps) => {
       setIsLoading(true);
       try {
         // Map ticket type to entity type
-        const entityType = type === 'incident' ? 'incident' : 'service-request';
+        let entityType: string;
+        switch (type) {
+          case 'incident':
+            entityType = 'incident';
+            break;
+          case 'service':
+            entityType = 'service-request';
+            break;
+          case 'change':
+            entityType = 'change-request';
+            break;
+          default:
+            entityType = 'incident';
+        }
+        
         const fields = await getMandatoryFieldsConfig(entityType);
         
         // Extract field names of required fields

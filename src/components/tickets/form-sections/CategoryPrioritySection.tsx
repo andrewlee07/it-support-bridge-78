@@ -18,12 +18,12 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { Ticket } from '@/utils/types';
+import { TicketType } from '@/utils/types';
 
 interface CategoryPrioritySectionProps {
   form: UseFormReturn<any>;
   isFieldRequired: (fieldName: string) => boolean;
-  type: 'incident' | 'service';
+  type: TicketType;
 }
 
 const CategoryPrioritySection: React.FC<CategoryPrioritySectionProps> = ({

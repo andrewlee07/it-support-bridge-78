@@ -18,12 +18,12 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { Ticket } from '@/utils/types';
+import { TicketType } from '@/utils/types';
 
 interface ServiceSelectionProps {
   form: UseFormReturn<any>;
   servicesByCategory: Record<string, any[]>;
-  type: 'incident' | 'service';
+  type: TicketType;
 }
 
 const ServiceSelection: React.FC<ServiceSelectionProps> = ({
