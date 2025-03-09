@@ -43,6 +43,7 @@ export const useUserManagement = () => {
   const handleViewChange = (view: ViewType) => {
     setViewType(view);
     localStorage.setItem('user-management-view', view);
+    console.log(`View changed to: ${view}`);
   };
 
   // Effect to sync with localStorage if it changes elsewhere

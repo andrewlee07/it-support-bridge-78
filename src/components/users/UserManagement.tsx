@@ -79,7 +79,13 @@ const UserManagement: React.FC = () => {
         onClose={() => setSelectedUserId(null)}
         onRoleChange={setSelectedRole}
         newUser={newUser}
-        setNewUser={setNewUser}
+        // Create wrapper function to handle the optional roles property
+        setNewUser={(userData) => {
+          setNewUser({
+            ...userData,
+            roles: userData.roles || [userData.role]
+          });
+        }}
         handleAddUser={handleAddUser}
         handleRemoveUser={() => {
           if (selectedUserId) handleRemoveUser(selectedUserId);
