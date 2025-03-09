@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { User } from '@/utils/types/user';
 import { mockUsers } from '@/utils/mockData/users';
 import { useUserSearch } from './userManagement/useUserSearch';
@@ -24,17 +25,26 @@ export const useUserManagement = () => {
     handleToggleUserStatus 
   } = useUserCrud(mockUsers);
 
+  const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const { searchTerm, handleSearch, filterUsersBySearchTerm } = useUserSearch();
   const { filterUsersByRole } = useUserFilters();
   const { handleImportUsers, handleExportUsers } = useUserImportExport(users, setUsers);
 
-  const filteredUsers = (role?: string): User[] => {
-    let filteredByRole = filterUsersByRole(users, role);
-    return filterUsersBySearchTerm(filteredByRole);
+  // Get filtered users based on activeFilter
+  const filteredUsers = (): User[] => {
+    let filtered = users;
+    
+    if (activeFilter !== 'all') {
+      filtered = users.filter(user => user.active === (activeFilter === 'active'));
+    }
+    
+    return filterUsersBySearchTerm(filtered);
   };
 
   return {
-    users,
+    users: filteredUsers(),
+    activeFilter,
+    setActiveFilter,
     searchTerm,
     selectedUserId,
     setSelectedUserId,
@@ -43,13 +53,13 @@ export const useUserManagement = () => {
     newUser,
     setNewUser,
     handleSearch,
-    filteredUsers,
     handleViewUser,
     handleAddUser,
     handleRemoveUser,
     handleUpdateUser,
     handleChangeRole,
-    handleToggleUserStatus,
+    handleToggleStatus: handleToggleUserStatus,
+    handleEditUser: handleUpdateUser,
     handleImportUsers,
     handleExportUsers
   };
