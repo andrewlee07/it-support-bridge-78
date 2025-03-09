@@ -56,6 +56,7 @@ const ServiceRequests = () => {
               <TabsTrigger value="open">Open</TabsTrigger>
               <TabsTrigger value="in-progress">In Progress</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="approved">Approved</TabsTrigger>
               <TabsTrigger value="fulfilled">Fulfilled</TabsTrigger>
             </TabsList>
             
@@ -72,6 +73,10 @@ const ServiceRequests = () => {
             </TabsContent>
             
             <TabsContent value="pending" className="mt-0">
+              <TicketList type="service" />
+            </TabsContent>
+            
+            <TabsContent value="approved" className="mt-0">
               <TicketList type="service" />
             </TabsContent>
             

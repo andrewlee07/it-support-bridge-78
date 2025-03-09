@@ -13,6 +13,7 @@ interface TicketFiltersProps {
   onSearchChange: (value: string) => void;
   onStatusChange: (value: TicketStatus | 'all' | 'closed') => void;
   onPriorityChange: (value: TicketPriority | 'all') => void;
+  type: 'incident' | 'service';
 }
 
 const TicketFilters: React.FC<TicketFiltersProps> = ({
@@ -21,7 +22,8 @@ const TicketFilters: React.FC<TicketFiltersProps> = ({
   priorityFilter,
   onSearchChange,
   onStatusChange,
-  onPriorityChange
+  onPriorityChange,
+  type
 }) => {
   return (
     <Card>
@@ -47,9 +49,15 @@ const TicketFilters: React.FC<TicketFiltersProps> = ({
               <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="open">Open</SelectItem>
               <SelectItem value="in-progress">In Progress</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
-              <SelectItem value="fulfilled">Fulfilled</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              {type === 'incident' ? (
+                <SelectItem value="resolved">Resolved</SelectItem>
+              ) : (
+                <>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="fulfilled">Fulfilled</SelectItem>
+                </>
+              )}
               <SelectItem value="closed">Closed</SelectItem>
             </SelectContent>
           </Select>
