@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -287,7 +288,6 @@ const EmailTemplateEditor: React.FC<EmailTemplateEditorProps> = ({
                       name={key}
                       value={value}
                       onChange={handleTestVariableChange}
-                      size="sm"
                       className="h-8"
                     />
                   </div>
