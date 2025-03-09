@@ -58,11 +58,9 @@ export const useUserCrud = (initialUsers: User[]) => {
     });
   };
 
-  const handleRemoveUser = () => {
-    if (!selectedUserId) return;
-    
+  const handleRemoveUser = (userId: string) => {
     // In a real app, this would make an API call
-    const updatedUsers = users.filter(user => user.id !== selectedUserId);
+    const updatedUsers = users.filter(user => user.id !== userId);
     setUsers(updatedUsers);
     
     toast({
@@ -71,41 +69,26 @@ export const useUserCrud = (initialUsers: User[]) => {
     });
   };
 
-  const handleUpdateUser = (updatedUserData: Partial<User>) => {
-    if (!selectedUserId) return;
-    
-    // In a real app, this would make an API call
-    const updatedUsers = users.map(user => {
-      if (user.id === selectedUserId) {
-        return { ...user, ...updatedUserData };
-      }
-      return user;
-    });
-    
-    setUsers(updatedUsers);
+  const handleUpdateUser = (userId: string) => {
+    // In a real app, this would make an API call or navigate to edit page
+    setSelectedUserId(userId);
+    console.log(`Editing user: ${userId}`);
     
     toast({
-      title: "User updated",
-      description: "User details have been updated successfully."
+      title: "User edit",
+      description: "Edit user details."
     });
   };
 
-  const handleChangeRole = () => {
-    if (!selectedUserId) return;
+  const handleChangeRole = (userId: string) => {
+    setSelectedUserId(userId);
     
-    // In a real app, this would make an API call
-    const updatedUsers = users.map(user => {
-      if (user.id === selectedUserId) {
-        return { ...user, role: selectedRole };
-      }
-      return user;
-    });
-    
-    setUsers(updatedUsers);
+    // In a real app, this would open a dialog or navigate to edit page
+    console.log(`Changing role for user: ${userId}`);
     
     toast({
-      title: "Role updated",
-      description: `User role has been updated to ${selectedRole}.`
+      title: "Role selection",
+      description: "Select a new role for the user."
     });
   };
 

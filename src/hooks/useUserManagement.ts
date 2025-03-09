@@ -61,6 +61,9 @@ export const useUserManagement = () => {
     handleToggleStatus: handleToggleUserStatus,
     handleEditUser: handleUpdateUser,
     handleImportUsers,
-    handleExportUsers
+    handleExportUsers,
+    // Add these for backward compatibility with UserManagement.tsx
+    handleToggleUserStatus,
+    filteredUsers: () => filteredUsers()
   };
 };

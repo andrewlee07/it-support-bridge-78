@@ -14,7 +14,7 @@ const UserManagementPage = () => {
     handleRemoveUser,
     handleChangeRole,
     handleToggleStatus,
-    handleEditUser
+    handleUpdateUser
   } = useUserManagement();
 
   const handleTabChange = (value: string) => {
@@ -45,7 +45,7 @@ const UserManagementPage = () => {
               onRemoveUser={handleRemoveUser}
               onChangeRole={handleChangeRole}
               onToggleStatus={handleToggleStatus}
-              onEditUser={handleEditUser}
+              onEditUser={handleUpdateUser}
             />
           </TabsContent>
           
@@ -56,7 +56,7 @@ const UserManagementPage = () => {
               onRemoveUser={handleRemoveUser}
               onChangeRole={handleChangeRole}
               onToggleStatus={handleToggleStatus}
-              onEditUser={handleEditUser}
+              onEditUser={handleUpdateUser}
             />
           </TabsContent>
           
@@ -67,7 +67,7 @@ const UserManagementPage = () => {
               onRemoveUser={handleRemoveUser}
               onChangeRole={handleChangeRole}
               onToggleStatus={handleToggleStatus}
-              onEditUser={handleEditUser}
+              onEditUser={handleUpdateUser}
             />
           </TabsContent>
         </Tabs>
