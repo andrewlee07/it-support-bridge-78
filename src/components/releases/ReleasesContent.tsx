@@ -2,6 +2,7 @@
 import React from 'react';
 import ReleasesSearch from './ReleasesSearch';
 import ReleasesList from './ReleasesList';
+import ReleasesErrorBoundary from '@/components/shared/ReleasesErrorBoundary';
 
 interface ReleasesContentProps {
   releases: {
@@ -24,25 +25,29 @@ const ReleasesContent: React.FC<ReleasesContentProps> = ({ releases }) => {
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <ReleasesSearch 
-          searchQuery={releases.searchQuery}
-          setSearchQuery={releases.setSearchQuery}
-        />
+        <ReleasesErrorBoundary>
+          <ReleasesSearch 
+            searchQuery={releases.searchQuery}
+            setSearchQuery={releases.setSearchQuery}
+          />
+        </ReleasesErrorBoundary>
       </div>
       
-      <ReleasesList
-        releases={releases.releasesData || []}
-        isLoading={releases.isLoading}
-        isError={releases.isError}
-        onApprove={releases.handleApprove}
-        onReject={releases.handleReject}
-        onCreateNew={releases.handleCreateNew}
-        onViewRelease={releases.handleViewRelease}
-        refetch={releases.refetch}
-        viewType={releases.activeTab as any}
-        searchQuery={releases.searchQuery}
-        canApprove={releases.canApproveReleases}
-      />
+      <ReleasesErrorBoundary>
+        <ReleasesList
+          releases={releases.releasesData || []}
+          isLoading={releases.isLoading}
+          isError={releases.isError}
+          onApprove={releases.handleApprove}
+          onReject={releases.handleReject}
+          onCreateNew={releases.handleCreateNew}
+          onViewRelease={releases.handleViewRelease}
+          refetch={releases.refetch}
+          viewType={releases.activeTab as any}
+          searchQuery={releases.searchQuery}
+          canApprove={releases.canApproveReleases}
+        />
+      </ReleasesErrorBoundary>
     </div>
   );
 };
