@@ -13,8 +13,15 @@ import otherRoutes from './otherRoutes';
 
 // Import the ServiceDetail page
 import ServiceDetail from '@/pages/ServiceDetail';
+// Import the missing Releases and Index pages
+import Releases from '@/pages/Releases';
+import Index from '@/pages/Index';
 
 const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Index />,
+  },
   ...adminRoutes,
   ...assetRoutes,
   ...changeRoutes,
@@ -25,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: '/service-catalog/:serviceId',
     element: <ServiceDetail />,
+  },
+  {
+    path: '/releases',
+    element: <Releases />,
   },
 ]);
 
