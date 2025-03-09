@@ -45,7 +45,7 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
     : data;
 
   // Formatter for SLA status display with gradient color
-  const formatSLAStatus = (slaInfo: any) => {
+  const formatSLAStatus = (slaInfo: SLAInfo): React.ReactNode => {
     if (!slaInfo || slaInfo.status === undefined) {
       return <div>N/A</div>;
     }
@@ -145,10 +145,12 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
                                 ? column.render(record[column.key], { ...record, slaType })
                                 : column.render(record[column.key], record);
                                 
-                              // Check if rendered is SLAInfo object
+                              // Check if rendered is SLAInfo object and format it if needed
                               if (rendered && typeof rendered === 'object' && 'status' in rendered) {
-                                return formatSLAStatus(rendered);
+                                return formatSLAStatus(rendered as SLAInfo);
                               }
+                              
+                              // If it's already a ReactNode, just return it
                               return rendered;
                             })()
                           : column.formatUserName && column.key === 'assignee'

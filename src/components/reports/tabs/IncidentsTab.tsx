@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import DynamicChartRenderer from '@/components/reports/DynamicChartRenderer';
 import InteractiveTable from '@/components/reports/InteractiveTable';
 import { incidentChartConfig } from '@/utils/reports/chartConfigs';
@@ -34,7 +34,7 @@ const IncidentsTab: React.FC<IncidentsTabProps> = ({ selectedSegment, onSegmentC
         // Get the slaType from the record if passed from the parent
         const currentSlaType = (record.slaType as SLAType) || 'resolution';
         
-        // Calculate SLA using the current SLA type
+        // Calculate SLA using the current SLA type - this returns SLAInfo
         const slaInfo = calculateSLAStatus({
           id: record.id || '',
           title: record.title || '',
@@ -49,6 +49,7 @@ const IncidentsTab: React.FC<IncidentsTabProps> = ({ selectedSegment, onSegmentC
           audit: []
         }, currentSlaType);
         
+        // Return the SLAInfo object - InteractiveTable will handle the rendering
         return slaInfo;
       }
     }
