@@ -6,10 +6,7 @@ import changeRoutes from './changeRoutes';
 import dashboardRoutes from './dashboardRoutes';
 import ticketRoutes from './ticketRoutes';
 import testManagementRoutes from './testManagementRoutes';
-import otherRoutes from './otherRoutes';
-
-// If we need to lazy load any of these routes later, we can use the following pattern:
-// const SomePage = lazy(() => import('@/pages/SomePage'));
+import { otherRoutes } from './otherRoutes';
 
 // Import the ServiceDetail page
 import ServiceDetail from '@/pages/ServiceDetail';
