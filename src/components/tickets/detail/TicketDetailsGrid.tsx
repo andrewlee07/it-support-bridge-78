@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { Ticket } from '@/utils/types/ticket';
 import StatusBadge from './StatusBadge';
 import PriorityBadge from './PriorityBadge';
+import { getServiceById } from '@/utils/mockData/services';
 
 interface TicketDetailsGridProps {
   ticket: Ticket;
@@ -11,6 +12,9 @@ interface TicketDetailsGridProps {
 }
 
 const TicketDetailsGrid: React.FC<TicketDetailsGridProps> = ({ ticket, isServiceRequest }) => {
+  // Get service details if a serviceId is present
+  const service = ticket.serviceId ? getServiceById(ticket.serviceId) : null;
+  
   return (
     <div className="grid md:grid-cols-2 gap-4">
       <div>
@@ -29,6 +33,14 @@ const TicketDetailsGrid: React.FC<TicketDetailsGridProps> = ({ ticket, isService
         <h3 className="text-sm font-medium">Assigned To</h3>
         <p className="text-sm">{ticket.assignedTo || 'Unassigned'}</p>
       </div>
+      
+      {service && (
+        <div>
+          <h3 className="text-sm font-medium">Service</h3>
+          <p className="text-sm">{service.name}</p>
+        </div>
+      )}
+      
       <div>
         <h3 className="text-sm font-medium">{isServiceRequest ? 'Request Type' : 'Category'}</h3>
         <p className="text-sm">{ticket.category}</p>

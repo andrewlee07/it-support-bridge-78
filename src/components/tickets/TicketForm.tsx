@@ -16,7 +16,9 @@ import { useForm } from 'react-hook-form';
 import { 
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
@@ -25,6 +27,7 @@ import { toast } from 'sonner';
 import { getMandatoryFieldsConfig } from '@/api/statusSynchronization';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { getServicesByCategory } from '@/utils/mockData/services';
 
 interface TicketFormProps {
   onSubmit: (data: Partial<Ticket>) => void;
@@ -35,6 +38,7 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mandatoryFields, setMandatoryFields] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [servicesByCategory, setServicesByCategory] = useState<Record<string, any[]>>({});
   
   const defaultValues = {
     title: '',
@@ -42,13 +46,14 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
     category: '' as TicketCategory,
     priority: 'P3' as TicketPriority, // Default to P3 (medium priority)
     type: type,
+    serviceId: '',
   };
   
   const form = useForm({ defaultValues });
   
-  // Fetch mandatory fields when component mounts
+  // Fetch mandatory fields and services when component mounts
   useEffect(() => {
-    const fetchMandatoryFields = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       try {
         // Map ticket type to entity type
@@ -61,14 +66,17 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
           .map(field => field.fieldName);
         
         setMandatoryFields(requiredFields);
+        
+        // Get services organized by category
+        setServicesByCategory(getServicesByCategory());
       } catch (error) {
-        console.error('Failed to fetch mandatory fields:', error);
+        console.error('Failed to fetch data:', error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchMandatoryFields();
+    fetchData();
   }, [type]);
   
   const handleSubmit = async (data: Partial<Ticket>) => {
@@ -159,6 +167,46 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
               </FormControl>
               <FormDescription>
                 Please provide as much detail as possible.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {/* Service selection field */}
+        <FormField
+          control={form.control}
+          name="serviceId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Service</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a service (optional)" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="">-- No service selected --</SelectItem>
+                  
+                  {Object.entries(servicesByCategory).map(([category, services]) => (
+                    <SelectGroup key={category}>
+                      <SelectLabel>{category}</SelectLabel>
+                      {services.map(service => (
+                        <SelectItem 
+                          key={service.id} 
+                          value={service.id}
+                          disabled={service.status === 'inactive'}
+                        >
+                          {service.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Select the IT service related to this {type}.
               </FormDescription>
               <FormMessage />
             </FormItem>

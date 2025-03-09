@@ -26,6 +26,9 @@ export interface Ticket {
   firstResponseAt?: Date;
   audit: AuditEntry[];
   
+  // Service catalog integration
+  serviceId?: string;
+  
   // Related items
   relatedAssets?: string[];
   relatedProblems?: string[];
@@ -74,6 +77,7 @@ export interface TicketFilter {
   assignedTo?: string[];
   category?: string[];
   type?: string[];
+  serviceId?: string[];
 }
 
 export interface TestCoverageRelationship {
