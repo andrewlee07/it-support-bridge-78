@@ -39,7 +39,7 @@ const ServiceCatalogManagerModal: React.FC<ServiceCatalogManagerModalProps> = ({
     logAdminAction({
       user,
       entityId: service.id,
-      entityType: 'service',
+      entityType: "service",
       action: 'view_edit_form',
       details: `Opened edit form for service: ${service.name}`
     });
@@ -63,7 +63,7 @@ const ServiceCatalogManagerModal: React.FC<ServiceCatalogManagerModalProps> = ({
     logAdminAction({
       user,
       entityId: selectedService.id,
-      entityType: 'service',
+      entityType: "service",
       action: 'update_service',
       details: `Updated service: ${selectedService.name}`,
       oldValue: JSON.stringify(selectedService),
@@ -90,7 +90,7 @@ const ServiceCatalogManagerModal: React.FC<ServiceCatalogManagerModalProps> = ({
     logAdminAction({
       user,
       entityId: service.id,
-      entityType: 'service',
+      entityType: "service",
       action: 'toggle_service_status',
       details: `Changed service status from ${service.status} to ${newStatus}`,
       oldValue: service.status,

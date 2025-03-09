@@ -48,8 +48,8 @@ export const decryptData = (encryptedData: string): string => {
  * Encrypt an object by encrypting all string values
  * This is useful for encrypting sensitive data before storage
  */
-export const encryptObject = <T extends Record<string, any>>(obj: T): T => {
-  const result = { ...obj };
+export const encryptObject = <T extends Record<string, any>>(obj: T): Record<string, any> => {
+  const result = { ...obj } as Record<string, any>;
   
   Object.keys(result).forEach(key => {
     if (typeof result[key] === 'string' && shouldEncryptField(key)) {
@@ -63,8 +63,8 @@ export const encryptObject = <T extends Record<string, any>>(obj: T): T => {
 /**
  * Decrypt an object by decrypting all encrypted string values
  */
-export const decryptObject = <T extends Record<string, any>>(obj: T): T => {
-  const result = { ...obj };
+export const decryptObject = <T extends Record<string, any>>(obj: T): Record<string, any> => {
+  const result = { ...obj } as Record<string, any>;
   
   Object.keys(result).forEach(key => {
     if (typeof result[key] === 'string' && shouldEncryptField(key)) {
@@ -91,20 +91,4 @@ const shouldEncryptField = (fieldName: string): boolean => {
   ];
   
   return sensitiveFields.some(field => fieldName.toLowerCase().includes(field));
-};
-
-/**
- * Hash a password or sensitive value (one-way encryption)
- * In a real app, use bcrypt or a similar library
- */
-export const hashValue = (value: string): string => {
-  // Simple hash function for demonstration
-  // DO NOT use this in production - use bcrypt or similar
-  let hash = 0;
-  for (let i = 0; i < value.length; i++) {
-    const char = value.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash.toString(16);
 };

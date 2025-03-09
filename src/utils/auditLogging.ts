@@ -1,6 +1,6 @@
 
 import { User } from '@/utils/types/user';
-import { AuditEntry, AuditEntityType } from '@/utils/types/audit';
+import { AuditEntry } from '@/utils/types/audit';
 import { v4 as uuidv4 } from 'uuid';
 
 // In-memory storage for audit logs (in a real app, this would be sent to a secure backend)
@@ -9,7 +9,7 @@ let auditLogs: AuditEntry[] = [];
 interface AuditLogOptions {
   user?: User | null;
   entityId: string;
-  entityType: AuditEntityType;
+  entityType: string;
   action: string;
   details?: string;
   oldValue?: string;
@@ -54,7 +54,7 @@ export const getAuditLogs = (): AuditEntry[] => {
  * Filter audit logs based on criteria
  */
 export const filterAuditLogs = (filters: {
-  entityType?: AuditEntityType;
+  entityType?: string;
   userId?: string;
   startDate?: Date;
   endDate?: Date;
