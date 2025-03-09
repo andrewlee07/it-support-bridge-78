@@ -40,12 +40,10 @@ const TestChart: React.FC<TestChartProps> = ({
         colors={{ datum: 'data.color' }}
         borderWidth={1}
         borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-        arcLabels={viewMode === 'percentage' ? true : false}
-        arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
+        arcLabel={d => `${((d.value / totalTests) * 100).toFixed(0)}%`}
         arcLabelsSkipAngle={10}
         arcLabelsRadiusOffset={0.55}
         arcLabelsStraightRadius={0.5}
-        arcLabel={d => `${((d.value / totalTests) * 100).toFixed(0)}%`}
         enableArcLinkLabels={false}
         tooltip={({ datum }) => {
           const statusItem = chartData.find(item => item.status === datum.data.status);

@@ -69,6 +69,7 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
         onSearchChange={setSearchQuery}
         onStatusChange={setStatusFilter}
         onPriorityChange={setPriorityFilter}
+        type={type}
       />
 
       {loading ? (
