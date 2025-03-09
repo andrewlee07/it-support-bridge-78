@@ -64,6 +64,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
     return allowedRoles.includes(user.role);
   };
 
+  // Add a console log to debug the navigation items
+  console.log('Navigation items:', navigationItems);
+
   return (
     <div 
       className={cn(

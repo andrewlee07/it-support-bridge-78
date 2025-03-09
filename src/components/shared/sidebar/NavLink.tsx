@@ -19,7 +19,7 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
   // Determine the actual path to navigate to
   const itemPath = item.href || item.path || '/';
   
-  // Create Icon component instance
+  // Create Icon component instance with correct props
   const IconComponent = item.icon;
   
   return (
