@@ -1,4 +1,3 @@
-
 import React from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { 
   AlertCircle, Headphones, PanelRightIcon, OctagonAlert, 
   BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert, 
-  Sliders, ArrowUpDown
+  Sliders, ArrowUpDown, LibraryIcon
 } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -22,6 +21,12 @@ const AdminSettings = () => {
       description: 'Configure service request settings, SLAs, mandatory fields, and workflows',
       icon: <Headphones className="h-8 w-8 text-primary/80" />,
       path: '/admin/service-request-configuration'
+    },
+    {
+      title: 'Service Catalogue Configuration',
+      description: 'Configure service catalog categories, fields, and visibility settings',
+      icon: <LibraryIcon className="h-8 w-8 text-primary/80" />,
+      path: '/admin/service-catalogue-configuration'
     },
     {
       title: 'Change Configuration',

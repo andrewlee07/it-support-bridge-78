@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import AdminSettings from '@/pages/AdminSettings';
 import ErrorLogs from '@/pages/admin/ErrorLogs';
 import IncidentConfiguration from '@/pages/admin/IncidentConfiguration';
 import ServiceRequestConfiguration from '@/pages/admin/ServiceRequestConfiguration';
+import ServiceCatalogueConfiguration from '@/pages/admin/ServiceCatalogueConfiguration';
 import ChangeConfiguration from '@/pages/admin/ChangeConfiguration';
 import ProblemConfiguration from '@/pages/admin/ProblemConfiguration';
 import AssetConfiguration from '@/pages/admin/AssetConfiguration';
@@ -36,6 +36,10 @@ const adminRoutes: RouteObject[] = [
   {
     path: 'admin/service-request-configuration',
     element: <ServiceRequestConfiguration />,
+  },
+  {
+    path: 'admin/service-catalogue-configuration',
+    element: <ServiceCatalogueConfiguration />,
   },
   {
     path: 'admin/change-configuration',
