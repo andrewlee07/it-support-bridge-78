@@ -43,7 +43,6 @@ const TestChart: React.FC<TestChartProps> = ({
         arcLabel={d => `${((d.value / totalTests) * 100).toFixed(0)}%`}
         arcLabelsSkipAngle={10}
         arcLabelsRadiusOffset={0.55}
-        arcLabelsStraightRadius={0.5}
         enableArcLinkLabels={false}
         tooltip={({ datum }) => {
           const statusItem = chartData.find(item => item.status === datum.data.status);
