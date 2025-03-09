@@ -70,11 +70,17 @@ const ReportsPage: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="service">
-              <ServiceRequestTab onSegmentClick={handleSegmentClick} />
+              <ServiceRequestTab 
+                selectedSegment={selectedSegment}
+                onSegmentClick={handleSegmentClick} 
+              />
             </TabsContent>
             
             <TabsContent value="problems">
-              <ProblemsTab onSegmentClick={handleSegmentClick} />
+              <ProblemsTab 
+                selectedSegment={selectedSegment}
+                onSegmentClick={handleSegmentClick} 
+              />
             </TabsContent>
             
             <TabsContent value="changes">

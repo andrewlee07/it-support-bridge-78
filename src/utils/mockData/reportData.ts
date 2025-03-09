@@ -18,16 +18,25 @@ export const mockIncidentTableData = [
 ];
 
 export const mockServiceRequestData = [
-  { id: 'sr', label: 'Pending', value: 30, color: '#FF6384' },
-  { id: 'sr', label: 'In Progress', value: 40, color: '#36A2EB' },
-  { id: 'sr', label: 'Closed', value: 30, color: '#4BC0C0' },
+  { id: 'pending', label: 'Pending', value: 30, color: '#FF6384' },
+  { id: 'in-progress', label: 'In Progress', value: 40, color: '#36A2EB' },
+  { id: 'closed', label: 'Closed', value: 30, color: '#4BC0C0' },
+];
+
+// Add mock service request table data to fix the import error
+export const mockServiceRequestTableData = [
+  { id: 'SR001', title: 'New laptop request', status: 'pending', priority: 'P3', assignee: 'John Doe', createdAt: '2023-06-01' },
+  { id: 'SR002', title: 'Software installation', status: 'in-progress', priority: 'P3', assignee: 'Jane Smith', createdAt: '2023-06-02' },
+  { id: 'SR003', title: 'Access request', status: 'pending', priority: 'P2', assignee: 'Bob Johnson', createdAt: '2023-06-03' },
+  { id: 'SR004', title: 'Password reset', status: 'closed', priority: 'P4', assignee: 'Alice Brown', createdAt: '2023-06-04' },
+  { id: 'SR005', title: 'Email configuration', status: 'in-progress', priority: 'P3', assignee: 'Charlie Davis', createdAt: '2023-06-05' },
 ];
 
 export const mockProblemData = [
-  { id: 'p', label: 'Open', value: 15, color: '#FF6384' },
-  { id: 'p', label: 'Under Investigation', value: 35, color: '#36A2EB' },
-  { id: 'p', label: 'Resolved', value: 20, color: '#FFCE56' },
-  { id: 'p', label: 'Closed', value: 30, color: '#4BC0C0' },
+  { id: 'open', label: 'Open', value: 15, color: '#FF6384' },
+  { id: 'under-investigation', label: 'Under Investigation', value: 35, color: '#36A2EB' },
+  { id: 'resolved', label: 'Resolved', value: 20, color: '#FFCE56' },
+  { id: 'closed', label: 'Closed', value: 30, color: '#4BC0C0' },
 ];
 
 export const mockChangeData = [
