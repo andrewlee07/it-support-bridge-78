@@ -1,4 +1,3 @@
-
 // Change management types
 import { Ticket } from './ticket';
 
@@ -6,7 +5,7 @@ export type ChangeStatus = 'draft' | 'submitted' | 'approved' | 'in-progress' | 
 export type RiskLevel = 'low' | 'medium' | 'high';
 export type ChangeCategory = 'standard' | 'normal' | 'emergency';
 export type ClosureReason = 'successful' | 'successful-with-issues' | 'rolled-back' | 'failed';
-export type ApproverRole = 'it' | 'user';
+export type ApproverRole = 'it' | 'user' | 'change-manager';
 
 export interface ChangeRequest extends Omit<Ticket, 'status' | 'category'> {
   status: ChangeStatus;

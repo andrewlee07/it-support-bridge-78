@@ -1,6 +1,6 @@
 
 // User types
-export type UserRole = 'admin' | 'manager' | 'agent' | 'developer' | 'it' | 'user';
+export type UserRole = 'admin' | 'manager' | 'agent' | 'developer' | 'it' | 'user' | 'problem-manager' | 'change-manager';
 
 export type MFAMethod = 'totp' | 'email' | 'sms' | 'none';
 

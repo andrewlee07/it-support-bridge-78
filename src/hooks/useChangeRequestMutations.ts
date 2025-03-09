@@ -3,10 +3,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { changeApi } from '@/utils/api/changeApi';
 import { useToast } from '@/hooks/use-toast';
 import { emailNotificationApi } from '@/utils/api/emailNotificationApi';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useChangeRequestMutations = (userId: string) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Mutation for approving change requests
   const approveMutation = useMutation({
@@ -34,10 +36,10 @@ export const useChangeRequestMutations = (userId: string) => {
         queryClient.invalidateQueries({ queryKey: ['changes'] });
       }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to approve change request. Please try again.",
+        description: error?.message || "Failed to approve change request. Please try again.",
         variant: "destructive"
       });
     }
@@ -59,10 +61,10 @@ export const useChangeRequestMutations = (userId: string) => {
         queryClient.invalidateQueries({ queryKey: ['changes'] });
       }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to reject change request. Please try again.",
+        description: error?.message || "Failed to reject change request. Please try again.",
         variant: "destructive"
       });
     }
@@ -71,5 +73,6 @@ export const useChangeRequestMutations = (userId: string) => {
   return {
     approveMutation,
     rejectMutation,
+    isChangeManager: user?.role === 'change-manager'
   };
 };

@@ -48,7 +48,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
     onOpenChange(false);
   };
 
-  const roles = ['admin', 'manager', 'agent', 'it', 'user'];
+  const roles = ['admin', 'manager', 'agent', 'it', 'user', 'problem-manager', 'change-manager'];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -142,7 +142,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
                     <SelectContent>
                       {roles.map((role) => (
                         <SelectItem key={role} value={role}>
-                          {role.charAt(0).toUpperCase() + role.slice(1)}
+                          {role.charAt(0).toUpperCase() + role.slice(1).replace('-', ' ')}
                         </SelectItem>
                       ))}
                     </SelectContent>

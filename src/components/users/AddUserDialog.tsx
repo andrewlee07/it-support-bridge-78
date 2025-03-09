@@ -84,6 +84,8 @@ const AddUserDialog: React.FC<AddUserDialogProps> = ({
                 <SelectItem value="it">IT Staff</SelectItem>
                 <SelectItem value="agent">Agent</SelectItem>
                 <SelectItem value="user">User</SelectItem>
+                <SelectItem value="problem-manager">Problem Manager</SelectItem>
+                <SelectItem value="change-manager">Change Manager</SelectItem>
               </SelectContent>
             </Select>
           </div>

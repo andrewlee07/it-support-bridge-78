@@ -14,11 +14,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
 
 // Mock workflow configuration data
 const mockWorkflowConfig = {
   requireApprovals: true,
   requiredApprovals: 2,
+  requireChangeManagerApproval: true,
   notifyStakeholders: true,
   allowEmergency: true,
   requireImplementationPlan: true,
@@ -106,24 +108,40 @@ const WorkflowSettingsTab = () => {
             </div>
             
             {workflowConfig.requireApprovals && (
-              <div className="space-y-2">
-                <Label htmlFor="approval-count">Required Approvals</Label>
-                <Select 
-                  value={workflowConfig.requiredApprovals.toString()} 
-                  onValueChange={handleApprovalCountChange}
-                >
-                  <SelectTrigger id="approval-count" className="w-full">
-                    <SelectValue placeholder="Select required approvals" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 Approval</SelectItem>
-                    <SelectItem value="2">2 Approvals</SelectItem>
-                    <SelectItem value="3">3 Approvals</SelectItem>
-                    <SelectItem value="4">4 Approvals</SelectItem>
-                    <SelectItem value="5">5 Approvals</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="approval-count">Required Approvals</Label>
+                  <Select 
+                    value={workflowConfig.requiredApprovals.toString()} 
+                    onValueChange={handleApprovalCountChange}
+                  >
+                    <SelectTrigger id="approval-count" className="w-full">
+                      <SelectValue placeholder="Select required approvals" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 Approval</SelectItem>
+                      <SelectItem value="2">2 Approvals</SelectItem>
+                      <SelectItem value="3">3 Approvals</SelectItem>
+                      <SelectItem value="4">4 Approvals</SelectItem>
+                      <SelectItem value="5">5 Approvals</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="change-manager-approval" 
+                    checked={workflowConfig.requireChangeManagerApproval}
+                    onCheckedChange={() => handleToggleSetting('requireChangeManagerApproval')}
+                  />
+                  <Label 
+                    htmlFor="change-manager-approval"
+                    className="font-medium text-sm"
+                  >
+                    Require Change Manager approval (mandatory)
+                  </Label>
+                </div>
+              </>
             )}
             
             <div className="flex items-center justify-between">
