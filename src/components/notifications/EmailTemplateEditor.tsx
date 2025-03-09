@@ -1,46 +1,21 @@
 
-import React from 'react';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage,
-  FormDescription
-} from '@/components/ui/form';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { emailNotificationApi } from '@/utils/api/emailNotificationApi';
-import { EmailTemplate } from '@/utils/types';
-import { useToast } from '@/hooks/use-toast';
-
-// Event type for the template form schema needs to match the actual EmailTemplate triggerOn type
-type TriggerEventType = 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 
-                         'sla-breach' | 'change-approved' | 'change-submitted' | 
-                         'problem-created' | 'problem-resolved';
-
-// Template form schema
-const templateFormSchema = z.object({
-  name: z.string().min(3, { message: 'Name must be at least 3 characters' }),
-  subject: z.string().min(3, { message: 'Subject must be at least 3 characters' }),
-  body: z.string().min(10, { message: 'Body must be at least 10 characters' }),
-  triggerOn: z.enum([
-    'ticket-created', 'ticket-updated', 'ticket-assigned', 'ticket-resolved', 
-    'sla-breach', 'change-approved', 'change-submitted', 
-    'problem-created', 'problem-resolved'
-  ], { message: 'Trigger event is required' }),
-  isActive: z.boolean().default(true),
-});
-
-type EmailTemplateFormValues = z.infer<typeof templateFormSchema>;
+import { toast } from 'sonner';
+import { EmailTemplate } from '@/utils/types/email';
 
 interface EmailTemplateEditorProps {
   initialData?: EmailTemplate;
@@ -48,297 +23,288 @@ interface EmailTemplateEditorProps {
   onCancel?: () => void;
 }
 
-// Event type options
-const eventTypeOptions = [
-  { value: 'ticket-created', label: 'Ticket Created' },
-  { value: 'ticket-updated', label: 'Ticket Updated' },
-  { value: 'ticket-assigned', label: 'Ticket Assigned' },
-  { value: 'ticket-resolved', label: 'Ticket Resolved' },
-  { value: 'sla-breach', label: 'SLA Breach' },
-  { value: 'change-approved', label: 'Change Request Approved' },
-  { value: 'change-submitted', label: 'Change Request Submitted' },
-  { value: 'problem-created', label: 'Problem Created' },
-  { value: 'problem-resolved', label: 'Problem Resolved' },
-];
-
-// Variable suggestion helper component
-const VariableSuggestions: React.FC = () => {
-  const variables = [
-    { name: '{userName}', description: 'Name of the user' },
-    { name: '{ticketId}', description: 'Ticket ID number' },
-    { name: '{ticketTitle}', description: 'Title of the ticket' },
-    { name: '{agentName}', description: 'Name of the assigned agent' },
-    { name: '{changeId}', description: 'Change request ID' },
-    { name: '{ticketPriority}', description: 'Priority of the ticket' },
-    { name: '{managerName}', description: 'Manager name' },
-  ];
-
-  return (
-    <div className="mt-4 bg-muted/50 p-3 rounded-md">
-      <p className="text-sm font-medium mb-2">Available Variables:</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        {variables.map((variable) => (
-          <div key={variable.name} className="flex items-start gap-1">
-            <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{variable.name}</code>
-            <span className="text-xs text-muted-foreground">{variable.description}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 const EmailTemplateEditor: React.FC<EmailTemplateEditorProps> = ({
   initialData,
   onSuccess,
   onCancel,
 }) => {
-  const { toast } = useToast();
+  const isEditing = !!initialData;
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ subject: string; body: string } | null>(null);
   
-  // Initialize form with default values or existing data
-  const form = useForm<EmailTemplateFormValues>({
-    resolver: zodResolver(templateFormSchema),
-    defaultValues: initialData
-      ? {
-          name: initialData.name,
-          subject: initialData.subject,
-          body: initialData.body,
-          triggerOn: initialData.triggerOn,
-          isActive: initialData.isActive,
-        }
-      : {
-          name: '',
-          subject: '',
-          body: '',
-          triggerOn: 'ticket-created',
-          isActive: true,
-        },
+  // Form state
+  const [formData, setFormData] = useState({
+    name: initialData?.name || '',
+    subject: initialData?.subject || '',
+    body: initialData?.body || '',
+    triggerOn: initialData?.triggerOn || 'ticket-created',
+    isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
   });
-
-  const handleSubmit = async (values: EmailTemplateFormValues) => {
+  
+  // Test variables
+  const [testVariables, setTestVariables] = useState<Record<string, string>>({
+    ticketId: 'INC-12345',
+    ticketTitle: 'Network connectivity issue',
+    userName: 'John Doe',
+    agentName: 'Jane Smith',
+    managerName: 'Richard Wilson',
+    ticketPriority: 'High',
+    changeId: 'CHG-6789',
+    changeTitle: 'Database server upgrade',
+    startDate: '2023-06-15 22:00',
+    endDate: '2023-06-16 02:00',
+  });
+  
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+  
+  const handleTestVariableChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    setTestVariables({
+      ...testVariables,
+      [name]: value,
+    });
+  };
+  
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData({
+      ...formData,
+      isActive: checked,
+    });
+  };
+  
+  const handleSelectChange = (value: string) => {
+    setFormData({
+      ...formData,
+      triggerOn: value as EmailTemplate['triggerOn'],
+    });
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     try {
-      if (initialData?.id) {
-        // Update existing template
-        const result = await emailNotificationApi.updateEmailTemplate(initialData.id, values as Partial<EmailTemplate>);
-        if (result.success) {
-          toast({
-            title: "Template Updated",
-            description: "Email template has been updated successfully.",
-          });
+      if (isEditing && initialData) {
+        const response = await emailNotificationApi.updateEmailTemplate(
+          initialData.id,
+          formData as Partial<EmailTemplate>
+        );
+        
+        if (response.success) {
+          toast.success('Email template updated successfully');
+          if (onSuccess) onSuccess();
         } else {
-          throw new Error(result.error || "Failed to update template");
+          toast.error(`Failed to update template: ${response.error}`);
         }
       } else {
-        // Create new template
-        const result = await emailNotificationApi.createEmailTemplate(values as Omit<EmailTemplate, 'id'>);
-        if (result.success) {
-          toast({
-            title: "Template Created",
-            description: "New email template has been created successfully.",
-          });
+        const response = await emailNotificationApi.createEmailTemplate(
+          formData as unknown as Omit<EmailTemplate, 'id'>
+        );
+        
+        if (response.success) {
+          toast.success('Email template created successfully');
+          if (onSuccess) onSuccess();
         } else {
-          throw new Error(result.error || "Failed to create template");
+          toast.error(`Failed to create template: ${response.error}`);
         }
       }
-      
-      if (onSuccess) {
-        onSuccess();
-      }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "An error occurred",
-        variant: "destructive",
-      });
+      toast.error('Error saving email template');
+      console.error(error);
     }
   };
-
-  const handleTestTemplate = () => {
-    const { subject, body } = form.getValues();
-    
-    // Preview the template with sample data
-    const sampleData = {
-      userName: "John Doe",
-      ticketId: "TK-12345",
-      ticketTitle: "System Outage",
-      agentName: "Jane Smith",
-      managerName: "Michael Johnson",
-      ticketPriority: "High",
-      changeId: "CR-7890"
-    };
-    
-    let previewSubject = subject;
-    let previewBody = body;
-    
-    // Replace variables with sample data
-    Object.entries(sampleData).forEach(([key, value]) => {
-      const pattern = new RegExp(`{${key}}`, 'g');
-      previewSubject = previewSubject.replace(pattern, value);
-      previewBody = previewBody.replace(pattern, value);
-    });
-    
-    toast({
-      title: "Template Preview",
-      description: (
-        <div className="mt-2 space-y-2">
-          <div>
-            <strong>Subject:</strong> 
-            <div className="bg-muted p-2 rounded mt-1 text-sm">{previewSubject}</div>
-          </div>
-          <div>
-            <strong>Body:</strong> 
-            <div className="bg-muted p-2 rounded mt-1 text-sm whitespace-pre-line">{previewBody}</div>
-          </div>
-        </div>
-      ),
-      duration: 10000,
-    });
+  
+  const handleTestTemplate = async () => {
+    setIsTesting(true);
+    try {
+      const response = await emailNotificationApi.testEmailTemplate(
+        { subject: formData.subject, body: formData.body },
+        testVariables
+      );
+      
+      if (response.success) {
+        setTestResult(response.data);
+      } else {
+        toast.error(`Test failed: ${response.error}`);
+      }
+    } catch (error) {
+      toast.error('Error testing template');
+      console.error(error);
+    } finally {
+      setIsTesting(false);
+    }
   };
+  
+  const triggerEvents = [
+    { label: 'Ticket Created', value: 'ticket-created' },
+    { label: 'Ticket Updated', value: 'ticket-updated' },
+    { label: 'Ticket Assigned', value: 'ticket-assigned' },
+    { label: 'Ticket Resolved', value: 'ticket-resolved' },
+    { label: 'SLA Breach', value: 'sla-breach' },
+    { label: 'Change Submitted', value: 'change-submitted' },
+    { label: 'Change Approved', value: 'change-approved' },
+    { label: 'Problem Created', value: 'problem-created' },
+    { label: 'Problem Resolved', value: 'problem-resolved' },
+  ];
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>{initialData ? 'Edit Email Template' : 'Create New Email Template'}</CardTitle>
-      </CardHeader>
-      
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
-          <CardContent className="space-y-6">
-            {/* Basic Info */}
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>{isEditing ? 'Edit Email Template' : 'Create Email Template'}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Template Name</Label>
+              <Input
+                id="name"
                 name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Template Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="E.g., Ticket Created Notification" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="triggerOn"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Trigger Event</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select trigger event" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {eventTypeOptions.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      When should this email template be sent?
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel>Active</FormLabel>
-                      <FormDescription>
-                        Enable or disable this email template
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="E.g., Ticket Created Notification"
+                required
               />
             </div>
             
-            {/* Email Content */}
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
+            <div className="space-y-2">
+              <Label htmlFor="triggerOn">Trigger Event</Label>
+              <Select
+                value={formData.triggerOn}
+                onValueChange={handleSelectChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a trigger event" />
+                </SelectTrigger>
+                <SelectContent>
+                  {triggerEvents.map((event) => (
+                    <SelectItem key={event.value} value={event.value}>
+                      {event.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="subject">Email Subject</Label>
+              <Input
+                id="subject"
                 name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Subject</FormLabel>
-                    <FormControl>
-                      <Input placeholder="E.g., Your ticket #{ticketId} has been created" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Use variables like {'{ticketId}'} to include dynamic content
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={formData.subject}
+                onChange={handleInputChange}
+                placeholder="E.g., Your ticket #{ticketId} has been created"
+                required
               />
-              
-              <FormField
-                control={form.control}
+              <p className="text-sm text-muted-foreground">
+                Use {"{variable}"} syntax to include dynamic content
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="body">Email Body</Label>
+              <Textarea
+                id="body"
                 name="body"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Body</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Enter email content here..." 
-                        className="min-h-[200px]" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                value={formData.body}
+                onChange={handleInputChange}
+                placeholder="Hello {userName},&#10;&#10;Your ticket #{ticketId} has been created..."
+                className="min-h-40"
+                required
               />
-              
-              <VariableSuggestions />
-              
-              <div className="flex justify-start">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleTestTemplate}
-                >
-                  Preview Template
+              <p className="text-sm text-muted-foreground">
+                Use {"{variable}"} syntax to include dynamic content
+              </p>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isActive"
+                checked={formData.isActive}
+                onCheckedChange={handleCheckboxChange}
+              />
+              <Label htmlFor="isActive">Active</Label>
+            </div>
+            
+            <div className="pt-4 flex justify-between">
+              <div className="space-x-2">
+                {onCancel && (
+                  <Button type="button" variant="outline" onClick={onCancel}>
+                    Cancel
+                  </Button>
+                )}
+                <Button type="button" variant="secondary" onClick={handleTestTemplate}>
+                  Test Template
                 </Button>
               </div>
+              <Button type="submit">
+                {isEditing ? 'Update Template' : 'Create Template'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+      
+      {testResult && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Template Preview</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Subject</Label>
+              <div className="p-3 bg-muted rounded-md">
+                {testResult.subject}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Body</Label>
+              <div className="p-3 bg-muted rounded-md whitespace-pre-wrap">
+                {testResult.body}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Test Variables</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                {Object.entries(testVariables).map(([key, value]) => (
+                  <div key={key} className="space-y-1">
+                    <Label htmlFor={`var-${key}`} className="text-xs">
+                      {key}
+                    </Label>
+                    <Input
+                      id={`var-${key}`}
+                      name={key}
+                      value={value}
+                      onChange={handleTestVariableChange}
+                      size="sm"
+                      className="h-8"
+                    />
+                  </div>
+                ))}
+              </div>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleTestTemplate}
+                disabled={isTesting}
+                className="mt-2"
+              >
+                {isTesting ? 'Testing...' : 'Update Preview'}
+              </Button>
             </div>
           </CardContent>
-          
-          <CardFooter className="flex justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-            <Button type="submit">
-              {initialData ? 'Update Template' : 'Create Template'}
-            </Button>
-          </CardFooter>
-        </form>
-      </Form>
-    </Card>
+        </Card>
+      )}
+    </div>
   );
 };
 

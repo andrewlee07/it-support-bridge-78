@@ -10,7 +10,7 @@ import NotificationLogsList from './NotificationLogsList';
 import NotificationSystemHealth from './NotificationSystemHealth';
 import WebhookConfigList from './WebhookConfigList';
 import { useDisclosure } from '@/hooks/useDisclosure';
-import { EmailTemplate } from '@/utils/types';
+import { EmailTemplate } from '@/utils/types/email';
 
 interface NotificationDashboardProps {
   className?: string;

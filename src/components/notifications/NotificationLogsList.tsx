@@ -1,8 +1,7 @@
 
-import React, { useEffect, useState } from 'react';
-import { format } from 'date-fns';
+import React, { useState } from 'react';
+import { useNotificationLogs } from '@/hooks/useNotifications';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -11,182 +10,133 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Bell, Clock, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NotificationLog } from '@/utils/types/notification';
-import { useNotificationLogs } from '@/hooks/useNotifications';
 
-interface NotificationLogsListProps {
-  className?: string;
-}
+const NotificationLogsList: React.FC = () => {
+  const { logs, isLoading } = useNotificationLogs();
+  const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
-const NotificationLogsList: React.FC<NotificationLogsListProps> = ({ className }) => {
-  const { logs, loading, fetchLogs, retryNotification } = useNotificationLogs();
-  const [selectedLog, setSelectedLog] = useState<NotificationLog | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isRetrying, setIsRetrying] = useState(false);
-
-  useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'sent':
-        return <Badge variant="success">{status}</Badge>;
-      case 'failed':
-        return <Badge variant="destructive">{status}</Badge>;
-      case 'retrying':
-      case 'queued':
-        return <Badge variant="warning">{status}</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
+  const toggleExpandEvent = (eventId: string) => {
+    if (expandedEventId === eventId) {
+      setExpandedEventId(null);
+    } else {
+      setExpandedEventId(eventId);
     }
   };
 
-  const handleViewDetail = (log: NotificationLog) => {
-    setSelectedLog(log);
-    setIsDetailOpen(true);
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
   };
 
-  const handleRetry = async () => {
-    if (!selectedLog) return;
+  const getEventTypeBadge = (type: string) => {
+    let variant: "default" | "secondary" | "outline" | "destructive" = "default";
     
-    setIsRetrying(true);
-    try {
-      await retryNotification(selectedLog.id);
-      await fetchLogs();
-      setIsDetailOpen(false);
-    } finally {
-      setIsRetrying(false);
+    if (type.includes('ticket')) {
+      variant = "default";
+    } else if (type.includes('change')) {
+      variant = "secondary";
+    } else if (type.includes('problem')) {
+      variant = "outline";
+    } else if (type.includes('breach')) {
+      variant = "destructive";
     }
+    
+    return (
+      <Badge variant={variant} className="whitespace-nowrap">
+        {type}
+      </Badge>
+    );
   };
 
-  const formatDate = (date: Date) => {
-    return format(new Date(date), 'MMM dd, yyyy HH:mm:ss');
-  };
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading notification logs...</div>;
+  }
 
   return (
-    <div className={className}>
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-xl">Notification Logs</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="py-4 text-center">Loading logs...</div>
-          ) : logs.length === 0 ? (
-            <div className="py-4 text-center text-muted-foreground">
-              No notification logs found
-            </div>
-          ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Event</TableHead>
-                    <TableHead>Recipient</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead></TableHead>
+    <Card>
+      <CardHeader>
+        <CardTitle>Notification Logs</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {logs.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground">
+            No notification logs found.
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Event Type</TableHead>
+                <TableHead>Timestamp</TableHead>
+                <TableHead>Target</TableHead>
+                <TableHead>Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {logs.map((event) => (
+                <React.Fragment key={event.id}>
+                  <TableRow 
+                    className={
+                      expandedEventId === event.id 
+                        ? "bg-muted/50 cursor-pointer" 
+                        : "cursor-pointer"
+                    }
+                    onClick={() => toggleExpandEvent(event.id)}
+                  >
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Bell className="h-4 w-4 text-muted-foreground" />
+                        {getEventTypeBadge(event.type)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span>{formatTimestamp(event.timestamp)}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium">{event.targetType}</span> 
+                      <span className="text-muted-foreground ml-1">{event.targetId}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm">
+                        {expandedEventId === event.id ? 'Hide Details' : 'View Details'}
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {logs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell className="font-medium">
-                        {formatDate(log.timestamp)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{log.eventType}</Badge>
-                      </TableCell>
-                      <TableCell>{log.recipientEmail}</TableCell>
-                      <TableCell>{getStatusBadge(log.status)}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewDetail(log)}
-                        >
-                          View
-                        </Button>
+                  
+                  {expandedEventId === event.id && (
+                    <TableRow className="bg-muted/50">
+                      <TableCell colSpan={4} className="p-4">
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Event Data</h4>
+                          <div className="bg-background p-3 rounded-md overflow-x-auto">
+                            <pre className="text-xs">
+                              {JSON.stringify(event.data, null, 2)}
+                            </pre>
+                          </div>
+                          
+                          <div className="flex justify-end">
+                            <Button variant="outline" size="sm">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              View Related {event.targetType}
+                            </Button>
+                          </div>
+                        </div>
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        {selectedLog && (
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Notification Details</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <div className="text-sm text-muted-foreground">Event Type</div>
-                <div>{selectedLog.eventType}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground">Time</div>
-                <div>{formatDate(selectedLog.timestamp)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground">Recipient</div>
-                <div>{selectedLog.recipientEmail}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground">Status</div>
-                <div>{getStatusBadge(selectedLog.status)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground">Channel</div>
-                <div className="capitalize">{selectedLog.channel}</div>
-              </div>
-              {selectedLog.error && (
-                <div>
-                  <div className="text-sm text-muted-foreground">Error</div>
-                  <div className="text-destructive text-sm">{selectedLog.error}</div>
-                </div>
-              )}
-              {selectedLog.retryCount !== undefined && (
-                <div>
-                  <div className="text-sm text-muted-foreground">Retry Count</div>
-                  <div>{selectedLog.retryCount}</div>
-                </div>
-              )}
-            </div>
-            <DialogFooter>
-              {selectedLog.status === 'failed' && (
-                <Button
-                  onClick={handleRetry}
-                  disabled={isRetrying}
-                  className="mr-auto"
-                >
-                  {isRetrying ? 'Retrying...' : 'Retry Now'}
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                onClick={() => setIsDetailOpen(false)}
-              >
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
+                  )}
+                </React.Fragment>
+              ))}
+            </TableBody>
+          </Table>
         )}
-      </Dialog>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
