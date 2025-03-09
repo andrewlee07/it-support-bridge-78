@@ -87,6 +87,21 @@ const UserManagement = () => {
     setEditUserDialogOpen(false);
   };
 
+  // Wrapper for setNewUser to handle the expected interface
+  const handleSetNewUser = (user: {
+    name: string;
+    email: string;
+    role: typeof newUser.role;
+    department: string;
+    title: string;
+  }) => {
+    // Add the roles property
+    setNewUser({
+      ...user,
+      roles: user.role ? [user.role] : []
+    });
+  };
+
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -97,7 +112,10 @@ const UserManagement = () => {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <UserSearchBar onChange={handleSearch} />
+          <UserSearchBar 
+            searchTerm={""} 
+            onSearchChange={handleSearch} 
+          />
         </div>
 
         <Tabs defaultValue="all" className="animate-fade-in">
@@ -127,9 +145,9 @@ const UserManagement = () => {
         setEditUserDialogOpen={setEditUserDialogOpen}
         selectedUser={selectedUser}
         newUser={newUser}
-        setNewUser={setNewUser}
+        setNewUser={handleSetNewUser}
         selectedRole={selectedRole}
-        setSelectedRole={setSelectedRole}
+        onRoleChange={setSelectedRole}
         handleAddUser={handleAddUserFromDialog}
         handleRemoveUser={handleRemoveUserFromDialog}
         handleChangeRole={handleChangeRoleFromDialog}

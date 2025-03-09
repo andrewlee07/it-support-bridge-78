@@ -29,6 +29,8 @@ const UserManagement: React.FC = () => {
     setActiveFilter,
     setSelectedUserId,
     setSelectedRole,
+    newUser,
+    setNewUser
   } = useUserManagement();
 
   return (
@@ -76,6 +78,18 @@ const UserManagement: React.FC = () => {
         selectedRole={selectedRole}
         onClose={() => setSelectedUserId(null)}
         onRoleChange={setSelectedRole}
+        newUser={newUser}
+        setNewUser={setNewUser}
+        handleAddUser={handleAddUser}
+        handleRemoveUser={() => {
+          if (selectedUserId) handleRemoveUser(selectedUserId);
+        }}
+        handleChangeRole={() => {
+          if (selectedUserId) handleChangeRole(selectedUserId);
+        }}
+        handleUpdateUser={(updatedUser) => {
+          if (selectedUserId) handleUpdateUser(selectedUserId);
+        }}
       />
     </div>
   );
