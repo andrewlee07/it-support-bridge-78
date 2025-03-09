@@ -51,32 +51,32 @@ const UserDialogs: React.FC<UserDialogsProps> = ({
   return (
     <>
       <AddUserDialog 
-        isOpen={false} 
-        onClose={() => {}} 
+        open={false} 
+        onOpenChange={() => {}} 
         newUser={newUser}
         setNewUser={setNewUser}
         onAddUser={handleAddUser}
       />
       
       <RemoveUserDialog 
-        isOpen={false} 
-        onClose={onClose}
-        onConfirm={handleRemoveUser}
+        open={false} 
+        onOpenChange={onClose}
+        onRemoveUser={handleRemoveUser}
       />
       
       <ChangeRoleDialog 
-        isOpen={false} 
-        onClose={onClose}
+        open={false} 
+        onOpenChange={onClose}
         selectedRole={selectedRole}
         onRoleChange={onRoleChange}
-        onConfirm={handleChangeRole}
+        onUpdateRole={handleChangeRole}
       />
       
       <EditUserDialog 
-        isOpen={false} 
-        onClose={onClose}
+        open={false} 
+        onOpenChange={onClose}
         user={null}
-        onUpdate={handleUpdateUser}
+        onUpdateUser={handleUpdateUser}
       />
     </>
   );

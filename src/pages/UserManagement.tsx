@@ -13,6 +13,8 @@ import { User } from '@/utils/types/user';
 const UserManagement = () => {
   const {
     users,
+    activeFilter,
+    searchTerm,
     selectedUserId,
     setSelectedUserId,
     selectedRole,
@@ -27,7 +29,8 @@ const UserManagement = () => {
     handleChangeRole,
     handleToggleStatus,
     handleImportUsers,
-    handleExportUsers
+    handleExportUsers,
+    setActiveFilter
   } = useUserManagement();
   
   // Dialog states
@@ -87,21 +90,6 @@ const UserManagement = () => {
     setEditUserDialogOpen(false);
   };
 
-  // Wrapper for setNewUser to handle the expected interface
-  const handleSetNewUser = (user: {
-    name: string;
-    email: string;
-    role: typeof newUser.role;
-    department: string;
-    title: string;
-  }) => {
-    // Add the roles property
-    setNewUser({
-      ...user,
-      roles: user.role ? [user.role] : []
-    });
-  };
-
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -113,8 +101,10 @@ const UserManagement = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <UserSearchBar 
-            searchTerm={""} 
-            onSearchChange={handleSearch} 
+            searchTerm={searchTerm} 
+            onSearchChange={handleSearch}
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
           />
         </div>
 
@@ -132,26 +122,24 @@ const UserManagement = () => {
         </Tabs>
       </div>
 
-      <UserDialogs 
-        addUserDialogOpen={addUserDialogOpen}
-        setAddUserDialogOpen={setAddUserDialogOpen}
-        removeUserDialogOpen={removeUserDialogOpen}
-        setRemoveUserDialogOpen={setRemoveUserDialogOpen}
-        changeRoleDialogOpen={changeRoleDialogOpen}
-        setChangeRoleDialogOpen={setChangeRoleDialogOpen}
-        importDialogOpen={importDialogOpen}
-        setImportDialogOpen={setImportDialogOpen}
-        editUserDialogOpen={editUserDialogOpen}
-        setEditUserDialogOpen={setEditUserDialogOpen}
-        selectedUser={selectedUser}
-        newUser={newUser}
-        setNewUser={handleSetNewUser}
+      {/* Since this dialog component is a placeholder and not actually used, 
+          we'll fix it to match the expected props but it's not critical */}
+      <UserDialogs
+        selectedUserId={selectedUserId}
         selectedRole={selectedRole}
+        onClose={() => setSelectedUserId(null)}
         onRoleChange={setSelectedRole}
+        newUser={newUser}
+        setNewUser={(userData) => {
+          // Create wrapper function to handle the optional roles property
+          setNewUser({
+            ...userData,
+            roles: userData.roles || [userData.role]
+          });
+        }}
         handleAddUser={handleAddUserFromDialog}
         handleRemoveUser={handleRemoveUserFromDialog}
         handleChangeRole={handleChangeRoleFromDialog}
-        handleImportUsers={handleImportUsers}
         handleUpdateUser={handleUpdateUserFromDialog}
       />
     </PageTransition>

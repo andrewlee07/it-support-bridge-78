@@ -1,12 +1,14 @@
 
 import React from 'react';
-import UserManagement from '@/components/users/UserManagement';
 import PageTransition from '@/components/shared/PageTransition';
+import UserManagement from '@/components/users/UserManagement';
 
 const Users = () => {
   return (
     <PageTransition>
-      <UserManagement />
+      <div className="container mx-auto p-4">
+        <UserManagement />
+      </div>
     </PageTransition>
   );
 };

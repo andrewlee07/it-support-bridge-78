@@ -16,6 +16,7 @@ interface AddUserDialogProps {
     role: UserRole;
     department: string;
     title: string;
+    roles?: UserRole[];
   };
   setNewUser: (user: {
     name: string;
@@ -23,6 +24,7 @@ interface AddUserDialogProps {
     role: UserRole;
     department: string;
     title: string;
+    roles?: UserRole[];
   }) => void;
   onAddUser: () => void;
 }
