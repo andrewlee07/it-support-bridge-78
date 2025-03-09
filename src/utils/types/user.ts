@@ -65,7 +65,7 @@ export interface Permission {
   name: string;
   description: string;
   resource: string;
-  action: 'create' | 'read' | 'update' | 'delete' | 'approve' | 'reject' | 'assign';
+  action: 'create' | 'read' | 'update' | 'delete' | 'approve' | 'reject' | 'assign' | 'configure' | 'manage';
 }
 
 export interface RolePermission {
