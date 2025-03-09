@@ -8,6 +8,7 @@ import NotFound from '@/pages/NotFound';
 import UserProfile from '@/pages/UserProfile';
 import UserSettings from '@/pages/UserSettings';
 import UserManagementPage from '@/pages/UserManagementPage';
+import Reports from '@/pages/Reports';
 
 export const otherRoutes: RouteObject[] = [
   {
@@ -33,6 +34,10 @@ export const otherRoutes: RouteObject[] = [
   {
     path: '/user-management',
     element: <UserManagementPage />,
+  },
+  {
+    path: '/reports',
+    element: <Reports />,
   },
   {
     path: '*',

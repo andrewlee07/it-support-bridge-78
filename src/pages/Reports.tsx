@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
-import ChartBuilder, { ChartConfig } from '@/components/reports/ChartBuilder';
 import DynamicChartRenderer from '@/components/reports/DynamicChartRenderer';
 import InteractiveTable from '@/components/reports/InteractiveTable';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import ChartBuilder, { ChartConfig } from '@/components/reports/ChartBuilder';
 
 // Mock data for testing
 const mockIncidentData = [
