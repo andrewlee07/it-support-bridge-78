@@ -30,7 +30,7 @@ const IncidentsTab: React.FC<IncidentsTabProps> = ({ selectedSegment, onSegmentC
       header: 'SLA Status',
       formatSLA: true,
       isSLAColumn: true, // Mark this as an SLA column
-      render: (value: any, record: Record<string, any>) => {
+      render: (value: any, record: Record<string, any>): React.ReactNode => {
         // Get the slaType from the record if passed from the parent
         const currentSlaType = (record.slaType as SLAType) || 'resolution';
         
@@ -49,8 +49,9 @@ const IncidentsTab: React.FC<IncidentsTabProps> = ({ selectedSegment, onSegmentC
           audit: []
         }, currentSlaType);
         
-        // Return the SLAInfo object - InteractiveTable will handle the rendering
-        return slaInfo;
+        // Return null instead of the raw SLAInfo object
+        // The parent component will handle formatting via the formatSLA flag
+        return null; // This allows the InteractiveTable to use its formatSLAStatus function
       }
     }
   ];

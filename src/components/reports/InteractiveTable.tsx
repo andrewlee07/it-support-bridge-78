@@ -144,7 +144,13 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
                               const rendered = column.isSLAColumn 
                                 ? column.render(record[column.key], { ...record, slaType })
                                 : column.render(record[column.key], record);
-                                
+                              
+                              // If the render function returns null or undefined for an SLA column,
+                              // we should calculate and format the SLA ourselves
+                              if (rendered === null && column.formatSLA && column.isSLAColumn) {
+                                return formatSLAStatus(record[column.key] || {});
+                              }
+                              
                               // Check if rendered is SLAInfo object and format it if needed
                               if (rendered && typeof rendered === 'object' && 'status' in rendered) {
                                 return formatSLAStatus(rendered as SLAInfo);
