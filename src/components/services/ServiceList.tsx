@@ -23,17 +23,19 @@ import {
 
 interface ServiceListProps {
   services: ServiceWithCategory[];
-  categories: ServiceCategory[];
-  onAddService: () => void;
-  onEditService: (service: ServiceWithCategory) => void;
+  categories?: ServiceCategory[];
+  onAddService?: () => void;
+  onEditService?: (service: ServiceWithCategory) => void;
+  onSelect?: (service: ServiceWithCategory) => void;
   isLoading?: boolean;
 }
 
 const ServiceList: React.FC<ServiceListProps> = ({
   services,
-  categories,
+  categories = [],
   onAddService,
   onEditService,
+  onSelect,
   isLoading = false
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,6 +53,14 @@ const ServiceList: React.FC<ServiceListProps> = ({
     return matchesSearch && matchesCategory;
   });
 
+  const handleRowClick = (service: ServiceWithCategory) => {
+    if (onSelect) {
+      onSelect(service);
+    } else if (onEditService) {
+      onEditService(service);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -64,27 +74,31 @@ const ServiceList: React.FC<ServiceListProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Select 
-            value={categoryFilter} 
-            onValueChange={setCategoryFilter}
-          >
-            <SelectTrigger className="w-full md:w-52">
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {categories.length > 0 && (
+            <Select 
+              value={categoryFilter} 
+              onValueChange={setCategoryFilter}
+            >
+              <SelectTrigger className="w-full md:w-52">
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
-        <Button onClick={onAddService}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Service
-        </Button>
+        {onAddService && (
+          <Button onClick={onAddService}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Service
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -115,7 +129,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
                 <TableRow 
                   key={service.id}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => onEditService(service)}
+                  onClick={() => handleRowClick(service)}
                 >
                   <TableCell>
                     <div>
@@ -140,16 +154,18 @@ const ServiceList: React.FC<ServiceListProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditService(service);
-                      }}
-                    >
-                      Edit
-                    </Button>
+                    {onEditService && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditService(service);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

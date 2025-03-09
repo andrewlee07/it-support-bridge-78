@@ -3,20 +3,25 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { mockServiceTicketCounts } from '@/utils/mockData/services';
+import { mockServiceTicketCounts } from '@/utils/mockData/serviceTickets';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Download } from 'lucide-react';
 
 interface ServiceTicketsReportProps {
+  serviceId?: string;
   onDownload?: () => void;
 }
 
-const ServiceTicketsReport: React.FC<ServiceTicketsReportProps> = ({ onDownload }) => {
+const ServiceTicketsReport: React.FC<ServiceTicketsReportProps> = ({ serviceId, onDownload }) => {
   const [period, setPeriod] = useState('30days');
   const [viewType, setViewType] = useState<'incidents' | 'requests' | 'total'>('total');
   
   const getChartData = () => {
-    return mockServiceTicketCounts.map(item => ({
+    const data = serviceId 
+      ? mockServiceTicketCounts.filter(item => item.serviceId === serviceId)
+      : mockServiceTicketCounts;
+
+    return data.map(item => ({
       name: item.serviceName,
       incidents: item.incidents,
       requests: item.requests,
