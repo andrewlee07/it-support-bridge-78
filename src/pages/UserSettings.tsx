@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { BellRing, Key, Moon, Shield, Sun } from 'lucide-react';
@@ -150,10 +150,15 @@ const UserSettings = () => {
                       <Key className="h-5 w-5" />
                       <Label htmlFor="two-factor">Two-factor Authentication</Label>
                     </div>
-                    <Switch 
-                      id="two-factor" 
-                      checked={user.mfaEnabled} 
-                    />
+                    <div className="flex items-center">
+                      <Badge 
+                        variant={user.mfaEnabled ? "success" : "secondary"}
+                        className={`rounded-full px-3 ${user.mfaEnabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}`}
+                      >
+                        {user.mfaEnabled ? 'Enabled' : 'Disabled'}
+                      </Badge>
+                      <div className="text-xs text-muted-foreground ml-2">(Managed by IT Admin)</div>
+                    </div>
                   </div>
                   
                   <div className="flex items-center justify-between">
