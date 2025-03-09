@@ -1,54 +1,9 @@
 
-import { Service, ServiceCategory, ServiceWithCategory } from '@/utils/types/service';
-
-// Mock service categories
-const serviceCategories: ServiceCategory[] = [
-  { 
-    id: 'cat-1', 
-    name: 'Hardware', 
-    description: 'Computer hardware and peripherals',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  { 
-    id: 'cat-2', 
-    name: 'Software', 
-    description: 'Applications and software licenses',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  { 
-    id: 'cat-3', 
-    name: 'Network', 
-    description: 'Network and connectivity services',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  { 
-    id: 'cat-4', 
-    name: 'Security', 
-    description: 'IT security services',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  { 
-    id: 'cat-5', 
-    name: 'Support', 
-    description: 'Technical support services',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-];
-
-// Mock teams
-const teams = [
-  { id: 'team-1', name: 'IT Support Team' },
-  { id: 'team-2', name: 'Network Team' },
-  { id: 'team-3', name: 'Security Team' }
-];
+import { ServiceWithCategory, Service } from '@/utils/types/service';
+import { serviceCategories } from './categories';
 
 // Mock services
-const services: ServiceWithCategory[] = [
+export const services: ServiceWithCategory[] = [
   {
     id: 'srv-1',
     name: 'Laptop Request',
@@ -156,34 +111,12 @@ const services: ServiceWithCategory[] = [
   },
 ];
 
-// Mock service ticket counts for analytics
-const mockServiceTicketCounts = [
-  { serviceId: 'srv-1', serviceName: 'Laptop Request', incidents: 12, requests: 45, total: 57 },
-  { serviceId: 'srv-2', serviceName: 'Software Installation', incidents: 5, requests: 68, total: 73 },
-  { serviceId: 'srv-3', serviceName: 'VPN Access', incidents: 8, requests: 32, total: 40 },
-  { serviceId: 'srv-4', serviceName: 'Password Reset', incidents: 3, requests: 89, total: 92 },
-  { serviceId: 'srv-5', serviceName: 'Technical Support', incidents: 21, requests: 34, total: 55 },
-];
-
-// Helper functions
 export const getAllServices = (): ServiceWithCategory[] => {
   return [...services];
 };
 
 export const getServiceById = (id: string): ServiceWithCategory | undefined => {
   return services.find(service => service.id === id);
-};
-
-export const getAllServiceCategories = (): ServiceCategory[] => {
-  return [...serviceCategories];
-};
-
-export const getServiceCategoryById = (id: string): ServiceCategory | undefined => {
-  return serviceCategories.find(category => category.id === id);
-};
-
-export const getTeamById = (id: string) => {
-  return teams.find(team => team.id === id);
 };
 
 export const getServicesByCategory = (): Record<string, ServiceWithCategory[]> => {
@@ -200,7 +133,7 @@ export const getServicesByCategory = (): Record<string, ServiceWithCategory[]> =
 };
 
 export const addService = (service: Service): ServiceWithCategory => {
-  const category = getServiceCategoryById(service.categoryId);
+  const category = serviceCategories.find(cat => cat.id === service.categoryId);
   
   if (!category) {
     throw new Error(`Category with ID ${service.categoryId} not found`);
@@ -225,7 +158,7 @@ export const updateService = (updatedService: Service): ServiceWithCategory => {
     throw new Error(`Service with ID ${updatedService.id} not found`);
   }
   
-  const category = getServiceCategoryById(updatedService.categoryId);
+  const category = serviceCategories.find(cat => cat.id === updatedService.categoryId);
   
   if (!category) {
     throw new Error(`Category with ID ${updatedService.categoryId} not found`);
@@ -240,6 +173,3 @@ export const updateService = (updatedService: Service): ServiceWithCategory => {
   services[index] = updatedServiceWithCategory;
   return updatedServiceWithCategory;
 };
-
-// Export for analytics
-export { mockServiceTicketCounts };

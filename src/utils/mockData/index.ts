@@ -22,6 +22,17 @@ import { mockEmailTemplates } from './emailTemplates';
 import { getDashboardStats } from './dashboardStats';
 import { simulateApiResponse, simulatePaginatedResponse, delay, createApiSuccessResponse, createApiErrorResponse } from './apiHelpers';
 
+// Import services from the new location
+import {
+  getAllServices,
+  getServiceById,
+  getAllServiceCategories,
+  getServiceCategoryById,
+  getTeamById,
+  getServicesByCategory,
+  mockServiceTicketCounts
+} from './services';
+
 // Import all test management exports
 import {
   testCases,
@@ -127,5 +138,14 @@ export {
   assignToRelease,
   removeFromRelease,
   getBacklogStats,
-  deleteBacklogItem
+  deleteBacklogItem,
+  
+  // Services
+  getAllServices,
+  getServiceById,
+  getAllServiceCategories,
+  getServiceCategoryById,
+  getTeamById,
+  getServicesByCategory,
+  mockServiceTicketCounts
 };
