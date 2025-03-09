@@ -10,6 +10,8 @@ export interface SLAInfo {
   timeLeft?: string; // Time left before breach or time since breach
   percentLeft?: number; // Percentage of time left (for progress bars)
   completed?: boolean; // Whether the SLA is completed (ticket resolved/closed)
+  slaType?: string; // What type of SLA this is (response, resolution)
+  slaName?: string; // Name of the SLA policy
 }
 
 /**
@@ -68,6 +70,8 @@ export const calculateSLAStatus = (ticket: Ticket): SLAInfo => {
     status,
     timeLeft: formatTimeLeft(minutesLeft),
     percentLeft,
-    completed: false
+    completed: false,
+    slaType: 'Resolution', // This is a resolution SLA
+    slaName: sla.name // Include the SLA policy name
   };
 };
