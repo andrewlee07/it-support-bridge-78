@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, 
@@ -11,9 +10,10 @@ import {
 import { Ticket } from '@/utils/types/ticket';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { ArrowDown, ArrowUp, Clock, AlertTriangle, AlertCircle } from 'lucide-react';
-import { calculateSLAStatus, SLAStatus } from '@/utils/sla/slaCalculations';
+import { ArrowDown, ArrowUp } from 'lucide-react';
+import { calculateSLAStatus } from '@/utils/sla/slaCalculations';
 import { Progress } from '@/components/ui/progress';
+import { getUserNameById } from '@/utils/userUtils';
 
 interface TicketTableProps {
   tickets: Ticket[];
@@ -105,46 +105,43 @@ const TicketTable: React.FC<TicketTableProps> = ({ tickets, onTicketClick }) => 
     }
   };
 
-  // SLA status indicator
+  // SLA status indicator - updated to use only progress bars with color coding
   const renderSLAIndicator = (ticket: Ticket) => {
     const slaInfo = calculateSLAStatus(ticket);
     
     if (ticket.status === 'closed' || ticket.status === 'resolved') {
-      return <span className="text-gray-500">Completed</span>;
+      return <div className="text-gray-500">Completed</div>;
     }
     
     switch (slaInfo.status) {
       case 'breached':
         return (
-          <div className="space-y-1">
-            <div className="flex items-center text-red-600">
-              <AlertCircle className="h-4 w-4 mr-1" />
-              <span>SLA Breached</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-red-600 font-medium">SLA Breached</span>
+              <span className="text-red-600 text-sm">{slaInfo.timeLeft}</span>
             </div>
-            <div className="text-xs text-red-600">{slaInfo.timeLeft}</div>
-            <Progress value={0} className="h-1.5 bg-red-200" indicatorClassName="bg-red-600" />
+            <Progress value={0} className="h-2" indicatorClassName="bg-red-600" />
           </div>
         );
       case 'warning':
         return (
-          <div className="space-y-1">
-            <div className="flex items-center text-amber-600">
-              <AlertTriangle className="h-4 w-4 mr-1" />
-              <span>SLA Warning</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-amber-600 font-medium">SLA Warning</span>
+              <span className="text-amber-600 text-sm">{slaInfo.timeLeft}</span>
             </div>
-            <div className="text-xs text-amber-600">{slaInfo.timeLeft}</div>
-            <Progress value={slaInfo.percentLeft} className="h-1.5 bg-amber-200" indicatorClassName="bg-amber-600" />
+            <Progress value={slaInfo.percentLeft} className="h-2" indicatorClassName="bg-amber-500" />
           </div>
         );
       default:
         return (
-          <div className="space-y-1">
-            <div className="flex items-center text-green-600">
-              <Clock className="h-4 w-4 mr-1" />
-              <span>SLA On Track</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-green-600 font-medium">SLA On Track</span>
+              <span className="text-green-600 text-sm">{slaInfo.timeLeft}</span>
             </div>
-            <div className="text-xs text-green-600">{slaInfo.timeLeft}</div>
-            <Progress value={slaInfo.percentLeft} className="h-1.5" />
+            <Progress value={slaInfo.percentLeft} className="h-2" indicatorClassName="bg-green-500" />
           </div>
         );
     }
@@ -213,7 +210,7 @@ const TicketTable: React.FC<TicketTableProps> = ({ tickets, onTicketClick }) => 
                   {ticket.priority}
                 </Badge>
               </TableCell>
-              <TableCell>{ticket.assignedTo || 'Unassigned'}</TableCell>
+              <TableCell>{getUserNameById(ticket.assignedTo)}</TableCell>
               <TableCell className="text-sm">
                 {formatDistanceToNow(new Date(ticket.createdAt), { addSuffix: true })}
               </TableCell>

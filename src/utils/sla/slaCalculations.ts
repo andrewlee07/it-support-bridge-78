@@ -9,6 +9,7 @@ export interface SLAInfo {
   status: SLAStatus;
   timeLeft?: string; // Time left before breach or time since breach
   percentLeft?: number; // Percentage of time left (for progress bars)
+  completed?: boolean; // Whether the SLA is completed (ticket resolved/closed)
 }
 
 /**
@@ -20,8 +21,12 @@ export const calculateSLAStatus = (ticket: Ticket): SLAInfo => {
     s => s.ticketType === ticket.type && s.priorityLevel === ticket.priority
   );
   
+  // If the ticket is resolved or closed, mark SLA as completed
   if (!sla || ticket.status === 'closed' || ticket.status === 'resolved') {
-    return { status: 'ok' };
+    return { 
+      status: 'ok',
+      completed: true 
+    };
   }
   
   const now = new Date();
@@ -62,6 +67,7 @@ export const calculateSLAStatus = (ticket: Ticket): SLAInfo => {
   return {
     status,
     timeLeft: formatTimeLeft(minutesLeft),
-    percentLeft
+    percentLeft,
+    completed: false
   };
 };

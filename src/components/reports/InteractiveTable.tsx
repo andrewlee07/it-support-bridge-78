@@ -9,6 +9,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { getUserNameById } from '@/utils/userUtils';
 
 interface InteractiveTableProps {
   data: Record<string, any>[];
@@ -16,6 +18,8 @@ interface InteractiveTableProps {
     key: string;
     header: string;
     render?: (value: any, record: Record<string, any>) => React.ReactNode;
+    formatUserName?: boolean;
+    formatSLA?: boolean;
   }[];
   title: string;
   filterKey?: string;
@@ -33,6 +37,50 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
   const filteredData = filterKey && filterValue !== undefined
     ? data.filter(record => record[filterKey] === filterValue)
     : data;
+
+  // Formatter for SLA status display
+  const formatSLAStatus = (slaInfo: any) => {
+    if (!slaInfo || slaInfo.status === undefined) {
+      return <div>N/A</div>;
+    }
+
+    if (slaInfo.completed) {
+      return <div className="text-gray-500">Completed</div>;
+    }
+
+    switch (slaInfo.status) {
+      case 'breached':
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-red-600 font-medium">SLA Breached</span>
+              <span className="text-red-600 text-sm">{slaInfo.timeLeft}</span>
+            </div>
+            <Progress value={0} className="h-2" indicatorClassName="bg-red-600" />
+          </div>
+        );
+      case 'warning':
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-amber-600 font-medium">SLA Warning</span>
+              <span className="text-amber-600 text-sm">{slaInfo.timeLeft}</span>
+            </div>
+            <Progress value={slaInfo.percentLeft} className="h-2" indicatorClassName="bg-amber-500" />
+          </div>
+        );
+      default:
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-green-600 font-medium">SLA On Track</span>
+              <span className="text-green-600 text-sm">{slaInfo.timeLeft}</span>
+            </div>
+            <Progress value={slaInfo.percentLeft} className="h-2" indicatorClassName="bg-green-500" />
+          </div>
+        );
+    }
+  };
 
   return (
     <Card>
@@ -68,7 +116,11 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
                       <TableCell key={`${i}-${column.key}`}>
                         {column.render
                           ? column.render(record[column.key], record)
-                          : record[column.key]}
+                          : column.formatUserName && column.key === 'assignee'
+                            ? getUserNameById(record[column.key])
+                            : column.formatSLA && column.key === 'sla'
+                              ? formatSLAStatus(record[column.key])
+                              : record[column.key]}
                       </TableCell>
                     ))}
                   </TableRow>
