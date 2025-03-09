@@ -6,7 +6,7 @@ import {
   refreshJWTToken,
   logSecurityEvent,
   getClientIPAddress 
-} from '@/utils/securityUtils';
+} from '@/utils/security/sessionManagement';
 import { updateUser } from '@/utils/mockData/users';
 
 export const useSessionManagement = (

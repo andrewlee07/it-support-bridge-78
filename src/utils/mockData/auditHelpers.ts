@@ -16,6 +16,7 @@ export const createAuditEntries = (entityId: string, entityType: 'ticket' | 'ass
       message: `${entityType.charAt(0).toUpperCase() + entityType.slice(1)} created`,
       performedBy: createdBy,
       timestamp: yesterday,
+      action: 'create' // Adding the required action property
     },
     {
       id: `audit-${entityId}-2`,
@@ -24,6 +25,7 @@ export const createAuditEntries = (entityId: string, entityType: 'ticket' | 'ass
       message: 'Status changed to in-progress',
       performedBy: 'user-2',
       timestamp: new Date(yesterday.getTime() + 3600000), // 1 hour later
+      action: 'update_status' // Adding the required action property
     },
   ];
 };
@@ -46,6 +48,7 @@ export const createAuditEntry = ({
     entityType,
     message,
     performedBy,
-    timestamp: new Date()
+    timestamp: new Date(),
+    action: message.split(' ')[0].toLowerCase() // Derive action from first word of message
   };
 };

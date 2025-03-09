@@ -1,7 +1,8 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { DEFAULT_PASSWORD_POLICY, updatePasswordPolicy, updateDefaultSessionTimeout } from '@/utils/securityUtils';
+import { DEFAULT_PASSWORD_POLICY, updatePasswordPolicy } from '@/utils/security/passwordPolicy';
+import { updateDefaultSessionTimeout } from '@/utils/security/sessionManagement';
 import { PasswordPolicy } from '@/utils/types/user';
 
 export const useSecuritySettings = () => {

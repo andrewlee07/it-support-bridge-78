@@ -6,7 +6,7 @@ import { useAuthentication } from '@/hooks/useAuthentication';
 import { useMFA } from '@/hooks/useMFA';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useSessionManagement } from '@/hooks/useSessionManagement';
-import { isSessionValid } from '@/utils/securityUtils';
+import { isSessionValid } from '@/utils/security/sessionManagement';
 import { useToast } from '@/hooks/use-toast';
 import { logError } from '@/utils/logging/errorLogger';
 

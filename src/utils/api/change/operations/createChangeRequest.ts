@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { 
   ChangeRequest, 
@@ -82,7 +83,8 @@ export const createChangeRequest = async (
         entityType: 'change',
         message: 'Change request created',
         performedBy: data.createdBy,
-        timestamp: now
+        timestamp: now,
+        action: 'create' // Adding the required action property
       }
     ]
   };

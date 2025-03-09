@@ -18,6 +18,25 @@ export const getSessionTimeout = (): number => {
   return currentSessionTimeoutMinutes;
 };
 
+// Update the default session timeout - needed for admin settings
+export const updateDefaultSessionTimeout = (timeoutMinutes: number): void => {
+  setSessionTimeout(timeoutMinutes);
+  console.log(`Default session timeout updated to ${timeoutMinutes} minutes`);
+};
+
+// Check if a user session is valid (combines isSessionExpired with other checks)
+export const isSessionValid = (user: User): boolean => {
+  if (!user.jwtToken) return false;
+  
+  // Check if the session is expired
+  if (isSessionExpired(user)) return false;
+  
+  // Check if the token is expired
+  if (user.tokenExpiry && new Date() > new Date(user.tokenExpiry)) return false;
+  
+  return true;
+};
+
 // Check if a user session is expired based on the session timeout
 export const isSessionExpired = (user: User): boolean => {
   if (!user.sessionStartTime) return false; // No session start time means session hasn't been initialized

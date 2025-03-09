@@ -29,7 +29,7 @@ const ServiceCatalogManagerModal: React.FC<ServiceCatalogManagerModalProps> = ({
   
   const handleEditService = (service: ServiceWithCategory) => {
     // Decrypt any encrypted fields (in a real app with actual encrypted data)
-    const decryptedService = decryptObject(service);
+    const decryptedService = decryptObject(service) as ServiceWithCategory;
     
     setSelectedService(decryptedService);
     setEditFormData(decryptedService);
