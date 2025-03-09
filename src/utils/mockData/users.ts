@@ -1,4 +1,3 @@
-
 import { User, UserRole, MFAMethod } from '../types/user';
 
 // Mock user data
@@ -10,8 +9,7 @@ export const mockUsers: User[] = [
     role: 'admin' as UserRole,
     department: 'IT',
     active: true,
-    mfaEnabled: true,
-    mfaMethod: 'email' as MFAMethod,
+    mfaEnabled: false,
     lockedUntil: undefined,
     requirePasswordChange: false,
     securityQuestions: [
