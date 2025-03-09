@@ -1,6 +1,7 @@
-
 import React from 'react';
 
+// This component is no longer needed as Nivo provides its own tooltip functionality
+// We're keeping it as an empty component to avoid breaking existing imports
 interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{
@@ -12,23 +13,8 @@ interface CustomTooltipProps {
   totalTests: number;
 }
 
-const CustomTooltip: React.FC<CustomTooltipProps> = ({ 
-  active, 
-  payload, 
-  totalTests 
-}) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    const percentage = ((data.count / totalTests) * 100).toFixed(1);
-    
-    return (
-      <div className="bg-white p-2 border shadow-md rounded-md">
-        <p className="font-medium">{data.label}</p>
-        <p>Count: {data.count}</p>
-        <p>Percentage: {percentage}%</p>
-      </div>
-    );
-  }
+const CustomTooltip: React.FC<CustomTooltipProps> = () => {
+  // Nivo now handles the tooltip rendering
   return null;
 };
 

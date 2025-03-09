@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { ResponsivePie } from '@nivo/pie';
 import { StatusCount } from '../types/chartTypes';
 import { TestStatus } from '@/utils/types/testTypes';
-import CustomTooltip from './CustomTooltip';
 
 interface TestChartProps {
   chartData: StatusCount[];
@@ -20,37 +19,54 @@ const TestChart: React.FC<TestChartProps> = ({
   viewMode,
   onFilterByStatus
 }) => {
+  // Transform data to fit Nivo's format
+  const nivoData = chartData.map(item => ({
+    id: item.label,
+    label: item.label,
+    value: item.count,
+    color: item.color,
+    status: item.status
+  }));
+
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={chartData}
-          cx="50%"
-          cy="50%"
-          labelLine={false}
-          outerRadius={80}
-          innerRadius={chartType === 'donut' ? 40 : 0}
-          dataKey="count"
-          nameKey="label"
-          label={({ name, percent }) => 
-            viewMode === 'percentage' 
-              ? `${(percent * 100).toFixed(0)}%`
-              : ''
+    <div style={{ width: '100%', height: '100%' }}>
+      <ResponsivePie
+        data={nivoData}
+        margin={{ top: 40, right: 80, bottom: 40, left: 80 }}
+        innerRadius={chartType === 'donut' ? 0.5 : 0}
+        padAngle={0.7}
+        cornerRadius={3}
+        activeOuterRadiusOffset={8}
+        colors={{ datum: 'data.color' }}
+        borderWidth={1}
+        borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+        arcLabels={viewMode === 'percentage' ? true : false}
+        arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
+        arcLabelsSkipAngle={10}
+        arcLabelsRadiusOffset={0.55}
+        arcLabelsStraightRadius={0.5}
+        arcLabel={d => `${((d.value / totalTests) * 100).toFixed(0)}%`}
+        enableArcLinkLabels={false}
+        tooltip={({ datum }) => {
+          const statusItem = chartData.find(item => item.status === datum.data.status);
+          const percentage = ((datum.value / totalTests) * 100).toFixed(1);
+          
+          return (
+            <div className="bg-white p-2 border shadow-md rounded-md">
+              <p className="font-medium">{datum.label}</p>
+              <p>Count: {datum.value}</p>
+              <p>Percentage: {percentage}%</p>
+            </div>
+          );
+        }}
+        onClick={(datum) => {
+          const statusItem = chartData.find(item => item.label === datum.label);
+          if (statusItem && onFilterByStatus) {
+            onFilterByStatus(statusItem.status);
           }
-          onClick={(data) => onFilterByStatus && onFilterByStatus(data.status)}
-        >
-          {chartData.map((entry, index) => (
-            <Cell 
-              key={`cell-${index}`} 
-              fill={entry.color} 
-              stroke="#fff"
-              strokeWidth={1}
-            />
-          ))}
-        </Pie>
-        <Tooltip content={<CustomTooltip totalTests={totalTests} />} />
-      </PieChart>
-    </ResponsiveContainer>
+        }}
+      />
+    </div>
   );
 };
 
