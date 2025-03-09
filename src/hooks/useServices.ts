@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { ServiceWithCategory, ServiceCategory } from '@/utils/types/service';
 import { getAllServices, getAllServiceCategories } from '@/utils/mockData/services';
 
@@ -10,35 +10,46 @@ interface UseServicesResult {
   error: Error | null;
 }
 
+const fetchServices = async (): Promise<ServiceWithCategory[]> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return getAllServices();
+};
+
+const fetchCategories = async (): Promise<ServiceCategory[]> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return getAllServiceCategories();
+};
+
 export const useServices = (): UseServicesResult => {
-  const [services, setServices] = useState<ServiceWithCategory[] | null>(null);
-  const [categories, setCategories] = useState<ServiceCategory[] | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const { 
+    data: services, 
+    error: servicesError,
+    isLoading: isServicesLoading
+  } = useQuery({
+    queryKey: ['services'],
+    queryFn: fetchServices
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        // In a real application, these would be API calls
-        const servicesData = getAllServices();
-        const categoriesData = getAllServiceCategories();
-        
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        setServices(servicesData);
-        setCategories(categoriesData);
-      } catch (err) {
-        console.error('Error fetching services:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { 
+    data: categories,
+    error: categoriesError,
+    isLoading: isCategoriesLoading
+  } = useQuery({
+    queryKey: ['serviceCategories'],
+    queryFn: fetchCategories
+  });
 
-    fetchData();
-  }, []);
+  // Combine the errors if any
+  const error = servicesError || categoriesError ? 
+    new Error((servicesError || categoriesError)?.message) : 
+    null;
 
-  return { services, categories, isLoading, error };
+  return {
+    services: services || null,
+    categories: categories || null,
+    isLoading: isServicesLoading || isCategoriesLoading,
+    error
+  };
 };
