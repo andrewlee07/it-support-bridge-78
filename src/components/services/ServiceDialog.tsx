@@ -3,50 +3,51 @@ import React from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import ServiceForm, { ServiceFormProps } from './ServiceForm';
 import { Service, ServiceCategory } from '@/utils/types/service';
-import ServiceForm, { ServiceFormValues } from './ServiceForm';
 
 interface ServiceDialogProps {
   isOpen: boolean;
+  onClose: () => void;
   service?: Service;
   categories: ServiceCategory[];
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (values: ServiceFormValues) => void;
-  isSubmitting?: boolean;
+  onSubmit: (values: any) => void;
+  isSubmitting: boolean;
 }
 
 const ServiceDialog: React.FC<ServiceDialogProps> = ({
   isOpen,
+  onClose,
   service,
   categories,
-  onOpenChange,
   onSubmit,
-  isSubmitting = false,
+  isSubmitting
 }) => {
-  const isEditing = !!service;
-  
+  const handleCancel = () => {
+    onClose();
+  };
+
+  const handleSubmit = (values: any) => {
+    onSubmit(values);
+  };
+
+  const title = service ? 'Edit Service' : 'Add New Service';
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px]">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Service' : 'Add New Service'}</DialogTitle>
-          <DialogDescription>
-            {isEditing
-              ? 'Update the details of this service.'
-              : 'Create a new service in the IT Service Catalog.'}
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        
         <ServiceForm
-          service={service}
           categories={categories}
-          onSubmit={onSubmit}
-          onCancel={() => onOpenChange(false)}
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
           isSubmitting={isSubmitting}
+          initialValues={service}
         />
       </DialogContent>
     </Dialog>

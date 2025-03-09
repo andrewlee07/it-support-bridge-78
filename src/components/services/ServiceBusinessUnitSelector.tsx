@@ -1,11 +1,14 @@
 
 import React, { useState } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { 
   Select, 
   SelectContent, 
@@ -13,196 +16,185 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { 
-  AlertOctagon, 
-  AlertTriangle, 
-  AlertCircle, 
-  AlertSquare, 
-  Plus, 
-  Building,
-  X 
-} from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  getAllBusinessUnits, 
-  getBusinessUnitsForService, 
-  addServiceBusinessUnit, 
-  removeServiceBusinessUnit 
-} from '@/utils/mockData/businessUnits';
-import { ServiceBusinessUnitCriticality } from '@/utils/types/service';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { AlertTriangle } from 'lucide-react';
+import { BusinessUnit, ServiceBusinessUnitCriticality } from '@/utils/types/service';
+import { SERVICE_BUSINESS_UNIT_CRITICALITY } from '@/utils/types/service';
 
 interface ServiceBusinessUnitSelectorProps {
-  serviceId: string;
+  businessUnits: BusinessUnit[];
+  selectedBusinessUnits: (BusinessUnit & { criticality: ServiceBusinessUnitCriticality, notes?: string })[];
+  onAdd: (businessUnitId: string, criticality: ServiceBusinessUnitCriticality, notes?: string) => void;
+  onRemove: (businessUnitId: string) => void;
+  onUpdate: (businessUnitId: string, criticality: ServiceBusinessUnitCriticality, notes?: string) => void;
 }
 
-const ServiceBusinessUnitSelector: React.FC<ServiceBusinessUnitSelectorProps> = ({ serviceId }) => {
+const ServiceBusinessUnitSelector: React.FC<ServiceBusinessUnitSelectorProps> = ({
+  businessUnits,
+  selectedBusinessUnits,
+  onAdd,
+  onRemove,
+  onUpdate
+}) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedBusinessUnitId, setSelectedBusinessUnitId] = useState<string>('');
-  const [selectedCriticality, setSelectedCriticality] = useState<ServiceBusinessUnitCriticality>('Medium');
+  const [criticality, setCriticality] = useState<ServiceBusinessUnitCriticality>('Medium');
   const [notes, setNotes] = useState<string>('');
-  
-  const allBusinessUnits = getAllBusinessUnits();
-  const associatedBusinessUnits = getBusinessUnitsForService(serviceId);
-  
-  // Filter out already associated business units
-  const availableBusinessUnits = allBusinessUnits.filter(
-    bu => !associatedBusinessUnits.some(associated => associated.id === bu.id)
-  );
-  
+
   const handleAddBusinessUnit = () => {
-    if (!selectedBusinessUnitId) return;
-    
-    addServiceBusinessUnit(serviceId, selectedBusinessUnitId, selectedCriticality, notes);
-    
-    // Reset form
+    if (selectedBusinessUnitId) {
+      onAdd(selectedBusinessUnitId, criticality, notes);
+      setIsDialogOpen(false);
+      resetForm();
+    }
+  };
+
+  const resetForm = () => {
     setSelectedBusinessUnitId('');
-    setSelectedCriticality('Medium');
+    setCriticality('Medium');
     setNotes('');
   };
-  
-  const handleRemoveBusinessUnit = (businessUnitId: string) => {
-    removeServiceBusinessUnit(serviceId, businessUnitId);
-  };
-  
-  const getCriticalityIcon = (criticality: ServiceBusinessUnitCriticality) => {
-    switch (criticality) {
-      case 'Critical':
-        return <AlertOctagon className="h-4 w-4 text-destructive" />;
-      case 'High':
-        return <AlertTriangle className="h-4 w-4 text-orange-500" />;
-      case 'Medium':
-        return <AlertCircle className="h-4 w-4 text-amber-500" />;
-      case 'Low':
-        return <AlertSquare className="h-4 w-4 text-blue-500" />;
-      default:
-        return null;
-    }
-  };
-  
-  const getCriticalityBgColor = (criticality: ServiceBusinessUnitCriticality) => {
-    switch (criticality) {
-      case 'Critical':
-        return 'bg-destructive/10';
-      case 'High':
-        return 'bg-orange-500/10';
-      case 'Medium':
-        return 'bg-amber-500/10';
-      case 'Low':
-        return 'bg-blue-500/10';
-      default:
-        return '';
-    }
-  };
-  
+
+  const availableBusinessUnits = businessUnits.filter(
+    bu => !selectedBusinessUnits.some(selected => selected.id === bu.id)
+  );
+
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Building className="h-5 w-5" />
-            Business Units
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="businessUnit">Business Unit</Label>
-                <Select 
-                  value={selectedBusinessUnitId} 
-                  onValueChange={setSelectedBusinessUnitId}
-                >
-                  <SelectTrigger id="businessUnit">
-                    <SelectValue placeholder="Select Business Unit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableBusinessUnits.length > 0 ? (
-                      availableBusinessUnits.map(bu => (
-                        <SelectItem key={bu.id} value={bu.id}>{bu.name}</SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="" disabled>No available business units</SelectItem>
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-medium">Business Units</h3>
+        <Button 
+          onClick={() => setIsDialogOpen(true)}
+          disabled={availableBusinessUnits.length === 0}
+        >
+          Add Business Unit
+        </Button>
+      </div>
+
+      {selectedBusinessUnits.length === 0 ? (
+        <div className="text-center p-4 border rounded-md bg-muted/30">
+          <p className="text-muted-foreground">No business units associated with this service</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {selectedBusinessUnits.map(bu => (
+            <div 
+              key={bu.id} 
+              className="p-3 border rounded-md flex flex-col gap-2"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-medium">{bu.name}</h4>
+                  <p className="text-sm text-muted-foreground">{bu.description}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center">
+                    {bu.criticality === 'Critical' && (
+                      <AlertTriangle className="h-4 w-4 text-destructive mr-1" />
                     )}
-                  </SelectContent>
-                </Select>
+                    <span 
+                      className={`text-sm font-medium px-2 py-1 rounded ${
+                        bu.criticality === 'Critical' 
+                          ? 'bg-destructive/15 text-destructive' 
+                          : bu.criticality === 'High' 
+                            ? 'bg-orange-500/15 text-orange-500' 
+                            : bu.criticality === 'Medium' 
+                              ? 'bg-amber-500/15 text-amber-500' 
+                              : 'bg-blue-500/15 text-blue-500'
+                      }`}
+                    >
+                      {bu.criticality}
+                    </span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => onRemove(bu.id)}
+                  >
+                    Remove
+                  </Button>
+                </div>
               </div>
               
-              <div>
-                <Label htmlFor="criticality">Criticality</Label>
-                <Select 
-                  value={selectedCriticality} 
-                  onValueChange={(value) => setSelectedCriticality(value as ServiceBusinessUnitCriticality)}
-                >
-                  <SelectTrigger id="criticality">
-                    <SelectValue placeholder="Select Criticality" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Critical">Critical</SelectItem>
-                    <SelectItem value="High">High</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="Low">Low</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="lg:col-span-3">
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea 
-                  id="notes" 
-                  placeholder="Optional notes about this business unit relationship" 
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="resize-none h-20"
-                />
-              </div>
+              {bu.notes && (
+                <div className="bg-muted/30 p-2 rounded-sm text-sm">
+                  <span className="font-medium">Notes:</span> {bu.notes}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Business Unit</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="business-unit">Business Unit</Label>
+              <Select 
+                value={selectedBusinessUnitId} 
+                onValueChange={setSelectedBusinessUnitId}
+              >
+                <SelectTrigger id="business-unit">
+                  <SelectValue placeholder="Select a business unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableBusinessUnits.map(bu => (
+                    <SelectItem key={bu.id} value={bu.id}>
+                      {bu.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
-            <Button 
-              onClick={handleAddBusinessUnit} 
-              disabled={!selectedBusinessUnitId || availableBusinessUnits.length === 0}
-              className="flex items-center"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Add Business Unit
-            </Button>
+            <div className="space-y-2">
+              <Label htmlFor="criticality">Criticality</Label>
+              <Select 
+                value={criticality} 
+                onValueChange={(value) => setCriticality(value as ServiceBusinessUnitCriticality)}
+              >
+                <SelectTrigger id="criticality">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SERVICE_BUSINESS_UNIT_CRITICALITY.map(level => (
+                    <SelectItem key={level} value={level}>
+                      {level}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea 
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Any specific considerations for this business unit"
+                rows={3}
+              />
+            </div>
           </div>
           
-          <div className="mt-6 space-y-2">
-            <h3 className="text-sm font-medium">Associated Business Units</h3>
-            
-            {associatedBusinessUnits.length > 0 ? (
-              <div className="space-y-2">
-                {associatedBusinessUnits.map(bu => (
-                  <div 
-                    key={bu.id} 
-                    className={`flex items-center justify-between p-3 rounded-md ${getCriticalityBgColor(bu.criticality)}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {getCriticalityIcon(bu.criticality)}
-                      <span className="font-medium">{bu.name}</span>
-                      {bu.notes && <span className="text-sm text-muted-foreground ml-2">({bu.notes})</span>}
-                    </div>
-                    
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => handleRemoveBusinessUnit(bu.id)}
-                      className="h-8 w-8"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-muted-foreground text-sm italic">
-                No business units associated yet.
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddBusinessUnit} disabled={!selectedBusinessUnitId}>
+              Add
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

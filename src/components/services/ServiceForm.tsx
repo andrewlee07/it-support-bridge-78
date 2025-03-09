@@ -1,9 +1,20 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -11,261 +22,294 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { mockServiceCategories } from '@/utils/mockData/services';
-import { Service } from '@/utils/types/service';
-import { FormField } from '@/components/ui/form';
-import { mockUsers, getUserById } from '@/utils/mockData/users';
-import { mockTeams, getTeamById } from '@/utils/mockData/services';
-import { SERVICE_SUPPORT_HOURS } from '@/utils/types/service';
-import ServiceBusinessUnitSelector from './ServiceBusinessUnitSelector';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Service, 
+  ServiceCategory, 
+  ServiceStatus, 
+  SupportHours, 
+  SERVICE_SUPPORT_HOURS 
+} from '@/utils/types/service';
+import { getAllUsers } from '@/utils/mockData/users';
+import { mockTeams } from '@/utils/mockData/teams';
 
-interface ServiceFormProps {
-  initialData?: Service;
-  onSubmit: (data: Service) => void;
+export interface ServiceFormProps {
+  initialValues?: Service;
+  categories: ServiceCategory[];
+  onSubmit: (values: any) => void;
   onCancel: () => void;
+  isSubmitting: boolean;
 }
 
+const formSchema = z.object({
+  name: z.string().min(2).max(100),
+  description: z.string().min(5).max(500),
+  categoryId: z.string().min(1),
+  status: z.enum(['active', 'inactive']),
+  supportContactId: z.string().optional(),
+  supportTeamId: z.string().optional(),
+  supportHours: z.enum([...SERVICE_SUPPORT_HOURS] as [string, ...string[]]).optional(),
+  serviceOwnerId: z.string().optional(),
+  documentationUrl: z.string().url().optional().or(z.literal('')),
+});
+
 const ServiceForm: React.FC<ServiceFormProps> = ({
-  initialData,
+  initialValues,
+  categories,
   onSubmit,
   onCancel,
+  isSubmitting
 }) => {
-  const [activeTab, setActiveTab] = useState<string>('basic');
-  const [formData, setFormData] = useState<Partial<Service>>({
-    name: '',
-    description: '',
-    categoryId: '',
-    status: 'active',
-    supportContactId: '',
-    supportTeamId: '',
-    supportHours: '',
-    serviceOwnerId: '',
-    documentationUrl: '',
-    ...initialData,
+  const users = getAllUsers();
+  
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialValues || {
+      name: '',
+      description: '',
+      categoryId: '',
+      status: 'active' as ServiceStatus,
+      supportContactId: '',
+      supportTeamId: '',
+      supportHours: '' as SupportHours,
+      serviceOwnerId: '',
+      documentationUrl: '',
+    },
   });
 
-  const handleChange = (field: keyof Service, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData as Service);
+  const handleSubmit = (values: any) => {
+    onSubmit(values);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">
-          {initialData ? 'Edit Service' : 'Add New Service'}
-        </h2>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="basic">Basic Info</TabsTrigger>
-          <TabsTrigger value="support">Support Details</TabsTrigger>
-          <TabsTrigger value="business-units">Business Units</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="basic" className="space-y-4 mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Service Name</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select
-                    value={formData.categoryId}
-                    onValueChange={(value) => handleChange('categoryId', value)}
-                    required
-                  >
-                    <SelectTrigger id="category">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Service Name</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter service name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
-                    <SelectContent>
-                      {mockServiceCategories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleChange('description', e.target.value)}
-                  required
-                  className="resize-none h-24"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => handleChange('status', value)}
-                  required
-                >
-                  <SelectTrigger id="status">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Enter service description"
+                    rows={3}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="support" className="space-y-4 mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Support Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="supportContact">Support Contact</Label>
-                  <Select
-                    value={formData.supportContactId || ''}
-                    onValueChange={(value) => handleChange('supportContactId', value)}
-                  >
-                    <SelectTrigger id="supportContact">
-                      <SelectValue placeholder="Select a support contact" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">None</SelectItem>
-                      {mockUsers.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="supportTeam">Support Team</Label>
-                  <Select
-                    value={formData.supportTeamId || ''}
-                    onValueChange={(value) => handleChange('supportTeamId', value)}
-                  >
-                    <SelectTrigger id="supportTeam">
-                      <SelectValue placeholder="Select a support team" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">None</SelectItem>
-                      {mockTeams.map((team) => (
-                        <SelectItem key={team.id} value={team.id}>
-                          {team.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="supportHours">Support Hours</Label>
-                  <Select
-                    value={formData.supportHours || ''}
-                    onValueChange={(value) => handleChange('supportHours', value)}
-                  >
-                    <SelectTrigger id="supportHours">
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="supportHours"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Support Hours</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  value={field.value || undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
                       <SelectValue placeholder="Select support hours" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">None specified</SelectItem>
-                      {SERVICE_SUPPORT_HOURS.map((hours) => (
-                        <SelectItem key={hours} value={hours}>
-                          {hours}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="serviceOwner">Service Owner</Label>
-                  <Select
-                    value={formData.serviceOwnerId || ''}
-                    onValueChange={(value) => handleChange('serviceOwnerId', value)}
-                  >
-                    <SelectTrigger id="serviceOwner">
-                      <SelectValue placeholder="Select a service owner" />
+                  </FormControl>
+                  <SelectContent>
+                    {SERVICE_SUPPORT_HOURS.map((hours) => (
+                      <SelectItem key={hours} value={hours}>
+                        {hours}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="supportContactId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Support Contact</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  value={field.value || undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select support contact" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">None</SelectItem>
-                      {mockUsers.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="documentationUrl">Documentation URL</Label>
-                <Input
-                  id="documentationUrl"
-                  value={formData.documentationUrl || ''}
-                  onChange={(e) => handleChange('documentationUrl', e.target.value)}
-                  placeholder="https://example.com/docs"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="supportTeamId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Support Team</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  value={field.value || undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select support team" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                    {mockTeams.map((team) => (
+                      <SelectItem key={team.id} value={team.id}>
+                        {team.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="serviceOwnerId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Service Owner</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  value={field.value || undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select service owner" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                    {users.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="documentationUrl"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Documentation URL</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Enter documentation URL"
+                    type="url"
+                  />
+                </FormControl>
+                <FormDescription>
+                  Link to detailed documentation for this service
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         
-        <TabsContent value="business-units" className="space-y-4 mt-4">
-          {formData.id ? (
-            <ServiceBusinessUnitSelector serviceId={formData.id} />
-          ) : (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center text-muted-foreground p-6">
-                  You'll be able to associate business units after saving the service.
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit">{initialData ? 'Update' : 'Create'} Service</Button>
-      </div>
-    </form>
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" type="button" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : initialValues ? 'Update Service' : 'Create Service'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 

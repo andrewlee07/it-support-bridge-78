@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { getServiceById } from '@/utils/mockData/services';
-import { getTeamById } from '@/utils/mockData/services';
+import { getTeamById } from '@/utils/mockData/teams';
 import { getUserById } from '@/utils/mockData/users';
 import { Card } from '@/components/ui/card';
 import { FileText, Clock, User, Users, ExternalLink, Building, AlertTriangle } from 'lucide-react';
