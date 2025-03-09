@@ -11,8 +11,9 @@ import { otherRoutes } from './otherRoutes';
 // If we need to lazy load any of these routes later, we can use the following pattern:
 // const SomePage = lazy(() => import('@/pages/SomePage'));
 
-// Import the ServiceDetail page
+// Import pages
 import ServiceDetail from '@/pages/ServiceDetail';
+import ServiceCatalog from '@/pages/ServiceCatalog';
 
 const router = createBrowserRouter([
   ...adminRoutes,
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   ...ticketRoutes,
   ...testManagementRoutes,
   ...otherRoutes,
+  {
+    path: '/service-catalog',
+    element: <ServiceCatalog />,
+  },
   {
     path: '/service-catalog/:serviceId',
     element: <ServiceDetail />,

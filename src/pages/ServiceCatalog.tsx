@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import ServiceList from '@/components/services/ServiceList';
 import ServiceManagement from '@/components/services/ServiceManagement';
@@ -8,19 +8,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useServices } from '@/hooks/useServices';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const ServiceCatalog: React.FC = () => {
   const { services, categories, isLoading } = useServices();
   const [activeTab, setActiveTab] = useState('all');
   const { userHasPermission } = useAuth();
+  const navigate = useNavigate();
   
   const canManageContent = userHasPermission('Manage Service Catalog Content') || 
                           userHasPermission('Manage Service Catalog Config');
 
   const handleServiceSelect = (service: ServiceWithCategory) => {
     console.log('Service selected:', service);
-    // In a real application, this would navigate to a service detail page
-    // or open a modal with service details
+    navigate(`/service-catalog/${service.id}`);
   };
 
   return (
