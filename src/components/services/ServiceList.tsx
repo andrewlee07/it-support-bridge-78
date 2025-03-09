@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Service, ServiceCategory, ServiceWithCategory } from '@/utils/types/service';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Search, CheckCircle, XCircle } from 'lucide-react';
+import { PlusCircle, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -20,14 +20,12 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Switch } from '@/components/ui/switch';
 
 interface ServiceListProps {
   services: ServiceWithCategory[];
   categories?: ServiceCategory[];
   onAddService?: () => void;
   onEditService?: (service: ServiceWithCategory) => void;
-  onToggleStatus?: (service: ServiceWithCategory) => void;
   onSelect?: (service: ServiceWithCategory) => void;
   onEdit?: (serviceId: string) => void;
   isLoading?: boolean;
@@ -38,7 +36,6 @@ const ServiceList: React.FC<ServiceListProps> = ({
   categories = [],
   onAddService,
   onEditService,
-  onToggleStatus,
   onSelect,
   onEdit,
   isLoading = false
@@ -63,13 +60,6 @@ const ServiceList: React.FC<ServiceListProps> = ({
       onSelect(service);
     } else if (onEditService) {
       onEditService(service);
-    }
-  };
-
-  const handleStatusToggle = (service: ServiceWithCategory, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click
-    if (onToggleStatus) {
-      onToggleStatus(service);
     }
   };
 
@@ -153,37 +143,17 @@ const ServiceList: React.FC<ServiceListProps> = ({
                   </TableCell>
                   <TableCell>{service.category.name}</TableCell>
                   <TableCell>
-                    {onToggleStatus ? (
-                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                        <Switch 
-                          checked={service.status === 'active'} 
-                          onClick={(e) => handleStatusToggle(service, e)}
-                        />
-                        <Badge 
-                          variant={service.status === 'active' ? 'default' : 'secondary'}
-                          className="capitalize"
-                        >
-                          <span 
-                            className={`mr-1.5 inline-block h-2 w-2 rounded-full ${
-                              service.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
-                            }`} 
-                          />
-                          {service.status}
-                        </Badge>
-                      </div>
-                    ) : (
-                      <Badge 
-                        variant={service.status === 'active' ? 'default' : 'secondary'}
-                        className="capitalize"
-                      >
-                        <span 
-                          className={`mr-1.5 inline-block h-2 w-2 rounded-full ${
-                            service.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
-                          }`} 
-                        />
-                        {service.status}
-                      </Badge>
-                    )}
+                    <Badge 
+                      variant={service.status === 'active' ? 'default' : 'secondary'}
+                      className="capitalize"
+                    >
+                      <span 
+                        className={`mr-1.5 inline-block h-2 w-2 rounded-full ${
+                          service.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
+                        }`} 
+                      />
+                      {service.status}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     {(onEditService || onEdit) && (
