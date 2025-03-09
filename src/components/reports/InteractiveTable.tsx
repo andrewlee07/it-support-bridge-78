@@ -11,13 +11,14 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { getUserNameById } from '@/utils/userUtils';
+import { SLAInfo } from '@/utils/sla/slaCalculations';
 
 interface InteractiveTableProps {
   data: Record<string, any>[];
   columns: {
     key: string;
     header: string;
-    render?: (value: any, record: Record<string, any>) => React.ReactNode;
+    render?: (value: any, record: Record<string, any>) => React.ReactNode | SLAInfo;
     formatUserName?: boolean;
     formatSLA?: boolean;
   }[];
@@ -115,7 +116,14 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
                     {columns.map((column) => (
                       <TableCell key={`${i}-${column.key}`}>
                         {column.render
-                          ? column.render(record[column.key], record)
+                          ? (() => {
+                              const rendered = column.render(record[column.key], record);
+                              // Check if rendered is SLAInfo object
+                              if (rendered && typeof rendered === 'object' && 'status' in rendered) {
+                                return formatSLAStatus(rendered);
+                              }
+                              return rendered;
+                            })()
                           : column.formatUserName && column.key === 'assignee'
                             ? getUserNameById(record[column.key])
                             : column.formatSLA && column.key === 'sla'

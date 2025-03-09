@@ -5,6 +5,7 @@ import InteractiveTable from '@/components/reports/InteractiveTable';
 import { incidentChartConfig } from '@/utils/reports/chartConfigs';
 import { mockIncidentData, mockIncidentTableData } from '@/utils/mockData/reportData';
 import { calculateSLAStatus } from '@/utils/sla/slaCalculations';
+import TicketSLAIndicator from '@/components/tickets/components/TicketSLAIndicator';
 
 interface IncidentsTabProps {
   selectedSegment: string | null;
@@ -29,12 +30,22 @@ const IncidentsTab: React.FC<IncidentsTabProps> = ({ selectedSegment, onSegmentC
       header: 'SLA Status',
       formatSLA: true,
       render: (value: any, record: Record<string, any>) => {
-        // Calculate SLA info from ticket data for rendering
-        return calculateSLAStatus({
-          ...record,
+        // Instead of returning the SLAInfo object directly, we'll render a component
+        const slaInfo = calculateSLAStatus({
+          id: record.id || '',
+          title: record.title || '',
+          description: '',
+          status: record.status || '',
+          priority: record.priority || '',
+          category: 'other',
+          type: 'incident',
+          createdBy: '',
           createdAt: new Date(record.createdAt),
-          type: 'incident'
+          updatedAt: new Date(),
+          audit: []
         });
+        
+        return slaInfo;
       }
     }
   ];
