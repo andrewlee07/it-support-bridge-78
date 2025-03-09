@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
@@ -90,6 +89,10 @@ const UserManagement = () => {
     setEditUserDialogOpen(false);
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveFilter(value as 'all' | 'active' | 'inactive');
+  };
+
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -109,7 +112,7 @@ const UserManagement = () => {
         </div>
 
         <Tabs defaultValue="all" className="animate-fade-in">
-          <UserTabsNavigation />
+          <UserTabsNavigation onTabChange={handleTabChange} />
           
           <UserTabsContent 
             users={users} 
