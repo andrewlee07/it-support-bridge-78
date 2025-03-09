@@ -18,7 +18,6 @@ import {
 import { toast } from 'sonner';
 import { WebhookConfig, EventType } from '@/utils/types/email';
 import { useWebhookConfigs } from '@/hooks/useNotifications';
-import { MultiSelect } from '@/components/ui/multi-select';
 
 const webhookSchema = z.object({
   name: z.string().min(3, {
@@ -37,11 +36,15 @@ type FormValues = z.infer<typeof webhookSchema>;
 interface WebhookConfigFormProps {
   initialData?: WebhookConfig;
   onClose: () => void;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
   initialData,
   onClose,
+  onSuccess,
+  onCancel
 }) => {
   const { createWebhook, updateWebhook } = useWebhookConfigs();
   const isEditing = !!initialData;
@@ -62,6 +65,7 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
     { value: 'change-submitted', label: 'Change Submitted' },
     { value: 'problem-created', label: 'Problem Created' },
     { value: 'problem-resolved', label: 'Problem Resolved' },
+    { value: 'service-request-approval-required', label: 'Service Request Approval Required' },
   ];
 
   // Form initialization
@@ -83,10 +87,14 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
     }
 
     try {
-      // Prepare the webhook data
-      const webhookData = {
-        ...data,
+      // Prepare the webhook data with all required fields
+      const webhookData: Omit<WebhookConfig, 'id'> = {
+        name: data.name,
+        url: data.url,
+        isActive: data.isActive,
         eventTypes: selectedEvents as EventType[],
+        secretKey: data.secretKey,
+        headers: data.headers,
       };
 
       if (isEditing && initialData) {
@@ -96,11 +104,21 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
         await createWebhook(webhookData);
         toast.success('Webhook created successfully');
       }
-      onClose();
+      
+      if (onSuccess) {
+        onSuccess();
+      } else if (onClose) {
+        onClose();
+      }
     } catch (error) {
       console.error('Error saving webhook:', error);
       toast.error('Failed to save webhook');
     }
+  };
+
+  // Handle multi-select component change
+  const handleMultiSelectChange = (values: string[]) => {
+    setSelectedEvents(values);
   };
 
   return (
@@ -142,12 +160,26 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
 
         <div className="space-y-3">
           <FormLabel>Event Types</FormLabel>
-          <MultiSelect
-            options={eventOptions}
-            selected={selectedEvents}
-            onChange={setSelectedEvents}
-            placeholder="Select event types..."
-          />
+          <div className="flex flex-wrap gap-2">
+            {eventOptions.map((option) => (
+              <div
+                key={option.value}
+                className={`px-3 py-1 rounded-md cursor-pointer border ${
+                  selectedEvents.includes(option.value)
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary'
+                }`}
+                onClick={() => {
+                  const newSelected = selectedEvents.includes(option.value)
+                    ? selectedEvents.filter(value => value !== option.value)
+                    : [...selectedEvents, option.value];
+                  setSelectedEvents(newSelected);
+                }}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>
           <FormDescription>
             Select which events should trigger this webhook
           </FormDescription>
@@ -192,7 +224,11 @@ const WebhookConfigForm: React.FC<WebhookConfigFormProps> = ({
         />
 
         <div className="flex justify-end space-x-2">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel || onClose}
+          >
             Cancel
           </Button>
           <Button type="submit" variant="default">

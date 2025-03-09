@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Globe, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import WebhookConfigForm from './WebhookConfigForm';
-import { WebhookConfig } from '@/hooks/useNotifications';
+import { WebhookConfig } from '@/utils/types/email';
 
 const WebhookConfigList: React.FC = () => {
   const { webhooks, isLoading, deleteWebhook } = useWebhookConfigs();
@@ -34,14 +34,8 @@ const WebhookConfigList: React.FC = () => {
 
   const handleDeleteWebhook = (id: string) => {
     if (window.confirm('Are you sure you want to delete this webhook configuration?')) {
-      deleteWebhook(id, {
-        onSuccess: () => {
-          toast.success('Webhook configuration deleted');
-        },
-        onError: () => {
-          toast.error('Failed to delete webhook configuration');
-        }
-      });
+      deleteWebhook(id);
+      toast.success('Webhook configuration deleted');
     }
   };
 
@@ -64,6 +58,7 @@ const WebhookConfigList: React.FC = () => {
       <WebhookConfigForm
         onSuccess={handleFormSuccess}
         onCancel={handleFormCancel}
+        onClose={handleFormCancel}
       />
     );
   }
@@ -74,6 +69,7 @@ const WebhookConfigList: React.FC = () => {
         initialData={editingWebhook}
         onSuccess={handleFormSuccess}
         onCancel={handleFormCancel}
+        onClose={handleFormCancel}
       />
     );
   }

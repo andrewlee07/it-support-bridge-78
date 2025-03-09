@@ -5,7 +5,7 @@ export interface EmailTemplate {
   name: string;
   subject: string;
   body: string;
-  triggerOn: 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 'sla-breach' | 'change-approved' | 'change-submitted' | 'problem-created' | 'problem-resolved';
+  triggerOn: 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 'sla-breach' | 'change-approved' | 'change-submitted' | 'problem-created' | 'problem-resolved' | 'service-request-approval-required';
   isActive: boolean;
   lastModified?: string;
   lastModifiedBy?: string;

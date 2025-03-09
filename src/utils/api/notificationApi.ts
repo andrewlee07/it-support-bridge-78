@@ -2,12 +2,26 @@ import { ApiResponse } from '../types/api';
 import { 
   NotificationTemplate, 
   WebhookConfig, 
-  NotificationLog, 
   EventType 
-} from '../types/notification';
+} from '../types/email';
 import { EmailTemplate } from '../types/email';
 import { emailNotificationApi } from './emailNotificationApi';
 import { simulateApiResponse } from '../mockData/apiHelpers';
+
+// Type for notification logs
+export interface NotificationLog {
+  id: string;
+  eventType: EventType;
+  recipientId?: string;
+  recipientEmail?: string;
+  channel: 'email' | 'webhook' | 'sms' | 'push';
+  status: 'sent' | 'failed' | 'pending';
+  timestamp: Date;
+  templateId?: string;
+  recordId?: string;
+  error?: string;
+  retryCount?: number;
+}
 
 // Mock data for the API
 const mockWebhooks: WebhookConfig[] = [
@@ -16,29 +30,24 @@ const mockWebhooks: WebhookConfig[] = [
     name: 'Slack Integration',
     url: 'https://hooks.slack.com/services/T00000/B00000/XXXX',
     eventTypes: ['incident-created', 'incident-assigned', 'incident-resolved'] as EventType[],
-    authType: 'token',
-    authCredentials: 'xoxb-123456789',
     isActive: true,
-    retryCount: 3,
-    retryInterval: 5
+    secretKey: 'xoxb-123456789',
+    headers: { 'Content-Type': 'application/json' }
   },
   {
     id: 'webhook-2',
     name: 'External System',
     url: 'https://api.external-system.com/webhooks/itsm',
     eventTypes: ['incident-created', 'incident-assigned', 'incident-resolved', 'service-request-completed'] as EventType[],
-    authType: 'basic',
-    authCredentials: 'user:password',
     isActive: false,
-    retryCount: 5,
-    retryInterval: 10
+    secretKey: 'user:password'
   }
 ];
 
 const mockLogs: NotificationLog[] = [
   {
     id: 'log-1',
-    eventType: 'incident-created' as EventType,
+    eventType: 'ticket-created' as EventType,
     recipientId: 'user-1',
     recipientEmail: 'john@example.com',
     channel: 'email',
@@ -49,7 +58,7 @@ const mockLogs: NotificationLog[] = [
   },
   {
     id: 'log-2',
-    eventType: 'incident-assigned' as EventType,
+    eventType: 'ticket-assigned' as EventType,
     recipientId: 'user-2',
     recipientEmail: 'jane@example.com',
     channel: 'email',
@@ -96,12 +105,12 @@ const mapEmailToNotificationTemplate = (emailTemplate: EmailTemplate): Notificat
   return {
     id: emailTemplate.id,
     name: emailTemplate.name,
-    eventType: emailTemplate.triggerOn as unknown as EventType, // Map triggerOn to eventType
+    eventType: emailTemplate.triggerOn, // Map triggerOn to eventType
     subject: emailTemplate.subject,
     body: emailTemplate.body,
     isActive: emailTemplate.isActive,
-    lastModified: new Date(),
-    lastModifiedBy: 'admin@example.com'
+    lastModified: emailTemplate.lastModified || new Date().toISOString(),
+    lastModifiedBy: emailTemplate.lastModifiedBy || 'admin@example.com'
   };
 };
 

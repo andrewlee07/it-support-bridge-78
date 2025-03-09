@@ -107,7 +107,7 @@ const EmailTemplateEditor: React.FC<EmailTemplateEditorProps> = ({
         }
       } else {
         const response = await emailNotificationApi.createEmailTemplate(
-          formData as EmailTemplate
+          formData as Omit<EmailTemplate, 'id'>
         );
         
         if (response.success) {
