@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import AdminSettings from '@/pages/AdminSettings';
@@ -19,63 +18,63 @@ import StatusSynchronizationConfig from '@/pages/admin/StatusSynchronizationConf
 
 const adminRoutes: RouteObject[] = [
   {
-    path: '/admin-settings',
+    path: 'admin-settings',
     element: <AdminSettings />,
   },
   {
-    path: '/process-configuration',
+    path: 'process-configuration',
     element: <ProcessConfiguration />,
   },
   {
-    path: '/admin/error-logs',
+    path: 'admin/error-logs',
     element: <ErrorLogs />,
   },
   {
-    path: '/admin/incident-configuration',
+    path: 'admin/incident-configuration',
     element: <IncidentConfiguration />,
   },
   {
-    path: '/admin/service-request-configuration',
+    path: 'admin/service-request-configuration',
     element: <ServiceRequestConfiguration />,
   },
   {
-    path: '/admin/service-catalogue-configuration',
+    path: 'admin/service-catalogue-configuration',
     element: <ServiceCatalogueConfiguration />,
   },
   {
-    path: '/admin/change-configuration',
+    path: 'admin/change-configuration',
     element: <ChangeConfiguration />,
   },
   {
-    path: '/admin/problem-configuration',
+    path: 'admin/problem-configuration',
     element: <ProblemConfiguration />,
   },
   {
-    path: '/admin/asset-configuration',
+    path: 'admin/asset-configuration',
     element: <AssetConfiguration />,
   },
   {
-    path: '/admin/sla-settings',
+    path: 'admin/sla-settings',
     element: <SLASettings />,
   },
   {
-    path: '/admin/security-settings',
+    path: 'admin/security-settings',
     element: <SecuritySettings />,
   },
   {
-    path: '/admin/bug-configuration',
+    path: 'admin/bug-configuration',
     element: <BugConfiguration />,
   },
   {
-    path: '/admin/release-configuration',
+    path: 'admin/release-configuration',
     element: <ReleaseConfiguration />,
   },
   {
-    path: '/admin/test-configuration',
+    path: 'admin/test-configuration',
     element: <TestConfiguration />,
   },
   {
-    path: '/admin/status-synchronization',
+    path: 'admin/status-synchronization',
     element: <StatusSynchronizationConfig />,
   },
 ];

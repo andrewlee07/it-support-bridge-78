@@ -46,6 +46,11 @@ export const navigationItems: NavItem[] = [
     path: '/service-requests',
   },
   {
+    name: 'Service Catalog',
+    icon: LibraryIcon,
+    path: '/service-catalog',
+  },
+  {
     name: 'Changes',
     icon: PanelRightIcon,
     path: '/changes',
@@ -59,11 +64,6 @@ export const navigationItems: NavItem[] = [
     name: 'Assets',
     icon: BoxesIcon,
     path: '/assets',
-  },
-  {
-    name: 'Service Catalog',
-    icon: LibraryIcon,
-    path: '/service-catalog',
   },
   {
     name: 'Backlog',
