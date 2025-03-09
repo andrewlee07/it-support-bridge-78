@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -29,7 +28,7 @@ const changeRequestSchema = z.object({
   endDate: z.date(),
   implementationPlan: z.string().min(10, { message: "Implementation plan must be at least 10 characters" }),
   rollbackPlan: z.string().min(10, { message: "Rollback plan must be at least 10 characters" }),
-  approverRoles: z.array(z.enum(['it', 'user'] as const)).optional(),
+  approverRoles: z.array(z.enum(['it', 'user', 'change-manager'] as const)).optional(),
   closureReason: z.enum(['successful', 'successful-with-issues', 'rolled-back', 'failed'] as const).optional(),
   closureNotes: z.string().optional(),
   assessmentAnswers: z.array(z.object({

@@ -126,13 +126,16 @@ const EmailTemplateEditor: React.FC<EmailTemplateEditorProps> = ({
   const handleTestTemplate = async () => {
     setIsTesting(true);
     try {
+      // Fix: Remove the second argument that's causing TS2554 error
       const response = await emailNotificationApi.testEmailTemplate(
-        { subject: formData.subject, body: formData.body },
-        testVariables
+        { subject: formData.subject, body: formData.body }
       );
       
       if (response.success) {
-        setTestResult(response.data);
+        // Fix: Set state correctly to avoid TS2345 error
+        if (response.data) {
+          setTestResult(response.data);
+        }
       } else {
         toast.error(`Test failed: ${response.error}`);
       }

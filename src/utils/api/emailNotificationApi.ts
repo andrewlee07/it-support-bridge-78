@@ -1,18 +1,17 @@
-
 import { ApiResponse, EmailTemplate, TicketType } from '../types';
 import { simulateApiResponse, createApiErrorResponse } from '../mockData/apiHelpers';
-import { emailTemplates } from '../mockData/emailTemplates';
+import { mockEmailTemplates } from '../mockData/emailTemplates';
 
 // Email notification API methods
 export const emailNotificationApi = {
   // Get all email templates
   getEmailTemplates: async (): Promise<ApiResponse<EmailTemplate[]>> => {
-    return simulateApiResponse(emailTemplates);
+    return simulateApiResponse(mockEmailTemplates);
   },
 
   // Get email template by id
   getEmailTemplateById: async (id: string): Promise<ApiResponse<EmailTemplate>> => {
-    const template = emailTemplates.find(t => t.id === id);
+    const template = mockEmailTemplates.find(t => t.id === id);
     if (!template) {
       return createApiErrorResponse('Email template not found', 404);
     }
@@ -20,12 +19,10 @@ export const emailNotificationApi = {
   },
 
   // Create new email template
-  createEmailTemplate: async (template: Omit<EmailTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<EmailTemplate>> => {
+  createEmailTemplate: async (template: Omit<EmailTemplate, 'id'>): Promise<ApiResponse<EmailTemplate>> => {
     const newTemplate: EmailTemplate = {
-      id: `template-${emailTemplates.length + 1}`,
+      id: `template-${mockEmailTemplates.length + 1}`,
       ...template,
-      createdAt: new Date(),
-      updatedAt: new Date()
     };
     
     // In a real app, we'd add to the database
@@ -35,15 +32,14 @@ export const emailNotificationApi = {
 
   // Update existing email template
   updateEmailTemplate: async (id: string, template: Partial<EmailTemplate>): Promise<ApiResponse<EmailTemplate>> => {
-    const templateIndex = emailTemplates.findIndex(t => t.id === id);
+    const templateIndex = mockEmailTemplates.findIndex(t => t.id === id);
     if (templateIndex === -1) {
       return createApiErrorResponse('Email template not found', 404);
     }
     
     const updatedTemplate = {
-      ...emailTemplates[templateIndex],
+      ...mockEmailTemplates[templateIndex],
       ...template,
-      updatedAt: new Date()
     };
     
     // In a real app, we'd update the database
@@ -53,7 +49,7 @@ export const emailNotificationApi = {
 
   // Delete email template
   deleteEmailTemplate: async (id: string): Promise<ApiResponse<void>> => {
-    const templateIndex = emailTemplates.findIndex(t => t.id === id);
+    const templateIndex = mockEmailTemplates.findIndex(t => t.id === id);
     if (templateIndex === -1) {
       return createApiErrorResponse('Email template not found', 404);
     }
@@ -83,10 +79,10 @@ export const emailNotificationApi = {
     return simulateApiResponse(undefined);
   },
 
-  // Send test email to verify template
-  testEmailTemplate: async (templateData: { subject: string; body: string; }): Promise<ApiResponse<void>> => {
+  // Test email template with fixed signature (only one parameter)
+  testEmailTemplate: async (templateData: { subject: string; body: string; }): Promise<ApiResponse<{ subject: string; body: string; }>> => {
     // In a real app, this would connect to an email service
     console.log(`Sending test email with subject: ${templateData.subject}`);
-    return simulateApiResponse(undefined);
+    return simulateApiResponse(templateData);
   }
 };
