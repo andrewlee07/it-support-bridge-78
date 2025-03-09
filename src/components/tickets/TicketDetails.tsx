@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Ticket } from '@/utils/types/ticket';
+import { Ticket, RelatedItem } from '@/utils/types/ticket';
 import PriorityBadge from './detail/PriorityBadge';
 import StatusBadge from './detail/StatusBadge';
 import TicketDetailsGrid from './detail/TicketDetailsGrid';
@@ -8,6 +8,7 @@ import RelatedItemsList from './detail/RelatedItemsList';
 import DetailBreadcrumb from './detail/DetailBreadcrumb';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { getProblemById } from '@/utils/mockData/problems';
 
 interface TicketDetailsProps {
   ticket: Ticket;
@@ -24,12 +25,15 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
   const isResolved = ['closed', 'resolved', 'fulfilled'].includes(ticket.status);
   
   // Create related problems items array if it exists
-  const relatedProblems = ticket.relatedProblems 
-    ? ticket.relatedProblems.map(id => ({
-        id,
-        type: 'problem'
-      }))
-    : [];
+  const relatedProblems: RelatedItem[] = (ticket.relatedProblems || []).map(id => {
+    const problem = getProblemById(id);
+    return {
+      id,
+      type: 'problem',
+      title: problem?.title || `Problem ${id}`,
+      status: problem?.status || 'unknown'
+    };
+  });
   
   return (
     <div className="space-y-6">
@@ -59,10 +63,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
             <h3 className="text-md font-medium">Related Problems</h3>
           </div>
           
-          <RelatedItemsList 
-            items={relatedProblems} 
-            type={type}
-          />
+          <RelatedItemsList items={relatedProblems} />
         </div>
       )}
       
@@ -77,10 +78,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
         </div>
         
         {ticket.relatedItems && ticket.relatedItems.length > 0 ? (
-          <RelatedItemsList 
-            items={ticket.relatedItems} 
-            type={type}
-          />
+          <RelatedItemsList items={ticket.relatedItems} />
         ) : (
           <div className="text-muted-foreground italic text-sm">
             No {isServiceRequest ? 'backlog items' : 'bugs'} have been created from this {isServiceRequest ? 'service request' : 'incident'}.

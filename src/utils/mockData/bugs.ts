@@ -2,7 +2,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from './apiHelpers';
 import { ApiResponse } from '../types/api';
-import { Bug, BugPriority, BugSeverity, BugStatus } from '../types/test/testStatus';
+import { BugPriority, BugSeverity, BugStatus } from '../types/test/testStatus';
+import { Bug } from '../types/test/bug';
 
 // Mock Bugs data
 export let bugs: Bug[] = [

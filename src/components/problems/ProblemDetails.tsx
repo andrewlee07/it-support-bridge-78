@@ -1,9 +1,12 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Problem } from '@/utils/types/problem';
 import { formatRelative } from 'date-fns';
 import RelatedItemsList from '@/components/tickets/detail/RelatedItemsList';
 import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
+import { RelatedItem } from '@/utils/types/ticket';
+import { getTicketById } from '@/utils/mockData/tickets';
 
 interface ProblemDetailsProps {
   problem: Problem;
@@ -11,10 +14,15 @@ interface ProblemDetailsProps {
 
 const ProblemDetails: React.FC<ProblemDetailsProps> = ({ problem }) => {
   // Transform the related incidents to the format expected by RelatedItemsList
-  const relatedIncidents = problem.relatedIncidents?.map(incidentId => ({
-    id: incidentId,
-    type: 'incident'
-  })) || [];
+  const relatedIncidents: RelatedItem[] = (problem.relatedIncidents || []).map(incidentId => {
+    const incident = getTicketById(incidentId);
+    return {
+      id: incidentId,
+      type: 'incident',
+      title: incident?.title || `Incident ${incidentId}`,
+      status: incident?.status || 'unknown'
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -140,7 +148,7 @@ const ProblemDetails: React.FC<ProblemDetailsProps> = ({ problem }) => {
         </CardHeader>
         <CardContent>
           {problem.relatedIncidents && problem.relatedIncidents.length > 0 ? (
-            <RelatedItemsList items={relatedIncidents} type="incident" />
+            <RelatedItemsList items={relatedIncidents} />
           ) : (
             <p className="text-muted-foreground">No related incidents have been linked to this problem.</p>
           )}
