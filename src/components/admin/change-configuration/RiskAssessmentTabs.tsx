@@ -1,25 +1,15 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import RiskQuestionsTab from './RiskQuestionsTab';
-import RiskThresholdsTab from './RiskThresholdsTab';
+import RiskTabs from './components/RiskTabs';
+import RiskQuestionsContent from './components/RiskQuestionsContent';
+import RiskThresholdsContent from './components/RiskThresholdsContent';
 
-const RiskAssessmentTabs = () => {
+const RiskAssessmentTabs: React.FC = () => {
   return (
-    <Tabs defaultValue="questions">
-      <TabsList className="mb-4">
-        <TabsTrigger value="questions">Risk Questions</TabsTrigger>
-        <TabsTrigger value="thresholds">Risk Thresholds</TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="questions" className="space-y-4">
-        <RiskQuestionsTab />
-      </TabsContent>
-      
-      <TabsContent value="thresholds" className="space-y-4">
-        <RiskThresholdsTab />
-      </TabsContent>
-    </Tabs>
+    <RiskTabs>
+      <RiskQuestionsContent />
+      <RiskThresholdsContent />
+    </RiskTabs>
   );
 };
 
