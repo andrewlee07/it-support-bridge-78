@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import SecuritySettingsComponent from '@/components/admin/SecuritySettings';
 import UserMFASettingsComponent from '@/components/admin/UserMFASettings';
+import DatabaseIndexingRecommendations from '@/components/admin/DatabaseIndexingRecommendations';
 import Breadcrumb from '@/components/shared/Breadcrumb';
 
 const SecuritySettings = () => {
@@ -29,6 +30,7 @@ const SecuritySettings = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="general">General Security</TabsTrigger>
             <TabsTrigger value="mfa">MFA Management</TabsTrigger>
+            <TabsTrigger value="database">Database Optimization</TabsTrigger>
           </TabsList>
           
           <TabsContent value="general" className="mt-0">
@@ -51,6 +53,10 @@ const SecuritySettings = () => {
                 <UserMFASettingsComponent />
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="database" className="mt-0">
+            <DatabaseIndexingRecommendations />
           </TabsContent>
         </Tabs>
       </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
 import { ArrowRight, Loader2, Shield } from 'lucide-react';
 import { isPasswordValid } from '@/utils/securityUtils';
+import MicrosoftSSOButton from '@/components/auth/MicrosoftSSOButton';
+import { Separator } from '@/components/ui/separator';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -38,8 +39,6 @@ const Login = () => {
       return;
     }
     
-    // In the demo app, we'll skip strict password validation
-    // Just check that something was entered
     if (value.length < 1) {
       setPasswordError('Password is required');
     } else {
@@ -67,6 +66,12 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleMicrosoftSSOSuccess = (token: string, userData: any) => {
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 1000);
   };
 
   console.log("Login component rendering, user state:", !!user);
@@ -99,6 +104,24 @@ const Login = () => {
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4 pt-6">
+                <div className="pt-2 pb-4">
+                  <MicrosoftSSOButton 
+                    onSuccess={handleMicrosoftSSOSuccess}
+                    className="border-[#0078d4] text-[#0078d4] hover:bg-[#0078d4]/10"
+                  />
+                </div>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <Separator className="w-full" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-2 text-muted-foreground">
+                      Or continue with email
+                    </span>
+                  </div>
+                </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input

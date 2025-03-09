@@ -1,87 +1,85 @@
 
 import { User } from '../types/user';
+import { DEFAULT_PASSWORD_POLICY } from './passwordPolicy';
 import { logSecurityEvent } from './securityEvents';
 
-// Store the default session timeout in minutes - in a real app, this would be stored in a database
-let defaultSessionTimeout = 30;
+// Store the session timeout in minutes - in a real app, this would be stored in a database
+const DEFAULT_SESSION_TIMEOUT_MINUTES = 30;
+let currentSessionTimeoutMinutes = DEFAULT_SESSION_TIMEOUT_MINUTES;
 
-// Update the default session timeout
-export const updateDefaultSessionTimeout = (minutes: number): number => {
-  if (minutes < 1) {
-    throw new Error('Session timeout must be at least 1 minute');
-  }
-  defaultSessionTimeout = minutes;
-  console.log('Default session timeout updated:', defaultSessionTimeout);
-  return defaultSessionTimeout;
+// Set the session timeout in minutes
+export const setSessionTimeout = (timeoutMinutes: number): void => {
+  currentSessionTimeoutMinutes = timeoutMinutes;
+  console.log(`Session timeout set to ${timeoutMinutes} minutes`);
 };
 
-// Get the default session timeout
-export const getDefaultSessionTimeout = (): number => {
-  return defaultSessionTimeout;
+// Get the current session timeout in minutes
+export const getSessionTimeout = (): number => {
+  return currentSessionTimeoutMinutes;
 };
 
-// Check if password has expired
-export const isPasswordExpired = (user: User): boolean => {
-  if (!user.passwordLastChanged) return false;
-  
-  const expiryDate = new Date(user.passwordLastChanged);
-  expiryDate.setDate(expiryDate.getDate() + (user.passwordPolicy?.expiryDays || 90));
-  
-  return new Date() > expiryDate;
-};
-
-// Check if user's session has expired
+// Check if a user session is expired based on the session timeout
 export const isSessionExpired = (user: User): boolean => {
-  if (!user.sessionStartTime || !user.sessionTimeout) return false;
+  if (!user.sessionStartTime) return false; // No session start time means session hasn't been initialized
   
-  const expiryTime = new Date(user.sessionStartTime);
-  expiryTime.setMinutes(expiryTime.getMinutes() + user.sessionTimeout);
+  const sessionTimeout = user.sessionTimeout || currentSessionTimeoutMinutes;
+  const sessionStartTime = new Date(user.sessionStartTime);
+  const currentTime = new Date();
   
-  return new Date() > expiryTime;
+  // Calculate session expiry time
+  const sessionExpiryTime = new Date(sessionStartTime);
+  sessionExpiryTime.setMinutes(sessionExpiryTime.getMinutes() + sessionTimeout);
+  
+  // Check if current time is past the session expiry time
+  return currentTime > sessionExpiryTime;
 };
 
-// Check if IP address is allowed for user
+// Check if an IP address is allowed for a user
 export const isIPAllowed = (user: User, ipAddress: string): boolean => {
-  // If no IP restrictions are set, allow all
-  if (!user.allowedIPRanges || user.allowedIPRanges.length === 0) return true;
+  if (!user.allowedIPRanges || user.allowedIPRanges.length === 0) {
+    // No IP restrictions
+    return true;
+  }
   
-  // Simple check - in a real app, you'd have more sophisticated IP range checking
+  // Check if IP is in allowed ranges
+  // This is a simple implementation - in a real app, you'd use CIDR matching
   return user.allowedIPRanges.includes(ipAddress);
 };
 
-// Function to check if a user session is valid
-export const isSessionValid = (user: User): boolean => {
-  if (!user.tokenExpiry) return false;
-  
-  const tokenExpiry = new Date(user.tokenExpiry);
-  const now = new Date();
-  
-  return tokenExpiry > now;
-};
-
-// Function to get the client's IP address (mock implementation)
+// Get client IP address (mock implementation)
 export const getClientIPAddress = (): string => {
-  // In a real application, this would be implemented differently
-  // This is just a mock implementation for development
+  // In a real app, this would come from the request
   return '127.0.0.1';
 };
 
-// Generate a JWT token (mock function)
-export const generateJWTToken = (user: User): { token: string, refreshToken: string, expiry: Date } => {
-  // In a real app, use a proper JWT library
-  const token = `jwt_${user.id}_${Date.now()}`;
-  const refreshToken = `refresh_${user.id}_${Date.now()}`;
+// Generate a JWT token
+export const generateJWTToken = (user: User): { token: string; refreshToken: string; expiry: Date } => {
+  // In a real app, this would use a JWT library
+  // For demo purposes, we'll just create a mock token
+  
   const expiry = new Date();
-  expiry.setHours(expiry.getHours() + 1); // 1 hour expiry
+  expiry.setHours(expiry.getHours() + 1); // Token expires in 1 hour
+  
+  const token = `mock-jwt-token-${user.id}-${Date.now()}`;
+  const refreshToken = `mock-refresh-token-${user.id}-${Date.now()}`;
   
   return { token, refreshToken, expiry };
 };
 
-// Refresh JWT token (mock function)
-export const refreshJWTToken = (user: User, currentRefreshToken: string): { token: string, refreshToken: string, expiry: Date } | null => {
-  // Verify refresh token matches
-  if (user.refreshToken !== currentRefreshToken) return null;
+// Refresh a JWT token
+export const refreshJWTToken = (user: User, refreshToken: string): { token: string; refreshToken: string; expiry: Date } | null => {
+  // In a real app, this would verify the refresh token
+  // For demo purposes, we'll just create a new token
   
-  // Generate new tokens
-  return generateJWTToken(user);
+  if (!refreshToken.startsWith('mock-refresh-token-')) {
+    return null;
+  }
+  
+  const expiry = new Date();
+  expiry.setHours(expiry.getHours() + 1); // Token expires in 1 hour
+  
+  const token = `mock-jwt-token-${user.id}-${Date.now()}`;
+  const newRefreshToken = `mock-refresh-token-${user.id}-${Date.now()}`;
+  
+  return { token, refreshToken: newRefreshToken, expiry };
 };

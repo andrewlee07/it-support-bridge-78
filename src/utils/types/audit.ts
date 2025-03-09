@@ -13,4 +13,9 @@ export interface AuditEntry {
   oldValue?: string;
   newValue?: string;
   performedBy: string;
+  // Additional fields needed by components
+  message?: string;        // Used by several components for display
+  description?: string;    // Used by ProblemActivity
+  user?: string;           // Used by ProblemActivity
+  assignedTo?: string;     // Used by ProblemActivity
 }
