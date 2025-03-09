@@ -1,4 +1,3 @@
-
 import { Service, ServiceCategory, ServiceWithCategory } from '../types/service';
 
 // Sample service categories
@@ -53,6 +52,11 @@ export const mockServices: Service[] = [
     description: 'Customer relationship management platform',
     categoryId: 'CAT-002',
     status: 'active',
+    supportContactId: 'user-2',
+    supportTeamId: 'team-sales',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'user-5',
+    documentationUrl: 'https://example.com/docs/salesforce',
     createdAt: new Date(2023, 0, 5),
     updatedAt: new Date(2023, 0, 5)
   },
@@ -62,6 +66,11 @@ export const mockServices: Service[] = [
     description: 'Email and productivity suite',
     categoryId: 'CAT-003',
     status: 'active',
+    supportContactId: 'user-3',
+    supportTeamId: 'team-it',
+    supportHours: '24/7 Support',
+    serviceOwnerId: 'user-2',
+    documentationUrl: 'https://example.com/docs/office365',
     createdAt: new Date(2023, 0, 6),
     updatedAt: new Date(2023, 0, 6)
   },
@@ -71,6 +80,11 @@ export const mockServices: Service[] = [
     description: 'Office wireless network',
     categoryId: 'CAT-001',
     status: 'active',
+    supportContactId: 'user-1',
+    supportTeamId: 'team-infrastructure',
+    supportHours: '24/7 Support',
+    serviceOwnerId: 'user-1',
+    documentationUrl: 'https://example.com/docs/wifi',
     createdAt: new Date(2023, 0, 7),
     updatedAt: new Date(2023, 0, 7)
   },
@@ -80,6 +94,11 @@ export const mockServices: Service[] = [
     description: 'Business intelligence and reporting',
     categoryId: 'CAT-002',
     status: 'active',
+    supportContactId: 'user-4',
+    supportTeamId: 'team-analytics',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'user-5',
+    documentationUrl: 'https://example.com/docs/powerbi',
     createdAt: new Date(2023, 0, 8),
     updatedAt: new Date(2023, 0, 8)
   },
@@ -89,6 +108,11 @@ export const mockServices: Service[] = [
     description: 'Custom database applications',
     categoryId: 'CAT-003',
     status: 'active',
+    supportContactId: 'user-3',
+    supportTeamId: 'team-applications',
+    supportHours: 'Extended Hours (8am-8pm)',
+    serviceOwnerId: 'user-3',
+    documentationUrl: 'https://example.com/docs/filemaker',
     createdAt: new Date(2023, 0, 9),
     updatedAt: new Date(2023, 0, 9)
   },
@@ -98,6 +122,11 @@ export const mockServices: Service[] = [
     description: 'Remote access to company network',
     categoryId: 'CAT-001',
     status: 'active',
+    supportContactId: 'user-1',
+    supportTeamId: 'team-infrastructure',
+    supportHours: '24/7 Support',
+    serviceOwnerId: 'user-2',
+    documentationUrl: 'https://example.com/docs/vpn',
     createdAt: new Date(2023, 0, 10),
     updatedAt: new Date(2023, 0, 10)
   }
@@ -183,4 +212,18 @@ export const generateCategoryId = (): string => {
   const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
   const nextId = maxId + 1;
   return `CAT-${nextId.toString().padStart(3, '0')}`;
+};
+
+// Mock data for teams
+export const mockTeams = [
+  { id: 'team-it', name: 'IT Support' },
+  { id: 'team-infrastructure', name: 'Infrastructure Team' },
+  { id: 'team-applications', name: 'Applications Support' },
+  { id: 'team-analytics', name: 'Analytics Team' },
+  { id: 'team-sales', name: 'Sales Operations' }
+];
+
+// Helper function to get team by ID
+export const getTeamById = (id: string): { id: string, name: string } | undefined => {
+  return mockTeams.find(team => team.id === id);
 };
