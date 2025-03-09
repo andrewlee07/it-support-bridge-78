@@ -17,6 +17,8 @@ const UserViewToggle: React.FC<UserViewToggleProps> = ({ view, onChange }) => {
     if (value) onChange(value as ViewType);
   }, [onChange]);
 
+  console.log('UserViewToggle rendering with view:', view); // Debugging log
+
   return (
     <TooltipProvider delayDuration={300}>
       <ToggleGroup 

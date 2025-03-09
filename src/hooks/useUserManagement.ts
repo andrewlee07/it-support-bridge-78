@@ -32,7 +32,7 @@ export const useUserManagement = () => {
   const { filterUsersByRole } = useUserFilters();
   const { handleImportUsers, handleExportUsers } = useUserImportExport(users, setUsers);
   
-  // Add view type state
+  // Add view type state with localStorage persistence
   const [viewType, setViewType] = useState<ViewType>(() => {
     // Get from localStorage or default to grid
     const savedView = localStorage.getItem('user-management-view');
@@ -41,9 +41,9 @@ export const useUserManagement = () => {
 
   // Save view preference
   const handleViewChange = (view: ViewType) => {
+    console.log(`Changing view to: ${view}`); // Debugging log
     setViewType(view);
     localStorage.setItem('user-management-view', view);
-    console.log(`View changed to: ${view}`);
   };
 
   // Effect to sync with localStorage if it changes elsewhere
