@@ -14,6 +14,7 @@ const NotificationTrigger: React.FC<NotificationTriggerProps> = ({ unreadCount }
       variant="ghost" 
       size="icon" 
       className="relative h-10 w-10 rounded-full"
+      type="button"
     >
       <Bell className="h-5 w-5" />
       {unreadCount > 0 && (
