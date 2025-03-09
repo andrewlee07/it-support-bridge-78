@@ -1,63 +1,65 @@
+import React from "react";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
-import React from 'react';
-import { RouteObject } from 'react-router-dom';
-import { ProtectedRoute } from '@/routes/ProtectedRoute';
-import MainLayout from '@/layouts/MainLayout';
+// Layouts
+import MainLayout from "@/layouts/MainLayout";
 
-// Auth and public pages
-import Login from '@/pages/Login';
-import MFAVerification from '@/pages/MFAVerification';
-import SecurityQuestionRecovery from '@/pages/SecurityQuestionRecovery';
-import Index from '@/pages/Index';
-import NotFound from '@/pages/NotFound';
+// Import routes
+import dashboardRoutes from "./dashboardRoutes";
+import ticketRoutes from "./ticketRoutes";
+import changeRoutes from "./changeRoutes";
+import assetRoutes from "./assetRoutes";
+import adminRoutes from "./adminRoutes";
+import testManagementRoutes from "./testManagementRoutes";
+import otherRoutes from "./otherRoutes";
 
-// Import route modules
-import ticketRoutes from './ticketRoutes';
-import adminRoutes from './adminRoutes';
-import dashboardRoutes from './dashboardRoutes';
-import testManagementRoutes from './testManagementRoutes';
-import assetRoutes from './assetRoutes';
-import changeRoutes from './changeRoutes';
-import { otherRoutes } from './otherRoutes';
+// Auth-related pages
+import Login from "@/pages/Login";
+import MFAVerification from "@/pages/MFAVerification";
+import SecurityQuestionRecovery from "@/pages/SecurityQuestionRecovery";
 
-const routes: RouteObject[] = [
+// Other standalone pages
+import NotFound from "@/pages/NotFound";
+import ServiceCatalog from "@/pages/ServiceCatalog";
+
+const router = createBrowserRouter([
   {
-    path: '/login',
+    path: "/",
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    path: "/login",
     element: <Login />,
   },
   {
-    path: '/mfa-verification',
+    path: "/mfa-verification",
     element: <MFAVerification />,
   },
   {
-    path: '/security-question-recovery',
+    path: "/security-recovery",
     element: <SecurityQuestionRecovery />,
   },
   {
-    path: '/',
-    element: <Index />,
-  },
-  {
-    path: '/',
-    element: (
-      <ProtectedRoute>
-        <MainLayout />
-      </ProtectedRoute>
-    ),
+    element: <MainLayout />,
     children: [
+      // Main routes within the authenticated layout
       ...dashboardRoutes,
       ...ticketRoutes,
       ...changeRoutes,
-      ...testManagementRoutes,
       ...assetRoutes,
       ...adminRoutes,
+      ...testManagementRoutes,
       ...otherRoutes,
+      {
+        path: "/service-catalog",
+        element: <ServiceCatalog />,
+      },
     ],
   },
   {
-    path: '*',
+    path: "*",
     element: <NotFound />,
   },
-];
+]);
 
-export default routes;
+export default router;

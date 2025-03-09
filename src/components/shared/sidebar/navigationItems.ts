@@ -24,6 +24,7 @@ import {
   Sliders,
   ArrowRightLeft,
   Link2,
+  LibraryIcon,
 } from 'lucide-react';
 
 import { NavItem } from './types';
@@ -43,6 +44,11 @@ export const navigationItems: NavItem[] = [
     name: 'Service Requests',
     icon: Headphones,
     path: '/service-requests',
+  },
+  {
+    name: 'Service Catalog',
+    icon: LibraryIcon,
+    path: '/service-catalog',
   },
   {
     name: 'Changes',
