@@ -28,15 +28,13 @@ const IncidentsTab: React.FC<IncidentsTabProps> = ({ selectedSegment, onSegmentC
       key: 'sla', 
       header: 'SLA Status',
       formatSLA: true,
-      render: (_, record) => {
+      render: (value: any, record: Record<string, any>) => {
         // Calculate SLA info from ticket data for rendering
-        const slaInfo = calculateSLAStatus({
+        return calculateSLAStatus({
           ...record,
           createdAt: new Date(record.createdAt),
           type: 'incident'
         });
-        
-        return slaInfo;
       }
     }
   ];
