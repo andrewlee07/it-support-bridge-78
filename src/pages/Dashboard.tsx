@@ -4,6 +4,8 @@ import PageTransition from '@/components/shared/PageTransition';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TicketPriority } from '@/utils/types/ticket';
+import { getDashboardStats } from '@/utils/mockData/dashboardStats';
+import { ServiceDashboardCard } from '@/components/services/ServiceDashboardCard';
 
 // Helper function to determine if a ticket is high priority
 export const isHighPriority = (priority: TicketPriority): boolean => {
@@ -12,6 +14,9 @@ export const isHighPriority = (priority: TicketPriority): boolean => {
 
 // Dashboard component
 const Dashboard = () => {
+  // Get dashboard statistics
+  const dashboardStats = getDashboardStats();
+
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -36,31 +41,24 @@ const Dashboard = () => {
                   <CardTitle className="text-sm font-medium">Open Incidents</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">24</div>
+                  <div className="text-2xl font-bold">{dashboardStats.openIncidents}</div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Service Requests</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">18</div>
-                </CardContent>
-              </Card>
+              <ServiceDashboardCard />
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">Changes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">5</div>
+                  <div className="text-2xl font-bold">{dashboardStats.pendingChangeRequests}</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Alerts</CardTitle>
+                  <CardTitle className="text-sm font-medium">SLA Compliance</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">3</div>
+                  <div className="text-2xl font-bold">{dashboardStats.slaCompliance}%</div>
                 </CardContent>
               </Card>
             </div>
@@ -72,9 +70,20 @@ const Dashboard = () => {
                   <CardDescription>Latest tickets and updates</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
-                    No recent activity to display.
-                  </p>
+                  {dashboardStats.recentTickets.length > 0 ? (
+                    <ul className="space-y-2">
+                      {dashboardStats.recentTickets.map(ticket => (
+                        <li key={ticket.id} className="text-sm">
+                          <span className="font-medium">{ticket.title}</span>
+                          <span className="text-muted-foreground"> - {ticket.status}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      No recent activity to display.
+                    </p>
+                  )}
                 </CardContent>
               </Card>
               
