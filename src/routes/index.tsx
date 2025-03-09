@@ -1,3 +1,4 @@
+
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
@@ -25,7 +26,7 @@ import ServiceCatalog from "@/pages/ServiceCatalog";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/login" replace />,
+    element: <Navigate to="/dashboard" replace />,
   },
   {
     path: "/login",
