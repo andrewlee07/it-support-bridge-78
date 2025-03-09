@@ -27,6 +27,7 @@ interface ServiceListProps {
   onAddService?: () => void;
   onEditService?: (service: ServiceWithCategory) => void;
   onSelect?: (service: ServiceWithCategory) => void;
+  onEdit?: (serviceId: string) => void;
   isLoading?: boolean;
 }
 
@@ -36,6 +37,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
   onAddService,
   onEditService,
   onSelect,
+  onEdit,
   isLoading = false
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,13 +156,17 @@ const ServiceList: React.FC<ServiceListProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {onEditService && (
+                    {(onEditService || onEdit) && (
                       <Button 
                         variant="ghost" 
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onEditService(service);
+                          if (onEditService) {
+                            onEditService(service);
+                          } else if (onEdit) {
+                            onEdit(service.id);
+                          }
                         }}
                       >
                         Edit
