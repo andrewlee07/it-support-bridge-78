@@ -18,7 +18,7 @@ import dashboardRoutes from './dashboardRoutes';
 import testManagementRoutes from './testManagementRoutes';
 import assetRoutes from './assetRoutes';
 import changeRoutes from './changeRoutes';
-import otherRoutes from './otherRoutes';
+import { otherRoutes } from './otherRoutes';
 
 const routes: RouteObject[] = [
   {
