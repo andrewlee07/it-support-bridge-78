@@ -55,6 +55,7 @@ const Incidents = () => {
               <TabsTrigger value="all">All Incidents</TabsTrigger>
               <TabsTrigger value="open">Open</TabsTrigger>
               <TabsTrigger value="in-progress">In Progress</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="resolved">Resolved</TabsTrigger>
             </TabsList>
             
@@ -67,6 +68,10 @@ const Incidents = () => {
             </TabsContent>
             
             <TabsContent value="in-progress" className="mt-0">
+              <TicketList type="incident" />
+            </TabsContent>
+            
+            <TabsContent value="pending" className="mt-0">
               <TicketList type="incident" />
             </TabsContent>
             
