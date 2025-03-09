@@ -46,26 +46,6 @@ export interface ServiceKnowledge {
   displayOrder: number;
 }
 
-// New service relationship types
-export type ServiceRelationshipType = 
-  | 'technical' 
-  | 'business'
-  | 'dependency'
-  | 'component'
-  | 'consumer'
-  | 'provider';
-
-// New interface for service relationships
-export interface ServiceRelationship {
-  id: string;
-  sourceServiceId: string;
-  targetServiceId: string;
-  relationshipType: ServiceRelationshipType;
-  description?: string;
-  isActive: boolean;
-  createdAt: Date;
-}
-
 export interface Service {
   id: string;
   name: string;
@@ -82,10 +62,6 @@ export interface Service {
   supportHours?: string;      // E.g., "Business Hours", "24/7"
   serviceOwnerId?: string;    // Person accountable for the service
   documentationUrl?: string;  // Link to detailed documentation
-  // Related services
-  relatedServiceIds?: string[]; // Array of related service IDs
-  serviceType?: 'technical' | 'business' | 'hybrid'; // Type of service
-  parentServiceId?: string;    // For hierarchical relationships
   createdAt: Date;
   updatedAt: Date;
 }
@@ -126,21 +102,4 @@ export const SERVICE_KNOWLEDGE_RELATIONSHIP_TYPES = [
   "Documentation",
   "Known Issue",
   "FAQ"
-] as const;
-
-// Service relationship type constants
-export const SERVICE_RELATIONSHIP_TYPES = [
-  "technical",
-  "business",
-  "dependency",
-  "component",
-  "consumer",
-  "provider"
-] as const;
-
-// Service types
-export const SERVICE_TYPES = [
-  "technical",
-  "business",
-  "hybrid"
 ] as const;
