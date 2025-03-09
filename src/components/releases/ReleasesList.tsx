@@ -20,6 +20,7 @@ interface ReleasesListProps {
   userRole?: string;
   searchQuery?: string;
   viewType?: 'all' | 'planned' | 'inProgress' | 'deployed';
+  canApprove?: boolean;
 }
 
 const ReleasesList: React.FC<ReleasesListProps> = ({
@@ -33,7 +34,8 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
   refetch,
   userRole,
   searchQuery,
-  viewType = 'all'
+  viewType = 'all',
+  canApprove = false
 }) => {
   // Utility functions for status and type colors
   const getStatusColor = (status: ReleaseStatus) => {
@@ -159,7 +161,7 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
               <span>Created: {format(new Date(release.createdAt), 'MMM d, yyyy')}</span>
             </div>
             <div className="flex gap-2">
-              {release.approvalStatus === 'pending' && userRole === 'admin' && (
+              {release.approvalStatus === 'pending' && canApprove && (
                 <>
                   <Button size="sm" variant="outline" onClick={() => onReject(release.id)}>
                     Reject

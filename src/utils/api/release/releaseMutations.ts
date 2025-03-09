@@ -1,9 +1,11 @@
+
 import { Release, ReleaseStatus, ApiResponse, ReleaseItem } from '../../types';
 import { delay, createApiErrorResponse, createApiSuccessResponse } from '../../mockData/apiHelpers';
 import { v4 as uuidv4 } from 'uuid';
 import { validateReleaseExists, addReleaseAuditEntry, generateReleaseId, findReleaseItemByRelation } from './releaseHelpers';
 import { mockReleases as releases, mockReleaseItems } from './mockData';
 import { synchronizeReleaseStatus } from '@/api/statusSynchronization';
+import { getUserById } from '@/utils/mockData/users';
 
 // Reference to the mock data - we get it from mockData and update it here
 // This ensures we're all working with the same data
