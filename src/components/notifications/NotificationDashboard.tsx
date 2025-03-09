@@ -167,7 +167,7 @@ const NotificationDashboard: React.FC = () => {
                 <div className="py-6 text-center">
                   <p className="text-muted-foreground">Notification system settings will appear here</p>
                 </div>
-              </CardContent>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
