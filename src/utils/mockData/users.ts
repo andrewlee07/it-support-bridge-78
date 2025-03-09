@@ -5,8 +5,8 @@ import { User, UserRole, MFAMethod } from '../types/user';
 export const mockUsers: User[] = [
   { 
     id: 'user-1', 
-    name: 'Alex Johnson', 
-    email: 'alex.johnson@example.com', 
+    name: 'John Doe', 
+    email: 'john.doe@example.com', 
     role: 'admin' as UserRole,
     department: 'IT',
     active: true,
@@ -27,12 +27,13 @@ export const mockUsers: User[] = [
   },
   { 
     id: 'user-2', 
-    name: 'Jamie Smith', 
-    email: 'jamie.smith@example.com', 
-    role: 'support-manager' as UserRole,
+    name: 'Jane Smith', 
+    email: 'jane.smith@example.com', 
+    role: 'it' as UserRole,
     department: 'Support',
     active: true,
-    mfaEnabled: false,
+    mfaEnabled: true,
+    mfaMethod: 'email' as MFAMethod,
     securityQuestions: [
       {
         question: "What was your first pet's name?",
@@ -42,13 +43,12 @@ export const mockUsers: User[] = [
   },
   { 
     id: 'user-3', 
-    name: 'Taylor Brown', 
-    email: 'taylor.brown@example.com', 
-    role: 'it' as UserRole,
-    department: 'IT',
+    name: 'Mike Johnson', 
+    email: 'mike.johnson@example.com', 
+    role: 'user' as UserRole,
+    department: 'Marketing',
     active: true,
-    mfaEnabled: true,
-    mfaMethod: 'totp' as MFAMethod,
+    mfaEnabled: false,
     securityQuestions: []
   },
   { 

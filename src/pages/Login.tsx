@@ -38,9 +38,10 @@ const Login = () => {
       return;
     }
     
-    const result = isPasswordValid(value);
-    if (!result.valid) {
-      setPasswordError(result.reason || 'Invalid password');
+    // In the demo app, we'll skip strict password validation
+    // Just check that something was entered
+    if (value.length < 1) {
+      setPasswordError('Password is required');
     } else {
       setPasswordError(null);
     }
@@ -49,9 +50,8 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const passwordValidation = isPasswordValid(password);
-    if (!passwordValidation.valid) {
-      setPasswordError(passwordValidation.reason || 'Invalid password');
+    if (!email || !password) {
+      setPasswordError('Email and password are required');
       return;
     }
     
