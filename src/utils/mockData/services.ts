@@ -243,4 +243,3 @@ export const updateService = (updatedService: Service): ServiceWithCategory => {
 
 // Export for analytics
 export { mockServiceTicketCounts };
-

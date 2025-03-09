@@ -52,12 +52,16 @@ export interface Service {
   description: string;
   categoryId: string;
   status: ServiceStatus;
-  // New Phase 2A fields
-  supportContactId?: string;     // Person responsible for support
-  supportTeamId?: string;        // Team responsible for support
-  supportHours?: string;         // E.g., "Business Hours", "24/7"
-  serviceOwnerId?: string;       // Person accountable for the service
-  documentationUrl?: string;     // Link to detailed documentation
+  // Owner fields
+  ownerId?: string;          // Person who owns the service
+  price?: string;           // Cost level of the service
+  approvalRequired?: boolean; // Whether the service requires approval
+  // Support fields
+  supportContactId?: string;  // Person responsible for support
+  supportTeamId?: string;     // Team responsible for support
+  supportHours?: string;      // E.g., "Business Hours", "24/7"
+  serviceOwnerId?: string;    // Person accountable for the service
+  documentationUrl?: string;  // Link to detailed documentation
   createdAt: Date;
   updatedAt: Date;
 }
