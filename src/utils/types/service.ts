@@ -10,6 +10,42 @@ export interface ServiceCategory {
   updatedAt: Date;
 }
 
+export interface BusinessUnit {
+  id: string;
+  name: string;
+  description: string;
+  managerIds: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type ServiceBusinessUnitCriticality = 'Critical' | 'High' | 'Medium' | 'Low';
+
+export interface ServiceBusinessUnit {
+  id: string;
+  serviceId: string;
+  businessUnitId: string;
+  criticality: ServiceBusinessUnitCriticality;
+  notes?: string;
+}
+
+export interface KnowledgeArticleType {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export type ServiceKnowledgeRelationshipType = 'Documentation' | 'Known Issue' | 'FAQ';
+
+export interface ServiceKnowledge {
+  id: string;
+  serviceId: string;
+  knowledgeArticleId: string;
+  relationshipType: ServiceKnowledgeRelationshipType;
+  isPrimary: boolean;
+  displayOrder: number;
+}
+
 export interface Service {
   id: string;
   name: string;
@@ -48,3 +84,18 @@ export const SERVICE_SUPPORT_HOURS = [
 ] as const;
 
 export type SupportHours = typeof SERVICE_SUPPORT_HOURS[number];
+
+// Service business unit criticality constants
+export const SERVICE_BUSINESS_UNIT_CRITICALITY = [
+  "Critical",
+  "High",
+  "Medium", 
+  "Low"
+] as const;
+
+// Service knowledge relationship type constants
+export const SERVICE_KNOWLEDGE_RELATIONSHIP_TYPES = [
+  "Documentation",
+  "Known Issue",
+  "FAQ"
+] as const;
