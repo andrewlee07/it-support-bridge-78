@@ -1,11 +1,12 @@
 
-import { useState } from 'react';
-import { User } from '@/utils/types/user';
+import { useState, useEffect } from 'react';
+import { User, UserRole } from '@/utils/types/user';
 import { mockUsers } from '@/utils/mockData/users';
 import { useUserSearch } from './userManagement/useUserSearch';
 import { useUserFilters } from './userManagement/useUserFilters';
 import { useUserCrud } from './userManagement/useUserCrud';
 import { useUserImportExport } from './userManagement/useUserImportExport';
+import { ViewType } from '@/components/users/UserViewToggle';
 
 export const useUserManagement = () => {
   const { 
@@ -22,13 +23,41 @@ export const useUserManagement = () => {
     handleRemoveUser,
     handleUpdateUser,
     handleChangeRole,
-    handleToggleUserStatus 
+    handleToggleUserStatus,
+    handleUserRoleChange
   } = useUserCrud(mockUsers);
 
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const { searchTerm, handleSearch, filterUsersBySearchTerm } = useUserSearch();
   const { filterUsersByRole } = useUserFilters();
   const { handleImportUsers, handleExportUsers } = useUserImportExport(users, setUsers);
+  
+  // Add view type state
+  const [viewType, setViewType] = useState<ViewType>(() => {
+    // Get from localStorage or default to grid
+    const savedView = localStorage.getItem('user-management-view');
+    return (savedView as ViewType) || 'grid';
+  });
+
+  // Save view preference
+  const handleViewChange = (view: ViewType) => {
+    setViewType(view);
+    localStorage.setItem('user-management-view', view);
+  };
+
+  // Effect to sync with localStorage if it changes elsewhere
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'user-management-view' && e.newValue) {
+        setViewType(e.newValue as ViewType);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   // Get filtered users based on activeFilter
   const filteredUsers = (): User[] => {
@@ -52,6 +81,8 @@ export const useUserManagement = () => {
     setSelectedRole,
     newUser,
     setNewUser,
+    viewType,
+    handleViewChange,
     handleSearch,
     handleViewUser,
     handleAddUser,
@@ -62,6 +93,7 @@ export const useUserManagement = () => {
     handleEditUser: handleUpdateUser,
     handleImportUsers,
     handleExportUsers,
+    handleUserRoleChange,
     // Add these for backward compatibility with UserManagement.tsx and Users.tsx
     handleToggleUserStatus,
     filteredUsers: () => filteredUsers()

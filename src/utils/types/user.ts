@@ -1,3 +1,4 @@
+
 // User types
 export type UserRole = 'admin' | 'manager' | 'agent' | 'developer' | 'it' | 'user' | 'problem-manager' | 'change-manager' | 'release-manager';
 
@@ -8,6 +9,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  roles?: UserRole[]; // Added multiple roles support
   department: string;
   title?: string;
   active?: boolean;

@@ -13,6 +13,7 @@ export const useUserCrud = (initialUsers: User[]) => {
     name: '',
     email: '',
     role: 'user' as UserRole,
+    roles: [] as UserRole[],
     department: '',
     title: '',
   });
@@ -31,6 +32,7 @@ export const useUserCrud = (initialUsers: User[]) => {
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
+      roles: [newUser.role, ...newUser.roles],
       department: newUser.department,
       title: newUser.title,
       active: true,
@@ -48,6 +50,7 @@ export const useUserCrud = (initialUsers: User[]) => {
       name: '',
       email: '',
       role: 'user',
+      roles: [],
       department: '',
       title: '',
     });
@@ -111,6 +114,51 @@ export const useUserCrud = (initialUsers: User[]) => {
     });
   };
 
+  const handleUserRoleChange = (userId: string, role: UserRole, checked: boolean) => {
+    // In a real app, this would make an API call
+    const updatedUsers = users.map(user => {
+      if (user.id === userId) {
+        // Initialize roles array if it doesn't exist
+        const roles = user.roles || [user.role];
+        
+        if (checked && !roles.includes(role)) {
+          // Add the role
+          return { 
+            ...user, 
+            roles: [...roles, role],
+            // Update the primary role if this is the first role or current primary role is being removed
+            role: roles.length === 0 ? role : user.role
+          };
+        } else if (!checked && roles.includes(role)) {
+          // Remove the role, but ensure there's at least one role
+          const updatedRoles = roles.filter(r => r !== role);
+          if (updatedRoles.length === 0) {
+            return user; // Don't remove the last role
+          }
+          
+          // If the primary role is being removed, set the first available role as primary
+          const newPrimaryRole = user.role === role ? updatedRoles[0] : user.role;
+          
+          return { 
+            ...user, 
+            roles: updatedRoles,
+            role: newPrimaryRole
+          };
+        }
+      }
+      return user;
+    });
+    
+    setUsers(updatedUsers);
+    
+    const targetUser = updatedUsers.find(user => user.id === userId);
+    
+    toast({
+      title: "Role updated",
+      description: `${targetUser?.name}'s roles have been updated.`
+    });
+  };
+
   return {
     users,
     setUsers,
@@ -125,6 +173,7 @@ export const useUserCrud = (initialUsers: User[]) => {
     handleRemoveUser,
     handleUpdateUser,
     handleChangeRole,
-    handleToggleUserStatus
+    handleToggleUserStatus,
+    handleUserRoleChange
   };
 };

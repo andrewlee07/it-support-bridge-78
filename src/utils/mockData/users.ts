@@ -1,3 +1,4 @@
+
 import { User, UserRole, MFAMethod } from '../types/user';
 
 export const mockUsers: User[] = [
@@ -6,6 +7,7 @@ export const mockUsers: User[] = [
     name: 'John Doe',
     email: 'john.doe@example.com',
     role: 'admin' as UserRole,
+    roles: ['admin', 'manager'] as UserRole[],
     department: 'IT',
     title: 'System Administrator',
     active: true,
@@ -26,6 +28,7 @@ export const mockUsers: User[] = [
     name: 'Jane Smith',
     email: 'jane.smith@example.com',
     role: 'manager' as UserRole,
+    roles: ['manager', 'agent'] as UserRole[],
     department: 'Support',
     title: 'Support Team Lead',
     active: true,
@@ -45,6 +48,7 @@ export const mockUsers: User[] = [
     name: 'Mike Johnson',
     email: 'mike.johnson@example.com',
     role: 'agent' as UserRole,
+    roles: ['agent', 'developer'] as UserRole[],
     department: 'Support',
     title: 'Support Specialist',
     active: true,
@@ -60,6 +64,7 @@ export const mockUsers: User[] = [
     name: 'Sarah Williams',
     email: 'sarah.williams@example.com',
     role: 'developer' as UserRole,
+    roles: ['developer', 'problem-manager'] as UserRole[],
     department: 'Engineering',
     title: 'Software Engineer',
     active: true,
@@ -79,6 +84,7 @@ export const mockUsers: User[] = [
     name: 'Alex Turner',
     email: 'alex.turner@example.com',
     role: 'agent' as UserRole,
+    roles: ['agent'] as UserRole[],
     department: 'Support',
     title: 'Support Specialist',
     active: false,
