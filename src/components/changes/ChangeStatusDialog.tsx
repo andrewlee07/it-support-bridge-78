@@ -12,6 +12,13 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { ChangeStatus } from '@/utils/types/change';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
 interface ChangeStatusDialogProps {
   isOpen: boolean;
@@ -60,22 +67,22 @@ const ChangeStatusDialog: React.FC<ChangeStatusDialogProps> = ({
         </DialogHeader>
         
         <div className="py-4">
-          <RadioGroup 
-            value={selectedStatus} 
-            onValueChange={setSelectedStatus}
-            className="space-y-3"
-          >
-            {statusOptions.map((option) => (
-              <div key={option.value} className="flex items-center space-x-2">
-                <RadioGroupItem 
-                  value={option.value} 
-                  id={option.value}
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select new status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem 
+                  key={option.value} 
+                  value={option.value}
                   disabled={option.value === currentStatus}
-                />
-                <Label htmlFor={option.value}>{option.label}</Label>
-              </div>
-            ))}
-          </RadioGroup>
+                >
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         
         <DialogFooter>
