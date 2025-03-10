@@ -3,13 +3,15 @@ import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
 import { fetchBacklogItems } from '@/utils/api/backlogApi';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ListIcon } from 'lucide-react';
+import { ListIcon, Settings } from 'lucide-react';
+import { DropResult } from 'react-beautiful-dnd';
+import { toast } from 'sonner';
 
 const BacklogKanban: React.FC = () => {
-  const [items, setItems] = useState<BacklogItem[]>([]);
+  const [backlogItems, setBacklogItems] = useState<BacklogItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
@@ -18,11 +20,10 @@ const BacklogKanban: React.FC = () => {
       try {
         setIsLoading(true);
         const response = await fetchBacklogItems();
-        if (response.success) {
-          setItems(response.data);
-        }
+        setBacklogItems(response);
       } catch (error) {
         console.error('Error loading backlog items:', error);
+        toast.error('Failed to load backlog items');
       } finally {
         setIsLoading(false);
       }
@@ -30,6 +31,26 @@ const BacklogKanban: React.FC = () => {
 
     loadBacklogItems();
   }, []);
+
+  const handleDragEnd = (result: DropResult) => {
+    // This would update the status of the item when dragged between columns
+    console.log('Item dragged:', result);
+  };
+
+  const handleEditItem = (item: BacklogItem) => {
+    // This would open the item edit dialog
+    console.log('Edit item:', item);
+  };
+
+  const handleQuickStatusChange = (itemId: string, newStatus: BacklogItemStatus) => {
+    // This would update the status of the item directly
+    console.log('Quick status change:', itemId, newStatus);
+  };
+
+  const handleCreateItem = (defaultStatus?: string) => {
+    // This would create a new item
+    console.log('Create item with default status:', defaultStatus);
+  };
 
   return (
     <PageTransition>
@@ -39,25 +60,35 @@ const BacklogKanban: React.FC = () => {
             <h1 className="text-2xl font-bold tracking-tight">Backlog Board</h1>
             <p className="text-muted-foreground">Manage your backlog items using the kanban board</p>
           </div>
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/backlog')}
-          >
-            <ListIcon className="mr-2 h-4 w-4" />
-            List View
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/backlog')}
+            >
+              <ListIcon className="mr-2 h-4 w-4" />
+              List View
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => document.querySelector('[data-kanban-board]')?.dispatchEvent(new Event('openConfig'))}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Configure Board
+            </Button>
+          </div>
         </div>
 
-        <KanbanBoard 
-          items={items} 
-          isLoading={isLoading} 
-          onItemUpdate={(updatedItem) => {
-            // Update the items state with the updated item
-            setItems(items.map(item => 
-              item.id === updatedItem.id ? updatedItem : item
-            ));
-          }}
-        />
+        <div data-kanban-board>
+          <KanbanBoard 
+            backlogItems={backlogItems} 
+            isLoading={isLoading} 
+            onDragEnd={handleDragEnd}
+            onEditItem={handleEditItem}
+            onQuickStatusChange={handleQuickStatusChange}
+            columnSize="standard"
+            onCreateItem={handleCreateItem}
+          />
+        </div>
       </div>
     </PageTransition>
   );
