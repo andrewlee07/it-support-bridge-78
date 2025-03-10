@@ -23,6 +23,7 @@ import SecurityQuestionRecovery from "@/pages/SecurityQuestionRecovery";
 import NotFound from "@/pages/NotFound";
 import ServiceCatalog from "@/pages/ServiceCatalog";
 import ServiceManagementPage from "@/pages/ServiceManagementPage";
+import AdminSettings from "@/pages/AdminSettings";
 
 const router = createBrowserRouter([
   {
@@ -49,7 +50,7 @@ const router = createBrowserRouter([
       ...ticketRoutes,
       ...changeRoutes,
       ...assetRoutes,
-      ...adminRoutes,
+      ...adminRoutes, // Administrative routes
       ...testManagementRoutes,
       ...otherRoutes,
       {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: "/service-management",
         element: <ServiceManagementPage />,
+      },
+      {
+        path: "/admin",
+        element: <AdminSettings />,
       },
     ],
   },

@@ -15,10 +15,6 @@ import StatusSynchronizationConfig from '@/pages/admin/StatusSynchronizationConf
 
 export const adminRoutes = [
   {
-    path: '/admin',
-    element: <AdminSettings />,
-  },
-  {
     path: '/admin/security-settings',
     element: <SecuritySettings />,
   },
