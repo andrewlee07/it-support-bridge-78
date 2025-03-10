@@ -136,8 +136,8 @@ export const navigationItems: NavItem[] = [
   {
     name: 'Users',
     title: 'User Management',
-    href: '/users',
-    path: '/users',
+    href: '/user-management',
+    path: '/user-management',
     icon: Users,
   },
   {

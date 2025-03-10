@@ -17,6 +17,7 @@ import RejectChange from '@/pages/RejectChange';
 import CloseChange from '@/pages/CloseChange';
 import Calendar from '@/pages/Calendar';
 import Approvals from '@/pages/Approvals';
+import UserManagementPage from '@/pages/UserManagementPage';
 
 const router = createBrowserRouter([
   {
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
       {
         path: '/users',
         element: React.createElement(() => React.createElement('div', null, 'User Management Page'))
+      },
+      {
+        path: '/user-management',
+        element: React.createElement(UserManagementPage)
       },
       {
         path: '/admin',
