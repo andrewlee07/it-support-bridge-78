@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 
-export const useDialog = (initialState = false) => {
+export const useDisclosure = (initialState = false) => {
   const [isOpen, setIsOpen] = useState(initialState);
 
   const onOpen = () => setIsOpen(true);
@@ -10,3 +9,6 @@ export const useDialog = (initialState = false) => {
 
   return { isOpen, onOpen, onClose, onToggle };
 };
+
+// Keep the old export for backward compatibility
+export const useDialog = useDisclosure;

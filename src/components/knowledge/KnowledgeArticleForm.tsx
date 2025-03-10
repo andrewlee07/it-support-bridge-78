@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TagInput } from '@/components/shared/TagInput';
+import TagInput from '@/components/shared/TagInput';
 
 interface KnowledgeArticleFormProps {
   isOpen: boolean;
@@ -145,9 +145,9 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
                   <FormLabel>Tags</FormLabel>
                   <FormControl>
                     <TagInput
+                      value={field.value}
+                      onChange={field.onChange}
                       placeholder="Add tags..."
-                      tags={field.value}
-                      setTags={(newTags) => field.onChange(newTags)}
                     />
                   </FormControl>
                   <FormMessage />
