@@ -28,6 +28,8 @@ import AdminSettings from '@/pages/AdminSettings';
 import IncidentDetail from '@/pages/IncidentDetail';
 import ServiceRequestDetail from '@/pages/ServiceRequestDetail';
 import BugDetail from '@/pages/BugDetail';
+import ReleaseDetail from '@/pages/ReleaseDetail';
+import Assets from '@/pages/Assets';
 
 const router = createBrowserRouter([
   {
@@ -119,7 +121,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/users',
-        element: React.createElement(() => React.createElement('div', null, 'User Management Page'))
+        element: React.createElement(UserManagementPage)
       },
       {
         path: '/user-management',
@@ -128,6 +130,10 @@ const router = createBrowserRouter([
       {
         path: '/admin',
         element: React.createElement(AdminSettings)
+      },
+      {
+        path: '/admin/service-catalogue-configuration',
+        element: React.createElement(ServiceCatalog, { isAdmin: true })
       },
       {
         path: '/profile',
@@ -146,8 +152,16 @@ const router = createBrowserRouter([
         element: React.createElement(Releases)
       },
       {
+        path: '/releases/:id',
+        element: React.createElement(ReleaseDetail)
+      },
+      {
         path: '/backlog',
         element: React.createElement(Backlog)
+      },
+      {
+        path: '/assets',
+        element: React.createElement(Assets)
       }
     ]
   }

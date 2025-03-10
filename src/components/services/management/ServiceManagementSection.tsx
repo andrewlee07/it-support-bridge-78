@@ -11,6 +11,7 @@ interface ServiceManagementSectionProps {
   onEditService: (service: ServiceWithCategory) => void;
   canConfigureCatalog: boolean;
   isLoading: boolean;
+  onAddService?: () => void;
 }
 
 const ServiceManagementSection: React.FC<ServiceManagementSectionProps> = ({
@@ -18,7 +19,8 @@ const ServiceManagementSection: React.FC<ServiceManagementSectionProps> = ({
   categories,
   onEditService,
   canConfigureCatalog,
-  isLoading
+  isLoading,
+  onAddService
 }) => {
   return (
     <div className="space-y-4">
@@ -38,7 +40,7 @@ const ServiceManagementSection: React.FC<ServiceManagementSectionProps> = ({
         services={services || []}
         categories={categories || []}
         onEditService={onEditService}
-        onAddService={canConfigureCatalog ? () => console.log("Add service") : undefined}
+        onAddService={canConfigureCatalog ? onAddService : undefined}
         isLoading={isLoading}
       />
     </div>

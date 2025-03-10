@@ -6,6 +6,7 @@ import { ServiceWithCategory } from '@/utils/types/service';
 import ServiceManagementDialog from './management/ServiceManagementDialog';
 import ServiceManagementSection from './management/ServiceManagementSection';
 import ServiceDetailDialog from './management/ServiceDetailDialog';
+import { toast } from 'sonner';
 
 interface ServiceManagementProps {
   inServiceCatalog?: boolean;
@@ -28,8 +29,16 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
 
   const handleSelectService = (service: ServiceWithCategory) => {
     setSelectedService(service);
-    // In a real app, this would open a modal or navigate to edit page
     console.log(`Selected service: ${service.name}`);
+  };
+
+  const handleCloseServiceDetail = () => {
+    setSelectedService(null);
+  };
+
+  const handleAddService = () => {
+    toast.info("Add service feature is coming soon!");
+    console.log("Add service");
   };
 
   return (
@@ -53,13 +62,14 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
           onEditService={handleSelectService}
           canConfigureCatalog={canConfigureCatalog}
           isLoading={isLoading}
+          onAddService={handleAddService}
         />
       )}
 
       <ServiceDetailDialog 
         service={selectedService}
         categories={categories}
-        onClose={() => setSelectedService(null)}
+        onClose={handleCloseServiceDetail}
         canConfigureCatalog={canConfigureCatalog}
       />
     </>

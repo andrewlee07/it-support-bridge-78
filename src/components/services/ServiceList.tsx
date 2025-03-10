@@ -1,65 +1,58 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ServiceWithCategory, ServiceCategory } from '@/utils/types/service';
-import ServiceListHeader from './list/ServiceListHeader';
-import ServiceContent from './list/ServiceContent';
+import { Skeleton } from '@/components/ui/skeleton';
+import ServiceTable from './list/ServiceTable';
+import ServiceEmptyState from './list/ServiceEmptyState';
+import ServiceAddButton from './list/ServiceAddButton';
 
 interface ServiceListProps {
   services: ServiceWithCategory[];
-  categories?: ServiceCategory[];
-  onAddService?: () => void;
-  onEditService?: (service: ServiceWithCategory) => void;
+  categories: ServiceCategory[];
   onSelect?: (service: ServiceWithCategory) => void;
-  onEdit?: (serviceId: string) => void;
+  onEditService?: (service: ServiceWithCategory) => void;
+  onAddService?: () => void;
   isLoading?: boolean;
 }
 
 const ServiceList: React.FC<ServiceListProps> = ({
   services,
-  categories = [],
-  onAddService,
-  onEditService,
+  categories,
   onSelect,
-  onEdit,
+  onEditService,
+  onAddService,
   isLoading = false
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [viewMode, setViewMode] = useState<'list' | 'topology'>('list');
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </div>
+    );
+  }
 
-  // Filter services based on search query and category filter
-  const filteredServices = services.filter(service => {
-    const matchesSearch = 
-      service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      service.description.toLowerCase().includes(searchQuery.toLowerCase());
-      
-    const matchesCategory = 
-      categoryFilter === 'all' || service.categoryId === categoryFilter;
-      
-    return matchesSearch && matchesCategory;
-  });
+  if (services.length === 0) {
+    return (
+      <div className="mt-4">
+        <ServiceEmptyState onAddService={onAddService} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      <ServiceListHeader 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
-        categories={categories}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        onAddService={onAddService}
-      />
-
-      <ServiceContent
-        isLoading={isLoading}
-        filteredServices={filteredServices}
-        viewMode={viewMode}
-        searchQuery={searchQuery}
-        onSelect={onSelect}
-        onEdit={onEdit}
-        onEditService={onEditService}
+      {onAddService && (
+        <div className="flex justify-end">
+          <ServiceAddButton onClick={onAddService} />
+        </div>
+      )}
+      
+      <ServiceTable 
+        services={services} 
+        onSelect={onSelect} 
+        onEditService={onEditService} 
       />
     </div>
   );
