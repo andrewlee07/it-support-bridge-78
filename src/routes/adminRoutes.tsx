@@ -1,6 +1,5 @@
 
 import React from 'react';
-import AdminSettings from '@/pages/AdminSettings';
 import SecuritySettings from '@/pages/admin/SecuritySettings';
 import SLASettings from '@/pages/admin/SLASettings';
 import IncidentConfiguration from '@/pages/admin/IncidentConfiguration';
@@ -57,5 +56,5 @@ export const adminRoutes = [
   {
     path: '/admin/status-synchronization',
     element: <StatusSynchronizationConfig />,
-  },
+  }
 ];

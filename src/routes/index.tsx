@@ -1,4 +1,3 @@
-
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
@@ -50,6 +49,10 @@ const router = createBrowserRouter([
       ...ticketRoutes,
       ...changeRoutes,
       ...assetRoutes,
+      {
+        path: "/admin",
+        element: <AdminSettings />,
+      },
       ...adminRoutes, // Administrative routes
       ...testManagementRoutes,
       ...otherRoutes,
@@ -60,10 +63,6 @@ const router = createBrowserRouter([
       {
         path: "/service-management",
         element: <ServiceManagementPage />,
-      },
-      {
-        path: "/admin",
-        element: <AdminSettings />,
       },
     ],
   },
