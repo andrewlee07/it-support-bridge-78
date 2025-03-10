@@ -22,13 +22,13 @@ export interface Release {
   version: string;
   type: ReleaseType;
   description: string;
-  plannedDate: Date;
+  plannedDate: Date | string;
   status: ReleaseStatus;
   owner: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   approvalStatus: ReleaseApprovalStatus;
-  approvedAt?: Date;
+  approvedAt?: Date | string;
   approvedBy?: string;
   items: ReleaseItem[];
   audit: any[];
@@ -40,6 +40,12 @@ export interface ReleaseMetrics {
   deployedReleases: number;
   pendingReleases: number;
   cancelledReleases: number;
+  releasesByType: {
+    major: number;
+    minor: number;
+    patch: number;
+    emergency: number;
+  };
   releasesByMonth: {
     month: string;
     count: number;

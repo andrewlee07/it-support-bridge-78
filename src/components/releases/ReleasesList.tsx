@@ -68,6 +68,12 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
     }
   };
 
+  // Helper function to format dates safely
+  const formatDate = (date: string | Date | undefined) => {
+    if (!date) return 'N/A';
+    return format(new Date(date), 'MMM d, yyyy');
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -147,7 +153,7 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
             <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 mr-1" />
-                <span>Planned: {format(new Date(release.plannedDate), 'MMM d, yyyy')}</span>
+                <span>Planned: {formatDate(release.plannedDate)}</span>
               </div>
               <div className="flex items-center">
                 <User className="h-4 w-4 mr-1" />
@@ -158,7 +164,7 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
           <CardFooter className="flex justify-between pt-2 text-sm text-muted-foreground">
             <div className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />
-              <span>Created: {format(new Date(release.createdAt), 'MMM d, yyyy')}</span>
+              <span>Created: {formatDate(release.createdAt)}</span>
             </div>
             <div className="flex gap-2">
               {release.approvalStatus === 'pending' && canApprove && (

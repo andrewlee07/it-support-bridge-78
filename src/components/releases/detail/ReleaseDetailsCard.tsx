@@ -17,6 +17,12 @@ const ReleaseDetailsCard: React.FC<ReleaseDetailsCardProps> = ({
   createdAt,
   approvedAt
 }) => {
+  // Helper function to format dates safely
+  const formatDate = (date: string | Date | undefined) => {
+    if (!date) return 'N/A';
+    return format(new Date(date), 'PPP');
+  };
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -26,7 +32,7 @@ const ReleaseDetailsCard: React.FC<ReleaseDetailsCardProps> = ({
         <div className="space-y-2 text-sm">
           <div className="flex items-center">
             <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-            <span>Planned Date: {format(new Date(plannedDate), 'PPP')}</span>
+            <span>Planned Date: {formatDate(plannedDate)}</span>
           </div>
           <div className="flex items-center">
             <User className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -34,12 +40,12 @@ const ReleaseDetailsCard: React.FC<ReleaseDetailsCardProps> = ({
           </div>
           <div className="flex items-center">
             <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-            <span>Created: {format(new Date(createdAt), 'PPP')}</span>
+            <span>Created: {formatDate(createdAt)}</span>
           </div>
           {approvedAt && (
             <div className="flex items-center">
               <CheckCircle className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span>Approved: {format(new Date(approvedAt), 'PPP')}</span>
+              <span>Approved: {formatDate(approvedAt)}</span>
             </div>
           )}
         </div>

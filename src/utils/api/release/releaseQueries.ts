@@ -1,5 +1,5 @@
 
-import { ApiResponse, Release, ReleaseStatus } from '@/utils/types';
+import { ApiResponse, Release, ReleaseStatus, ReleaseMetrics, ReleaseType } from '@/utils/types';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from '../../mockData/apiHelpers';
 import { mockReleases } from './mockData';
 
@@ -23,7 +23,7 @@ export const getReleaseById = async (id: string): Promise<ApiResponse<Release>> 
 };
 
 // Get release metrics (placeholder for actual metrics calculation)
-export const getReleaseMetrics = async (): Promise<ApiResponse<any>> => {
+export const getReleaseMetrics = async (): Promise<ApiResponse<ReleaseMetrics>> => {
   await delay();
   
   // Calculate some basic metrics
@@ -32,11 +32,20 @@ export const getReleaseMetrics = async (): Promise<ApiResponse<any>> => {
   const pendingReleases = mockReleases.filter(r => r.status !== 'Deployed' && r.status !== 'Cancelled').length;
   const cancelledReleases = mockReleases.filter(r => r.status === 'Cancelled').length;
   
-  const metrics = {
+  // Calculate type-based counts
+  const releasesByType = {
+    major: mockReleases.filter(r => r.type === 'major').length,
+    minor: mockReleases.filter(r => r.type === 'minor').length,
+    patch: mockReleases.filter(r => r.type === 'patch').length,
+    emergency: mockReleases.filter(r => r.type === 'emergency').length,
+  };
+  
+  const metrics: ReleaseMetrics = {
     totalReleases,
     deployedReleases,
     pendingReleases,
     cancelledReleases,
+    releasesByType,
     releasesByMonth: [
       { month: 'Jan', count: 2 },
       { month: 'Feb', count: 3 },
