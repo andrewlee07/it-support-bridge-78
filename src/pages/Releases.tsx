@@ -16,8 +16,8 @@ const Releases = () => {
       <div className="container mx-auto py-6 space-y-6">
         <ReleasesErrorBoundary>
           <ReleasesHeader
+            onCreateNew={releases.handleCreateNew}
             onTabChange={releases.handleTabChange}
-            onAddNew={releases.handleCreateNew}
             activeTab={releases.activeTab}
             onStatusFilterChange={releases.setStatusFilter}
             statusFilter={releases.statusFilter}

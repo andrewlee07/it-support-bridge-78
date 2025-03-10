@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, FileText, CalendarDays } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,12 @@ interface ChangesHeaderProps {
 }
 
 const ChangesHeader: React.FC<ChangesHeaderProps> = ({ onCreateNew }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
       <div>
@@ -20,7 +26,10 @@ const ChangesHeader: React.FC<ChangesHeaderProps> = ({ onCreateNew }) => {
       </div>
       
       <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-        <ChangesSearch />
+        <ChangesSearch 
+          searchQuery={searchQuery} 
+          onSearchChange={handleSearchChange} 
+        />
         
         <div className="flex gap-2 ml-auto">
           <Button

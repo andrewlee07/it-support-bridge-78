@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameDay, addDays } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -26,7 +25,7 @@ import CalendarEventList from './CalendarEventList';
 import CalendarEventTable from './CalendarEventTable';
 import CalendarEventPopover from './CalendarEventPopover';
 import { useChangeCalendarEvents } from '@/hooks/useChangeCalendarEvents';
-import { CalendarEvent, CalendarViewType } from '@/utils/types/calendar';
+import { CalendarEvent, CalendarViewType, CalendarEventType } from '@/utils/types/calendar';
 
 interface SharedCalendarProps {
   onEventClick?: (event: CalendarEvent) => void;
@@ -39,11 +38,10 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    type: 'all',
+    type: 'all' as CalendarEventType | 'all',
     status: 'all',
   });
 
-  // Fetch events from both change and release management
   const { events, isLoading, refetch } = useChangeCalendarEvents(date, view, filters);
 
   const handleEventClick = (event: CalendarEvent) => {
@@ -86,7 +84,14 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    if (key === 'type') {
+      setFilters(prev => ({ 
+        ...prev, 
+        [key]: value as CalendarEventType | 'all'
+      }));
+    } else {
+      setFilters(prev => ({ ...prev, [key]: value }));
+    }
   };
 
   const toggleFilters = () => {
@@ -94,7 +99,6 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
   };
 
   const exportData = () => {
-    // Logic to export calendar data
     console.log('Exporting calendar data');
   };
 
@@ -264,10 +268,10 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
               onSelect={(newDate) => newDate && setDate(newDate)}
               className={dayIsInCurrentView(date) ? 'h-full' : ''}
               components={{
-                Day: ({ day, displayValue }) => {
+                Day: ({ date: day, displayText }) => {
                   return (
                     <div className="relative h-12 w-full p-1 flex justify-center">
-                      <div className="absolute top-1 right-1 text-xs">{displayValue}</div>
+                      <div className="absolute top-1 right-1 text-xs">{displayText}</div>
                       {renderEvent(day)}
                     </div>
                   );
