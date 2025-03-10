@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChangesList } from './ChangesList';
+import ChangesList from './ChangesList';
 
 interface ChangeTabsProps {
   userId?: string;
