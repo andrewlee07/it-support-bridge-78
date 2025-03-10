@@ -51,13 +51,18 @@ export const useChangeRequests = (params?: UseChangeRequestsParams) => {
     setSearchQuery(e.target.value);
   };
 
+  // Create a properly typed callback for tab changes
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as 'all' | 'pending' | 'upcoming' | 'completed');
+  };
+
   return {
     changes: data?.items || [],
     loading: isLoading,
     error: isError ? error : null,
     refetch,
     activeTab,
-    setActiveTab,
+    setActiveTab: handleTabChange, // Return the wrapper function instead
     searchQuery,
     handleSearchChange,
     isLoading,
