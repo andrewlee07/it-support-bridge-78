@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import MainLayout from '@/layouts/MainLayout';
@@ -18,6 +17,9 @@ import CloseChange from '@/pages/CloseChange';
 import Calendar from '@/pages/Calendar';
 import Approvals from '@/pages/Approvals';
 import UserManagementPage from '@/pages/UserManagementPage';
+import ServiceCatalog from '@/pages/ServiceCatalog';
+import TestTracking from '@/pages/TestTracking';
+import Bugs from '@/pages/Bugs';
 
 const router = createBrowserRouter([
   {
@@ -84,12 +86,16 @@ const router = createBrowserRouter([
         element: React.createElement(Approvals)
       },
       {
-        path: '/bugs',
-        element: React.createElement(() => React.createElement('div', null, 'Bugs Page'))
+        path: '/services',
+        element: React.createElement(ServiceCatalog)
       },
       {
         path: '/testing',
-        element: React.createElement(() => React.createElement('div', null, 'Testing Page'))
+        element: React.createElement(TestTracking)
+      },
+      {
+        path: '/bugs',
+        element: React.createElement(Bugs)
       },
       {
         path: '/users',
@@ -114,10 +120,6 @@ const router = createBrowserRouter([
       {
         path: '/knowledge',
         element: React.createElement(() => React.createElement('div', null, 'Knowledge Base Page'))
-      },
-      {
-        path: '/services',
-        element: React.createElement(() => React.createElement('div', null, 'Services Page'))
       }
     ]
   }

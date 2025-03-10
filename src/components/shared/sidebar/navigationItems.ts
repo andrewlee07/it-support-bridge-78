@@ -1,3 +1,4 @@
+
 import {
   LayoutDashboard,
   AlarmClock,
@@ -92,8 +93,8 @@ export const navigationItems: NavItem[] = [
     icon: Database,
   },
   {
-    name: 'Services',
-    title: 'Services',
+    name: 'Service Catalog',
+    title: 'Service Catalog',
     href: '/services',
     path: '/services',
     icon: Network,
@@ -120,21 +121,21 @@ export const navigationItems: NavItem[] = [
     icon: Settings,
   },
   {
-    name: 'Bugs',
-    title: 'Bugs',
-    href: '/bugs',
-    path: '/bugs',
-    icon: Bug,
-  },
-  {
-    name: 'Testing',
-    title: 'Testing',
+    name: 'Test Management',
+    title: 'Test Management',
     href: '/testing',
     path: '/testing',
     icon: TestTube2,
   },
   {
-    name: 'Users',
+    name: 'Bug Tracking',
+    title: 'Bug Tracking',
+    href: '/bugs',
+    path: '/bugs',
+    icon: Bug,
+  },
+  {
+    name: 'User Management',
     title: 'User Management',
     href: '/user-management',
     path: '/user-management',
