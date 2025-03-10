@@ -1,6 +1,6 @@
 
 // Mock asset data for demonstration purposes
-const mockAssets = [
+export const mockAssets = [
   {
     id: 'ASSET-001',
     name: 'Dell XPS 15 Laptop',
@@ -82,6 +82,14 @@ const mockAssets = [
     notes: 'Main network switch for office'
   }
 ];
+
+// Generate a new asset ID
+export const generateAssetId = () => {
+  const lastAsset = mockAssets[mockAssets.length - 1];
+  const lastIdNumber = parseInt(lastAsset.id.split('-')[1]);
+  const newIdNumber = lastIdNumber + 1;
+  return `ASSET-${newIdNumber.toString().padStart(3, '0')}`;
+};
 
 // Helper function to get all assets
 export const getAllAssets = async () => {

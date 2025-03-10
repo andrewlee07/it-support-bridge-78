@@ -42,6 +42,7 @@ export interface Problem {
   // Associated assets and services
   associatedAssets?: string[];
   associatedServices?: string[];
+  serviceId?: string; // Adding serviceId field to match what's used in ProblemDetails component
 }
 
 export interface RelatedIncident {

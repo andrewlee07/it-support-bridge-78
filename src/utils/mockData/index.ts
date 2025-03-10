@@ -10,7 +10,11 @@ import {
   generateIncidentId,
   generateServiceRequestId
 } from './tickets';
-import { mockAssets, getAssetById, generateAssetId } from './assets';
+import { 
+  mockAssets, 
+  getAssetById, 
+  generateAssetId 
+} from './assets';
 import { 
   mockChangeRequests, 
   getChangeRequestById, 
