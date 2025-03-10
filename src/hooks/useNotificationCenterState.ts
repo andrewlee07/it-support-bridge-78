@@ -19,7 +19,8 @@ export const useNotificationCenterState = (initialNotifications: Notification[])
       backlogItems: true,
       releases: true,
       assets: true,
-      changes: true
+      changes: true,
+      knowledge: true
     },
     deliveryMethods: {
       inApp: true,
@@ -116,3 +117,4 @@ export const useNotificationCenterState = (initialNotifications: Notification[])
     itemsPerPage
   };
 };
+
