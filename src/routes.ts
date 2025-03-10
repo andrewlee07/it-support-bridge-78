@@ -84,35 +84,35 @@ const router = createBrowserRouter([
       },
       {
         path: '/bugs',
-        element: React.createElement(() => <div>Bugs Page</div>)
+        element: React.createElement(() => React.createElement('div', null, 'Bugs Page'))
       },
       {
         path: '/testing',
-        element: React.createElement(() => <div>Testing Page</div>)
+        element: React.createElement(() => React.createElement('div', null, 'Testing Page'))
       },
       {
         path: '/users',
-        element: React.createElement(() => <div>User Management Page</div>)
+        element: React.createElement(() => React.createElement('div', null, 'User Management Page'))
       },
       {
         path: '/admin',
-        element: React.createElement(() => <div>Admin Settings Page</div>)
+        element: React.createElement(() => React.createElement('div', null, 'Admin Settings Page'))
       },
       {
         path: '/profile',
-        element: React.createElement(() => <div>User Profile Page</div>)
+        element: React.createElement(() => React.createElement('div', null, 'User Profile Page'))
       },
       {
         path: '/security',
-        element: React.createElement(() => <div>Security Page</div>)
+        element: React.createElement(() => React.createElement('div', null, 'Security Page'))
       },
       {
         path: '/knowledge',
-        element: React.createElement(() => <div>Knowledge Base Page</div>)
+        element: React.createElement(() => React.createElement('div', null, 'Knowledge Base Page'))
       },
       {
         path: '/services',
-        element: React.createElement(() => <div>Services Page</div>)
+        element: React.createElement(() => React.createElement('div', null, 'Services Page'))
       }
     ]
   }
