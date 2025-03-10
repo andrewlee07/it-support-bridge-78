@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,9 +6,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface PlanTemplatesProps {
   type: 'implementation' | 'rollback';
@@ -18,7 +20,10 @@ interface PlanTemplatesProps {
 
 const PlanTemplates: React.FC<PlanTemplatesProps> = ({ type, onSelectTemplate }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isNewTemplateDialogOpen, setIsNewTemplateDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [newTemplateName, setNewTemplateName] = useState('');
+  const [newTemplateContent, setNewTemplateContent] = useState('');
 
   // Mock templates - in a real app, these would come from the backend
   const templates = type === 'implementation' 
@@ -91,6 +96,14 @@ const PlanTemplates: React.FC<PlanTemplatesProps> = ({ type, onSelectTemplate })
         },
       ];
 
+  const handleSaveNewTemplate = () => {
+    // In a real app, this would save to the backend
+    // For now, just close the dialog
+    setIsNewTemplateDialogOpen(false);
+    setNewTemplateName('');
+    setNewTemplateContent('');
+  };
+
   // Filter templates based on search
   const filteredTemplates = searchQuery
     ? templates.filter(template => 
@@ -106,15 +119,25 @@ const PlanTemplates: React.FC<PlanTemplatesProps> = ({ type, onSelectTemplate })
 
   return (
     <>
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => setIsDialogOpen(true)}
-        className="mb-2"
-      >
-        Browse {type === 'implementation' ? 'Implementation' : 'Rollback'} Templates
-      </Button>
+      <div className="flex gap-2 mb-2">
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="sm" 
+          onClick={() => setIsDialogOpen(true)}
+        >
+          Browse Templates
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setIsNewTemplateDialogOpen(true)}
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          Save as Template
+        </Button>
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
@@ -160,6 +183,49 @@ const PlanTemplates: React.FC<PlanTemplatesProps> = ({ type, onSelectTemplate })
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isNewTemplateDialogOpen} onOpenChange={setIsNewTemplateDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Save as Template</DialogTitle>
+            <DialogDescription>
+              Create a new template for future use
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="templateName">Template Name</Label>
+              <Input
+                id="templateName"
+                value={newTemplateName}
+                onChange={(e) => setNewTemplateName(e.target.value)}
+                placeholder="Enter template name"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="templateContent">Template Content</Label>
+              <Textarea
+                id="templateContent"
+                value={newTemplateContent}
+                onChange={(e) => setNewTemplateContent(e.target.value)}
+                placeholder="Enter template content"
+                className="min-h-[200px]"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsNewTemplateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveNewTemplate}>
+              Save Template
             </Button>
           </DialogFooter>
         </DialogContent>

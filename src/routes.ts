@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import MainLayout from '@/layouts/MainLayout';
@@ -81,6 +80,38 @@ const router = createBrowserRouter([
       {
         path: '/approvals',
         element: React.createElement(Approvals)
+      },
+      {
+        path: '/bugs',
+        element: React.createElement(() => <div>Bugs Page</div>)
+      },
+      {
+        path: '/testing',
+        element: React.createElement(() => <div>Testing Page</div>)
+      },
+      {
+        path: '/users',
+        element: React.createElement(() => <div>User Management Page</div>)
+      },
+      {
+        path: '/admin',
+        element: React.createElement(() => <div>Admin Settings Page</div>)
+      },
+      {
+        path: '/profile',
+        element: React.createElement(() => <div>User Profile Page</div>)
+      },
+      {
+        path: '/security',
+        element: React.createElement(() => <div>Security Page</div>)
+      },
+      {
+        path: '/knowledge',
+        element: React.createElement(() => <div>Knowledge Base Page</div>)
+      },
+      {
+        path: '/services',
+        element: React.createElement(() => <div>Services Page</div>)
       }
     ]
   }

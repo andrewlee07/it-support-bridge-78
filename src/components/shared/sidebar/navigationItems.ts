@@ -1,4 +1,3 @@
-
 import {
   LayoutDashboard,
   AlarmClock,
@@ -14,6 +13,10 @@ import {
   Database,
   FileText,
   CheckSquare,
+  Bug,
+  TestTube2,
+  Users,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { NavItem } from './types';
 
@@ -115,5 +118,33 @@ export const navigationItems: NavItem[] = [
     href: '/settings',
     path: '/settings',
     icon: Settings,
+  },
+  {
+    name: 'Bugs',
+    title: 'Bugs',
+    href: '/bugs',
+    path: '/bugs',
+    icon: Bug,
+  },
+  {
+    name: 'Testing',
+    title: 'Testing',
+    href: '/testing',
+    path: '/testing',
+    icon: TestTube2,
+  },
+  {
+    name: 'Users',
+    title: 'User Management',
+    href: '/users',
+    path: '/users',
+    icon: Users,
+  },
+  {
+    name: 'Admin',
+    title: 'Admin Settings',
+    href: '/admin',
+    path: '/admin',
+    icon: SlidersHorizontal,
   },
 ];
