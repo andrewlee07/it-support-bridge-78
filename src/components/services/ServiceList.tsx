@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Service, ServiceCategory, ServiceWithCategory } from '@/utils/types/service';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Search, Edit, ExternalLink } from 'lucide-react';
+import { PlusCircle, Search, Edit, ExternalLink, Grid, List } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -20,6 +20,7 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
+import ServiceTopologyView from './ServiceTopologyView';
 
 interface ServiceListProps {
   services: ServiceWithCategory[];
@@ -42,6 +43,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [viewMode, setViewMode] = useState<'list' | 'topology'>('list');
 
   // Filter services based on search query and category filter
   const filteredServices = services.filter(service => {
@@ -66,41 +68,65 @@ const ServiceList: React.FC<ServiceListProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <div className="flex-1 flex space-x-2">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search services..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        <div className="flex-1 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+          <div className="flex space-x-2">
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search services..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            {categories.length > 0 && (
+              <Select 
+                value={categoryFilter} 
+                onValueChange={setCategoryFilter}
+              >
+                <SelectTrigger className="w-full md:w-52">
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
-          {categories.length > 0 && (
-            <Select 
-              value={categoryFilter} 
-              onValueChange={setCategoryFilter}
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <div className="border rounded-md p-1">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+              className="px-2"
             >
-              <SelectTrigger className="w-full md:w-52">
-                <SelectValue placeholder="Filter by category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'topology' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('topology')}
+              className="px-2"
+            >
+              <Grid className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          {onAddService && (
+            <Button onClick={onAddService} className="bg-primary text-white">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Service
+            </Button>
           )}
         </div>
-        {onAddService && (
-          <Button onClick={onAddService} className="bg-primary text-white">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Service
-          </Button>
-        )}
       </div>
 
       {isLoading ? (
@@ -114,6 +140,17 @@ const ServiceList: React.FC<ServiceListProps> = ({
               ? "No services match your search"
               : "No services found. Add your first service to get started."}
           </p>
+        </div>
+      ) : viewMode === 'topology' ? (
+        <div className="h-[700px]">
+          <ServiceTopologyView 
+            services={filteredServices} 
+            onSelectService={(service) => {
+              if (onSelect) {
+                onSelect(service);
+              }
+            }} 
+          />
         </div>
       ) : (
         <div className="border rounded-md">
