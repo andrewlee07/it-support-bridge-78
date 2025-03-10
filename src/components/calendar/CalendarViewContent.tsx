@@ -11,7 +11,7 @@ import { getEventColorClass } from './utils/eventColorUtils';
 interface CalendarViewContentProps {
   displayMode: 'calendar' | 'table' | 'split';
   date: Date;
-  view: 'day' | 'week' | 'month' | 'timeline';
+  view: 'day' | 'week' | 'month';
   events: CalendarEvent[];
   isLoading: boolean;
   onDateSelect: (date: Date | undefined) => void;

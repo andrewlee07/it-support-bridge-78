@@ -50,12 +50,6 @@ export const useChangeCalendarEvents = (
           start: startOfMonth(date),
           end: endOfMonth(date)
         };
-      case 'timeline':
-        // For timeline, show 3 months: previous, current, and next
-        return {
-          start: startOfMonth(subMonths(date, 1)),
-          end: endOfMonth(addMonths(date, 1))
-        };
       default:
         return {
           start: startOfMonth(date),
