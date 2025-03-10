@@ -77,7 +77,7 @@ const Login = () => {
         <div className="max-w-screen-xl mx-auto">
           <div className="flex items-center">
             <img 
-              src="/lovable-uploads/9f8e5267-ab6c-409e-99f0-0517f48fc1b8.png" 
+              src="/lovable-uploads/1d1d210b-925d-4f3b-a218-4bb7ea9297a7.png" 
               alt="We Are Group" 
               className="h-10 md:h-12"
             />
