@@ -4,7 +4,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { isSameDay } from 'date-fns';
 import { CalendarEvent } from '@/utils/types/calendar';
 import CalendarEventTable from './CalendarEventTable';
-import { DayProps, DayContent } from 'react-day-picker';
+import { DayProps } from 'react-day-picker';
 
 interface CalendarViewContentProps {
   displayMode: 'calendar' | 'table' | 'split';
@@ -40,7 +40,9 @@ const CalendarViewContent: React.FC<CalendarViewContentProps> = ({
               Day: ({ date: day, ...props }: DayProps) => {
                 return (
                   <div className="relative h-12 w-full p-1 flex justify-center">
-                    <div className="absolute top-1 right-1 text-xs">{props.children}</div>
+                    <div className="absolute top-1 right-1 text-xs">
+                      {day && props.children}
+                    </div>
                     {day && renderEvent(day)}
                   </div>
                 );
