@@ -112,7 +112,7 @@ export const mockServiceKnowledge: ServiceKnowledge[] = [
     id: 'SK-001',
     serviceId: 'SVC-001', // Salesforce CRM
     knowledgeArticleId: 'KA-001',
-    relationshipType: 'Documentation',
+    relationshipType: 'documentation',
     isPrimary: true,
     displayOrder: 1
   },
@@ -120,7 +120,7 @@ export const mockServiceKnowledge: ServiceKnowledge[] = [
     id: 'SK-002',
     serviceId: 'SVC-001', // Salesforce CRM
     knowledgeArticleId: 'KA-002',
-    relationshipType: 'Known Issue',
+    relationshipType: 'known-issue',
     isPrimary: true,
     displayOrder: 2
   },
@@ -128,7 +128,7 @@ export const mockServiceKnowledge: ServiceKnowledge[] = [
     id: 'SK-003',
     serviceId: 'SVC-002', // Microsoft 365
     knowledgeArticleId: 'KA-003',
-    relationshipType: 'Documentation',
+    relationshipType: 'documentation',
     isPrimary: true,
     displayOrder: 1
   },
@@ -136,7 +136,7 @@ export const mockServiceKnowledge: ServiceKnowledge[] = [
     id: 'SK-004',
     serviceId: 'SVC-002', // Microsoft 365
     knowledgeArticleId: 'KA-004',
-    relationshipType: 'FAQ',
+    relationshipType: 'faq',
     isPrimary: true,
     displayOrder: 2
   },
@@ -144,7 +144,7 @@ export const mockServiceKnowledge: ServiceKnowledge[] = [
     id: 'SK-005',
     serviceId: 'SVC-003', // Corporate WiFi
     knowledgeArticleId: 'KA-005',
-    relationshipType: 'Documentation',
+    relationshipType: 'documentation',
     isPrimary: true,
     displayOrder: 1
   },
@@ -152,7 +152,7 @@ export const mockServiceKnowledge: ServiceKnowledge[] = [
     id: 'SK-006',
     serviceId: 'SVC-003', // Corporate WiFi
     knowledgeArticleId: 'KA-006',
-    relationshipType: 'Known Issue',
+    relationshipType: 'known-issue',
     isPrimary: true,
     displayOrder: 2
   },
@@ -160,7 +160,7 @@ export const mockServiceKnowledge: ServiceKnowledge[] = [
     id: 'SK-007',
     serviceId: 'SVC-004', // Power BI
     knowledgeArticleId: 'KA-007',
-    relationshipType: 'Documentation',
+    relationshipType: 'documentation',
     isPrimary: true,
     displayOrder: 1
   },
@@ -168,7 +168,7 @@ export const mockServiceKnowledge: ServiceKnowledge[] = [
     id: 'SK-008',
     serviceId: 'SVC-006', // VPN Access
     knowledgeArticleId: 'KA-008',
-    relationshipType: 'FAQ',
+    relationshipType: 'faq',
     isPrimary: true,
     displayOrder: 1
   }
@@ -291,7 +291,7 @@ export const associateKnowledgeWithService = (
   // Get current display order max value
   const relatedItems = mockServiceKnowledge.filter(sk => sk.serviceId === serviceId);
   const maxDisplayOrder = relatedItems.length > 0 
-    ? Math.max(...relatedItems.map(item => item.displayOrder))
+    ? Math.max(...relatedItems.map(item => item.displayOrder || 0))
     : 0;
   
   // Generate new ID

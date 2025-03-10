@@ -125,7 +125,7 @@ export interface ServiceBusinessUnit {
 }
 
 // Knowledge base integration types
-export type ServiceKnowledgeRelationshipType = 'documentation' | 'user-guide' | 'faq' | 'training';
+export type ServiceKnowledgeRelationshipType = 'documentation' | 'user-guide' | 'faq' | 'training' | 'known-issue';
 
 export interface ServiceKnowledge {
   id: string;
@@ -133,4 +133,5 @@ export interface ServiceKnowledge {
   knowledgeArticleId: string;
   relationshipType: ServiceKnowledgeRelationshipType;
   isPrimary?: boolean;
+  displayOrder?: number;
 }
