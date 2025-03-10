@@ -14,7 +14,14 @@ interface ReleasesHeaderProps {
   totalCount?: number;
 }
 
-const ReleasesHeader: React.FC<ReleasesHeaderProps> = ({ onCreateNew }) => {
+const ReleasesHeader: React.FC<ReleasesHeaderProps> = ({ 
+  onCreateNew,
+  onTabChange,
+  activeTab,
+  onStatusFilterChange,
+  statusFilter,
+  totalCount
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
