@@ -9,13 +9,14 @@ import ChangeRequestMetadata from './ChangeRequestMetadata';
 import ChangeRequestDescription from './ChangeRequestDescription';
 import ChangeRequestApprovals from './ChangeRequestApprovals';
 import ChangeRequestActionButtons from './ChangeRequestActionButtons';
+import ChangeRequestClosureDetails from './ChangeRequestClosureDetails';
 
 export interface ChangeRequestContentProps {
   changeRequest: ChangeRequest;
   onApprove?: () => void;
   onReject?: () => void;
   onEdit?: () => void;
-  onUpdateStatus?: (status: string) => void;
+  onUpdateStatus?: (status: string, closureReason?: string) => void;
   onAddImplementor?: (userId: string) => void;
   onAddApprover?: (userId: string, role: string) => void;
   onClose?: () => void;
@@ -51,9 +52,9 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
   const canUpdateStatus = hasPermission(['admin', 'it', 'change-manager']) || 
                           changeRequest.createdBy === user?.id;
 
-  const handleStatusChange = (newStatus: string) => {
+  const handleStatusChange = (newStatus: string, closureReason?: string) => {
     if (onUpdateStatus) {
-      onUpdateStatus(newStatus);
+      onUpdateStatus(newStatus, closureReason);
     }
   };
 
@@ -61,6 +62,9 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
   const showRiskAssessment = changeRequest.riskScore > 0 && 
                             changeRequest.assessmentAnswers && 
                             changeRequest.assessmentAnswers.length > 0;
+
+  // Show closure details if the change is completed and has a closure reason
+  const showClosureDetails = changeRequest.status === 'completed' && changeRequest.closureReason;
 
   return (
     <Card className="w-full shadow-sm">
@@ -79,6 +83,7 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           <ChangeRequestBadges 
             status={changeRequest.status}
             riskLevel={changeRequest.riskLevel}
+            closureReason={changeRequest.closureReason}
             canUpdateStatus={canUpdateStatus}
             onStatusChange={handleStatusChange}
           />
@@ -98,11 +103,18 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           onAddImplementor={onAddImplementor}
         />
         
+        {showClosureDetails && (
+          <ChangeRequestClosureDetails 
+            closureReason={changeRequest.closureReason}
+            closedAt={changeRequest.updatedAt}
+          />
+        )}
+        
         {showRiskAssessment && (
           <div className="border rounded-md p-4 bg-muted/20">
             <h3 className="text-lg font-medium mb-3">Risk Assessment Details</h3>
             <RiskAssessmentDetails 
-              answers={changeRequest.assessmentAnswers || []} 
+              answers={changeRequest.assessmentAnswers || []}
               riskScore={changeRequest.riskScore}
               riskLevel={changeRequest.riskLevel}
             />

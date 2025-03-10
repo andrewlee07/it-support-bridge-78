@@ -37,6 +37,10 @@ const ChangeDetail = () => {
     navigate(`/changes/${changeRequest.id}/close`);
   };
 
+  const handleStatusUpdate = (status: string, closureReason?: string) => {
+    handleUpdateStatus(status, closureReason);
+  };
+
   if (loading) {
     return <ChangeRequestLoading />;
   }
@@ -55,7 +59,7 @@ const ChangeDetail = () => {
           onApprove={handleApprove}
           onReject={handleReject}
           onEdit={handleEdit}
-          onUpdateStatus={handleUpdateStatus}
+          onUpdateStatus={handleStatusUpdate}
           onAddImplementor={handleAddImplementor}
           onAddApprover={handleAddApprover}
           onClose={handleClose}

@@ -62,13 +62,20 @@ export const useChangeRequestDetail = (id: string | undefined) => {
     }
   };
 
-  const handleUpdateStatus = async (status: string) => {
+  const handleUpdateStatus = async (status: string, closureReason?: string) => {
     if (!changeRequest || !user) return;
     
     try {
+      const updateData: Partial<ChangeRequest> = { status: status as any };
+      
+      // If changing to completed and providing a closure reason, include it
+      if (status === 'completed' && closureReason) {
+        updateData.closureReason = closureReason as any;
+      }
+      
       const response = await updateChangeRequest(
         changeRequest.id,
-        { status: status as any },
+        updateData,
         user.id
       );
       

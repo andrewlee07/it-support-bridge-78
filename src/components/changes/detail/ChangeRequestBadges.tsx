@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -22,23 +23,25 @@ import {
   SelectValue as ClosureSelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { RiskLevel, ChangeStatus } from '@/utils/types/change';
+import { RiskLevel, ChangeStatus, ClosureReason } from '@/utils/types/change';
 
 interface ChangeRequestBadgesProps {
   status: ChangeStatus;
   riskLevel: RiskLevel;
+  closureReason?: ClosureReason;
   canUpdateStatus: boolean;
-  onStatusChange?: (status: string) => void;
+  onStatusChange?: (status: string, closureReason?: string) => void;
 }
 
 const ChangeRequestBadges: React.FC<ChangeRequestBadgesProps> = ({
   status,
   riskLevel,
+  closureReason: initialClosureReason,
   canUpdateStatus,
   onStatusChange
 }) => {
   const [showClosureDialog, setShowClosureDialog] = useState(false);
-  const [selectedClosureReason, setSelectedClosureReason] = useState<string>('');
+  const [selectedClosureReason, setSelectedClosureReason] = useState<string>(initialClosureReason || '');
 
   const handleStatusChange = (newStatus: string) => {
     if (newStatus === 'completed') {
@@ -50,7 +53,7 @@ const ChangeRequestBadges: React.FC<ChangeRequestBadgesProps> = ({
 
   const handleClosureSubmit = () => {
     if (selectedClosureReason) {
-      onStatusChange?.('completed');
+      onStatusChange?.('completed', selectedClosureReason);
       setShowClosureDialog(false);
     }
   };
