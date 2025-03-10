@@ -5,10 +5,10 @@ import { KnowledgeArticle } from '@/utils/types/knowledge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { createKnowledgeArticle, updateKnowledgeArticle } from '@/utils/api/knowledgeApi';
 import { useQueryClient } from '@tanstack/react-query';
+import { Editor } from '@tinymce/tinymce-react';
 import {
   Form,
   FormControl,
@@ -85,7 +85,7 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {articleToEdit ? 'Edit Article' : 'Create New Article'}
@@ -163,10 +163,24 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Article content..."
-                      className="min-h-[200px]"
-                      {...field}
+                    <Editor
+                      apiKey="your-tinymce-api-key" // You'll need to get a free API key from TinyMCE
+                      value={field.value}
+                      onEditorChange={field.onChange}
+                      init={{
+                        height: 400,
+                        menubar: false,
+                        plugins: [
+                          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                          'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                          'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                        ],
+                        toolbar: 'undo redo | blocks | ' +
+                          'bold italic forecolor | alignleft aligncenter ' +
+                          'alignright alignjustify | bullist numlist outdent indent | ' +
+                          'removeformat | help',
+                        content_style: 'body { font-family:Inter,Arial,sans-serif; font-size:14px }'
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
