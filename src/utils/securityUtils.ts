@@ -33,6 +33,12 @@ export const mockPermissions: Permission[] = [
   { id: 'perm-12', name: 'Reject Releases', description: 'Ability to reject releases', resource: 'releases', action: 'reject' },
   { id: 'perm-13', name: 'Manage Service Catalog Config', description: 'Access to Service Catalog Configuration in admin settings', resource: 'service-catalog', action: 'configure' },
   { id: 'perm-14', name: 'Manage Service Catalog Content', description: 'Access to manage service content within service catalog', resource: 'service-catalog', action: 'manage' },
+  
+  // Knowledge article permissions
+  { id: 'perm-15', name: 'Create Knowledge Articles', description: 'Ability to create knowledge articles', resource: 'knowledge-articles', action: 'create' },
+  { id: 'perm-16', name: 'Edit Knowledge Articles', description: 'Ability to edit knowledge articles', resource: 'knowledge-articles', action: 'update' },
+  { id: 'perm-17', name: 'Delete Knowledge Articles', description: 'Ability to delete knowledge articles', resource: 'knowledge-articles', action: 'delete' },
+  { id: 'perm-18', name: 'Approve Knowledge Articles', description: 'Ability to review and approve knowledge articles', resource: 'knowledge-articles', action: 'approve' },
 ];
 
 // Mock role permissions - in a real app, this would come from a database
@@ -79,6 +85,22 @@ export const mockRolePermissions: RolePermission[] = [
   // Service Catalog Manager permissions
   { roleId: 'service-catalog-manager' as const, permissionId: 'perm-1' }, // View tickets
   { roleId: 'service-catalog-manager' as const, permissionId: 'perm-14' }, // Manage service catalog content
+  
+  // Knowledge permissions
+  { roleId: 'admin' as const, permissionId: 'perm-15' }, // Create KB articles
+  { roleId: 'admin' as const, permissionId: 'perm-16' }, // Edit KB articles
+  { roleId: 'admin' as const, permissionId: 'perm-17' }, // Delete KB articles
+  { roleId: 'admin' as const, permissionId: 'perm-18' }, // Approve KB articles
+  
+  // Manager can approve articles
+  { roleId: 'manager' as const, permissionId: 'perm-18' }, // Approve KB articles
+  
+  // IT staff can create and edit articles
+  { roleId: 'it' as const, permissionId: 'perm-15' }, // Create KB articles
+  { roleId: 'it' as const, permissionId: 'perm-16' }, // Edit KB articles
+  
+  // Agents can create articles
+  { roleId: 'agent' as const, permissionId: 'perm-15' }, // Create KB articles
 ];
 
 // Placeholder for security event log - in a real app, this would be stored in a database

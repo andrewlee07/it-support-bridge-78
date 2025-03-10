@@ -6,9 +6,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { createKnowledgeArticle, updateKnowledgeArticle } from '@/utils/api/knowledgeApi';
+import { createKnowledgeArticle, updateKnowledgeArticle, submitArticleForReview, approveArticle, rejectArticle } from '@/utils/api/knowledgeApi';
 import { useQueryClient } from '@tanstack/react-query';
 import { Editor } from '@tinymce/tinymce-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
   FormControl,
@@ -30,6 +32,7 @@ interface KnowledgeArticleFormProps {
   isOpen: boolean;
   onClose: () => void;
   articleToEdit?: KnowledgeArticle;
+  mode?: 'edit' | 'review';
 }
 
 type FormValues = {
@@ -37,6 +40,7 @@ type FormValues = {
   content: string;
   type: string;
   tags: string[];
+  reviewComments?: string;
 };
 
 const ARTICLE_TYPES = [
@@ -51,30 +55,51 @@ const ARTICLE_TYPES = [
 const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
   isOpen,
   onClose,
-  articleToEdit
+  articleToEdit,
+  mode = 'edit'
 }) => {
   const queryClient = useQueryClient();
+  const { user, userCanPerformAction } = useAuth();
+  
+  const isAuthor = userCanPerformAction('knowledge-articles', 'create');
+  const isReviewer = userCanPerformAction('knowledge-articles', 'approve');
+  
   const form = useForm<FormValues>({
     defaultValues: {
       title: articleToEdit?.title || '',
       content: articleToEdit?.content || '',
       type: articleToEdit?.type || 'Documentation',
       tags: articleToEdit?.tags || [],
+      reviewComments: articleToEdit?.reviewComments || '',
     }
   });
 
   const onSubmit = async (data: FormValues) => {
     try {
-      if (articleToEdit) {
-        await updateKnowledgeArticle(articleToEdit.id, data);
-        toast.success('Article updated successfully');
+      if (mode === 'review' && articleToEdit) {
+        // Handle review actions
+        if (isReviewer) {
+          // This is handled by the review action buttons, not form submission
+          return;
+        }
       } else {
-        await createKnowledgeArticle({
-          ...data,
-          authorId: 'user-1', // Mock user ID
-        });
-        toast.success('Article created successfully');
+        // Handle edit/create
+        if (articleToEdit) {
+          await updateKnowledgeArticle(articleToEdit.id, {
+            ...data,
+            status: 'draft' // Save as draft when updating
+          });
+          toast.success('Article updated successfully');
+        } else {
+          await createKnowledgeArticle({
+            ...data,
+            authorId: user?.id || 'user-1', // Use actual user ID
+            status: 'draft' // New articles start as drafts
+          });
+          toast.success('Article created successfully');
+        }
       }
+      
       queryClient.invalidateQueries({ queryKey: ['knowledgeArticles'] });
       onClose();
     } catch (error) {
@@ -83,12 +108,69 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
     }
   };
 
+  const handleSubmitForReview = async () => {
+    if (!articleToEdit) return;
+
+    try {
+      await submitArticleForReview(articleToEdit.id);
+      toast.success('Article submitted for review');
+      queryClient.invalidateQueries({ queryKey: ['knowledgeArticles'] });
+      onClose();
+    } catch (error) {
+      toast.error('Failed to submit article for review');
+      console.error(error);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!articleToEdit) return;
+
+    try {
+      const values = form.getValues();
+      await approveArticle(articleToEdit.id, values.reviewComments || '');
+      toast.success('Article approved');
+      queryClient.invalidateQueries({ queryKey: ['knowledgeArticles'] });
+      onClose();
+    } catch (error) {
+      toast.error('Failed to approve article');
+      console.error(error);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!articleToEdit) return;
+
+    try {
+      const values = form.getValues();
+      if (!values.reviewComments) {
+        toast.error('Please provide review comments when rejecting an article');
+        return;
+      }
+      
+      await rejectArticle(articleToEdit.id, values.reviewComments);
+      toast.success('Article rejected');
+      queryClient.invalidateQueries({ queryKey: ['knowledgeArticles'] });
+      onClose();
+    } catch (error) {
+      toast.error('Failed to reject article');
+      console.error(error);
+    }
+  };
+
+  const isReviewMode = mode === 'review' && isReviewer;
+  const canSubmitForReview = articleToEdit && articleToEdit.status === 'draft' && isAuthor;
+  const isPendingReview = articleToEdit && articleToEdit.status === 'pending_review';
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {articleToEdit ? 'Edit Article' : 'Create New Article'}
+            {isReviewMode 
+              ? 'Review Knowledge Article' 
+              : articleToEdit 
+                ? 'Edit Article' 
+                : 'Create New Article'}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -101,7 +183,12 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Article title" {...field} />
+                    <Input 
+                      placeholder="Article title" 
+                      {...field} 
+                      readOnly={isReviewMode} 
+                      className={isReviewMode ? "bg-gray-100" : ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -118,9 +205,10 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={isReviewMode}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className={isReviewMode ? "bg-gray-100" : ""}>
                         <SelectValue placeholder="Select article type" />
                       </SelectTrigger>
                     </FormControl>
@@ -148,6 +236,7 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
                       value={field.value}
                       onChange={field.onChange}
                       placeholder="Add tags..."
+                      disabled={isReviewMode}
                     />
                   </FormControl>
                   <FormMessage />
@@ -167,6 +256,7 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
                       apiKey="your-tinymce-api-key" // You'll need to get a free API key from TinyMCE
                       value={field.value}
                       onEditorChange={field.onChange}
+                      disabled={isReviewMode}
                       init={{
                         height: 400,
                         menubar: false,
@@ -179,7 +269,8 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
                           'bold italic forecolor | alignleft aligncenter ' +
                           'alignright alignjustify | bullist numlist outdent indent | ' +
                           'removeformat | help',
-                        content_style: 'body { font-family:Inter,Arial,sans-serif; font-size:14px }'
+                        content_style: 'body { font-family:Inter,Arial,sans-serif; font-size:14px }',
+                        readonly: isReviewMode
                       }}
                     />
                   </FormControl>
@@ -188,13 +279,66 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
               )}
             />
 
+            {isReviewMode && (
+              <FormField
+                control={form.control}
+                name="reviewComments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Review Comments</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Provide feedback or comments on this article..."
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <div className="flex justify-end space-x-2 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit">
-                {articleToEdit ? 'Update' : 'Create'} Article
-              </Button>
+
+              {isReviewMode ? (
+                <>
+                  <Button 
+                    type="button" 
+                    variant="destructive" 
+                    onClick={handleReject}
+                  >
+                    Reject
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="default" 
+                    onClick={handleApprove}
+                  >
+                    Approve
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {canSubmitForReview && (
+                    <Button 
+                      type="button" 
+                      variant="secondary" 
+                      onClick={handleSubmitForReview}
+                    >
+                      Submit for Review
+                    </Button>
+                  )}
+                  {!isPendingReview && (
+                    <Button type="submit">
+                      {articleToEdit ? 'Save' : 'Create'} Draft
+                    </Button>
+                  )}
+                </>
+              )}
             </div>
           </form>
         </Form>

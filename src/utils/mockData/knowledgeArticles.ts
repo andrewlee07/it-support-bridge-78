@@ -1,18 +1,5 @@
-
 import { ServiceKnowledge, ServiceKnowledgeRelationshipType } from '../types/service';
-
-// Knowledge article interface
-export interface KnowledgeArticle {
-  id: string;
-  title: string;
-  content: string;
-  type: string; // "Documentation", "Known Issue", "FAQ", "Guide", etc.
-  tags: string[];
-  authorId: string;
-  viewCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { KnowledgeArticle } from '../types/knowledge';
 
 // Mock knowledge articles
 export const mockKnowledgeArticles: KnowledgeArticle[] = [
@@ -25,7 +12,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     authorId: 'user-2',
     viewCount: 243,
     createdAt: new Date(2023, 1, 15),
-    updatedAt: new Date(2023, 1, 15)
+    updatedAt: new Date(2023, 1, 15),
+    status: 'approved'
   },
   {
     id: 'KA-002',
@@ -36,7 +24,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     authorId: 'user-3',
     viewCount: 156,
     createdAt: new Date(2023, 2, 10),
-    updatedAt: new Date(2023, 2, 10)
+    updatedAt: new Date(2023, 2, 10),
+    status: 'approved'
   },
   {
     id: 'KA-003',
@@ -47,7 +36,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     authorId: 'user-1',
     viewCount: 382,
     createdAt: new Date(2023, 2, 5),
-    updatedAt: new Date(2023, 2, 5)
+    updatedAt: new Date(2023, 2, 5),
+    status: 'approved'
   },
   {
     id: 'KA-004',
@@ -58,7 +48,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     authorId: 'user-3',
     viewCount: 215,
     createdAt: new Date(2023, 3, 12),
-    updatedAt: new Date(2023, 3, 12)
+    updatedAt: new Date(2023, 3, 12),
+    status: 'approved'
   },
   {
     id: 'KA-005',
@@ -69,7 +60,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     authorId: 'user-1',
     viewCount: 298,
     createdAt: new Date(2023, 1, 20),
-    updatedAt: new Date(2023, 1, 20)
+    updatedAt: new Date(2023, 1, 20),
+    status: 'pending_review'
   },
   {
     id: 'KA-006',
@@ -80,7 +72,9 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     authorId: 'user-1',
     viewCount: 123,
     createdAt: new Date(2023, 4, 5),
-    updatedAt: new Date(2023, 4, 5)
+    updatedAt: new Date(2023, 4, 5),
+    status: 'draft',
+    reviewComments: 'Please provide more details on the connectivity issues'
   },
   {
     id: 'KA-007',
@@ -91,7 +85,11 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     authorId: 'user-4',
     viewCount: 187,
     createdAt: new Date(2023, 3, 25),
-    updatedAt: new Date(2023, 3, 25)
+    updatedAt: new Date(2023, 3, 25),
+    status: 'rejected',
+    reviewerId: 'user-1',
+    reviewDate: new Date(2023, 3, 27),
+    reviewComments: 'This guide needs more screenshots and clearer instructions.'
   },
   {
     id: 'KA-008',
@@ -102,7 +100,10 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     authorId: 'user-1',
     viewCount: 276,
     createdAt: new Date(2023, 2, 15),
-    updatedAt: new Date(2023, 2, 15)
+    updatedAt: new Date(2023, 2, 15),
+    status: 'approved',
+    reviewerId: 'user-5',
+    reviewDate: new Date(2023, 2, 16)
   }
 ];
 

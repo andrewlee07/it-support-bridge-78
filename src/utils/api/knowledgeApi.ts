@@ -8,7 +8,8 @@ export const getKnowledgeArticles = async (
   query?: string,
   type?: string,
   categoryId?: string,
-  tags?: string[]
+  tags?: string[],
+  status?: string
 ): Promise<ApiResponse<PaginatedResponse<KnowledgeArticle>>> => {
   // Simulate API call to fetch articles
   let filteredArticles = [...mockKnowledgeArticles];
@@ -30,6 +31,10 @@ export const getKnowledgeArticles = async (
     filteredArticles = filteredArticles.filter(article => 
       tags.some(tag => article.tags.includes(tag))
     );
+  }
+  
+  if (status) {
+    filteredArticles = filteredArticles.filter(article => article.status === status);
   }
   
   return {
@@ -66,7 +71,9 @@ export const getKnowledgeArticleById = async (id: string): Promise<ApiResponse<K
 };
 
 // Create a new knowledge article
-export const createKnowledgeArticle = async (article: Omit<KnowledgeArticle, 'id' | 'viewCount' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<KnowledgeArticle>> => {
+export const createKnowledgeArticle = async (
+  article: Omit<KnowledgeArticle, 'id' | 'viewCount' | 'createdAt' | 'updatedAt'>
+): Promise<ApiResponse<KnowledgeArticle>> => {
   const newId = `KA-${(mockKnowledgeArticles.length + 1).toString().padStart(3, '0')}`;
   
   const newArticle: KnowledgeArticle = {
@@ -74,7 +81,8 @@ export const createKnowledgeArticle = async (article: Omit<KnowledgeArticle, 'id
     ...article,
     viewCount: 0,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    status: article.status || 'draft'
   };
   
   mockKnowledgeArticles.push(newArticle);
@@ -86,7 +94,10 @@ export const createKnowledgeArticle = async (article: Omit<KnowledgeArticle, 'id
 };
 
 // Update an existing knowledge article
-export const updateKnowledgeArticle = async (id: string, updates: Partial<KnowledgeArticle>): Promise<ApiResponse<KnowledgeArticle>> => {
+export const updateKnowledgeArticle = async (
+  id: string, 
+  updates: Partial<KnowledgeArticle>
+): Promise<ApiResponse<KnowledgeArticle>> => {
   const index = mockKnowledgeArticles.findIndex(article => article.id === id);
   
   if (index === -1) {
@@ -100,6 +111,88 @@ export const updateKnowledgeArticle = async (id: string, updates: Partial<Knowle
   const updatedArticle = {
     ...mockKnowledgeArticles[index],
     ...updates,
+    updatedAt: new Date()
+  };
+  
+  mockKnowledgeArticles[index] = updatedArticle;
+  
+  return {
+    success: true,
+    data: updatedArticle
+  };
+};
+
+// Submit an article for review
+export const submitArticleForReview = async (id: string): Promise<ApiResponse<KnowledgeArticle>> => {
+  const index = mockKnowledgeArticles.findIndex(article => article.id === id);
+  
+  if (index === -1) {
+    return {
+      success: false,
+      message: 'Article not found',
+      statusCode: 404
+    };
+  }
+  
+  const updatedArticle = {
+    ...mockKnowledgeArticles[index],
+    status: 'pending_review' as const,
+    updatedAt: new Date()
+  };
+  
+  mockKnowledgeArticles[index] = updatedArticle;
+  
+  return {
+    success: true,
+    data: updatedArticle
+  };
+};
+
+// Approve an article
+export const approveArticle = async (id: string, comments?: string): Promise<ApiResponse<KnowledgeArticle>> => {
+  const index = mockKnowledgeArticles.findIndex(article => article.id === id);
+  
+  if (index === -1) {
+    return {
+      success: false,
+      message: 'Article not found',
+      statusCode: 404
+    };
+  }
+  
+  const updatedArticle = {
+    ...mockKnowledgeArticles[index],
+    status: 'approved' as const,
+    reviewDate: new Date(),
+    reviewComments: comments || mockKnowledgeArticles[index].reviewComments,
+    updatedAt: new Date()
+  };
+  
+  mockKnowledgeArticles[index] = updatedArticle;
+  
+  return {
+    success: true,
+    data: updatedArticle
+  };
+};
+
+// Reject an article
+export const rejectArticle = async (id: string, comments: string): Promise<ApiResponse<KnowledgeArticle>> => {
+  const index = mockKnowledgeArticles.findIndex(article => article.id === id);
+  
+  if (index === -1) {
+    return {
+      success: false,
+      message: 'Article not found',
+      statusCode: 404
+    };
+  }
+  
+  const updatedArticle = {
+    ...mockKnowledgeArticles[index],
+    status: 'rejected' as const,
+    reviewDate: new Date(),
+    reviewComments: comments,
     updatedAt: new Date()
   };
   

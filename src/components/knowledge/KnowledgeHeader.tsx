@@ -2,23 +2,37 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw, Search } from 'lucide-react';
+import { Plus, RefreshCw, Search, ClipboardCheck } from 'lucide-react';
 import { useDialog } from '@/hooks/useDisclosure';
 import KnowledgeArticleForm from './KnowledgeArticleForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { KnowledgeArticle } from '@/utils/types/knowledge';
+import { Badge } from '@/components/ui/badge';
 
 interface KnowledgeHeaderProps {
   onSearch: (query: string) => void;
   searchQuery: string;
   onRefresh: () => void;
+  pendingReviewCount?: number;
+  onReviewArticlesClick?: () => void;
+  selectedArticle?: KnowledgeArticle;
 }
 
 const KnowledgeHeader: React.FC<KnowledgeHeaderProps> = ({ 
   onSearch, 
   searchQuery,
-  onRefresh 
+  onRefresh,
+  pendingReviewCount = 0,
+  onReviewArticlesClick,
+  selectedArticle
 }) => {
   const [localSearch, setLocalSearch] = useState(searchQuery);
-  const { isOpen, onOpen, onClose } = useDialog();
+  const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDialog();
+  const { isOpen: isReviewOpen, onOpen: onReviewOpen, onClose: onReviewClose } = useDialog();
+  const { userCanPerformAction } = useAuth();
+
+  const isAuthor = userCanPerformAction('knowledge-articles', 'create');
+  const isReviewer = userCanPerformAction('knowledge-articles', 'approve');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +52,31 @@ const KnowledgeHeader: React.FC<KnowledgeHeaderProps> = ({
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          <Button 
-            size="sm" 
-            onClick={onOpen}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            New Article
-          </Button>
+          
+          {isReviewer && pendingReviewCount > 0 && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onReviewArticlesClick}
+              className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
+            >
+              <ClipboardCheck className="h-4 w-4 mr-2" />
+              Review Articles
+              <Badge variant="secondary" className="ml-2 bg-amber-200 text-amber-800">
+                {pendingReviewCount}
+              </Badge>
+            </Button>
+          )}
+          
+          {isAuthor && (
+            <Button 
+              size="sm" 
+              onClick={onCreateOpen}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              New Article
+            </Button>
+          )}
         </div>
       </div>
 
@@ -64,10 +96,19 @@ const KnowledgeHeader: React.FC<KnowledgeHeaderProps> = ({
         </Button>
       </form>
 
-      {isOpen && (
+      {isCreateOpen && (
         <KnowledgeArticleForm
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={isCreateOpen}
+          onClose={onCreateClose}
+        />
+      )}
+
+      {isReviewOpen && selectedArticle && (
+        <KnowledgeArticleForm
+          isOpen={isReviewOpen}
+          onClose={onReviewClose}
+          articleToEdit={selectedArticle}
+          mode="review"
         />
       )}
     </div>

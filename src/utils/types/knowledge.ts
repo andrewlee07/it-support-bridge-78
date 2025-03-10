@@ -10,6 +10,10 @@ export interface KnowledgeArticle {
   createdAt: Date;
   updatedAt: Date;
   serviceId?: string;
+  status: 'draft' | 'pending_review' | 'approved' | 'rejected';
+  reviewerId?: string;
+  reviewDate?: Date;
+  reviewComments?: string;
 }
 
 export interface KnowledgeCategory {
