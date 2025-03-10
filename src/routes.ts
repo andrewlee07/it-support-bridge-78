@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import MainLayout from '@/layouts/MainLayout';
@@ -24,6 +23,7 @@ import Bugs from '@/pages/Bugs';
 import ProblemManagement from '@/pages/ProblemManagement';
 import Releases from '@/pages/Releases';
 import Backlog from '@/pages/Backlog';
+import BacklogKanban from '@/pages/BacklogKanban';
 import AdminSettings from '@/pages/AdminSettings';
 import IncidentDetail from '@/pages/IncidentDetail';
 import ServiceRequestDetail from '@/pages/ServiceRequestDetail';
@@ -31,8 +31,6 @@ import BugDetail from '@/pages/BugDetail';
 import ReleaseDetail from '@/pages/ReleaseDetail';
 import Assets from '@/pages/Assets';
 import Knowledge from '@/pages/Knowledge';
-
-// Import admin pages
 import SecuritySettings from '@/pages/admin/SecuritySettings';
 import SLASettings from '@/pages/admin/SLASettings';
 import IncidentConfiguration from '@/pages/admin/IncidentConfiguration';
@@ -145,7 +143,6 @@ const router = createBrowserRouter([
         path: '/admin',
         element: React.createElement(AdminSettings)
       },
-      // Admin routes
       {
         path: '/admin/security-settings',
         element: React.createElement(SecuritySettings)
@@ -191,10 +188,6 @@ const router = createBrowserRouter([
         element: React.createElement(StatusSynchronizationConfig)
       },
       {
-        path: '/admin/service-catalogue-configuration',
-        element: React.createElement(ServiceCatalog, { isAdmin: true })
-      },
-      {
         path: '/profile',
         element: React.createElement(() => React.createElement('div', null, 'User Profile Page'))
       },
@@ -217,6 +210,10 @@ const router = createBrowserRouter([
       {
         path: '/backlog',
         element: React.createElement(Backlog)
+      },
+      {
+        path: '/backlog/kanban',
+        element: React.createElement(BacklogKanban)
       },
       {
         path: '/assets',
