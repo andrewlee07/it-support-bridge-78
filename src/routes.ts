@@ -1,5 +1,6 @@
 
 import { createBrowserRouter } from 'react-router-dom';
+import React from 'react';
 import MainLayout from '@/layouts/MainLayout';
 import Dashboard from '@/pages/Dashboard';
 import Login from '@/pages/Login';
@@ -20,68 +21,66 @@ import Approvals from '@/pages/Approvals';
 const router = createBrowserRouter([
   {
     path: '/login',
-    element: <Login />
+    element: React.createElement(Login)
   },
   {
     path: '/',
-    element: (
-      <ProtectedRoute>
-        <MainLayout />
-      </ProtectedRoute>
+    element: React.createElement(ProtectedRoute, null, 
+      React.createElement(MainLayout)
     ),
-    errorElement: <ErrorPage />,
+    errorElement: React.createElement(ErrorPage),
     children: [
       {
         path: '/',
-        element: <Dashboard />
+        element: React.createElement(Dashboard)
       },
       {
         path: '/dashboard',
-        element: <Dashboard />
+        element: React.createElement(Dashboard)
       },
       {
         path: '/incidents',
-        element: <Incidents />
+        element: React.createElement(Incidents)
       },
       {
         path: '/service-requests',
-        element: <ServiceRequests />
+        element: React.createElement(ServiceRequests)
       },
       {
         path: '/problems',
-        element: <Problems />
+        element: React.createElement(Problems)
       },
       {
         path: '/changes',
-        element: <Changes />
+        element: React.createElement(Changes)
       },
       {
         path: '/changes/:id',
-        element: <ChangeDetail />
+        element: React.createElement(ChangeDetail)
       },
       {
         path: '/changes/new',
-        element: <NewChangeRequest />
+        element: React.createElement(NewChangeRequest)
       },
       {
         path: '/changes/:id/edit',
-        element: <EditChangeRequest />
+        element: React.createElement(EditChangeRequest)
       },
       {
         path: '/changes/:id/reject',
-        element: <RejectChange />
+        element: React.createElement(RejectChange)
       },
       {
         path: '/changes/:id/close',
-        element: <CloseChange />
+        element: React.createElement(CloseChange)
       },
       {
         path: '/calendar',
-        element: <Calendar />
+        element: React.createElement(Calendar)
       },
       {
         path: '/approvals',
-        element: <Approvals />
+        element: React.createElement(Approvals)
       }
     ]
   }
