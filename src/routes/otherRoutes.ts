@@ -9,18 +9,18 @@ import React from "react";
 export const otherRoutes: RouteObject[] = [
   {
     path: "/reports",
-    element: <Reports />,
+    element: React.createElement(Reports),
   },
   {
     path: "/calendar",
-    element: <Calendar />,
+    element: React.createElement(Calendar),
   },
   {
     path: "/security-audit-log",
-    element: <SecurityAuditLog />,
+    element: React.createElement(SecurityAuditLog),
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: React.createElement(NotFound),
   },
 ];
