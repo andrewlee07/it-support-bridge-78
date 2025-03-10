@@ -1,3 +1,4 @@
+
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import MainLayout from '@/layouts/MainLayout';
@@ -20,6 +21,13 @@ import UserManagementPage from '@/pages/UserManagementPage';
 import ServiceCatalog from '@/pages/ServiceCatalog';
 import TestTracking from '@/pages/TestTracking';
 import Bugs from '@/pages/Bugs';
+import ProblemManagement from '@/pages/ProblemManagement';
+import Releases from '@/pages/Releases';
+import Backlog from '@/pages/Backlog';
+import AdminSettings from '@/pages/AdminSettings';
+import IncidentDetail from '@/pages/IncidentDetail';
+import ServiceRequestDetail from '@/pages/ServiceRequestDetail';
+import BugDetail from '@/pages/BugDetail';
 
 const router = createBrowserRouter([
   {
@@ -46,12 +54,20 @@ const router = createBrowserRouter([
         element: React.createElement(Incidents)
       },
       {
+        path: '/incidents/:id',
+        element: React.createElement(IncidentDetail)
+      },
+      {
         path: '/service-requests',
         element: React.createElement(ServiceRequests)
       },
       {
+        path: '/service-requests/:id',
+        element: React.createElement(ServiceRequestDetail)
+      },
+      {
         path: '/problems',
-        element: React.createElement(Problems)
+        element: React.createElement(ProblemManagement)
       },
       {
         path: '/changes',
@@ -98,6 +114,10 @@ const router = createBrowserRouter([
         element: React.createElement(Bugs)
       },
       {
+        path: '/bugs/:id',
+        element: React.createElement(BugDetail)
+      },
+      {
         path: '/users',
         element: React.createElement(() => React.createElement('div', null, 'User Management Page'))
       },
@@ -107,7 +127,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/admin',
-        element: React.createElement(() => React.createElement('div', null, 'Admin Settings Page'))
+        element: React.createElement(AdminSettings)
       },
       {
         path: '/profile',
@@ -120,6 +140,14 @@ const router = createBrowserRouter([
       {
         path: '/knowledge',
         element: React.createElement(() => React.createElement('div', null, 'Knowledge Base Page'))
+      },
+      {
+        path: '/releases',
+        element: React.createElement(Releases)
+      },
+      {
+        path: '/backlog',
+        element: React.createElement(Backlog)
       }
     ]
   }
