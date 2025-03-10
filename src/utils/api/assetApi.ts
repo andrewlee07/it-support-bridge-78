@@ -1,29 +1,31 @@
+
 import { Asset, ApiResponse } from '../types';
-import { mockAssets, generateAssetId, delay } from '../mockData';
+import { mockAssets, generateAssetId } from '../mockData';
 import { createApiErrorResponse, createApiSuccessResponse } from '../mockData/apiHelpers';
 
 const assetApi = {
   getAssets: async (): Promise<ApiResponse<Asset[]>> => {
-    await delay(500);
-    return createApiSuccessResponse(mockAssets);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return createApiSuccessResponse(mockAssets as Asset[]);
   },
 
   getAssetById: async (id: string): Promise<ApiResponse<Asset | null>> => {
-    await delay(500);
+    await new Promise(resolve => setTimeout(resolve, 500));
     const asset = mockAssets.find(asset => asset.id === id);
     if (!asset) {
       return createApiErrorResponse<Asset | null>('Asset not found', 404);
     }
-    return createApiSuccessResponse(asset);
+    return createApiSuccessResponse(asset as Asset);
   },
 
   createAsset: async (asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt' | 'audit'>): Promise<ApiResponse<Asset>> => {
-    await delay(500);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const now = new Date();
     const newAsset: Asset = {
       id: generateAssetId(),
       ...asset,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
       audit: []
     };
     mockAssets.push(newAsset);
@@ -31,17 +33,24 @@ const assetApi = {
   },
 
   updateAsset: async (id: string, updates: Partial<Asset>): Promise<ApiResponse<Asset | null>> => {
-    await delay(500);
+    await new Promise(resolve => setTimeout(resolve, 500));
     const index = mockAssets.findIndex(asset => asset.id === id);
     if (index === -1) {
       return createApiErrorResponse<Asset | null>('Asset not found', 404);
     }
-    mockAssets[index] = { ...mockAssets[index], ...updates, updatedAt: new Date() };
-    return createApiSuccessResponse(mockAssets[index]);
+    
+    const updatedAsset: Asset = {
+      ...mockAssets[index],
+      ...updates,
+      updatedAt: new Date()
+    };
+    
+    mockAssets[index] = updatedAsset;
+    return createApiSuccessResponse(updatedAsset);
   },
 
   deleteAsset: async (id: string): Promise<ApiResponse<boolean>> => {
-    await delay(500);
+    await new Promise(resolve => setTimeout(resolve, 500));
     const index = mockAssets.findIndex(asset => asset.id === id);
     if (index === -1) {
       return createApiErrorResponse<boolean>('Asset not found', 404);

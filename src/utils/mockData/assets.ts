@@ -1,4 +1,3 @@
-
 // Mock asset data for demonstration purposes
 export const mockAssets = [
   {
@@ -7,13 +6,16 @@ export const mockAssets = [
     type: 'hardware',
     model: 'Dell XPS 15 9500',
     serialNumber: 'XPS-9500-001',
-    status: 'active',
+    status: 'in-use',
     location: 'Main Office',
     assignedTo: 'user-1',
     purchaseDate: new Date('2021-05-15'),
-    warrantyExpiration: new Date('2024-05-15'),
-    lastAuditDate: new Date('2022-03-10'),
-    notes: 'Primary development laptop for frontend team'
+    expiryDate: new Date('2024-05-15'),
+    manufacturer: 'Dell',
+    notes: 'Primary development laptop for frontend team',
+    createdAt: new Date('2021-05-15'),
+    updatedAt: new Date('2021-05-15'),
+    audit: []
   },
   {
     id: 'ASSET-002',
@@ -21,13 +23,16 @@ export const mockAssets = [
     type: 'hardware',
     model: 'Apple iPhone 13 Pro',
     serialNumber: 'IP13-PRO-002',
-    status: 'active',
+    status: 'in-use',
     location: 'Remote',
     assignedTo: 'user-2',
     purchaseDate: new Date('2021-10-20'),
-    warrantyExpiration: new Date('2023-10-20'),
-    lastAuditDate: new Date('2022-03-15'),
-    notes: 'Testing device for mobile apps'
+    expiryDate: new Date('2023-10-20'),
+    manufacturer: 'Apple',
+    notes: 'Testing device for mobile apps',
+    createdAt: new Date('2021-10-20'),
+    updatedAt: new Date('2021-10-20'),
+    audit: []
   },
   {
     id: 'ASSET-003',
@@ -35,12 +40,15 @@ export const mockAssets = [
     type: 'software',
     model: 'Microsoft Office 365 Business',
     serialNumber: 'OFF365-BUS-003',
-    status: 'active',
+    status: 'in-use',
     assignedTo: 'user-3',
     purchaseDate: new Date('2022-01-05'),
-    warrantyExpiration: new Date('2023-01-05'),
-    lastAuditDate: new Date('2022-03-20'),
-    notes: 'Annual subscription'
+    expiryDate: new Date('2023-01-05'),
+    manufacturer: 'Microsoft',
+    notes: 'Annual subscription',
+    createdAt: new Date('2022-01-05'),
+    updatedAt: new Date('2022-01-05'),
+    audit: []
   },
   {
     id: 'ASSET-004',
@@ -48,12 +56,15 @@ export const mockAssets = [
     type: 'hardware',
     model: 'HP LaserJet Pro M404dn',
     serialNumber: 'HP-M404DN-004',
-    status: 'active',
+    status: 'available',
     location: 'Finance Department',
     purchaseDate: new Date('2020-11-12'),
-    warrantyExpiration: new Date('2023-11-12'),
-    lastAuditDate: new Date('2022-03-25'),
-    notes: 'Main printer for finance team'
+    expiryDate: new Date('2023-11-12'),
+    manufacturer: 'HP',
+    notes: 'Main printer for finance team',
+    createdAt: new Date('2020-11-12'),
+    updatedAt: new Date('2020-11-12'),
+    audit: []
   },
   {
     id: 'ASSET-005',
@@ -61,12 +72,15 @@ export const mockAssets = [
     type: 'software',
     model: 'Adobe Creative Cloud Complete',
     serialNumber: 'ADOBE-CC-005',
-    status: 'active',
+    status: 'in-use',
     assignedTo: 'user-4',
     purchaseDate: new Date('2021-12-10'),
-    warrantyExpiration: new Date('2022-12-10'),
-    lastAuditDate: new Date('2022-04-01'),
-    notes: 'Design team subscription'
+    expiryDate: new Date('2022-12-10'),
+    manufacturer: 'Adobe',
+    notes: 'Design team subscription',
+    createdAt: new Date('2021-12-10'),
+    updatedAt: new Date('2021-12-10'),
+    audit: []
   },
   {
     id: 'ASSET-006',
@@ -74,12 +88,15 @@ export const mockAssets = [
     type: 'hardware',
     model: 'Cisco Catalyst 9300',
     serialNumber: 'CISCO-9300-006',
-    status: 'active',
+    status: 'in-use',
     location: 'Server Room',
     purchaseDate: new Date('2020-06-23'),
-    warrantyExpiration: new Date('2025-06-23'),
-    lastAuditDate: new Date('2022-04-05'),
-    notes: 'Main network switch for office'
+    expiryDate: new Date('2025-06-23'),
+    manufacturer: 'Cisco',
+    notes: 'Main network switch for office',
+    createdAt: new Date('2020-06-23'),
+    updatedAt: new Date('2020-06-23'),
+    audit: []
   }
 ];
 
