@@ -10,7 +10,7 @@ import dashboardRoutes from "./dashboardRoutes";
 import ticketRoutes from "./ticketRoutes";
 import changeRoutes from "./changeRoutes";
 import assetRoutes from "./assetRoutes";
-import adminRoutes from "./adminRoutes";
+import { adminRoutes } from "./adminRoutes";
 import testManagementRoutes from "./testManagementRoutes";
 import { otherRoutes } from "./otherRoutes";
 
