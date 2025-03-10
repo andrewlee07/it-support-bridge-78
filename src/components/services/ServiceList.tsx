@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Service, ServiceCategory, ServiceWithCategory } from '@/utils/types/service';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search, Edit, ExternalLink } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -96,7 +96,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
           )}
         </div>
         {onAddService && (
-          <Button onClick={onAddService}>
+          <Button onClick={onAddService} className="bg-primary text-white">
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Service
           </Button>
@@ -123,7 +123,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
                 <TableHead>Service Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-24">Actions</TableHead>
+                <TableHead className="w-24 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -155,23 +155,41 @@ const ServiceList: React.FC<ServiceListProps> = ({
                       {service.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    {(onEditService || onEdit) && (
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-2">
+                      {(onEditService || onEdit) && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="bg-white text-gray-700 border-gray-300 hover:bg-gray-100 hover:text-gray-900"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onEditService) {
+                              onEditService(service);
+                            } else if (onEdit) {
+                              onEdit(service.id);
+                            }
+                          }}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                      )}
                       <Button 
-                        variant="ghost" 
+                        variant="default" 
                         size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (onEditService) {
-                            onEditService(service);
-                          } else if (onEdit) {
-                            onEdit(service.id);
+                          if (onSelect) {
+                            onSelect(service);
                           }
                         }}
                       >
-                        Edit
+                        <ExternalLink className="h-4 w-4 mr-1" />
+                        View
                       </Button>
-                    )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
