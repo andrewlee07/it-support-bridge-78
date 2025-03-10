@@ -149,6 +149,7 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           approvedBy={changeRequest.approvedBy}
           approvedAt={changeRequest.approvedAt}
           approverRoles={changeRequest.approverRoles}
+          status={changeRequest.status}
           onAddApprover={onAddApprover}
         />
         
