@@ -12,13 +12,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { SearchIcon, Plus, User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ApproversListProps {
-  approverRoles: ApproverRole[];
+  approverRoles?: ApproverRole[];
   onAddApprover?: (userId: string, role: string) => void;
 }
 
-const ApproversList: React.FC<ApproversListProps> = ({ approverRoles, onAddApprover }) => {
+const ApproversList: React.FC<ApproversListProps> = ({ approverRoles = [], onAddApprover }) => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<ApproverRole>('change-manager');
@@ -89,17 +90,33 @@ const ApproversList: React.FC<ApproversListProps> = ({ approverRoles, onAddAppro
             <DialogTitle>Add Approver</DialogTitle>
           </DialogHeader>
           
-          <div className="relative">
-            <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search for users..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-1 block">Approver Role</label>
+              <Select value={selectedRole} onValueChange={(value: ApproverRole) => setSelectedRole(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="it">IT Department</SelectItem>
+                  <SelectItem value="user">End User</SelectItem>
+                  <SelectItem value="change-manager">Change Manager</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="relative">
+              <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search for users..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
           
-          <div className="h-[240px] overflow-auto border rounded-md">
+          <div className="h-[240px] overflow-auto border rounded-md mt-2">
             {filteredUsers.length > 0 ? (
               <div className="divide-y">
                 {filteredUsers.map(user => (

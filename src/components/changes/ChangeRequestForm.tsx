@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,6 +8,8 @@ import { Form } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { ChangeRequest, TicketCategory, ChangeCategory, ClosureReason, ApproverRole } from '@/utils/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 // Import our component sections
 import BasicInfoSection from './form/BasicInfoSection';
@@ -51,7 +53,7 @@ export interface ChangeRequestFormProps {
   initialData?: Partial<ChangeRequest>;
   isEditing?: boolean;
   isClosing?: boolean;
-  isEditMode?: boolean; // Added this prop to fix the TypeScript error
+  isEditMode?: boolean;
 }
 
 const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({ 
@@ -61,17 +63,19 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
   initialData, 
   isEditing = false,
   isClosing = false,
-  isEditMode = false // Provide a default value
+  isEditMode = false
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [riskAssessmentCompleted, setRiskAssessmentCompleted] = useState(
+    initialData?.assessmentAnswers && initialData.assessmentAnswers.length > 0
+  );
   
   // Safely map any priority to a valid form value
   const mapPriority = (priority: any): 'P1' | 'P2' | 'P3' | 'P4' => {
     if (priority === 'P1' || priority === 'P2' || priority === 'P3' || priority === 'P4') {
       return priority;
     }
-    // Default to P2 for any other value including 'medium'
     return 'P2';
   };
   
@@ -81,13 +85,13 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
       title: initialData?.title || "",
       description: initialData?.description || "",
       category: (initialData?.category as TicketCategory) || "software",
-      priority: mapPriority(initialData?.priority) || "P2", // Using the safe mapping function
+      priority: mapPriority(initialData?.priority) || "P2",
       changeCategory: (initialData?.category as ChangeCategory) || "normal",
       startDate: initialData?.startDate ? new Date(initialData.startDate) : new Date(Date.now() + 86400000), // tomorrow
       endDate: initialData?.endDate ? new Date(initialData.endDate) : new Date(Date.now() + 172800000), // day after tomorrow
       implementationPlan: initialData?.implementationPlan || "",
       rollbackPlan: initialData?.rollbackPlan || "",
-      approverRoles: initialData?.approverRoles || ['it'],
+      approverRoles: initialData?.approverRoles || [],
       closureReason: initialData?.closureReason,
       closureNotes: "",
       assessmentAnswers: initialData?.assessmentAnswers || [],
@@ -104,10 +108,25 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
       return;
     }
     
+    // Check if risk assessment is completed
+    if (!isClosing && !values.assessmentAnswers?.length) {
+      toast({
+        title: "Risk Assessment Required",
+        description: "You must complete the risk assessment before submitting",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     onSubmit(values);
   };
 
   const handleCancel = onCancel || (() => window.history.back());
+
+  // Update risk assessment completion state when answers change
+  const onRiskAssessmentComplete = (completed: boolean) => {
+    setRiskAssessmentCompleted(completed);
+  };
 
   return (
     <Card className="w-full shadow-sm">
@@ -122,8 +141,20 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
                 <BasicInfoSection form={form} />
                 <DateSelectionSection form={form} />
                 <PlanningSection form={form} />
-                <RiskAssessmentSection form={form} />
-                <ApproverSection form={form} />
+                <RiskAssessmentSection 
+                  form={form}
+                  onComplete={onRiskAssessmentComplete}  
+                />
+                
+                {!riskAssessmentCompleted && (
+                  <Alert variant="warning">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Risk Assessment Required</AlertTitle>
+                    <AlertDescription>
+                      The risk assessment must be completed before the change can be submitted for approval.
+                    </AlertDescription>
+                  </Alert>
+                )}
               </>
             )}
             

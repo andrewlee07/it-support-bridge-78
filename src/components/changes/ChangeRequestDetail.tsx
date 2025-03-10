@@ -11,6 +11,7 @@ export interface ChangeRequestDetailProps {
   onUpdateStatus?: (status: string) => void;
   onAddImplementor?: (userId: string) => void;
   onAddApprover?: (userId: string, role: string) => void;
+  onClose?: () => void;
 }
 
 const ChangeRequestDetail: React.FC<ChangeRequestDetailProps> = (props) => {

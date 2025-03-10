@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,6 +18,11 @@ const Changes = () => {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [selectedChangeId, setSelectedChangeId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
+    // Get saved preference from localStorage or default to grid
+    const savedPreference = localStorage.getItem('changeViewMode');
+    return (savedPreference as 'grid' | 'table') || 'grid';
+  });
   
   // Custom hooks
   const {
@@ -32,6 +37,11 @@ const Changes = () => {
   } = useChangeRequests();
   
   const { approveMutation, rejectMutation } = useChangeRequestMutations(user?.id || '');
+
+  // Save view mode preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('changeViewMode', viewMode);
+  }, [viewMode]);
 
   // Event handlers
   const handleApprove = (changeId: string) => {
@@ -66,6 +76,10 @@ const Changes = () => {
     navigate(`/changes/${changeId}`);
   };
 
+  const handleViewModeChange = (mode: 'grid' | 'table') => {
+    setViewMode(mode);
+  };
+
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -86,6 +100,8 @@ const Changes = () => {
           refetch={refetch}
           userRole={user?.role}
           searchQuery={searchQuery}
+          viewMode={viewMode}
+          onViewModeChange={handleViewModeChange}
         />
       </div>
 

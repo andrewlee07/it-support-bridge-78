@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { ChangeRequest } from '@/utils/types/change';
 import { useAuth } from '@/contexts/AuthContext';
-import ChangeStatusDialog from '../ChangeStatusDialog';
 import RiskAssessmentDetails from '../RiskAssessmentDetails';
 import ChangeRequestBadges from './ChangeRequestBadges';
 import ChangeRequestMetadata from './ChangeRequestMetadata';
@@ -19,6 +18,7 @@ export interface ChangeRequestContentProps {
   onUpdateStatus?: (status: string) => void;
   onAddImplementor?: (userId: string) => void;
   onAddApprover?: (userId: string, role: string) => void;
+  onClose?: () => void;
 }
 
 const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
@@ -28,11 +28,11 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
   onEdit,
   onUpdateStatus,
   onAddImplementor,
-  onAddApprover
+  onAddApprover,
+  onClose
 }) => {
   const { user, hasPermission } = useAuth();
   const [showRiskDetails, setShowRiskDetails] = useState(false);
-  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   
   const canApprove = hasPermission(['admin', 'change-manager']) && 
                      changeRequest.status === 'submitted' &&
@@ -44,15 +44,23 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
   const canEdit = (changeRequest.createdBy === user?.id && changeRequest.status === 'draft') ||
                   hasPermission(['admin', 'it']);
 
+  const canClose = (changeRequest.createdBy === user?.id || 
+                   hasPermission(['admin', 'it', 'change-manager'])) && 
+                   changeRequest.status === 'in-progress';
+
   const canUpdateStatus = hasPermission(['admin', 'it', 'change-manager']) || 
                           changeRequest.createdBy === user?.id;
 
   const handleStatusChange = (newStatus: string) => {
     if (onUpdateStatus) {
       onUpdateStatus(newStatus);
-      setIsStatusDialogOpen(false);
     }
   };
+
+  // Always display risk assessment details if there's a risk score
+  const showRiskAssessment = changeRequest.riskScore > 0 && 
+                            changeRequest.assessmentAnswers && 
+                            changeRequest.assessmentAnswers.length > 0;
 
   return (
     <Card className="w-full shadow-sm">
@@ -72,7 +80,7 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
             status={changeRequest.status}
             riskLevel={changeRequest.riskLevel}
             canUpdateStatus={canUpdateStatus}
-            onStatusDialogOpen={() => setIsStatusDialogOpen(true)}
+            onStatusChange={handleStatusChange}
           />
         </div>
       </CardHeader>
@@ -90,10 +98,10 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           onAddImplementor={onAddImplementor}
         />
         
-        {showRiskDetails && changeRequest.assessmentAnswers && changeRequest.assessmentAnswers.length > 0 && (
+        {showRiskAssessment && (
           <div className="border rounded-md p-4 bg-muted/20">
             <h3 className="text-lg font-medium mb-3">Risk Assessment Details</h3>
-            <RiskAssessmentDetails answers={changeRequest.assessmentAnswers} />
+            <RiskAssessmentDetails answers={changeRequest.assessmentAnswers || []} />
           </div>
         )}
         
@@ -116,18 +124,13 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           canEdit={canEdit}
           canReject={canReject}
           canApprove={canApprove}
+          canClose={canClose}
           onEdit={onEdit}
           onReject={onReject}
           onApprove={onApprove}
+          onClose={onClose}
         />
       </CardFooter>
-
-      <ChangeStatusDialog
-        isOpen={isStatusDialogOpen}
-        onOpenChange={setIsStatusDialogOpen}
-        currentStatus={changeRequest.status}
-        onStatusChange={handleStatusChange}
-      />
     </Card>
   );
 };

@@ -3,10 +3,8 @@ import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import FormSectionHeader from './FormSectionHeader';
 import CustomFormField from './CustomFormField';
-import { Label } from '@/components/ui/label';
 
 interface ClosureSectionProps {
   form: UseFormReturn<any>;

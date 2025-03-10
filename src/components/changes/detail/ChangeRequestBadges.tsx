@@ -1,28 +1,27 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown } from 'lucide-react';
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { RiskLevel, ChangeStatus } from '@/utils/types/change';
 
 interface ChangeRequestBadgesProps {
   status: ChangeStatus;
   riskLevel: RiskLevel;
   canUpdateStatus: boolean;
-  onStatusDialogOpen: () => void;
+  onStatusChange?: (status: string) => void; 
 }
 
 const ChangeRequestBadges: React.FC<ChangeRequestBadgesProps> = ({
   status,
   riskLevel,
   canUpdateStatus,
-  onStatusDialogOpen
+  onStatusChange
 }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -61,21 +60,24 @@ const ChangeRequestBadges: React.FC<ChangeRequestBadgesProps> = ({
   return (
     <div className="flex flex-wrap gap-2">
       {canUpdateStatus ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="flex items-center gap-1">
+        <Select defaultValue={status} onValueChange={(value) => onStatusChange?.(value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue>
               <Badge className={getStatusColor(status)}>
                 {status.charAt(0).toUpperCase() + status.slice(1)}
               </Badge>
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onStatusDialogOpen}>
-              Update Status
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="submitted">Submitted</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
+            <SelectItem value="in-progress">In Progress</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="failed">Failed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
       ) : (
         <Badge className={getStatusColor(status)}>
           {status.charAt(0).toUpperCase() + status.slice(1)}

@@ -8,16 +8,19 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Check } from 'lucide-react';
 import FormSectionHeader from './FormSectionHeader';
+import { Input } from '@/components/ui/input';
 
 interface RiskAssessmentSectionProps {
   form: UseFormReturn<any>;
+  onComplete?: (isComplete: boolean) => void;
 }
 
-const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form }) => {
+const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form, onComplete }) => {
   const [assessmentAnswers, setAssessmentAnswers] = useState<RiskAssessmentAnswer[]>([]);
   const [calculatedRisk, setCalculatedRisk] = useState<{ score: number; level: string } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch risk assessment questions
   const { data: questions, isLoading, error } = useQuery({
@@ -54,6 +57,23 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form }) =
       form.setValue('assessmentAnswers', assessmentAnswers);
     }
   }, [assessmentAnswers, form]);
+
+  // Check if all required questions are answered
+  useEffect(() => {
+    if (!questions) return;
+    
+    const requiredQuestions = questions.filter(q => q.active && q.isRequired);
+    const answeredRequiredQuestions = requiredQuestions.filter(q => 
+      assessmentAnswers.some(a => a.questionId === q.id)
+    );
+    
+    const isComplete = requiredQuestions.length > 0 && 
+      answeredRequiredQuestions.length === requiredQuestions.length;
+    
+    if (onComplete) {
+      onComplete(isComplete);
+    }
+  }, [assessmentAnswers, questions, onComplete]);
 
   const handleAnswerChange = (questionId: string, optionId: string, value: number) => {
     setAssessmentAnswers(prev => {
@@ -94,6 +114,23 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form }) =
 
   // Only show active questions
   const activeQuestions = questions?.filter(q => q.active) || [];
+  
+  // Filter questions based on search
+  const filteredQuestions = searchQuery
+    ? activeQuestions.filter(q => 
+        q.question.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : activeQuestions;
+
+  // Calculate completion percentage
+  const requiredQuestions = activeQuestions.filter(q => q.isRequired);
+  const answeredRequired = requiredQuestions.filter(q => 
+    assessmentAnswers.some(a => a.questionId === q.id)
+  ).length;
+  
+  const completionPercentage = requiredQuestions.length > 0 
+    ? Math.round((answeredRequired / requiredQuestions.length) * 100) 
+    : 0;
 
   return (
     <div className="space-y-4">
@@ -101,6 +138,27 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form }) =
         title="Risk Assessment" 
         description="Answer these questions to assess the risk level of the change"
       />
+
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-32 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary" 
+              style={{ width: `${completionPercentage}%` }}
+            />
+          </div>
+          <span className="text-sm text-muted-foreground">
+            {completionPercentage}% Complete
+          </span>
+        </div>
+        
+        {completionPercentage === 100 && (
+          <span className="text-sm text-green-600 flex items-center gap-1">
+            <Check className="h-4 w-4" />
+            Assessment Complete
+          </span>
+        )}
+      </div>
 
       {calculatedRisk && (
         <div className={`p-3 rounded-md text-white ${
@@ -116,8 +174,17 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form }) =
         </div>
       )}
 
+      <div className="mb-4">
+        <Input 
+          placeholder="Search questions..." 
+          value={searchQuery} 
+          onChange={e => setSearchQuery(e.target.value)}
+          className="max-w-md"
+        />
+      </div>
+
       <div className="space-y-6">
-        {activeQuestions.map((question) => (
+        {filteredQuestions.map((question) => (
           <FormField
             key={question.id}
             control={form.control}

@@ -32,6 +32,11 @@ const ChangeDetail = () => {
     navigate(`/changes/${changeRequest.id}/edit`);
   };
 
+  const handleClose = () => {
+    if (!changeRequest) return;
+    navigate(`/changes/${changeRequest.id}/close`);
+  };
+
   if (loading) {
     return <ChangeRequestLoading />;
   }
@@ -53,6 +58,7 @@ const ChangeDetail = () => {
           onUpdateStatus={handleUpdateStatus}
           onAddImplementor={handleAddImplementor}
           onAddApprover={handleAddApprover}
+          onClose={handleClose}
         />
       </div>
     </PageTransition>
