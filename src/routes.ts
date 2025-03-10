@@ -30,6 +30,7 @@ import ServiceRequestDetail from '@/pages/ServiceRequestDetail';
 import BugDetail from '@/pages/BugDetail';
 import ReleaseDetail from '@/pages/ReleaseDetail';
 import Assets from '@/pages/Assets';
+import Knowledge from '@/pages/Knowledge';
 
 const router = createBrowserRouter([
   {
@@ -145,7 +146,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/knowledge',
-        element: React.createElement(() => React.createElement('div', null, 'Knowledge Base Page'))
+        element: React.createElement(Knowledge)
       },
       {
         path: '/releases',
