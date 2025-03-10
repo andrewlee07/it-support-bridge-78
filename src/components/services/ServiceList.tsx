@@ -36,7 +36,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
   if (services.length === 0) {
     return (
       <div className="mt-4">
-        <ServiceEmptyState onAddService={onAddService} />
+        <ServiceEmptyState hasSearchQuery={false} onAddService={onAddService} />
       </div>
     );
   }
@@ -45,7 +45,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
     <div className="space-y-4">
       {onAddService && (
         <div className="flex justify-end">
-          <ServiceAddButton onClick={onAddService} />
+          <ServiceAddButton onAddService={onAddService} />
         </div>
       )}
       
