@@ -6,6 +6,7 @@ import ChangeDetail from '@/pages/ChangeDetail';
 import Releases from '@/pages/Releases';
 import ReleaseDetail from '@/pages/ReleaseDetail';
 import NewRelease from '@/pages/NewRelease';
+import EditChangeRequest from '@/pages/EditChangeRequest';
 
 const changeRoutes: RouteObject[] = [
   {
@@ -15,6 +16,10 @@ const changeRoutes: RouteObject[] = [
   {
     path: 'changes/:id',
     element: <ChangeDetail />,
+  },
+  {
+    path: 'changes/:id/edit',
+    element: <EditChangeRequest />,
   },
   {
     path: 'releases',
