@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -33,7 +32,7 @@ const CalendarPage: React.FC = () => {
             View and manage upcoming changes and releases in a unified calendar
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0 min-h-[700px]">
+        <CardContent className="p-0 min-h-[800px]">
           <SharedCalendar onEventClick={handleEventClick} />
         </CardContent>
       </Card>

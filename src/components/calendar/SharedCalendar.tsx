@@ -8,6 +8,7 @@ import CalendarEventPopover from './CalendarEventPopover';
 import { useCalendarDateHelpers } from '@/hooks/useCalendarDateHelpers';
 import { useChangeCalendarEvents } from '@/hooks/useChangeCalendarEvents';
 import { CalendarEvent, CalendarViewType, CalendarEventType } from '@/utils/types/calendar';
+import { getEventColor } from '@/utils/calendar/eventFormatters';
 
 interface SharedCalendarProps {
   onEventClick?: (event: CalendarEvent) => void;
@@ -86,17 +87,35 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
 
     if (dayEvents.length === 0) return null;
 
+    // Show up to 3 events per day with a "+X more" indicator if there are more
+    const eventsToShow = dayEvents.slice(0, 3);
+    const remainingEventsCount = dayEvents.length - eventsToShow.length;
+
     return (
-      <div className="absolute bottom-0 left-0 right-0">
-        <div 
-          className="text-xs text-center bg-primary/10 text-primary rounded-sm mx-1 truncate cursor-pointer" 
-          onClick={(e) => {
-            e.stopPropagation();
-            handleEventClick(dayEvents[0]);
-          }}
-        >
-          {dayEvents.length} {dayEvents.length === 1 ? 'event' : 'events'}
-        </div>
+      <div className="absolute bottom-1 left-0 right-0 flex flex-col gap-1 px-1">
+        {eventsToShow.map((event, index) => (
+          <div 
+            key={event.id}
+            className={`text-xs rounded px-1 py-0.5 truncate cursor-pointer ${getEventColor(event)}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEventClick(event);
+            }}
+          >
+            {event.title}
+          </div>
+        ))}
+        {remainingEventsCount > 0 && (
+          <div 
+            className="text-xs text-center bg-gray-200 text-gray-700 rounded px-1 py-0.5 truncate cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Can show a modal with all events for this day in the future
+            }}
+          >
+            +{remainingEventsCount} more
+          </div>
+        )}
       </div>
     );
   };

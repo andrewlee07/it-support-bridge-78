@@ -30,20 +30,20 @@ const CalendarViewContent: React.FC<CalendarViewContentProps> = ({
   return (
     <div className={displayMode === 'split' ? 'grid grid-rows-2 gap-4 h-full' : 'h-full'}>
       {(displayMode === 'calendar' || displayMode === 'split') && (
-        <div className="w-full">
+        <div className="w-full h-[650px] overflow-auto">
           <Calendar
             mode="single"
             selected={date}
             onSelect={(newDate) => onDateSelect(newDate)}
-            className={dayIsInCurrentView(date) ? 'h-full' : ''}
+            className={dayIsInCurrentView(date) ? 'h-full rounded-md shadow-sm border' : ''}
             components={{
               Day: ({ date: day, ...props }: DayProps) => {
                 // The day can be null for placeholder days
                 if (!day) return null;
                 
                 return (
-                  <div className="relative h-12 w-full p-1 flex justify-center">
-                    <div className="absolute top-1 right-1 text-xs">
+                  <div className="relative h-full w-full p-1 flex justify-center">
+                    <div className="absolute top-1 right-1 text-xs font-medium">
                       {day.getDate()}
                     </div>
                     {renderEvent(day)}
