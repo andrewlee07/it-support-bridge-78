@@ -1,5 +1,6 @@
 import { ServiceKnowledge, ServiceKnowledgeRelationshipType } from '../types/service';
 import { KnowledgeArticle } from '../types/knowledge';
+import { addMonths, subMonths, isAfter, isBefore, addDays } from 'date-fns';
 
 // Mock knowledge articles
 export const mockKnowledgeArticles: KnowledgeArticle[] = [
@@ -13,7 +14,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     viewCount: 243,
     createdAt: new Date(2023, 1, 15),
     updatedAt: new Date(2023, 1, 15),
-    status: 'approved'
+    status: 'approved',
+    expiryDate: addMonths(new Date(), 6)
   },
   {
     id: 'KA-002',
@@ -25,7 +27,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     viewCount: 156,
     createdAt: new Date(2023, 2, 10),
     updatedAt: new Date(2023, 2, 10),
-    status: 'approved'
+    status: 'approved',
+    expiryDate: addMonths(new Date(), 9)
   },
   {
     id: 'KA-003',
@@ -37,7 +40,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     viewCount: 382,
     createdAt: new Date(2023, 2, 5),
     updatedAt: new Date(2023, 2, 5),
-    status: 'approved'
+    status: 'approved',
+    expiryDate: addMonths(new Date(), 4)
   },
   {
     id: 'KA-004',
@@ -49,7 +53,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     viewCount: 215,
     createdAt: new Date(2023, 3, 12),
     updatedAt: new Date(2023, 3, 12),
-    status: 'approved'
+    status: 'approved',
+    expiryDate: addMonths(new Date(), 2) // Expiring soon
   },
   {
     id: 'KA-005',
@@ -61,7 +66,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     viewCount: 298,
     createdAt: new Date(2023, 1, 20),
     updatedAt: new Date(2023, 1, 20),
-    status: 'pending_review'
+    status: 'pending_review',
+    expiryDate: addMonths(new Date(), 12)
   },
   {
     id: 'KA-006',
@@ -74,7 +80,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     createdAt: new Date(2023, 4, 5),
     updatedAt: new Date(2023, 4, 5),
     status: 'draft',
-    reviewComments: 'Please provide more details on the connectivity issues'
+    reviewComments: 'Please provide more details on the connectivity issues',
+    expiryDate: addMonths(new Date(), 8)
   },
   {
     id: 'KA-007',
@@ -89,7 +96,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     status: 'rejected',
     reviewerId: 'user-1',
     reviewDate: new Date(2023, 3, 27),
-    reviewComments: 'This guide needs more screenshots and clearer instructions.'
+    reviewComments: 'This guide needs more screenshots and clearer instructions.',
+    expiryDate: addMonths(new Date(), 10)
   },
   {
     id: 'KA-008',
@@ -103,7 +111,8 @@ export const mockKnowledgeArticles: KnowledgeArticle[] = [
     updatedAt: new Date(2023, 2, 15),
     status: 'approved',
     reviewerId: 'user-5',
-    reviewDate: new Date(2023, 2, 16)
+    reviewDate: new Date(2023, 2, 16),
+    expiryDate: subMonths(new Date(), 1) // Already expired
   }
 ];
 
@@ -232,7 +241,8 @@ export const addKnowledgeArticle = (article: Omit<KnowledgeArticle, 'id' | 'view
     ...article,
     viewCount: 0,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    expiryDate: article.expiryDate || addMonths(new Date(), 12) // Default to 1 year
   };
   
   mockKnowledgeArticles.push(newArticle);
@@ -343,4 +353,24 @@ export const incrementKnowledgeArticleViewCount = (id: string): number => {
   
   article.viewCount += 1;
   return article.viewCount;
+};
+
+// Check for articles nearing expiry and notify authors
+export const checkExpiringArticles = () => {
+  const today = new Date();
+  const expiringArticles = mockKnowledgeArticles.filter(article => {
+    if (!article.expiryDate) return false;
+    
+    // Check if article expires within one month
+    const expiryDate = new Date(article.expiryDate);
+    const oneMonthBefore = subMonths(expiryDate, 1);
+    
+    // Check if we're in the "notification window" and haven't sent a notification yet
+    return isAfter(today, oneMonthBefore) && 
+           isBefore(today, expiryDate) && 
+           (!article.lastReviewNotificationDate || 
+            isAfter(today, addDays(new Date(article.lastReviewNotificationDate), 7)));
+  });
+  
+  return expiringArticles;
 };

@@ -2,6 +2,7 @@
 import { ApiResponse, PaginatedResponse } from '../types/api';
 import { KnowledgeArticle, KnowledgeCategory } from '../types/knowledge';
 import { mockKnowledgeArticles } from '../mockData/knowledgeArticles';
+import { addMonths, isAfter, subMonths } from 'date-fns';
 
 // Get all knowledge articles (with optional filtering)
 export const getKnowledgeArticles = async (
@@ -82,7 +83,8 @@ export const createKnowledgeArticle = async (
     viewCount: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
-    status: article.status || 'draft'
+    status: article.status || 'draft',
+    expiryDate: article.expiryDate || addMonths(new Date(), 12) // Default to 1 year if not provided
   };
   
   mockKnowledgeArticles.push(newArticle);
@@ -198,6 +200,8 @@ export const rejectArticle = async (id: string, comments: string): Promise<ApiRe
   
   mockKnowledgeArticles[index] = updatedArticle;
   
+  // In a real app, this would trigger a notification to the author
+  
   return {
     success: true,
     data: updatedArticle
@@ -242,5 +246,41 @@ export const getKnowledgeCategories = async (): Promise<ApiResponse<KnowledgeCat
   return {
     success: true,
     data: categories
+  };
+};
+
+// Get articles with expiry date approaching (1 month before expiry)
+export const getExpiringArticles = async (): Promise<ApiResponse<KnowledgeArticle[]>> => {
+  const today = new Date();
+  const expiringArticles = mockKnowledgeArticles.filter(article => {
+    if (!article.expiryDate) return false;
+    
+    const expiryDate = new Date(article.expiryDate);
+    const oneMonthBefore = subMonths(expiryDate, 1);
+    
+    return isAfter(today, oneMonthBefore) && 
+           isAfter(expiryDate, today) && 
+           article.status === 'approved';
+  });
+  
+  return {
+    success: true,
+    data: expiringArticles
+  };
+};
+
+// Get articles by service
+export const getKnowledgeArticlesByService = async (serviceId: string): Promise<ApiResponse<KnowledgeArticle[]>> => {
+  // Import helper function to get articles for a specific service
+  const { getKnowledgeArticlesForService } = require('../mockData/knowledgeArticles');
+  const articles = getKnowledgeArticlesForService(serviceId);
+  
+  return {
+    success: true,
+    data: articles.map(art => {
+      // Remove the relationship properties from the returned articles
+      const { relationshipType, isPrimary, displayOrder, ...article } = art;
+      return article;
+    })
   };
 };

@@ -5,7 +5,7 @@ export interface Notification {
   message: string;
   timestamp: Date;
   read: boolean;
-  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change';
+  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'knowledge';
   priority?: 'critical' | 'high' | 'medium' | 'low';
   entityId: string;
   url: string;
@@ -25,6 +25,7 @@ export interface NotificationSettings {
     releases: boolean;
     assets: boolean;
     changes: boolean;
+    knowledge: boolean;
   };
   deliveryMethods: {
     inApp: boolean;

@@ -28,7 +28,6 @@ const KnowledgeHeader: React.FC<KnowledgeHeaderProps> = ({
 }) => {
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDialog();
-  const { isOpen: isReviewOpen, onOpen: onReviewOpen, onClose: onReviewClose } = useDialog();
   const { userCanPerformAction } = useAuth();
 
   const isAuthor = userCanPerformAction('knowledge-articles', 'create');
@@ -100,15 +99,6 @@ const KnowledgeHeader: React.FC<KnowledgeHeaderProps> = ({
         <KnowledgeArticleForm
           isOpen={isCreateOpen}
           onClose={onCreateClose}
-        />
-      )}
-
-      {isReviewOpen && selectedArticle && (
-        <KnowledgeArticleForm
-          isOpen={isReviewOpen}
-          onClose={onReviewClose}
-          articleToEdit={selectedArticle}
-          mode="review"
         />
       )}
     </div>

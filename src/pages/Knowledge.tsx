@@ -92,6 +92,10 @@ const Knowledge = () => {
     setActiveTab(value);
   };
 
+  const handleReviewArticlesClick = () => {
+    setActiveTab('pending');
+  };
+
   const pendingReviewCount = articlesData?.data?.items.filter(
     article => article.status === 'pending_review'
   ).length || 0;
@@ -116,7 +120,7 @@ const Knowledge = () => {
         searchQuery={searchQuery}
         onRefresh={handleRefresh}
         pendingReviewCount={pendingReviewCount}
-        onReviewArticlesClick={() => setActiveTab('pending')}
+        onReviewArticlesClick={handleReviewArticlesClick}
         selectedArticle={selectedArticle}
       />
       

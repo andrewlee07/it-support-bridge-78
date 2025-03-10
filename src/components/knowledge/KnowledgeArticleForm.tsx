@@ -11,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Editor } from '@tinymce/tinymce-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Textarea } from '@/components/ui/textarea';
+import { addMonths } from 'date-fns';
 import {
   Form,
   FormControl,
@@ -26,6 +27,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import TagInput from '@/components/shared/TagInput';
 
 interface KnowledgeArticleFormProps {
@@ -41,6 +47,8 @@ type FormValues = {
   type: string;
   tags: string[];
   reviewComments?: string;
+  expiryDate?: Date;
+  serviceId?: string;
 };
 
 const ARTICLE_TYPES = [
@@ -63,6 +71,9 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
   
   const isAuthor = userCanPerformAction('knowledge-articles', 'create');
   const isReviewer = userCanPerformAction('knowledge-articles', 'approve');
+
+  // Set default expiry date to 1 year from now if creating a new article
+  const defaultExpiryDate = articleToEdit?.expiryDate || addMonths(new Date(), 12);
   
   const form = useForm<FormValues>({
     defaultValues: {
@@ -71,6 +82,8 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
       type: articleToEdit?.type || 'Documentation',
       tags: articleToEdit?.tags || [],
       reviewComments: articleToEdit?.reviewComments || '',
+      expiryDate: articleToEdit?.expiryDate ? new Date(articleToEdit.expiryDate) : defaultExpiryDate,
+      serviceId: articleToEdit?.serviceId || '',
     }
   });
 
@@ -112,6 +125,12 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
     if (!articleToEdit) return;
 
     try {
+      const values = form.getValues();
+      await updateKnowledgeArticle(articleToEdit.id, {
+        ...values, 
+        expiryDate: values.expiryDate
+      });
+      
       await submitArticleForReview(articleToEdit.id);
       toast.success('Article submitted for review');
       queryClient.invalidateQueries({ queryKey: ['knowledgeArticles'] });
@@ -220,6 +239,48 @@ const KnowledgeArticleForm: React.FC<KnowledgeArticleFormProps> = ({
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="expiryDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Expiry Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                            isReviewMode && "bg-gray-100"
+                          )}
+                          disabled={isReviewMode}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

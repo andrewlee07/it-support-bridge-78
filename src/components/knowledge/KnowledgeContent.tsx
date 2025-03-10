@@ -3,9 +3,9 @@ import React from 'react';
 import { KnowledgeArticle, KnowledgeCategory } from '@/utils/types/knowledge';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Eye, Tag, FileText, AlertTriangle, ClipboardCheck } from 'lucide-react';
+import { Clock, Eye, Tag, FileText, AlertTriangle, ClipboardCheck, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
+import { format, isAfter, subMonths } from 'date-fns';
 import KnowledgeSidebar from './KnowledgeSidebar';
 import { useDialog } from '@/hooks/useDisclosure';
 import KnowledgeArticleForm from './KnowledgeArticleForm';
@@ -59,6 +59,21 @@ const KnowledgeContent: React.FC<KnowledgeContentProps> = ({
       default:
         return null;
     }
+  };
+
+  const renderExpiryBadge = (article: KnowledgeArticle) => {
+    if (!article.expiryDate) return null;
+    
+    const today = new Date();
+    const oneMonthFromNow = subMonths(article.expiryDate, 1);
+    
+    if (isAfter(today, article.expiryDate)) {
+      return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">Expired</Badge>;
+    } else if (isAfter(today, oneMonthFromNow)) {
+      return <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">Expiring Soon</Badge>;
+    }
+    
+    return null;
   };
 
   const canEdit = (article: KnowledgeArticle) => {
@@ -131,6 +146,13 @@ const KnowledgeContent: React.FC<KnowledgeContentProps> = ({
                   </div>
                   <div className="flex items-center space-x-2">
                     {renderStatusBadge(article)}
+                    {renderExpiryBadge(article)}
+                    {article.expiryDate && (
+                      <div className="flex items-center text-gray-500 text-sm">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        Expires: {format(new Date(article.expiryDate), 'MMM d, yyyy')}
+                      </div>
+                    )}
                     {article.status === 'rejected' && article.reviewComments && (
                       <div className="relative group">
                         <AlertTriangle size={18} className="text-red-500 cursor-help" />

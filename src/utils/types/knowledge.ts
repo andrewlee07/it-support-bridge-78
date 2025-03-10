@@ -14,6 +14,8 @@ export interface KnowledgeArticle {
   reviewerId?: string;
   reviewDate?: Date;
   reviewComments?: string;
+  expiryDate?: Date;
+  lastReviewNotificationDate?: Date;
 }
 
 export interface KnowledgeCategory {
