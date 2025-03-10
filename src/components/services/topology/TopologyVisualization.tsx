@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { TopologyNode } from './components/TopologyNode';
 import { TopologyLink } from './components/TopologyLink';
 import { TopologyEmptyState } from './components/TopologyEmptyState';
+import { useTopologyLayout } from '@/hooks/service-topology/useTopologyLayout';
 
 interface TopologyVisualizationProps {
   services: ServiceWithCategory[];
@@ -28,6 +29,9 @@ export const TopologyVisualization: React.FC<TopologyVisualizationProps> = ({
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [isDragging, setIsDragging] = useState(false);
 
+  // Use the new hook to handle node positioning
+  const { positionedNodes } = useTopologyLayout(topologyData, dimensions);
+
   useEffect(() => {
     // Update dimensions based on container size
     const updateDimensions = () => {
@@ -41,29 +45,6 @@ export const TopologyVisualization: React.FC<TopologyVisualizationProps> = ({
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
-
-  // Calculate node positions using a force-based layout simulation
-  useEffect(() => {
-    if (topologyData.nodes.length === 0) return;
-
-    // Simple force-directed layout (in a real app, use d3-force or similar)
-    // This is a very simplified version for demonstration
-    const centerX = dimensions.width / 2;
-    const centerY = dimensions.height / 2;
-    const radius = Math.min(dimensions.width, dimensions.height) * 0.35;
-    
-    // Position nodes in a circle for this basic implementation
-    const angleStep = (2 * Math.PI) / topologyData.nodes.length;
-    
-    topologyData.nodes.forEach((node, i) => {
-      const angle = i * angleStep;
-      (node as any).x = centerX + radius * Math.cos(angle);
-      (node as any).y = centerY + radius * Math.sin(angle);
-    });
-    
-    // Force update to trigger re-render
-    setDimensions({...dimensions});
-  }, [topologyData, dimensions]);
 
   // Dragging functionality
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -117,12 +98,12 @@ export const TopologyVisualization: React.FC<TopologyVisualizationProps> = ({
           <TopologyLink 
             key={`link-${index}`}
             link={link}
-            nodes={topologyData.nodes}
+            nodes={positionedNodes}
           />
         ))}
         
         {/* Draw service nodes */}
-        {topologyData.nodes.map((node) => (
+        {positionedNodes.map((node) => (
           <TopologyNode 
             key={`node-${node.id}`}
             node={node}
