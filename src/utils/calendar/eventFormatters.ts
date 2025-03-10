@@ -26,12 +26,17 @@ export const changeRequestToCalendarEvent = (change: ChangeRequest): CalendarEve
  * Converts a release to a calendar event
  */
 export const releaseToCalendarEvent = (release: Release): CalendarEvent => {
+  // Ensure date is a Date object
+  const plannedDate = release.plannedDate instanceof Date 
+    ? release.plannedDate 
+    : new Date(release.plannedDate);
+    
   return {
     id: `release-${release.id}`,
     entityId: release.id,
     title: release.title,
     description: release.description,
-    date: release.plannedDate,
+    date: plannedDate,
     endDate: undefined, // Releases might not have an end date
     type: 'release',
     status: release.status,

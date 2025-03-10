@@ -135,11 +135,22 @@ const updateItemStatusBasedOnRelease = async (itemIndex: number, releaseId: stri
         const previousDueDate = backlogItems[itemIndex].dueDate;
         backlogItems[itemIndex].dueDate = new Date(release.plannedDate);
         
+        // Format date value safely for history
+        const formattedPreviousDate = previousDueDate 
+          ? (previousDueDate instanceof Date 
+              ? previousDueDate.toISOString() 
+              : String(previousDueDate)) 
+          : 'None';
+          
+        const formattedNewDate = release.plannedDate instanceof Date 
+          ? release.plannedDate.toISOString() 
+          : String(release.plannedDate);
+        
         backlogItems[itemIndex].history.push({
           id: uuidv4(),
           field: 'dueDate',
-          previousValue: previousDueDate ? previousDueDate.toISOString() : 'None',
-          newValue: release.plannedDate.toISOString(),
+          previousValue: formattedPreviousDate,
+          newValue: formattedNewDate,
           changedBy: 'system-sync',
           changedAt: new Date()
         });

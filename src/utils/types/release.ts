@@ -51,4 +51,19 @@ export interface ReleaseMetrics {
     count: number;
   }[];
   successRate: number;
+  // Adding properties expected by the ReleaseMetrics component
+  statusCounts: {
+    Planned: number;
+    'In Progress': number;
+    Deployed: number;
+    Cancelled: number;
+  };
+  typeCounts: {
+    major: number;
+    minor: number;
+    patch: number;
+    emergency: number;
+  };
+  upcomingReleases: number;
+  deployedThisMonth: number;
 }

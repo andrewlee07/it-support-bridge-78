@@ -1,4 +1,5 @@
 
+
 import { ApiResponse, Release, ReleaseStatus, ReleaseMetrics, ReleaseType } from '@/utils/types';
 import { delay, createApiSuccessResponse, createApiErrorResponse } from '../../mockData/apiHelpers';
 import { mockReleases } from './mockData';
@@ -39,6 +40,34 @@ export const getReleaseMetrics = async (): Promise<ApiResponse<ReleaseMetrics>> 
     patch: mockReleases.filter(r => r.type === 'patch').length,
     emergency: mockReleases.filter(r => r.type === 'emergency').length,
   };
+
+  // Calculate status counts
+  const statusCounts = {
+    'Planned': mockReleases.filter(r => r.status === 'Planned').length,
+    'In Progress': mockReleases.filter(r => r.status === 'In Progress').length,
+    'Deployed': deployedReleases,
+    'Cancelled': cancelledReleases
+  };
+
+  // Get current date for calculating deployedThisMonth
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  // Calculate deployed this month
+  const deployedThisMonth = mockReleases.filter(r => {
+    const deployDate = new Date(r.updatedAt);
+    return r.status === 'Deployed' && 
+           deployDate.getMonth() === currentMonth && 
+           deployDate.getFullYear() === currentYear;
+  }).length;
+
+  // Calculate upcoming releases (planned for future date)
+  const upcomingReleases = mockReleases.filter(r => {
+    if (r.status === 'Deployed' || r.status === 'Cancelled') return false;
+    const plannedDate = new Date(r.plannedDate);
+    return plannedDate > now;
+  }).length;
   
   const metrics: ReleaseMetrics = {
     totalReleases,
@@ -54,7 +83,12 @@ export const getReleaseMetrics = async (): Promise<ApiResponse<ReleaseMetrics>> 
       { month: 'May', count: 2 },
       { month: 'Jun', count: 3 }
     ],
-    successRate: deployedReleases / (deployedReleases + cancelledReleases) * 100
+    successRate: deployedReleases / (deployedReleases + cancelledReleases) * 100,
+    // Add the new required properties
+    statusCounts,
+    typeCounts: releasesByType,
+    upcomingReleases,
+    deployedThisMonth
   };
   
   return createApiSuccessResponse(metrics);
@@ -62,3 +96,4 @@ export const getReleaseMetrics = async (): Promise<ApiResponse<ReleaseMetrics>> 
 
 // Export mockReleases for usage in other modules
 export { mockReleases };
+
