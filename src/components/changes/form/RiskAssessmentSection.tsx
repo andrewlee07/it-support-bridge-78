@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { RiskAssessmentQuestion, RiskAssessmentAnswer } from '@/utils/types';
@@ -22,7 +21,6 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form, onC
   const [calculatedRisk, setCalculatedRisk] = useState<{ score: number; level: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch risk assessment questions
   const { data: questions, isLoading, error } = useQuery({
     queryKey: ['riskQuestions'],
     queryFn: async () => {
@@ -31,7 +29,6 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form, onC
     }
   });
 
-  // Calculate risk score whenever answers change
   useEffect(() => {
     if (assessmentAnswers.length > 0) {
       const calculateRisk = async () => {
@@ -51,24 +48,22 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form, onC
     }
   }, [assessmentAnswers]);
 
-  // Update the form value whenever assessmentAnswers changes
   useEffect(() => {
     if (assessmentAnswers.length > 0) {
       form.setValue('assessmentAnswers', assessmentAnswers);
     }
   }, [assessmentAnswers, form]);
 
-  // Check if all required questions are answered
   useEffect(() => {
     if (!questions) return;
     
-    const requiredQuestions = questions.filter(q => q.active && q.isRequired);
-    const answeredRequiredQuestions = requiredQuestions.filter(q => 
+    const allQuestions = questions.filter(q => q.active);
+    const answeredQuestions = allQuestions.filter(q => 
       assessmentAnswers.some(a => a.questionId === q.id)
     );
     
-    const isComplete = requiredQuestions.length > 0 && 
-      answeredRequiredQuestions.length === requiredQuestions.length;
+    const isComplete = allQuestions.length > 0 && 
+      answeredQuestions.length === allQuestions.length;
     
     if (onComplete) {
       onComplete(isComplete);
@@ -77,22 +72,18 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form, onC
 
   const handleAnswerChange = (questionId: string, optionId: string, value: number) => {
     setAssessmentAnswers(prev => {
-      // Find if there's an existing answer for this question
       const existingIndex = prev.findIndex(a => a.questionId === questionId);
       
       if (existingIndex >= 0) {
-        // Update existing answer
         const updated = [...prev];
         updated[existingIndex] = { questionId, selectedOptionId: optionId, value };
         return updated;
       } else {
-        // Add new answer
         return [...prev, { questionId, selectedOptionId: optionId, value }];
       }
     });
   };
 
-  // Get the selected option ID for a question
   const getSelectedOption = (questionId: string) => {
     return assessmentAnswers.find(a => a.questionId === questionId)?.selectedOptionId || '';
   };
@@ -112,17 +103,14 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form, onC
     );
   }
 
-  // Only show active questions
   const activeQuestions = questions?.filter(q => q.active) || [];
   
-  // Filter questions based on search
   const filteredQuestions = searchQuery
     ? activeQuestions.filter(q => 
         q.question.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : activeQuestions;
 
-  // Calculate completion percentage
   const requiredQuestions = activeQuestions.filter(q => q.isRequired);
   const answeredRequired = requiredQuestions.filter(q => 
     assessmentAnswers.some(a => a.questionId === q.id)
@@ -193,7 +181,7 @@ const RiskAssessmentSection: React.FC<RiskAssessmentSectionProps> = ({ form, onC
               <FormItem className="space-y-3">
                 <FormLabel className="font-medium">
                   {question.question}
-                  {question.isRequired && <span className="text-red-500 ml-1">*</span>}
+                  <span className="text-red-500 ml-1">*</span>
                 </FormLabel>
                 <FormControl>
                   <RadioGroup
