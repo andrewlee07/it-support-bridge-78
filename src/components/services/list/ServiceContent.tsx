@@ -4,7 +4,7 @@ import { ServiceWithCategory } from '@/utils/types/service';
 import ServiceEmptyState from './ServiceEmptyState';
 import ServiceLoadingState from './ServiceLoadingState';
 import ServiceTable from './ServiceTable';
-import ServiceTopologyView from '../ServiceTopologyView';
+import { ServiceTopologyView } from '../topology';
 
 interface ServiceContentProps {
   isLoading: boolean;
