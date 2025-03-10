@@ -62,7 +62,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             <TabsTrigger value="day">Day</TabsTrigger>
             <TabsTrigger value="week">Week</TabsTrigger>
             <TabsTrigger value="month">Month</TabsTrigger>
-            <TabsTrigger value="timeline">Timeline</TabsTrigger>
           </TabsList>
         </Tabs>
 

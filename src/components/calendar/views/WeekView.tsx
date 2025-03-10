@@ -1,7 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import { CalendarEvent } from '@/utils/types/calendar';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface WeekViewProps {
   date: Date;
@@ -16,16 +18,29 @@ const WeekView: React.FC<WeekViewProps> = ({
   onEventClick,
   getEventColorClass,
 }) => {
+  const [showWorkWeek, setShowWorkWeek] = useState(false);
   const weekStart = startOfWeek(date);
+  const daysToShow = showWorkWeek ? 5 : 7;
   
   return (
     <div className="p-4 h-full overflow-y-auto">
-      <h2 className="text-xl font-semibold mb-4">
-        Week of {format(weekStart, 'MMMM d, yyyy')}
-      </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">
+          Week of {format(weekStart, 'MMMM d, yyyy')}
+        </h2>
+        
+        <div className="flex items-center space-x-2">
+          <Switch 
+            id="work-week-toggle" 
+            checked={showWorkWeek} 
+            onCheckedChange={setShowWorkWeek}
+          />
+          <Label htmlFor="work-week-toggle">5-day work week</Label>
+        </div>
+      </div>
       
-      <div className="grid grid-cols-7 gap-2 min-h-[450px]">
-        {Array.from({ length: 7 }).map((_, index) => {
+      <div className={`grid ${showWorkWeek ? 'grid-cols-5' : 'grid-cols-7'} gap-2 min-h-[450px]`}>
+        {Array.from({ length: daysToShow }).map((_, index) => {
           const day = addDays(weekStart, index);
           const dayName = format(day, 'EEE');
           const dayNumber = format(day, 'd');

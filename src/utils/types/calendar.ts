@@ -3,7 +3,7 @@
 import { ChangeRequest } from './change';
 import { Release } from './release';
 
-export type CalendarViewType = 'day' | 'week' | 'month' | 'timeline';
+export type CalendarViewType = 'day' | 'week' | 'month';
 export type CalendarEventType = 'change' | 'release';
 
 export interface CalendarEvent {
