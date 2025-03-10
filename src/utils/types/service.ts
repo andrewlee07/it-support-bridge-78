@@ -45,16 +45,35 @@ export interface ServiceCategory {
   id: string;
   name: string;
   description?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  displayOrder?: number;
 }
+
+export type ServiceStatus = 'active' | 'inactive' | 'maintenance' | 'deprecated';
+export type SupportHours = 'Business Hours (9am-5pm)' | 'Extended Hours (8am-8pm)' | '24/7 Support' | 'Limited Support' | 'not-specified';
+
+export const SERVICE_SUPPORT_HOURS: SupportHours[] = [
+  'Business Hours (9am-5pm)',
+  'Extended Hours (8am-8pm)',
+  '24/7 Support',
+  'Limited Support',
+  'not-specified'
+];
 
 export interface Service {
   id: string;
   name: string;
   description: string;
   categoryId: string;
-  status: 'active' | 'inactive' | 'maintenance' | 'deprecated';
+  status: ServiceStatus;
   owner?: string;
   supportContact?: string;
+  supportContactId?: string;
+  supportTeamId?: string;
+  serviceOwnerId?: string;
+  documentationUrl?: string;
+  supportHours?: SupportHours;
   slaId?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -79,4 +98,39 @@ export interface ServiceWithCategory extends Service {
 export interface ServiceWithRelationships extends ServiceWithCategory {
   relationships: ServiceRelationship[];
   children?: ServiceWithRelationships[]; // For hierarchical representation
+}
+
+// Business unit related types
+export interface BusinessUnit {
+  id: string;
+  name: string;
+  description: string;
+  managerIds: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type ServiceBusinessUnitCriticality = 'Critical' | 'High' | 'Medium' | 'Low';
+
+export const SERVICE_BUSINESS_UNIT_CRITICALITY: ServiceBusinessUnitCriticality[] = [
+  'Critical', 'High', 'Medium', 'Low'
+];
+
+export interface ServiceBusinessUnit {
+  id: string;
+  serviceId: string;
+  businessUnitId: string;
+  criticality: ServiceBusinessUnitCriticality;
+  notes?: string;
+}
+
+// Knowledge base integration types
+export type ServiceKnowledgeRelationshipType = 'documentation' | 'user-guide' | 'faq' | 'training';
+
+export interface ServiceKnowledge {
+  id: string;
+  serviceId: string;
+  knowledgeArticleId: string;
+  relationshipType: ServiceKnowledgeRelationshipType;
+  isPrimary?: boolean;
 }
