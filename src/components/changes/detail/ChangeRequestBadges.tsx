@@ -1,28 +1,27 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown } from 'lucide-react';
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { RiskLevel, ChangeStatus } from '@/utils/types/change';
 
 interface ChangeRequestBadgesProps {
   status: ChangeStatus;
   riskLevel: RiskLevel;
   canUpdateStatus: boolean;
-  onStatusDialogOpen: () => void;
+  onStatusChange: (status: ChangeStatus) => void;
 }
 
 const ChangeRequestBadges: React.FC<ChangeRequestBadgesProps> = ({
   status,
   riskLevel,
   canUpdateStatus,
-  onStatusDialogOpen
+  onStatusChange
 }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -58,24 +57,33 @@ const ChangeRequestBadges: React.FC<ChangeRequestBadgesProps> = ({
     }
   };
 
+  // Available status options to transition to
+  const getAvailableStatusOptions = () => {
+    const allStatuses: ChangeStatus[] = ['draft', 'submitted', 'approved', 'in-progress', 'completed', 'failed', 'cancelled'];
+    // Remove current status from options
+    return allStatuses.filter(s => s !== status);
+  };
+
   return (
     <div className="flex flex-wrap gap-2">
       {canUpdateStatus ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="flex items-center gap-1">
-              <Badge className={getStatusColor(status)}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </Badge>
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onStatusDialogOpen}>
-              Update Status
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <Badge className={getStatusColor(status)}>
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </Badge>
+          <Select onValueChange={(value) => onStatusChange(value as ChangeStatus)}>
+            <SelectTrigger className="h-8 w-[150px] text-xs">
+              <SelectValue placeholder="Update Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {getAvailableStatusOptions().map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       ) : (
         <Badge className={getStatusColor(status)}>
           {status.charAt(0).toUpperCase() + status.slice(1)}

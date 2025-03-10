@@ -6,14 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { ChangeRequest, TicketCategory, ChangeCategory, ClosureReason, ApproverRole } from '@/utils/types';
 
 // Import our component sections
 import BasicInfoSection from './form/BasicInfoSection';
 import DateSelectionSection from './form/DateSelectionSection';
 import PlanningSection from './form/PlanningSection';
-import ApproverSection from './form/ApproverSection';
 import ClosureSection from './form/ClosureSection';
 import FormActions from './form/FormActions';
 import RiskAssessmentSection from './form/RiskAssessmentSection';
@@ -64,7 +63,6 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
   isEditMode = false // Provide a default value
 }) => {
   const { user } = useAuth();
-  const { toast } = useToast();
   
   // Safely map any priority to a valid form value
   const mapPriority = (priority: any): 'P1' | 'P2' | 'P3' | 'P4' => {
@@ -87,7 +85,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
       endDate: initialData?.endDate ? new Date(initialData.endDate) : new Date(Date.now() + 172800000), // day after tomorrow
       implementationPlan: initialData?.implementationPlan || "",
       rollbackPlan: initialData?.rollbackPlan || "",
-      approverRoles: initialData?.approverRoles || ['it'],
+      approverRoles: initialData?.approverRoles || [],
       closureReason: initialData?.closureReason,
       closureNotes: "",
       assessmentAnswers: initialData?.assessmentAnswers || [],
@@ -96,11 +94,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
 
   const handleSubmit = (values: ChangeRequestFormValues) => {
     if (!user) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to submit a change request",
-        variant: "destructive",
-      });
+      toast.error("You must be logged in to submit a change request");
       return;
     }
     
@@ -123,7 +117,6 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
                 <DateSelectionSection form={form} />
                 <PlanningSection form={form} />
                 <RiskAssessmentSection form={form} />
-                <ApproverSection form={form} />
               </>
             )}
             
