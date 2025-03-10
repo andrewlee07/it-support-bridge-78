@@ -101,7 +101,11 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
         {showRiskAssessment && (
           <div className="border rounded-md p-4 bg-muted/20">
             <h3 className="text-lg font-medium mb-3">Risk Assessment Details</h3>
-            <RiskAssessmentDetails answers={changeRequest.assessmentAnswers || []} />
+            <RiskAssessmentDetails 
+              answers={changeRequest.assessmentAnswers || []} 
+              riskScore={changeRequest.riskScore}
+              riskLevel={changeRequest.riskLevel}
+            />
           </div>
         )}
         
