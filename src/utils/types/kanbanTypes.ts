@@ -12,7 +12,7 @@ export interface KanbanBoardConfig {
   columns: KanbanColumnConfig[];
   layout: 'horizontal' | 'grid';
   defaultCollapsed: string[];
-  viewType?: 'status' | 'sprint';
+  viewType: 'status' | 'sprint';
 }
 
 // Default configuration

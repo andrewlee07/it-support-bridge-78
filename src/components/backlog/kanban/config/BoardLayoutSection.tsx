@@ -15,14 +15,14 @@ import { Layers, Kanban } from 'lucide-react';
 
 interface BoardLayoutSectionProps {
   layout: 'horizontal' | 'grid';
-  viewType?: 'status' | 'sprint';
+  viewType: 'status' | 'sprint';
   onLayoutChange: (layout: 'horizontal' | 'grid') => void;
   onViewTypeChange: (viewType: 'status' | 'sprint') => void;
 }
 
 const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
   layout,
-  viewType = 'status',
+  viewType,
   onLayoutChange,
   onViewTypeChange
 }) => {

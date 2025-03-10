@@ -22,6 +22,17 @@ export interface ChangeRequest extends Omit<Ticket, 'status' | 'category'> {
   approverRoles?: ApproverRole[];
   approvedBy?: string;
   approvedAt?: Date;
+  implementor?: string; // Person implementing the change
+  approvers?: ChangeApprover[]; // List of approvers
+}
+
+export interface ChangeApprover {
+  id: string;
+  userId: string;
+  role: ApproverRole;
+  status: 'pending' | 'approved' | 'rejected';
+  comments?: string;
+  timestamp?: Date;
 }
 
 export interface RiskAssessmentQuestion {
