@@ -1,18 +1,15 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { ChangeRequest } from '@/utils/types/change';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import ChangeStatusDialog from '../ChangeStatusDialog';
 import RiskAssessmentDetails from '../RiskAssessmentDetails';
 import ChangeRequestBadges from './ChangeRequestBadges';
 import ChangeRequestMetadata from './ChangeRequestMetadata';
 import ChangeRequestDescription from './ChangeRequestDescription';
 import ChangeRequestApprovals from './ChangeRequestApprovals';
 import ChangeRequestActionButtons from './ChangeRequestActionButtons';
-import { useNavigate } from 'react-router-dom';
-import { ClipboardList, XCircle } from 'lucide-react';
 
 export interface ChangeRequestContentProps {
   changeRequest: ChangeRequest;
@@ -34,14 +31,12 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
   onAddApprover
 }) => {
   const { user, hasPermission } = useAuth();
-  const [showRiskDetails, setShowRiskDetails] = useState(true); // Default to showing risk details
-  const navigate = useNavigate();
+  const [showRiskDetails, setShowRiskDetails] = useState(false);
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   
   const canApprove = hasPermission(['admin', 'change-manager']) && 
                      changeRequest.status === 'submitted' &&
-                     changeRequest.createdBy !== user?.id &&
-                     changeRequest.assessmentAnswers &&
-                     changeRequest.assessmentAnswers.length > 0; // Can only approve with completed risk assessment
+                     changeRequest.createdBy !== user?.id;
   
   const canReject = hasPermission(['admin', 'change-manager']) && 
                     changeRequest.status === 'submitted';
@@ -51,26 +46,12 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
 
   const canUpdateStatus = hasPermission(['admin', 'it', 'change-manager']) || 
                           changeRequest.createdBy === user?.id;
-                          
-  const canCloseChange = changeRequest.status === 'in-progress' &&
-                         (changeRequest.createdBy === user?.id || 
-                          hasPermission(['admin', 'it', 'change-manager']));
 
   const handleStatusChange = (newStatus: string) => {
-    // Check if we're trying to submit without a risk assessment
-    if (newStatus === 'submitted' && 
-        (!changeRequest.assessmentAnswers || changeRequest.assessmentAnswers.length === 0)) {
-      toast.error('Risk assessment must be completed before submitting for approval.');
-      return;
-    }
-    
     if (onUpdateStatus) {
       onUpdateStatus(newStatus);
+      setIsStatusDialogOpen(false);
     }
-  };
-  
-  const handleCloseChange = () => {
-    navigate(`/changes/${changeRequest.id}/close`);
   };
 
   return (
@@ -91,7 +72,7 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
             status={changeRequest.status}
             riskLevel={changeRequest.riskLevel}
             canUpdateStatus={canUpdateStatus}
-            onStatusChange={handleStatusChange}
+            onStatusDialogOpen={() => setIsStatusDialogOpen(true)}
           />
         </div>
       </CardHeader>
@@ -116,29 +97,6 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           </div>
         )}
         
-        {(!changeRequest.assessmentAnswers || changeRequest.assessmentAnswers.length === 0) && (
-          <div className="border border-yellow-300 rounded-md p-4 bg-yellow-50 text-yellow-800">
-            <h3 className="text-md font-medium mb-2 flex items-center">
-              <XCircle className="h-5 w-5 mr-2" />
-              Risk Assessment Required
-            </h3>
-            <p className="text-sm">
-              A risk assessment must be completed before this change can be submitted for approval.
-            </p>
-            {canEdit && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2" 
-                onClick={() => navigate(`/changes/${changeRequest.id}/edit`)}
-              >
-                <ClipboardList className="h-4 w-4 mr-2" />
-                Complete Risk Assessment
-              </Button>
-            )}
-          </div>
-        )}
-        
         <ChangeRequestDescription 
           description={changeRequest.description}
           implementationPlan={changeRequest.implementationPlan}
@@ -151,41 +109,9 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           approverRoles={changeRequest.approverRoles}
           onAddApprover={onAddApprover}
         />
-        
-        {changeRequest.closureReason && (
-          <div className="border rounded-md p-4">
-            <h3 className="text-lg font-medium mb-3">Closure Information</h3>
-            <div className="space-y-2">
-              <div>
-                <span className="text-sm font-medium">Outcome:</span>
-                <span className="ml-2 text-sm">
-                  {changeRequest.closureReason.split('-').map(word => 
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}
-                </span>
-              </div>
-              {changeRequest.closureNotes && (
-                <div>
-                  <span className="text-sm font-medium">Notes:</span>
-                  <p className="mt-1 text-sm">{changeRequest.closureNotes}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </CardContent>
       
-      <CardFooter className="flex justify-between">
-        <div>
-          {canCloseChange && (
-            <Button 
-              variant="outline" 
-              onClick={handleCloseChange}
-            >
-              Close Change
-            </Button>
-          )}
-        </div>
+      <CardFooter>
         <ChangeRequestActionButtons 
           canEdit={canEdit}
           canReject={canReject}
@@ -195,6 +121,13 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           onApprove={onApprove}
         />
       </CardFooter>
+
+      <ChangeStatusDialog
+        isOpen={isStatusDialogOpen}
+        onOpenChange={setIsStatusDialogOpen}
+        currentStatus={changeRequest.status}
+        onStatusChange={handleStatusChange}
+      />
     </Card>
   );
 };
