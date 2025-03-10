@@ -1,24 +1,69 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import NavLink from './sidebar/NavLink';
 import { navigationItems } from './sidebar/navigationItems';
 import GlobalSearch from './search/GlobalSearch';
-import SidebarCollapseButton from './sidebar/SidebarCollapseButton';
-import { useSidebar } from './sidebar/useSidebar';
-import { isActiveRoute, hasPermission } from './sidebar/sidebarUtils';
 
 interface SidebarProps {
   onCollapsedChange?: (collapsed: boolean) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
+  const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
-  const { collapsed, toggleCollapsed } = useSidebar({ onCollapsedChange });
   
+  // Check if we're on mobile based on screen width
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  // Update isMobile state when window resizes
+  useEffect(() => {
+    const handleResize = () => {
+      const newIsMobile = window.innerWidth < 768;
+      setIsMobile(newIsMobile);
+      
+      // Auto-collapse on mobile, but ensure sidebar is always visible
+      if (newIsMobile) {
+        setCollapsed(true);
+        if (onCollapsedChange) onCollapsedChange(true);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Set initial state
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [onCollapsedChange]);
+  
+  const toggleCollapsed = () => {
+    const newCollapsedState = !collapsed;
+    setCollapsed(newCollapsedState);
+    
+    // Notify parent component about the collapse state change
+    if (onCollapsedChange) {
+      onCollapsedChange(newCollapsedState);
+    }
+  };
+  
+  const isActiveRoute = (path: string | undefined): boolean => {
+    if (!path) return false;
+    return location.pathname === path || location.pathname.startsWith(path);
+  };
+  
+  // Function to check if user has permission for the menu item
+  const hasPermission = (allowedRoles: string[] = []): boolean => {
+    if (!user) return false;
+    if (allowedRoles.length === 0) return true; // If no roles specified, allow access
+    return allowedRoles.includes(user.role);
+  };
+
   return (
     <div 
       className={cn(
@@ -32,10 +77,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
             IT Support Bridge
           </div>
         )}
-        <SidebarCollapseButton 
-          collapsed={collapsed} 
-          onToggle={toggleCollapsed}
-        />
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className={cn("rounded-full h-8 w-8", collapsed && "mx-auto")} 
+          onClick={toggleCollapsed}
+        >
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </Button>
       </div>
       
       <div className="py-4 flex flex-col h-[calc(100vh-4rem)] justify-between">
@@ -48,11 +97,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
         <div className="space-y-1 px-3 overflow-y-auto flex-grow">
           {navigationItems.map((item) => (
             // Only render if user has permission
-            hasPermission(user, item.allowedRoles || []) && (
+            hasPermission(item.allowedRoles || []) && (
               <NavLink 
                 key={item.path || item.name} 
                 item={item} 
-                isActive={isActiveRoute(location.pathname, item.path)}
+                isActive={isActiveRoute(item.path)}
                 collapsed={collapsed} 
               />
             )

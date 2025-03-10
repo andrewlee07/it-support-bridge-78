@@ -19,7 +19,6 @@ export interface ChangeRequest extends Omit<Ticket, 'status' | 'category'> {
   implementationPlan: string;
   rollbackPlan: string;
   closureReason?: ClosureReason;
-  closureNotes?: string; // Added this property
   approverRoles?: ApproverRole[];
   approvedBy?: string;
   approvedAt?: Date;
