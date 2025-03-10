@@ -1,5 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Plus, Save, Trash2 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import PageTransition from '@/components/shared/PageTransition';
 import DynamicChartRenderer from '@/components/reports/DynamicChartRenderer';
 import ReportHeader from '@/components/reports/ReportHeader';

@@ -172,12 +172,12 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
                 <label htmlFor="supportContact" className="text-sm font-medium">
                   Support Contact
                 </label>
-                <Select defaultValue={selectedService.supportContactId || ""}>
+                <Select defaultValue={selectedService.supportContactId || "none"}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select support contact" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     <SelectItem value="user-1">John Doe</SelectItem>
                     <SelectItem value="user-2">Jane Smith</SelectItem>
                     <SelectItem value="user-4">Morgan Lee</SelectItem>
@@ -189,12 +189,12 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
                 <label htmlFor="serviceOwner" className="text-sm font-medium">
                   Service Owner
                 </label>
-                <Select defaultValue={selectedService.serviceOwnerId || ""}>
+                <Select defaultValue={selectedService.serviceOwnerId || "none"}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select service owner" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     <SelectItem value="user-1">John Doe</SelectItem>
                     <SelectItem value="user-5">Casey Wilson</SelectItem>
                   </SelectContent>
@@ -205,12 +205,12 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
                 <label htmlFor="supportHours" className="text-sm font-medium">
                   Support Hours
                 </label>
-                <Select defaultValue={selectedService.supportHours || ""}>
+                <Select defaultValue={selectedService.supportHours || "not-specified"}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select support hours" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Not specified</SelectItem>
+                    <SelectItem value="not-specified">Not specified</SelectItem>
                     <SelectItem value="Business Hours (9am-5pm)">Business Hours (9am-5pm)</SelectItem>
                     <SelectItem value="Extended Hours (8am-8pm)">Extended Hours (8am-8pm)</SelectItem>
                     <SelectItem value="24/7 Support">24/7 Support</SelectItem>
