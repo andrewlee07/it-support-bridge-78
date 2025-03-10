@@ -20,67 +20,71 @@ import Approvals from '@/pages/Approvals';
 const router = createBrowserRouter([
   {
     path: '/login',
-    element: <Login />,
+    element: <Login />
   },
   {
     path: '/',
-    element: <ProtectedRoute><MainLayout /></ProtectedRoute>,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
         path: '/',
-        element: <Dashboard />,
+        element: <Dashboard />
       },
       {
         path: '/dashboard',
-        element: <Dashboard />,
+        element: <Dashboard />
       },
       {
         path: '/incidents',
-        element: <Incidents />,
+        element: <Incidents />
       },
       {
         path: '/service-requests',
-        element: <ServiceRequests />,
+        element: <ServiceRequests />
       },
       {
         path: '/problems',
-        element: <Problems />,
+        element: <Problems />
       },
       {
         path: '/changes',
-        element: <Changes />,
+        element: <Changes />
       },
       {
         path: '/changes/:id',
-        element: <ChangeDetail />,
+        element: <ChangeDetail />
       },
       {
         path: '/changes/new',
-        element: <NewChangeRequest />,
+        element: <NewChangeRequest />
       },
       {
         path: '/changes/:id/edit',
-        element: <EditChangeRequest />,
+        element: <EditChangeRequest />
       },
       {
         path: '/changes/:id/reject',
-        element: <RejectChange />,
+        element: <RejectChange />
       },
       {
         path: '/changes/:id/close',
-        element: <CloseChange />,
+        element: <CloseChange />
       },
       {
         path: '/calendar',
-        element: <Calendar />,
+        element: <Calendar />
       },
       {
         path: '/approvals',
-        element: <Approvals />,
-      },
-    ],
-  },
+        element: <Approvals />
+      }
+    ]
+  }
 ]);
 
 export default router;
