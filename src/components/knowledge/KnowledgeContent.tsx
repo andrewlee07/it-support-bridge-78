@@ -76,6 +76,9 @@ const KnowledgeContent: React.FC<KnowledgeContentProps> = ({
     return <div className="text-center py-10 text-red-500">{error}</div>;
   }
 
+  // Extract all unique tags from articles
+  const allTags = Array.from(new Set(articles.flatMap(article => article.tags)));
+
   if (articles.length === 0) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -84,6 +87,9 @@ const KnowledgeContent: React.FC<KnowledgeContentProps> = ({
             categories={categories}
             selectedCategory={selectedCategory}
             onCategorySelect={onCategorySelect}
+            tags={allTags}
+            selectedTags={selectedTags}
+            onTagSelect={onTagSelect}
           />
         </div>
         <div className="md:col-span-3">
@@ -108,7 +114,7 @@ const KnowledgeContent: React.FC<KnowledgeContentProps> = ({
           onCategorySelect={onCategorySelect}
           selectedTags={selectedTags}
           onTagSelect={onTagSelect}
-          allTags={Array.from(new Set(articles.flatMap(article => article.tags)))}
+          tags={allTags}
         />
       </div>
       <div className="md:col-span-3">
