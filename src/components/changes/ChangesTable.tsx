@@ -7,7 +7,7 @@ import { ChangeRequest } from '@/utils/types/change';
 import { format } from 'date-fns';
 import { Eye, Check, X } from 'lucide-react';
 
-interface ChangesTableProps {
+export interface ChangesTableProps {
   changes: ChangeRequest[];
   activeTab: string;
   onApprove?: (id: string) => void;

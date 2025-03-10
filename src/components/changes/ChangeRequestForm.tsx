@@ -147,7 +147,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
                 />
                 
                 {!riskAssessmentCompleted && (
-                  <Alert variant="warning">
+                  <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Risk Assessment Required</AlertTitle>
                     <AlertDescription>
