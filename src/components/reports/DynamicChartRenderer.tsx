@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ResponsivePie } from '@nivo/pie';
 import { 
@@ -34,6 +33,34 @@ const DynamicChartRenderer: React.FC<DynamicChartRendererProps> = ({
     );
   }
 
+  const formatLineData = (inputData: any[]) => {
+    if (inputData.length > 0 && 'id' in inputData[0] && 'data' in inputData[0]) {
+      return inputData;
+    }
+
+    return [
+      {
+        id: "values",
+        data: inputData.map(item => ({
+          x: item.label,
+          y: item.value
+        }))
+      }
+    ];
+  };
+
+  const formatBarData = (inputData: any[]) => {
+    if (inputData.length > 0 && config.groupBy && inputData[0][config.groupBy]) {
+      return inputData;
+    }
+
+    return inputData.map(item => ({
+      [config.groupBy || 'label']: item.label,
+      value: item.value,
+      color: item.color
+    }));
+  };
+
   const renderChart = () => {
     const commonProps = {
       margin: { top: 40, right: 80, bottom: 40, left: 80 },
@@ -60,25 +87,31 @@ const DynamicChartRenderer: React.FC<DynamicChartRendererProps> = ({
           />
         );
       case 'bar':
+        const barData = formatBarData(data);
         return (
           <ResponsiveBar
-            data={data}
+            data={barData}
             {...commonProps}
-            keys={config.metrics}
-            indexBy={config.groupBy || 'id'}
+            keys={['value']}
+            indexBy={config.groupBy || 'label'}
             padding={0.3}
-            groupMode="grouped"
             colors={{ scheme: 'category10' }}
             borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
             axisBottom={{
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
+              legend: config.xAxisLabel || '',
+              legendPosition: 'middle',
+              legendOffset: 32
             }}
             axisLeft={{
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
+              legend: config.yAxisLabel || '',
+              legendPosition: 'middle',
+              legendOffset: -40
             }}
             labelSkipWidth={12}
             labelSkipHeight={12}
@@ -87,9 +120,10 @@ const DynamicChartRenderer: React.FC<DynamicChartRendererProps> = ({
         );
       case 'line':
       case 'area':
+        const lineData = formatLineData(data);
         return (
           <ResponsiveLine
-            data={data}
+            data={lineData}
             {...commonProps}
             enableArea={config.chartType === 'area'}
             enablePoints={true}
@@ -98,6 +132,22 @@ const DynamicChartRenderer: React.FC<DynamicChartRendererProps> = ({
             pointBorderWidth={2}
             pointBorderColor={{ from: 'serieColor' }}
             useMesh={true}
+            axisBottom={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: config.xAxisLabel || '',
+              legendPosition: 'middle',
+              legendOffset: 32
+            }}
+            axisLeft={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: config.yAxisLabel || '',
+              legendPosition: 'middle',
+              legendOffset: -40
+            }}
             onClick={(point) => {
               if (point.data && onSegmentClick) {
                 onSegmentClick(point.data.x as string);

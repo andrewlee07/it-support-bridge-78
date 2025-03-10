@@ -1,29 +1,33 @@
+import React, { useState, useEffect } from 'react';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import PageTransition from '@/components/shared/PageTransition';
+import DynamicChartRenderer from '@/components/reports/DynamicChartRenderer';
+import ReportHeader from '@/components/reports/ReportHeader';
+import ReportTabsNavigation from '@/components/reports/ReportTabsNavigation';
+import DashboardTab from '@/components/reports/tabs/DashboardTab';
+import IncidentsTab from '@/components/reports/tabs/IncidentsTab';
+import ServiceRequestTab from '@/components/reports/tabs/ServiceRequestTab';
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Save, Trash2 } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
+// Define the chart types
+export type ChartType = 'pie' | 'donut' | 'bar' | 'line' | 'area';
 
-// Chart types we support
-export type ChartType = 'pie' | 'bar' | 'line' | 'area' | 'donut';
+// Define the metrics
+export type Metric = 'count' | 'sum' | 'average';
 
-// Data source type
-export type DataSource = 'incidents' | 'serviceRequests' | 'changes' | 'problems' | 'assets' | 'tests';
+// Define the data sources
+export type DataSource = 'incidents' | 'serviceRequests' | 'problems' | 'changes' | 'assets' | 'tests';
 
-// Chart configuration type
+// Define the configuration for a chart
 export interface ChartConfig {
   id: string;
   name: string;
   chartType: ChartType;
   dataSource: DataSource;
-  metrics: string[];
+  metrics: Metric[];
   filters: Record<string, any>;
   groupBy?: string;
-  colors?: string[];
+  xAxisLabel?: string;
+  yAxisLabel?: string;
 }
 
 interface ChartBuilderProps {

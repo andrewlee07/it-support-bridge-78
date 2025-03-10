@@ -8,6 +8,8 @@ export const incidentChartConfig: ChartConfig = {
   dataSource: 'incidents',
   metrics: ['count'],
   filters: {},
+  xAxisLabel: 'Status',
+  yAxisLabel: 'Count',
 };
 
 export const serviceRequestChartConfig: ChartConfig = {
@@ -17,6 +19,8 @@ export const serviceRequestChartConfig: ChartConfig = {
   dataSource: 'serviceRequests',
   metrics: ['count'],
   filters: {},
+  xAxisLabel: 'Status',
+  yAxisLabel: 'Count',
 };
 
 export const problemChartConfig: ChartConfig = {
@@ -26,6 +30,8 @@ export const problemChartConfig: ChartConfig = {
   dataSource: 'problems',
   metrics: ['count'],
   filters: {},
+  xAxisLabel: 'Status',
+  yAxisLabel: 'Count',
 };
 
 export const changeChartConfig: ChartConfig = {
@@ -35,6 +41,9 @@ export const changeChartConfig: ChartConfig = {
   dataSource: 'changes',
   metrics: ['count'],
   filters: {},
+  groupBy: 'label',
+  xAxisLabel: 'Status',
+  yAxisLabel: 'Count',
 };
 
 export const releaseChartConfig: ChartConfig = {
@@ -44,6 +53,8 @@ export const releaseChartConfig: ChartConfig = {
   dataSource: 'incidents', // Using incidents as a valid dataSource
   metrics: ['count'],
   filters: {},
+  xAxisLabel: 'Status',
+  yAxisLabel: 'Count',
 };
 
 export const assetChartConfig: ChartConfig = {
@@ -53,6 +64,8 @@ export const assetChartConfig: ChartConfig = {
   dataSource: 'assets',
   metrics: ['count'],
   filters: {},
+  xAxisLabel: 'Status',
+  yAxisLabel: 'Count',
 };
 
 export const backlogChartConfig: ChartConfig = {
@@ -62,4 +75,7 @@ export const backlogChartConfig: ChartConfig = {
   dataSource: 'tests', // Using tests as a valid dataSource
   metrics: ['count'],
   filters: {},
+  groupBy: 'label',
+  xAxisLabel: 'Status',
+  yAxisLabel: 'Count',
 };
