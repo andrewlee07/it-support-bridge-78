@@ -38,12 +38,15 @@ const CalendarViewContent: React.FC<CalendarViewContentProps> = ({
             className={dayIsInCurrentView(date) ? 'h-full' : ''}
             components={{
               Day: ({ date: day, ...props }: DayProps) => {
+                // The day can be null for placeholder days
+                if (!day) return null;
+                
                 return (
                   <div className="relative h-12 w-full p-1 flex justify-center">
                     <div className="absolute top-1 right-1 text-xs">
-                      {day && props.children}
+                      {day.getDate()}
                     </div>
-                    {day && renderEvent(day)}
+                    {renderEvent(day)}
                   </div>
                 );
               }
