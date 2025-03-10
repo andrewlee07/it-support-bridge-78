@@ -1,13 +1,12 @@
+
 import React from 'react';
-import { ResponsivePie } from '@nivo/pie';
-import { 
-  ResponsiveBar 
-} from '@nivo/bar';
-import { 
-  ResponsiveLine 
-} from '@nivo/line';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig } from './ChartBuilder';
+import PieChartRenderer from './chart-renderers/PieChartRenderer';
+import BarChartRenderer from './chart-renderers/BarChartRenderer';
+import LineChartRenderer from './chart-renderers/LineChartRenderer';
+import NoDataPlaceholder from './chart-renderers/NoDataPlaceholder';
+import { formatLineData, formatBarData } from './chart-renderers/DataFormatter';
 
 interface DynamicChartRendererProps {
   config: ChartConfig;
@@ -21,138 +20,56 @@ const DynamicChartRenderer: React.FC<DynamicChartRendererProps> = ({
   onSegmentClick,
 }) => {
   if (!data || data.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{config.name}</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[300px] flex items-center justify-center">
-          <p className="text-muted-foreground">No data available</p>
-        </CardContent>
-      </Card>
-    );
+    return <NoDataPlaceholder title={config.name} />;
   }
 
-  const formatLineData = (inputData: any[]) => {
-    if (inputData.length > 0 && 'id' in inputData[0] && 'data' in inputData[0]) {
-      return inputData;
-    }
-
-    return [
-      {
-        id: "values",
-        data: inputData.map(item => ({
-          x: item.label,
-          y: item.value
-        }))
-      }
-    ];
-  };
-
-  const formatBarData = (inputData: any[]) => {
-    if (inputData.length > 0 && config.groupBy && inputData[0][config.groupBy]) {
-      return inputData;
-    }
-
-    return inputData.map(item => ({
-      [config.groupBy || 'label']: item.label,
-      value: item.value,
-      color: item.color
-    }));
+  const commonProps = {
+    margin: { top: 40, right: 80, bottom: 40, left: 80 },
   };
 
   const renderChart = () => {
-    const commonProps = {
-      margin: { top: 40, right: 80, bottom: 40, left: 80 },
-    };
-
     switch (config.chartType) {
       case 'pie':
+        return (
+          <PieChartRenderer 
+            data={data} 
+            onClick={onSegmentClick}
+            commonProps={commonProps}
+          />
+        );
       case 'donut':
         return (
-          <ResponsivePie
-            data={data}
-            {...commonProps}
-            innerRadius={config.chartType === 'donut' ? 0.5 : 0}
-            padAngle={0.7}
-            cornerRadius={3}
-            activeOuterRadiusOffset={8}
-            colors={{ scheme: 'category10' }}
-            borderWidth={1}
-            borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-            arcLabelsSkipAngle={10}
-            arcLabelsRadiusOffset={0.55}
-            enableArcLinkLabels={config.chartType !== 'donut'}
-            onClick={(datum) => onSegmentClick && onSegmentClick(datum.id as string)}
+          <PieChartRenderer 
+            data={data} 
+            innerRadius={0.5}
+            onClick={onSegmentClick}
+            commonProps={commonProps}
           />
         );
       case 'bar':
-        const barData = formatBarData(data);
+        const barData = formatBarData(data, config.groupBy);
         return (
-          <ResponsiveBar
+          <BarChartRenderer
             data={barData}
-            {...commonProps}
             keys={['value']}
             indexBy={config.groupBy || 'label'}
-            padding={0.3}
-            colors={{ scheme: 'category10' }}
-            borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-            axisBottom={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: config.xAxisLabel || '',
-              legendPosition: 'middle',
-              legendOffset: 32
-            }}
-            axisLeft={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: config.yAxisLabel || '',
-              legendPosition: 'middle',
-              legendOffset: -40
-            }}
-            labelSkipWidth={12}
-            labelSkipHeight={12}
-            onClick={(datum) => onSegmentClick && onSegmentClick(datum.indexValue as string)}
+            xAxisLabel={config.xAxisLabel}
+            yAxisLabel={config.yAxisLabel}
+            onClick={onSegmentClick}
+            commonProps={commonProps}
           />
         );
       case 'line':
       case 'area':
-        const lineData = formatLineData(data);
+        const lineData = formatLineData(data, config.groupBy);
         return (
-          <ResponsiveLine
+          <LineChartRenderer
             data={lineData}
-            {...commonProps}
             enableArea={config.chartType === 'area'}
-            enablePoints={true}
-            pointSize={10}
-            pointColor={{ theme: 'background' }}
-            pointBorderWidth={2}
-            pointBorderColor={{ from: 'serieColor' }}
-            useMesh={true}
-            axisBottom={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: config.xAxisLabel || '',
-              legendPosition: 'middle',
-              legendOffset: 32
-            }}
-            axisLeft={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: config.yAxisLabel || '',
-              legendPosition: 'middle',
-              legendOffset: -40
-            }}
-            onClick={(point) => {
-              if (point.data && onSegmentClick) {
-                onSegmentClick(point.data.x as string);
-              }
-            }}
+            xAxisLabel={config.xAxisLabel}
+            yAxisLabel={config.yAxisLabel}
+            onClick={(value) => onSegmentClick && onSegmentClick(value)}
+            commonProps={commonProps}
           />
         );
       default:
