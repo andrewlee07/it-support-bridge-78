@@ -149,6 +149,7 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
       <CalendarViewContent 
         displayMode={displayMode}
         date={date}
+        view={view}
         events={events}
         isLoading={isLoading}
         onDateSelect={newDate => newDate && setDate(newDate)}
