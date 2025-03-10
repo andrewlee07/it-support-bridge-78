@@ -20,7 +20,7 @@ const ServiceEmptyState: React.FC<ServiceEmptyStateProps> = ({
       {onAddService && (
         <button
           onClick={onAddService}
-          className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90"
+          className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-DEFAULT hover:bg-purple-dark rounded-md"
         >
           Add Service
         </button>

@@ -1,3 +1,4 @@
+
 // Mock asset data for demonstration purposes
 export const mockAssets = [
   {

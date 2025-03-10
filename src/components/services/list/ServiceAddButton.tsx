@@ -9,7 +9,7 @@ interface ServiceAddButtonProps {
 
 const ServiceAddButton: React.FC<ServiceAddButtonProps> = ({ onAddService }) => {
   return (
-    <Button onClick={onAddService} className="bg-primary text-white">
+    <Button onClick={onAddService} className="bg-purple-DEFAULT hover:bg-purple-dark text-white">
       <PlusCircle className="mr-2 h-4 w-4" />
       Add Service
     </Button>

@@ -28,7 +28,7 @@ const assetApi = {
       updatedAt: now,
       audit: []
     };
-    mockAssets.push(newAsset);
+    mockAssets.push(newAsset as any);
     return createApiSuccessResponse(newAsset);
   },
 
@@ -39,13 +39,13 @@ const assetApi = {
       return createApiErrorResponse<Asset | null>('Asset not found', 404);
     }
     
-    const updatedAsset: Asset = {
+    const updatedAsset = {
       ...mockAssets[index],
       ...updates,
       updatedAt: new Date()
-    };
+    } as Asset;
     
-    mockAssets[index] = updatedAsset;
+    mockAssets[index] = updatedAsset as any;
     return createApiSuccessResponse(updatedAsset);
   },
 
