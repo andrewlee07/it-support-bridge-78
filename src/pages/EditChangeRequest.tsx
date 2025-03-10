@@ -45,7 +45,7 @@ const EditChangeRequest = () => {
     }
   }, [id]);
 
-  const handleSubmit = async (formData: Partial<ChangeRequest>) => {
+  const handleSubmit = async (formData: any) => {
     if (!user || !changeRequest) return;
     
     try {
