@@ -19,6 +19,7 @@ interface ColumnsSectionProps {
   onRemoveColumn: (columnId: string) => void;
   onMoveColumn: (columnId: string, direction: 'up' | 'down') => void;
   onToggleVisibility: (columnId: string, isVisible: boolean) => void;
+  onUpdateColumnName: (columnId: string, newName: string) => void;
 }
 
 const ColumnsSection: React.FC<ColumnsSectionProps> = ({
@@ -27,7 +28,8 @@ const ColumnsSection: React.FC<ColumnsSectionProps> = ({
   onAddColumn,
   onRemoveColumn,
   onMoveColumn,
-  onToggleVisibility
+  onToggleVisibility,
+  onUpdateColumnName
 }) => {
   return (
     <Card>
@@ -52,6 +54,7 @@ const ColumnsSection: React.FC<ColumnsSectionProps> = ({
                 onToggleVisibility={onToggleVisibility}
                 onRemoveColumn={onRemoveColumn}
                 onMoveColumn={onMoveColumn}
+                onUpdateColumnName={onUpdateColumnName}
               />
             ))}
           </div>

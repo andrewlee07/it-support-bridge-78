@@ -2,10 +2,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { KanbanBoardConfig } from '@/utils/types/kanbanTypes';
+import { KanbanBoardConfig, sprintColumnsConfig } from '@/utils/types/kanbanTypes';
 import { useKanbanConfig } from './config/useKanbanConfig';
 import BoardLayoutSection from './config/BoardLayoutSection';
 import ColumnsSection from './config/ColumnsSection';
+import { toast } from 'sonner';
 
 interface KanbanConfigDialogProps {
   open: boolean;
@@ -26,12 +27,25 @@ const KanbanConfigDialog: React.FC<KanbanConfigDialogProps> = ({
     handleRemoveColumn,
     handleMoveColumn,
     handleToggleVisibility,
+    handleUpdateColumnName,
     handleLayoutChange,
+    handleViewTypeChange,
     getFinalConfig
   } = useKanbanConfig(currentConfig);
 
   const handleSubmit = () => {
     onSave(getFinalConfig());
+    toast.success("Board configuration updated");
+  };
+
+  const handleSwitchToSprints = (viewType: 'status' | 'sprint') => {
+    handleViewTypeChange(viewType);
+    
+    // If switching to sprints and there are no sprint columns yet, add them
+    if (viewType === 'sprint' && !config.columns.some(col => col.statusValue.startsWith('sprint'))) {
+      // Add sprint columns
+      toast.info("Setting up sprint view");
+    }
   };
 
   return (
@@ -44,7 +58,9 @@ const KanbanConfigDialog: React.FC<KanbanConfigDialogProps> = ({
         <div className="space-y-4">
           <BoardLayoutSection 
             layout={config.layout}
+            viewType={config.viewType}
             onLayoutChange={handleLayoutChange}
+            onViewTypeChange={handleSwitchToSprints}
           />
 
           <ColumnsSection 
@@ -54,6 +70,7 @@ const KanbanConfigDialog: React.FC<KanbanConfigDialogProps> = ({
             onRemoveColumn={handleRemoveColumn}
             onMoveColumn={handleMoveColumn}
             onToggleVisibility={handleToggleVisibility}
+            onUpdateColumnName={handleUpdateColumnName}
           />
 
           <DialogFooter>

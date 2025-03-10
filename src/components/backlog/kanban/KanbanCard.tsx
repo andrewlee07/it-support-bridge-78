@@ -54,7 +54,10 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
   };
 
   return (
-    <Card className="shadow-sm hover:shadow transition-shadow">
+    <Card 
+      className="shadow-sm hover:shadow transition-shadow cursor-pointer"
+      onClick={onEdit}
+    >
       <CardContent className={cn(
         "flex flex-col",
         columnSize === 'compact' ? "p-2 space-y-1" : "p-3 space-y-2"
@@ -70,12 +73,20 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
             <MoveDiagonal className="h-3 w-3 text-muted-foreground mr-1" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6 p-0">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6 p-0"
+                  onClick={(e) => e.stopPropagation()} // Prevent card click when clicking menu
+                >
                   <MoreVertical className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[180px]">
-                <DropdownMenuItem onClick={onEdit}>
+                <DropdownMenuItem onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click
+                  onEdit();
+                }}>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </DropdownMenuItem>
@@ -89,7 +100,10 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
                     return (
                       <DropdownMenuItem
                         key={status}
-                        onClick={() => onStatusChange(status as BacklogItemStatus)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click
+                          onStatusChange(status as BacklogItemStatus);
+                        }}
                         className="pl-4"
                       >
                         {status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}

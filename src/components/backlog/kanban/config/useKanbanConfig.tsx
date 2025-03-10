@@ -69,10 +69,28 @@ export function useKanbanConfig(initialConfig: KanbanBoardConfig) {
     }));
   };
 
+  const handleUpdateColumnName = (columnId: string, newName: string) => {
+    if (!newName) return;
+    
+    setLocalConfig(prev => ({
+      ...prev,
+      columns: prev.columns.map(col => 
+        col.id === columnId ? { ...col, displayName: newName } : col
+      )
+    }));
+  };
+
   const handleLayoutChange = (layout: 'horizontal' | 'grid') => {
     setLocalConfig(prev => ({
       ...prev,
       layout
+    }));
+  };
+
+  const handleViewTypeChange = (viewType: 'status' | 'sprint') => {
+    setLocalConfig(prev => ({
+      ...prev,
+      viewType: viewType
     }));
   };
 
@@ -97,7 +115,9 @@ export function useKanbanConfig(initialConfig: KanbanBoardConfig) {
     handleRemoveColumn,
     handleMoveColumn,
     handleToggleVisibility,
+    handleUpdateColumnName,
     handleLayoutChange,
+    handleViewTypeChange,
     getFinalConfig
   };
 }

@@ -16,6 +16,7 @@ interface KanbanColumnsProps {
   onEditItem: (item: BacklogItem) => void;
   onQuickStatusChange: (itemId: string, newStatus: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
+  onAddItem: (status: string) => void;
 }
 
 const KanbanColumns: React.FC<KanbanColumnsProps> = ({
@@ -27,6 +28,7 @@ const KanbanColumns: React.FC<KanbanColumnsProps> = ({
   onEditItem,
   onQuickStatusChange,
   columnSize,
+  onAddItem
 }) => {
   // Group items by status
   const itemsByStatus = boardConfig.columns.reduce((acc, column) => {
@@ -58,6 +60,7 @@ const KanbanColumns: React.FC<KanbanColumnsProps> = ({
                 onEditItem={onEditItem}
                 onQuickStatusChange={onQuickStatusChange}
                 columnSize={columnSize}
+                onAddItem={onAddItem}
               />
             ))}
           </div>

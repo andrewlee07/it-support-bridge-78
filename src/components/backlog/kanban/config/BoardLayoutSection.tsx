@@ -7,66 +7,61 @@ import {
   CardDescription, 
   CardContent 
 } from '@/components/ui/card';
-import { 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormDescription 
-} from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Layout, LayoutGrid } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { KanbanBoardConfig } from '@/utils/types/kanbanTypes';
+import { Layers, Kanban } from 'lucide-react';
 
 interface BoardLayoutSectionProps {
   layout: 'horizontal' | 'grid';
+  viewType?: 'status' | 'sprint';
   onLayoutChange: (layout: 'horizontal' | 'grid') => void;
+  onViewTypeChange: (viewType: 'status' | 'sprint') => void;
 }
 
 const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
   layout,
-  onLayoutChange
+  viewType = 'status',
+  onLayoutChange,
+  onViewTypeChange
 }) => {
-  const form = useForm<KanbanBoardConfig>();
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Board Layout</CardTitle>
         <CardDescription>
-          Choose how columns are displayed on the board
+          Configure how the kanban board is displayed
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <FormField
-          control={form.control}
-          name="layout"
-          render={() => (
-            <FormItem className="space-y-3">
-              <FormLabel>Layout Style</FormLabel>
-              <RadioGroup
-                value={layout}
-                onValueChange={(value: 'horizontal' | 'grid') => onLayoutChange(value)}
-                className="flex flex-col space-y-1"
-              >
-                <div className="flex items-center space-x-3 space-y-0">
-                  <RadioGroupItem value="horizontal" id="horizontal" />
-                  <Layout className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="horizontal">Horizontal Scrolling Columns</Label>
-                </div>
-                <div className="flex items-center space-x-3 space-y-0">
-                  <RadioGroupItem value="grid" id="grid" />
-                  <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="grid">Grid Layout</Label>
-                </div>
-              </RadioGroup>
-              <FormDescription>
-                Horizontal layout with scrolling is recommended for boards with many columns
-              </FormDescription>
-            </FormItem>
-          )}
-        />
+      <CardContent className="space-y-4">
+        <div>
+          <h3 className="text-sm font-medium mb-2">Layout Type</h3>
+          <RadioGroup value={layout} onValueChange={(v) => onLayoutChange(v as 'horizontal' | 'grid')}>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="horizontal" id="horizontal" />
+              <Label htmlFor="horizontal">Horizontal</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="grid" id="grid" />
+              <Label htmlFor="grid">Grid</Label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium mb-2">View Type</h3>
+          <ToggleGroup type="single" value={viewType} onValueChange={(v) => v && onViewTypeChange(v as 'status' | 'sprint')}>
+            <ToggleGroupItem value="status" aria-label="Status View">
+              <Layers className="h-4 w-4 mr-2" />
+              Status
+            </ToggleGroupItem>
+            <ToggleGroupItem value="sprint" aria-label="Sprint View">
+              <Kanban className="h-4 w-4 mr-2" />
+              Sprint
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
       </CardContent>
     </Card>
   );

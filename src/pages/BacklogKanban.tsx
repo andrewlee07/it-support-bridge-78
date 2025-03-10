@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +9,9 @@ import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { fetchBacklogItems, updateBacklogItem } from '@/utils/api/backlogApi';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
 import BacklogKanbanHeader from '@/components/backlog/kanban/BacklogKanbanHeader';
-import { KanbanBoardConfig } from '@/utils/types/kanbanTypes';
+import { KanbanBoardConfig, defaultKanbanConfig } from '@/utils/types/kanbanTypes';
+import KanbanDialogs from '@/components/backlog/kanban/components/KanbanDialogs';
+import KanbanConfigDialog from '@/components/backlog/kanban/KanbanConfigDialog';
 
 const BacklogKanban: React.FC = () => {
   const navigate = useNavigate();
@@ -17,8 +20,9 @@ const BacklogKanban: React.FC = () => {
   const [columnSize, setColumnSize] = useState<'compact' | 'standard'>('standard');
   const [searchQuery, setSearchQuery] = useState('');
   const [newItemDialogOpen, setNewItemDialogOpen] = useState(false);
-  const [boardConfig, setBoardConfig] = useState<KanbanBoardConfig | null>(null);
+  const [boardConfig, setBoardConfig] = useState<KanbanBoardConfig>(defaultKanbanConfig);
   const [configOpen, setConfigOpen] = useState(false);
+  const [newItemStatus, setNewItemStatus] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const savedConfig = localStorage.getItem('kanbanBoardConfig');
@@ -89,16 +93,19 @@ const BacklogKanban: React.FC = () => {
   const handleFormSuccess = () => {
     setEditingItem(null);
     setNewItemDialogOpen(false);
+    setNewItemStatus(undefined);
     refetch();
-    toast.success('Backlog item created successfully');
+    toast.success('Backlog item saved successfully');
   };
 
   const handleFormCancel = () => {
     setEditingItem(null);
     setNewItemDialogOpen(false);
+    setNewItemStatus(undefined);
   };
 
-  const handleCreateItem = () => {
+  const handleCreateItem = (defaultStatus?: string) => {
+    setNewItemStatus(defaultStatus);
     setNewItemDialogOpen(true);
   };
 
@@ -107,20 +114,17 @@ const BacklogKanban: React.FC = () => {
     if (kanbanBoardElement) {
       const event = new CustomEvent('addBucket');
       kanbanBoardElement.dispatchEvent(event);
-      toast.success('Adding new bucket...');
-    } else {
-      toast.error('Could not find the kanban board element');
     }
   };
 
   const handleOpenConfigDialog = () => {
     setConfigOpen(true);
-    
-    const kanbanBoardElement = document.querySelector('[data-kanban-board]');
-    if (kanbanBoardElement) {
-      const event = new CustomEvent('openConfig');
-      kanbanBoardElement.dispatchEvent(event);
-    }
+  };
+
+  const handleUpdateBoardConfig = (newConfig: KanbanBoardConfig) => {
+    setBoardConfig(newConfig);
+    localStorage.setItem('kanbanBoardConfig', JSON.stringify(newConfig));
+    setConfigOpen(false);
   };
 
   return (
@@ -135,7 +139,7 @@ const BacklogKanban: React.FC = () => {
             onViewTable={handleViewTable}
             columnSize={columnSize}
             setColumnSize={setColumnSize}
-            onCreateItem={handleCreateItem}
+            onCreateItem={() => handleCreateItem()}
             onAddBucket={handleAddBucket}
             onConfigOpen={handleOpenConfigDialog}
           />
@@ -150,9 +154,31 @@ const BacklogKanban: React.FC = () => {
               onEditItem={handleEditItem}
               onQuickStatusChange={handleQuickStatusChange}
               columnSize={columnSize}
+              onCreateItem={handleCreateItem}
             />
           </div>
         </div>
+
+        {/* Dialogs */}
+        <KanbanConfigDialog
+          open={configOpen}
+          onClose={() => setConfigOpen(false)}
+          currentConfig={boardConfig}
+          onSave={handleUpdateBoardConfig}
+        />
+        
+        <KanbanDialogs 
+          editingItem={editingItem}
+          setEditingItem={setEditingItem}
+          newItemDialogOpen={newItemDialogOpen}
+          setNewItemDialogOpen={setNewItemDialogOpen}
+          configOpen={configOpen}
+          setConfigOpen={setConfigOpen}
+          boardConfig={boardConfig}
+          updateBoardConfig={handleUpdateBoardConfig}
+          onFormSuccess={handleFormSuccess}
+          onFormCancel={handleFormCancel}
+        />
       </div>
     </PageTransition>
   );

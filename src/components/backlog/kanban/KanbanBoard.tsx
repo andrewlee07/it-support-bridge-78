@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DropResult } from 'react-beautiful-dnd';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
-import { defaultKanbanConfig, KanbanBoardConfig } from '@/utils/types/kanbanTypes';
+import { defaultKanbanConfig, KanbanBoardConfig, sprintColumnsConfig } from '@/utils/types/kanbanTypes';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 
@@ -20,6 +20,7 @@ interface KanbanBoardProps {
   onEditItem: (item: BacklogItem) => void;
   onQuickStatusChange: (itemId: string, newStatus: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
+  onCreateItem: (defaultStatus?: string) => void;
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
@@ -29,12 +30,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onEditItem,
   onQuickStatusChange,
   columnSize,
+  onCreateItem
 }) => {
   const [collapsedColumns, setCollapsedColumns] = useState<string[]>([]);
   const [boardConfig, setBoardConfig] = useState<KanbanBoardConfig>(defaultKanbanConfig);
   const [configOpen, setConfigOpen] = useState(false);
   const [newItemDialogOpen, setNewItemDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<BacklogItem | null>(null);
+  const [defaultStatus, setDefaultStatus] = useState<string | undefined>(undefined);
   const boardRef = useRef<HTMLDivElement>(null);
 
   // Load configuration from localStorage if available
@@ -42,7 +45,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     const savedConfig = localStorage.getItem('kanbanBoardConfig');
     if (savedConfig) {
       try {
-        setBoardConfig(JSON.parse(savedConfig));
+        const parsedConfig = JSON.parse(savedConfig);
+        setBoardConfig(parsedConfig);
+        
+        // Load collapsed columns from saved config
+        if (parsedConfig.defaultCollapsed) {
+          setCollapsedColumns(parsedConfig.defaultCollapsed);
+        }
       } catch (e) {
         console.error('Failed to parse saved kanban config:', e);
       }
@@ -60,14 +69,20 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       handleAddBucket();
     };
 
+    const handleOpenConfigEvent = () => {
+      setConfigOpen(true);
+    };
+
     const boardElement = document.querySelector('[data-kanban-board]');
     if (boardElement) {
       boardElement.addEventListener('addBucket', handleAddBucketEvent);
+      boardElement.addEventListener('openConfig', handleOpenConfigEvent);
     }
 
     return () => {
       if (boardElement) {
         boardElement.removeEventListener('addBucket', handleAddBucketEvent);
+        boardElement.removeEventListener('openConfig', handleOpenConfigEvent);
       }
     };
   }, [boardConfig]); // Re-attach when boardConfig changes
@@ -81,6 +96,15 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   const updateBoardConfig = (newConfig: KanbanBoardConfig) => {
+    // Check if view type changed from status to sprint or vice versa
+    if (newConfig.viewType !== boardConfig.viewType) {
+      // If changing to sprint view and there are no sprint columns
+      if (newConfig.viewType === 'sprint' && !newConfig.columns.some(col => col.statusValue.startsWith('sprint'))) {
+        // Add sprint columns
+        newConfig.columns = [...newConfig.columns, ...sprintColumnsConfig];
+      }
+    }
+    
     setBoardConfig(newConfig);
     setConfigOpen(false);
   };
@@ -88,12 +112,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const handleNewItemSuccess = () => {
     setNewItemDialogOpen(false);
     setEditingItem(null);
+    setDefaultStatus(undefined);
     // The parent component will refresh the list through the query invalidation
   };
 
   const handleNewItemCancel = () => {
     setNewItemDialogOpen(false);
     setEditingItem(null);
+    setDefaultStatus(undefined);
   };
 
   const handleAddBucket = () => {
@@ -119,12 +145,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     toast.success(`New bucket "${newBucketName}" added`);
   };
 
-  const handleOpenConfigDialog = () => {
-    setConfigOpen(true);
+  const handleAddItem = (status: string) => {
+    setDefaultStatus(status);
+    onCreateItem(status);
   };
 
   const handleCreateItem = () => {
-    setNewItemDialogOpen(true);
+    onCreateItem();
   };
 
   if (isLoading) {
@@ -134,7 +161,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   return (
     <div ref={boardRef} className="h-full">
       <KanbanBoardHeader 
-        onConfigOpen={handleOpenConfigDialog} 
+        onConfigOpen={() => setConfigOpen(true)} 
         onCreateItem={handleCreateItem}
       />
 
@@ -150,6 +177,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           onEditItem={onEditItem}
           onQuickStatusChange={onQuickStatusChange}
           columnSize={columnSize}
+          onAddItem={handleAddItem}
         />
       )}
 

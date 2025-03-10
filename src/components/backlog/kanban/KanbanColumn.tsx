@@ -18,6 +18,7 @@ interface KanbanColumnProps {
   onEditItem: (item: BacklogItem) => void;
   onQuickStatusChange: (itemId: string, newStatus: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
+  onAddItem: (status: string) => void;
 }
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
@@ -28,6 +29,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   onEditItem,
   onQuickStatusChange,
   columnSize,
+  onAddItem
 }) => {
   // Calculate column height based on viewport height
   const getColumnHeight = () => {
@@ -59,9 +61,25 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
             {items.length}
           </span>
         </CardTitle>
-        <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="h-6 w-6">
-          {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-        </Button>
+        <div className="flex items-center">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => onAddItem(columnConfig.statusValue)}
+            className="h-6 w-6 mr-1"
+            title={`Add item to ${columnConfig.displayName}`}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onToggleCollapse} 
+            className="h-6 w-6"
+          >
+            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </Button>
+        </div>
       </CardHeader>
       
       {!isCollapsed && (
