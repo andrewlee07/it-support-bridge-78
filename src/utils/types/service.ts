@@ -75,6 +75,8 @@ export interface Service {
   documentationUrl?: string;
   supportHours?: SupportHours;
   slaId?: string;
+  price?: string; // Adding this to match the mock data
+  approvalRequired?: boolean; // Adding this to match the mock data
   createdAt: Date;
   updatedAt: Date;
   // New fields for relationships
