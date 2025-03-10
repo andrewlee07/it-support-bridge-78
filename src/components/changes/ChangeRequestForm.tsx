@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -43,13 +44,14 @@ const changeRequestSchema = z.object({
 
 type ChangeRequestFormValues = z.infer<typeof changeRequestSchema>;
 
-interface ChangeRequestFormProps {
+export interface ChangeRequestFormProps {
   onSubmit: (data: ChangeRequestFormValues) => void;
   onCancel?: () => void;
   isSubmitting?: boolean;
   initialData?: Partial<ChangeRequest>;
   isEditing?: boolean;
   isClosing?: boolean;
+  isEditMode?: boolean; // Added this prop to fix the TypeScript error
 }
 
 const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({ 
@@ -58,7 +60,8 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
   isSubmitting = false,
   initialData, 
   isEditing = false,
-  isClosing = false 
+  isClosing = false,
+  isEditMode = false // Provide a default value
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -109,7 +112,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
   return (
     <Card className="w-full shadow-sm">
       <CardHeader>
-        <CardTitle>{isClosing ? "Close Change Request" : isEditing ? "Edit Change Request" : "New Change Request"}</CardTitle>
+        <CardTitle>{isClosing ? "Close Change Request" : isEditing || isEditMode ? "Edit Change Request" : "New Change Request"}</CardTitle>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -131,7 +134,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
             <FormActions 
               onCancel={handleCancel} 
               isSubmitting={isSubmitting} 
-              isEditing={isEditing}
+              isEditing={isEditing || isEditMode}
               submitLabel={isClosing ? "Close Change" : "Submit"} 
             />
           </CardFooter>

@@ -122,6 +122,7 @@ const EditChangeRequest = () => {
           initialData={changeRequest}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
+          isEditing={true}
         />
       </div>
     </PageTransition>
