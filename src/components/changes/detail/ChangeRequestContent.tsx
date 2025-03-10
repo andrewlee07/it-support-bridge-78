@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { ChangeRequest } from '@/utils/types/change';
@@ -58,13 +57,9 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
     }
   };
 
-  // Always display risk assessment details if there's a risk score
   const showRiskAssessment = changeRequest.riskScore > 0 && 
                             changeRequest.assessmentAnswers && 
                             changeRequest.assessmentAnswers.length > 0;
-
-  // Show closure details if the change is completed and has a closure reason
-  const showClosureDetails = changeRequest.status === 'completed' && changeRequest.closureReason;
 
   return (
     <Card className="w-full shadow-sm">
@@ -103,7 +98,7 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           onAddImplementor={onAddImplementor}
         />
         
-        {showClosureDetails && (
+        {changeRequest.status === 'completed' && (
           <ChangeRequestClosureDetails 
             closureReason={changeRequest.closureReason}
             closedAt={changeRequest.updatedAt}
