@@ -6,6 +6,7 @@ import { useTicketForm } from './hooks/useTicketForm';
 import BasicInfoSection from './form-sections/BasicInfoSection';
 import ServiceSelection from './form-sections/ServiceSelection';
 import CategoryPrioritySection from './form-sections/CategoryPrioritySection';
+import AssetServiceSection from './form-sections/AssetServiceSection';
 import FormActions from './form-sections/FormActions';
 import FormHeader from './form-sections/FormHeader';
 
@@ -50,6 +51,14 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
           isFieldRequired={isFieldRequired} 
           type={type} 
         />
+        
+        {/* Add the new Asset and Service section */}
+        {type === 'incident' && (
+          <AssetServiceSection
+            form={form}
+            type="incident"
+          />
+        )}
         
         <FormActions 
           isSubmitting={isSubmitting} 

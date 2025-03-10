@@ -9,6 +9,9 @@ import DetailBreadcrumb from './detail/DetailBreadcrumb';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { getProblemById } from '@/utils/mockData/problems';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { getAssetById } from '@/utils/mockData/assets';
 
 interface TicketDetailsProps {
   ticket: Ticket;
@@ -35,6 +38,24 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
     };
   });
   
+  // Get associated assets
+  const associatedAssets = (ticket.associatedAssets || []).map(id => {
+    const asset = getAssetById(id);
+    return asset ? {
+      id: asset.id,
+      name: asset.name,
+      model: asset.model,
+      type: asset.type,
+      status: asset.status
+    } : { 
+      id, 
+      name: `Asset ${id}`,
+      model: 'Unknown',
+      type: 'unknown',
+      status: 'unknown'
+    };
+  });
+  
   return (
     <div className="space-y-6">
       <DetailBreadcrumb 
@@ -55,6 +76,31 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
       </div>
       
       <TicketDetailsGrid ticket={ticket} isServiceRequest={isServiceRequest} />
+      
+      {/* Show associated assets section */}
+      {associatedAssets.length > 0 && (
+        <div className="space-y-4 mt-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-md font-medium">Associated Assets</h3>
+          </div>
+          
+          <Card className="p-4">
+            <div className="space-y-2">
+              {associatedAssets.map(asset => (
+                <div key={asset.id} className="flex justify-between items-center border-b pb-2 last:border-0 last:pb-0">
+                  <div>
+                    <p className="font-medium">{asset.name}</p>
+                    <p className="text-sm text-muted-foreground">{asset.model} - {asset.type}</p>
+                  </div>
+                  <Badge variant={asset.status === 'active' ? 'default' : 'secondary'}>
+                    {asset.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
       
       {/* Show related problems section if there are any */}
       {relatedProblems.length > 0 && (

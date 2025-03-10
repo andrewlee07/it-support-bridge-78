@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +24,8 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { ProblemPriority } from '@/utils/types/problem';
+import AssetServiceSection from '@/components/tickets/form-sections/AssetServiceSection';
+import { getAllServices } from '@/utils/mockData/services';
 
 const problemSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters' }),
@@ -31,7 +33,9 @@ const problemSchema = z.object({
   category: z.string(),
   priority: z.string(),
   relatedIncidents: z.string().optional(),
-  resolutionPlan: z.string().optional()
+  resolutionPlan: z.string().optional(),
+  associatedAssets: z.array(z.string()).optional(),
+  serviceId: z.string().optional()
 });
 
 type ProblemFormValues = z.infer<typeof problemSchema>;
@@ -42,6 +46,7 @@ interface ProblemFormProps {
 
 const ProblemForm: React.FC<ProblemFormProps> = ({ onSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [services, setServices] = useState<any[]>([]);
 
   const form = useForm<ProblemFormValues>({
     resolver: zodResolver(problemSchema),
@@ -51,9 +56,20 @@ const ProblemForm: React.FC<ProblemFormProps> = ({ onSubmit }) => {
       category: '',
       priority: 'P2',
       relatedIncidents: '',
-      resolutionPlan: ''
+      resolutionPlan: '',
+      associatedAssets: [],
+      serviceId: ''
     }
   });
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      const allServices = await getAllServices();
+      setServices(allServices);
+    };
+    
+    fetchServices();
+  }, []);
 
   const handleSubmit = async (data: ProblemFormValues) => {
     setIsSubmitting(true);
@@ -173,6 +189,35 @@ const ProblemForm: React.FC<ProblemFormProps> = ({ onSubmit }) => {
         
         <FormField
           control={form.control}
+          name="serviceId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Associated Service</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value || ''}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an associated service" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  {services.map(service => (
+                    <SelectItem key={service.id} value={service.id}>
+                      {service.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Select a service associated with this problem.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
           name="relatedIncidents"
           render={({ field }) => (
             <FormItem>
@@ -190,6 +235,9 @@ const ProblemForm: React.FC<ProblemFormProps> = ({ onSubmit }) => {
             </FormItem>
           )}
         />
+        
+        {/* Add Asset Service Section */}
+        <AssetServiceSection form={form} type="problem" />
         
         <FormField
           control={form.control}

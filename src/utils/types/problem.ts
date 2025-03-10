@@ -1,4 +1,3 @@
-
 import { AuditEntry } from './audit';
 import { Ticket, TicketCategory, PendingSubStatus } from './ticket';
 
@@ -39,6 +38,10 @@ export interface Problem {
   pendingSubStatus?: PendingSubStatus;
   reopenReason?: string;
   reopenedAt?: Date;
+  
+  // Associated assets and services
+  associatedAssets?: string[];
+  associatedServices?: string[];
 }
 
 export interface RelatedIncident {

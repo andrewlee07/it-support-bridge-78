@@ -25,6 +25,7 @@ export const useTicketForm = ({ onSubmit, type }: UseTicketFormProps) => {
     priority: 'P3' as TicketPriority, // Default to P3 (medium priority)
     type: type,
     serviceId: '', // This is okay as we handle it in the component
+    associatedAssets: [] as string[], // Add associated assets field
   };
   
   const form = useForm({ defaultValues });

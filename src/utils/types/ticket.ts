@@ -1,4 +1,3 @@
-
 import { AuditEntry } from './audit';
 
 export type TicketCategory = 'hardware' | 'software' | 'network' | 'access' | 'other';
@@ -48,6 +47,10 @@ export interface Ticket {
   
   // Notes information
   notes?: TicketNote[];
+  
+  // Associated assets and services
+  associatedAssets?: string[];
+  associatedServices?: string[];
 }
 
 export interface TicketNote {
