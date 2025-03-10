@@ -1,30 +1,15 @@
 
 import {
-  BarChart3,
-  Gauge,
-  ShieldAlert,
-  MessageSquare,
-  Clock3,
-  Package,
-  AlertCircle,
-  PanelRight,
-  Users2,
-  AlertOctagon,
-  Headphones,
-  FileSpreadsheet,
-  CalendarDays,
-  FlaskConical,
   LayoutDashboard,
-  Settings2,
-  BookText,
-  Bug,
-  ListChecks,
+  AlertCircle,
+  Headphones,
+  Package,
   GitPullRequest,
-  Settings,
-  Sliders,
-  ArrowRightLeft,
-  Link2,
+  ListChecks,
   Library,
+  Bug,
+  ClipboardList,
+  CheckCircle
 } from 'lucide-react';
 
 import { NavItem } from './types';
@@ -33,7 +18,7 @@ export const navigationItems: NavItem[] = [
   {
     name: 'Dashboard',
     icon: LayoutDashboard,
-    path: '/dashboard',
+    path: '/',
   },
   {
     name: 'Incidents',
@@ -46,19 +31,9 @@ export const navigationItems: NavItem[] = [
     path: '/service-requests',
   },
   {
-    name: 'Service Catalog',
-    icon: Library,
-    path: '/service-catalog',
-  },
-  {
     name: 'Changes',
-    icon: PanelRight,
+    icon: ClipboardList,
     path: '/changes',
-  },
-  {
-    name: 'Problems',
-    icon: AlertOctagon,
-    path: '/problems',
   },
   {
     name: 'Assets',
@@ -66,24 +41,19 @@ export const navigationItems: NavItem[] = [
     path: '/assets',
   },
   {
-    name: 'Backlog',
-    icon: ListChecks,
-    path: '/backlog',
-  },
-  {
     name: 'Releases',
     icon: GitPullRequest,
     path: '/releases',
   },
   {
-    name: 'Testing',
-    icon: FlaskConical,
-    path: '/test-tracking',
+    name: 'Backlog',
+    icon: ListChecks,
+    path: '/backlog',
   },
   {
-    name: 'Test Traceability',
-    icon: Link2,
-    path: '/test-traceability',
+    name: 'Service Catalog',
+    icon: Library,
+    path: '/service-catalog',
   },
   {
     name: 'Bugs',
@@ -91,24 +61,8 @@ export const navigationItems: NavItem[] = [
     path: '/bugs',
   },
   {
-    name: 'Reports',
-    icon: FileSpreadsheet,
-    path: '/reports',
-  },
-  {
-    name: 'Calendar',
-    icon: CalendarDays,
-    path: '/calendar',
-  },
-  {
-    name: 'User Management',
-    icon: Users2,
-    path: '/user-management',
-  },
-  {
-    name: 'Admin Settings',
-    icon: Settings2,
-    path: '/admin-settings',
-    allowedRoles: ['admin'],
-  },
+    name: 'My Approvals',
+    icon: CheckCircle,
+    path: '/approvals',
+  }
 ];
