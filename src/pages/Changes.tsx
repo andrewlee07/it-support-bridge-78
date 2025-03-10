@@ -34,7 +34,9 @@ const Changes = () => {
     isLoading,
     isError,
     refetch
-  } = useChangeRequests();
+  } = useChangeRequests({
+    userId: user?.id
+  });
   
   const { approveMutation, rejectMutation } = useChangeRequestMutations(user?.id || '');
 

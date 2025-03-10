@@ -17,6 +17,7 @@ export const getChangeRequests = async (
     fromDate?: Date;
     toDate?: Date;
     search?: string;
+    assignedToUserId?: string; // Adding this parameter to support the hook
   }
 ): Promise<PaginatedResponse<ChangeRequest>> => {
   let filteredChanges = [...getChangeRequestsFromStore()];
@@ -29,6 +30,11 @@ export const getChangeRequests = async (
     
     if (filters.createdBy) {
       filteredChanges = filteredChanges.filter(c => c.createdBy === filters.createdBy);
+    }
+    
+    if (filters.assignedToUserId) {
+      // Filter by assigned user if provided
+      filteredChanges = filteredChanges.filter(c => c.implementor === filters.assignedToUserId);
     }
     
     if (filters.fromDate) {

@@ -6,8 +6,8 @@ import { ChangeRequest } from '@/utils/types/change';
 
 interface ChangeTabsProps {
   userId?: string;
-  activeTab?: string;
-  onTabChange?: (value: string) => void;
+  activeTab: string;
+  onTabChange: (value: string) => void;
   changes?: ChangeRequest[];
   isLoading?: boolean;
   isError?: boolean;

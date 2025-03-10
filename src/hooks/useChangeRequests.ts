@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChangeStatus } from '@/utils/types';
 import { changeApi } from '@/utils/api/changeApi';
+import { ChangeEvent } from 'react';
 
 interface UseChangeRequestsParams {
   filter?: 'all' | 'pending' | 'upcoming' | 'completed';
@@ -10,7 +11,10 @@ interface UseChangeRequestsParams {
 }
 
 export const useChangeRequests = (params?: UseChangeRequestsParams) => {
-  const filter = params?.filter || 'all';
+  const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'upcoming' | 'completed'>(params?.filter || 'all');
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const filter = activeTab;
   const userId = params?.userId;
 
   let statusFilter: ChangeStatus[] = [];
@@ -31,21 +35,32 @@ export const useChangeRequests = (params?: UseChangeRequestsParams) => {
   }
   
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['changes', filter, userId],
+    queryKey: ['changes', filter, userId, searchQuery],
     queryFn: async () => {
       const response = await changeApi.getChangeRequests(1, 50, {
         status: statusFilter.length > 0 ? statusFilter : undefined,
-        assignedToUserId: userId
+        createdBy: userId, // Using createdBy instead of assignedToUserId
+        search: searchQuery
       });
       
       return response;
     }
   });
 
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return {
     changes: data?.items || [],
     loading: isLoading,
     error: isError ? error : null,
-    refetch
+    refetch,
+    activeTab,
+    setActiveTab,
+    searchQuery,
+    handleSearchChange,
+    isLoading,
+    isError
   };
 };
