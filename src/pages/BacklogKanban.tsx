@@ -20,10 +20,21 @@ const BacklogKanban: React.FC = () => {
       try {
         setIsLoading(true);
         const response = await fetchBacklogItems();
-        setBacklogItems(response);
+        // Check if response is an array directly or needs to extract data property
+        if (Array.isArray(response)) {
+          setBacklogItems(response);
+        } else if (response.data) {
+          // If response is a PaginatedResponse object, extract the data property
+          setBacklogItems(response.data);
+        } else {
+          console.error('Unexpected response format:', response);
+          toast.error('Failed to load backlog items: unexpected data format');
+          setBacklogItems([]);
+        }
       } catch (error) {
         console.error('Error loading backlog items:', error);
         toast.error('Failed to load backlog items');
+        setBacklogItems([]);
       } finally {
         setIsLoading(false);
       }
