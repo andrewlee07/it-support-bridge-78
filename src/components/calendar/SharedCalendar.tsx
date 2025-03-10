@@ -53,6 +53,11 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
 
   const handleViewChange = (newView: CalendarViewType) => {
     setView(newView);
+    
+    // Automatically switch to calendar or split mode when changing views
+    if ((newView === 'day' || newView === 'week') && displayMode === 'table') {
+      setDisplayMode('split');
+    }
   };
 
   const handleFilterChange = (key: string, value: string) => {
@@ -107,7 +112,7 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
         ))}
         {remainingEventsCount > 0 && (
           <div 
-            className="text-xs text-center bg-gray-200 text-gray-700 rounded px-1 py-0.5 truncate cursor-pointer"
+            className="text-xs text-center bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded px-1 py-0.5 truncate cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               // Can show a modal with all events for this day in the future
@@ -146,17 +151,19 @@ const SharedCalendar: React.FC<SharedCalendarProps> = ({ onEventClick }) => {
         />
       )}
 
-      <CalendarViewContent 
-        displayMode={displayMode}
-        date={date}
-        view={view}
-        events={events}
-        isLoading={isLoading}
-        onDateSelect={newDate => newDate && setDate(newDate)}
-        onEventClick={handleEventClick}
-        dayIsInCurrentView={dayIsInCurrentView}
-        renderEvent={renderEvent}
-      />
+      <div className="flex-grow overflow-hidden">
+        <CalendarViewContent 
+          displayMode={displayMode}
+          date={date}
+          view={view}
+          events={events}
+          isLoading={isLoading}
+          onDateSelect={newDate => newDate && setDate(newDate)}
+          onEventClick={handleEventClick}
+          dayIsInCurrentView={dayIsInCurrentView}
+          renderEvent={renderEvent}
+        />
+      </div>
 
       {selectedEvent && (
         <CalendarEventPopover 
