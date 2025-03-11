@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Notification, NotificationSettings } from '@/components/shared/notifications/types';
 import { toast } from 'sonner';
