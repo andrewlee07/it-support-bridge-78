@@ -1,15 +1,17 @@
 
 import { useState, useEffect } from 'react';
-import { KanbanBoardConfig, defaultKanbanConfig, sprintColumnsConfig, generateAssigneeColumns, priorityColumnsConfig, generateLabelColumns } from '@/utils/types/kanbanTypes';
-import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { v4 as uuidv4 } from 'uuid';
+import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
+import { 
+  KanbanBoardConfig, 
+  defaultKanbanConfig, 
+  sprintColumnsConfig, 
+  generateAssigneeColumns, 
+  priorityColumnsConfig, 
+  generateLabelColumns 
+} from '@/utils/types/kanbanTypes';
 import { toast } from 'sonner';
-
-interface UseKanbanBoardProps {
-  backlogItems: BacklogItem[];
-  viewDimension: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
-  onCreateItem: (defaultStatus?: string) => void;
-}
+import { UseKanbanBoardProps } from './types';
 
 export function useKanbanBoard({ 
   backlogItems, 

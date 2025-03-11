@@ -5,10 +5,10 @@ import {
   useBacklogDrag, 
   useBacklogActions, 
   useViewDimension,
-  ViewDimension 
 } from './kanban';
+import type { ViewDimension } from './kanban/types';
 
-export { ViewDimension };
+export type { ViewDimension };
 
 /**
  * Main hook for backlog kanban functionality
