@@ -2,12 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import {
-  AlertOctagon,
-  AlarmClock,
-  Clock,
-  CheckCircle
-} from 'lucide-react';
+import { AlertTriangle, AlertCircle, BellRing, Bell } from 'lucide-react';
 
 interface PriorityLevelsSectionProps {
   levels: {
@@ -29,8 +24,8 @@ const PriorityLevelsSection: React.FC<PriorityLevelsSectionProps> = ({
       
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <AlertOctagon className="h-5 w-5 text-red-500" />
-          <Label>Critical</Label>
+          <AlertTriangle className="h-5 w-5 text-red-500" />
+          <Label>Critical priority</Label>
         </div>
         <Switch 
           checked={levels.critical} 
@@ -40,8 +35,8 @@ const PriorityLevelsSection: React.FC<PriorityLevelsSectionProps> = ({
       
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <AlarmClock className="h-5 w-5 text-orange-500" />
-          <Label>High</Label>
+          <AlertCircle className="h-5 w-5 text-orange-500" />
+          <Label>High priority</Label>
         </div>
         <Switch 
           checked={levels.high} 
@@ -51,8 +46,8 @@ const PriorityLevelsSection: React.FC<PriorityLevelsSectionProps> = ({
       
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Clock className="h-5 w-5 text-yellow-500" />
-          <Label>Medium</Label>
+          <BellRing className="h-5 w-5 text-blue-500" />
+          <Label>Medium priority</Label>
         </div>
         <Switch 
           checked={levels.medium} 
@@ -62,8 +57,8 @@ const PriorityLevelsSection: React.FC<PriorityLevelsSectionProps> = ({
       
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <CheckCircle className="h-5 w-5 text-blue-500" />
-          <Label>Low</Label>
+          <Bell className="h-5 w-5 text-gray-500" />
+          <Label>Low priority</Label>
         </div>
         <Switch 
           checked={levels.low} 

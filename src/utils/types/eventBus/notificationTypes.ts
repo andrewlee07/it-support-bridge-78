@@ -61,3 +61,79 @@ export interface EnhancedNotificationTemplate {
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * Channel configuration for multi-channel administration
+ */
+export interface NotificationChannel {
+  id: string;
+  name: string;
+  type: 'email' | 'slack' | 'inApp' | 'sms' | 'webhook' | 'teams' | 'custom';
+  enabled: boolean;
+  priority: number; // Lower number = higher priority
+  capabilities: {
+    supportsFormatting: boolean;
+    supportsAttachments: boolean;
+    supportsThreading: boolean;
+    supportsAcknowledgement: boolean;
+    supportsReply: boolean;
+    maxMessageSize?: number;
+  };
+  deliverySettings: {
+    retryCount: number;
+    retryInterval: number; // in minutes
+    expiresAfter?: number; // in minutes, optional
+  };
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Rule-based channel routing configuration
+ */
+export interface ChannelRoutingRule {
+  id: string;
+  name: string;
+  description: string;
+  conditions: Array<{
+    field: 'audience' | 'importance' | 'category' | 'tags' | 'time' | 'userPreference';
+    operator: 'equals' | 'contains' | 'startsWith' | 'endsWith' | 'greaterThan' | 'lessThan' | 'in' | 'notIn';
+    value: any;
+  }>;
+  channelId: string;
+  fallbackChannelId?: string;
+  isActive: boolean;
+  priority: number; // Lower number = higher priority (evaluated first)
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Multi-channel configuration
+ */
+export interface MultiChannelConfig {
+  id: string;
+  name: string;
+  description: string;
+  channels: NotificationChannel[];
+  routingRules: ChannelRoutingRule[];
+  defaultChannelId: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Channel delivery result for testing
+ */
+export interface ChannelTestResult {
+  channelId: string;
+  channelName: string;
+  success: boolean;
+  deliveryTime?: number; // in ms
+  error?: string;
+  messagePreview?: string;
+  timestamp: string;
+}
+
