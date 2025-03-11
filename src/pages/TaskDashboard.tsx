@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { PlusCircle, ChevronRight, ClipboardList, CheckCircle2, Clock, AlertCircle, PauseCircle } from 'lucide-react';
+import { PlusCircle, ChevronRight, ClipboardList, CheckCircle2, Clock, AlertCircle, PauseCircle, Calendar, CalendarDays } from 'lucide-react';
 import PageTransition from '@/components/shared/PageTransition';
 import TaskCard from '@/components/tasks/TaskCard';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,6 +18,7 @@ const TaskDashboard: React.FC = () => {
   const [tasksDueToday, setTasksDueToday] = useState<Task[]>([]);
   const [taskStats, setTaskStats] = useState<TaskStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [todayTasks, setTodayTasks] = useState<Task[]>([]);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -43,6 +44,24 @@ const TaskDashboard: React.FC = () => {
         setTasks(tasksResponse.data || []);
         setTasksDueToday(todayResponse.data || []);
         setTaskStats(statsResponse.data || null);
+
+        // Get all tasks for today section (regardless of due date)
+        const today = new Date();
+        const dayStart = new Date(today);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(today);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        // Filter tasks created or updated today
+        const todayTasksFiltered = tasksResponse.data?.filter(task => {
+          const updatedAt = new Date(task.updatedAt);
+          const createdAt = new Date(task.createdAt);
+          return (updatedAt >= dayStart && updatedAt <= dayEnd) || 
+                 (createdAt >= dayStart && createdAt <= dayEnd) ||
+                 (todayResponse.data?.some(t => t.id === task.id));
+        }) || [];
+
+        setTodayTasks(sortTasksByPriorityAndDueDate(todayTasksFiltered));
       } catch (error) {
         console.error('Error loading dashboard data:', error);
         toast.error('Failed to load dashboard data');
@@ -158,10 +177,52 @@ const TaskDashboard: React.FC = () => {
               )}
             </div>
 
-            {/* Today's Tasks */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Due Today</CardTitle>
+            {/* Today Section */}
+            <Card className="mb-6 border-l-4 border-l-blue-500">
+              <CardHeader className="pb-3">
+                <div className="flex items-center">
+                  <CalendarDays className="h-5 w-5 mr-2 text-blue-500" />
+                  <CardTitle>Today</CardTitle>
+                </div>
+                <CardDescription>Tasks requiring attention today - updated, created, or due</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {todayTasks.length === 0 ? (
+                  <p className="text-muted-foreground">No tasks for today</p>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {todayTasks.slice(0, 6).map((task) => (
+                      <TaskCard 
+                        key={task.id} 
+                        task={task} 
+                        onClick={() => handleTaskClick(task.id)} 
+                      />
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+              {todayTasks.length > 6 && (
+                <CardFooter>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="ml-auto" 
+                    onClick={() => navigate('/tasks', { state: { filter: 'today' } })}
+                  >
+                    View All
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </CardFooter>
+              )}
+            </Card>
+
+            {/* Due Today */}
+            <Card className="mb-6 border-l-4 border-l-amber-500">
+              <CardHeader className="pb-3">
+                <div className="flex items-center">
+                  <AlertCircle className="h-5 w-5 mr-2 text-amber-500" />
+                  <CardTitle>Due Today</CardTitle>
+                </div>
                 <CardDescription>Tasks that need to be completed today</CardDescription>
               </CardHeader>
               <CardContent>

@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
 import { Task } from '@/utils/types/taskTypes';
 import { CalendarDays, Clock, User, AlertTriangle, CheckCircle } from 'lucide-react';
-import { formatDistanceToNow, isToday, isTomorrow, isPast } from 'date-fns';
+import { formatDistanceToNow, isToday, isTomorrow, isPast, differenceInHours } from 'date-fns';
 import { 
   getTaskStatusColor, 
   getTaskPriorityColor, 
@@ -18,14 +18,27 @@ import { getStatusIconForTask, getPriorityIcon } from '@/components/shared/notif
 interface TaskCardProps {
   task: Task;
   onClick?: () => void;
+  highlight?: boolean;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, highlight = false }) => {
   // Helper to get appropriate due date styling
   const getDueDateColor = () => {
     if (!task.dueDate) return 'text-gray-500';
-    if (isTaskOverdue(task)) return 'text-red-600 font-medium';
-    if (isTaskDueSoon(task, 24)) return 'text-orange-600';
+    
+    const dueDate = new Date(task.dueDate);
+    const now = new Date();
+    const hoursUntilDue = differenceInHours(dueDate, now);
+    
+    if (isPast(dueDate)) return 'text-red-600 font-medium';
+    if (isToday(dueDate)) {
+      // Today but less than 4 hours away
+      if (hoursUntilDue <= 4) return 'text-red-500 font-medium animate-pulse';
+      // Today but more than 4 hours away
+      return 'text-amber-600 font-medium';
+    }
+    if (isTomorrow(dueDate)) return 'text-amber-500';
+    if (isTaskDueSoon(task, 48)) return 'text-orange-600';
     return 'text-gray-600';
   };
 
@@ -35,7 +48,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
     
     const dueDate = new Date(task.dueDate);
     
-    if (isToday(dueDate)) return 'Due today';
+    if (isToday(dueDate)) {
+      // Format for today with hours remaining
+      const now = new Date();
+      const hoursLeft = Math.max(0, Math.floor(differenceInHours(dueDate, now)));
+      if (hoursLeft <= 4) {
+        return `Due in ${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''}`;
+      }
+      return 'Due today';
+    }
+    
     if (isTomorrow(dueDate)) return 'Due tomorrow';
     if (isPast(dueDate)) return `Overdue (${formatDistanceToNow(dueDate, { addSuffix: true })})`;
     
@@ -51,18 +73,22 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
                        task.status !== 'completed' && 
                        task.status !== 'cancelled';
 
-  // Determine border color based on status
-  const cardBorderClass = `border ${statusVisuals.borderColor}`;
-
   // Determine if task needs attention (overdue or critical)
   const needsAttention = isTaskOverdue(task) || task.priority === 'critical';
+  
+  // Check if the task is due today
+  const isDueToday = task.dueDate && isToday(new Date(task.dueDate));
+  
+  // Special styling for tasks due today
+  const todayHighlightClass = isDueToday ? 'ring-2 ring-amber-400' : '';
+  const highlightBorder = highlight ? 'border-blue-400 border-2' : '';
 
   return (
     <Card 
-      className={`shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer ${cardBorderClass} ${shouldAnimate ? 'animate-pulse' : ''} ${statusVisuals.hoverBg}`}
+      className={`shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer ${todayHighlightClass} ${highlightBorder} ${shouldAnimate ? 'animate-pulse' : ''}`}
       onClick={onClick}
     >
-      <CardHeader className="pb-2">
+      <CardHeader className={`pb-2 ${isDueToday ? 'bg-amber-50 dark:bg-amber-950/20' : ''}`}>
         <div className="flex justify-between items-start gap-2">
           <div>
             <div className="text-xs text-muted-foreground mb-1">{task.id}</div>
@@ -104,6 +130,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
             {formatDueDate()}
           </div>
         </div>
+        {isDueToday && (
+          <div className="w-full mt-2 pt-2 border-t flex justify-center">
+            <span className="text-xs bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-2 py-1 rounded-full flex items-center">
+              <CalendarDays className="h-3 w-3 mr-1" />
+              Due Today
+            </span>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
