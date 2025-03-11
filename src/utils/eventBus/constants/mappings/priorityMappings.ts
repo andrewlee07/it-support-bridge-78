@@ -1,0 +1,57 @@
+
+import { EventType } from '@/utils/types/eventBus';
+import { Notification } from '@/components/shared/notifications/types';
+
+/**
+ * Maps event types to priority
+ */
+export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
+  'ticket.created': 'medium',
+  'ticket.updated': 'low',
+  'ticket.assigned': 'medium',
+  'ticket.resolved': 'medium',
+  'ticket.closed': 'low',
+  'ticket.reopened': 'high',
+  'change.created': 'medium',
+  'change.updated': 'low',
+  'change.approved': 'medium',
+  'change.rejected': 'high',
+  'change.implemented': 'medium',
+  'problem.created': 'high',
+  'problem.updated': 'medium',
+  'problem.resolved': 'medium',
+  'problem.assigned': 'medium',
+  'problem.rootCauseIdentified': 'high',
+  'problem.workaroundAvailable': 'high',
+  'problem.closed': 'medium',
+  'sla.warning': 'high',
+  'sla.breached': 'critical',
+  'task.created': 'medium',
+  'task.updated': 'low',
+  'task.completed': 'medium',
+  'release.created': 'medium',
+  'release.updated': 'low',
+  'release.deployed': 'high',
+  'release.planApproved': 'medium',
+  'release.readyForTest': 'medium',
+  'release.testCompleted': 'medium',
+  'release.scheduledDeployment': 'high',
+  'release.deploymentStarted': 'high',
+  'release.deploymentCompleted': 'high',
+  'release.rollback': 'critical',
+  'knowledge.created': 'low',
+  'knowledge.updated': 'low',
+  'knowledge.published': 'medium',
+  'asset.created': 'low',
+  'asset.updated': 'low',
+  'asset.retired': 'medium',
+  'test.created': 'low',
+  'test.executed': 'low',
+  'test.passed': 'medium',
+  'test.failed': 'high',
+  'knownError.created': 'high',
+  'knownError.updated': 'medium',
+  'knownError.workaroundUpdated': 'high',
+  'knownError.planToFix': 'medium',
+  'knownError.resolved': 'medium'
+};

@@ -1,0 +1,57 @@
+
+import { EventType } from '@/utils/types/eventBus';
+import { Notification } from '@/components/shared/notifications/types';
+
+/**
+ * Maps event types to notification types
+ */
+export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']> = {
+  'ticket.created': 'incident',
+  'ticket.updated': 'incident',
+  'ticket.assigned': 'incident',
+  'ticket.resolved': 'incident',
+  'ticket.closed': 'incident',
+  'ticket.reopened': 'incident',
+  'change.created': 'change',
+  'change.updated': 'change',
+  'change.approved': 'change',
+  'change.rejected': 'change',
+  'change.implemented': 'change',
+  'problem.created': 'incident',
+  'problem.updated': 'incident',
+  'problem.resolved': 'incident',
+  'problem.assigned': 'incident',
+  'problem.rootCauseIdentified': 'incident',
+  'problem.workaroundAvailable': 'incident',
+  'problem.closed': 'incident',
+  'sla.warning': 'incident',
+  'sla.breached': 'incident',
+  'task.created': 'task',
+  'task.updated': 'task',
+  'task.completed': 'task',
+  'release.created': 'release',
+  'release.updated': 'release',
+  'release.deployed': 'release',
+  'release.planApproved': 'release',
+  'release.readyForTest': 'release',
+  'release.testCompleted': 'release',
+  'release.scheduledDeployment': 'release',
+  'release.deploymentStarted': 'release',
+  'release.deploymentCompleted': 'release',
+  'release.rollback': 'release',
+  'knowledge.created': 'knowledge',
+  'knowledge.updated': 'knowledge',
+  'knowledge.published': 'knowledge',
+  'asset.created': 'asset',
+  'asset.updated': 'asset',
+  'asset.retired': 'asset',
+  'test.created': 'testCase',
+  'test.executed': 'testCase',
+  'test.passed': 'testCase',
+  'test.failed': 'bug',
+  'knownError.created': 'knowledge',
+  'knownError.updated': 'knowledge',
+  'knownError.workaroundUpdated': 'knowledge',
+  'knownError.planToFix': 'knowledge',
+  'knownError.resolved': 'knowledge'
+};
