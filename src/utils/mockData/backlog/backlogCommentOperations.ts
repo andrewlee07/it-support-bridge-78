@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { BacklogItem, Comment } from '@/utils/types/backlogTypes';
+import { BacklogItem, Comment, BacklogItemComment } from '@/utils/types/backlogTypes';
 import { ApiResponse } from '@/utils/types/api';
 import { backlogItems } from './backlogItems';
 import { createApiSuccessResponse, createApiErrorResponse } from '../apiHelpers';
@@ -26,13 +26,13 @@ export const addComment = (
     backlogItems[itemIndex].comments = [];
   }
   
-  // Create a proper Comment object
-  const newComment: Comment = {
+  // Create a proper BacklogItemComment object
+  const newComment: BacklogItemComment = {
     id: uuidv4(),
-    content: comment.text,
+    text: comment.text,
+    content: comment.text, // For forward compatibility
     author: comment.author,
-    createdAt: new Date(),
-    text: comment.text // For backward compatibility
+    createdAt: new Date()
   };
   
   backlogItems[itemIndex].comments!.push(newComment);
@@ -77,8 +77,8 @@ export const updateComment = (
     };
   }
   
-  backlogItems[itemIndex].comments![commentIndex].content = text;
-  backlogItems[itemIndex].comments![commentIndex].text = text; // For backward compatibility
+  backlogItems[itemIndex].comments![commentIndex].text = text;
+  backlogItems[itemIndex].comments![commentIndex].content = text; // For forward compatibility
   backlogItems[itemIndex].comments![commentIndex].updatedAt = new Date();
   
   return {

@@ -1,4 +1,3 @@
-
 export type BacklogItemStatus = 'open' | 'in-progress' | 'ready' | 'blocked' | 'completed' | 'deferred';
 export type BacklogItemPriority = 'critical' | 'high' | 'medium' | 'low';
 export type BacklogItemType = 'feature' | 'bug' | 'task' | 'enhancement' | 'technical-debt';
@@ -19,20 +18,21 @@ export interface BacklogTestCoverage {
   failed?: number;
   covered?: number;
   total?: number;
+  lastUpdated?: Date; // For compatibility with TraceabilityMatrix and test integration
 }
 
-// Update Comment interface to include both text and content fields for compatibility
+// Comment interface - ensuring both text and content fields are available
 export interface Comment {
   id: string;
   content: string; // Primary field for comment content
-  text?: string;   // For backward compatibility
+  text: string;    // For backward compatibility - making it required
   author: string;
   createdAt: Date;
   updatedAt?: Date;
   parentId?: string;
 }
 
-// Update BacklogItemComment to be compatible with Comment
+// BacklogItemComment - keep both fields for compatibility
 export interface BacklogItemComment {
   id: string;
   text: string;         // Primary field for backward compatibility
@@ -43,7 +43,7 @@ export interface BacklogItemComment {
   parentId?: string;    // Add support for nested comments
 }
 
-// Attachment interface with proper naming conventions
+// Attachment interface with proper naming conventions and backward compatibility
 export interface Attachment {
   id: string;
   filename: string;     // Primary field
@@ -70,6 +70,8 @@ export interface BacklogItemAttachment {
   // Add fields to improve compatibility with Attachment
   fileUrl?: string;
   fileName?: string;
+  fileType?: string;
+  fileSize?: number;
 }
 
 // HistoryEntry interface

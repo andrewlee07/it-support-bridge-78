@@ -4,7 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { BacklogItem, Attachment, Comment, BacklogItemComment } from '@/utils/types/backlogTypes';
+import { 
+  BacklogItem, 
+  Attachment, 
+  Comment, 
+  BacklogItemComment, 
+  BacklogItemAttachment, 
+  HistoryEntry 
+} from '@/utils/types/backlogTypes';
 import { format } from 'date-fns';
 import { getReleases } from '@/utils/api/release';
 import { Paperclip, MessageSquare, History, Users, Clock } from 'lucide-react';
@@ -39,8 +46,8 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   // States for each feature
   const [attachments, setAttachments] = useState<Attachment[]>(mapBacklogAttachmentsToAttachments(item.attachments || []));
   const [comments, setComments] = useState<Comment[]>(mapBacklogCommentsToComments(item.comments || []));
-  const [history, setHistory] = useState(item.history || []);
-  const [watchers, setWatchers] = useState(item.watchers || []);
+  const [history, setHistory] = useState<HistoryEntry[]>(item.history || []);
+  const [watchers, setWatchers] = useState<string[]>(item.watchers || []);
   const [availableUsers, setAvailableUsers] = useState<any[]>([]);
 
   // Function to convert BacklogItemAttachment to Attachment
@@ -49,14 +56,29 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
       id: att.id,
       filename: att.filename || att.fileName || '',
       fileUrl: att.fileUrl || att.url || '',
-      fileType: 'unknown', // Default value as it's not in the old type
-      fileSize: 0, // Default value as it's not in the old type
+      fileType: att.fileType || 'unknown', // Default value if not available
+      fileSize: att.fileSize || 0, // Default value if not available
       uploadedBy: att.uploadedBy,
       uploadedAt: att.uploadedAt,
       // Backward compatibility fields
       fileName: att.filename || att.fileName,
       name: att.filename || att.fileName,
       url: att.fileUrl || att.url
+    }));
+  }
+
+  // Function to convert Attachment to BacklogItemAttachment
+  function mapAttachmentsToBacklogAttachments(attachments: Attachment[]): BacklogItemAttachment[] {
+    return attachments.map(att => ({
+      id: att.id,
+      filename: att.filename,
+      url: att.url || att.fileUrl, // Ensure url is always set
+      uploadedBy: att.uploadedBy,
+      uploadedAt: att.uploadedAt,
+      fileUrl: att.fileUrl,
+      fileType: att.fileType,
+      fileSize: att.fileSize,
+      fileName: att.fileName || att.filename
     }));
   }
 
@@ -150,7 +172,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     const { user } = require('@/contexts/AuthContext');
     const newComment: Comment = {
       id: uuidv4(),
-      content,
+      content: content,
       text: content, // Set both for compatibility
       author: user?.id,
       createdAt: new Date(),
@@ -273,14 +295,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
       updates.watchers = watchers;
     } else if (field === 'attachments') {
       // Convert Attachment[] back to BacklogItemAttachment[]
-      const backlogAttachments = attachments.map(att => ({
-        id: att.id,
-        filename: att.filename || att.fileName || '',
-        url: att.fileUrl || att.url || '',
-        uploadedBy: att.uploadedBy,
-        uploadedAt: att.uploadedAt
-      }));
-      updates.attachments = backlogAttachments;
+      updates.attachments = mapAttachmentsToBacklogAttachments(attachments);
     }
     
     updateItem(updates);

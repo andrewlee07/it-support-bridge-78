@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { BacklogItem, Attachment } from '@/utils/types/backlogTypes';
+import { BacklogItem, Attachment, BacklogItemAttachment } from '@/utils/types/backlogTypes';
 import { ApiResponse } from '@/utils/types/api';
 import { backlogItems } from './backlogItems';
 import { createApiSuccessResponse, createApiErrorResponse } from '../apiHelpers';
@@ -26,17 +26,17 @@ export const addAttachment = (
     backlogItems[itemIndex].attachments = [];
   }
   
-  // Create a proper Attachment object
-  const newAttachment: Attachment = {
+  // Create a proper BacklogItemAttachment object
+  const newAttachment: BacklogItemAttachment = {
     id: uuidv4(),
-    fileName: attachment.name,
+    filename: attachment.name,
+    url: attachment.url,
     fileUrl: attachment.url,
     fileType: attachment.url.split('.').pop() || 'unknown',
     fileSize: 0, // We don't have this info
     uploadedBy: 'system',
     uploadedAt: new Date(),
-    name: attachment.name, // For backward compatibility
-    url: attachment.url // For backward compatibility
+    fileName: attachment.name // For backward compatibility
   };
   
   backlogItems[itemIndex].attachments!.push(newAttachment);
@@ -67,7 +67,7 @@ export const removeAttachment = (
   }
   
   backlogItems[itemIndex].attachments = backlogItems[itemIndex].attachments?.filter(
-    attachment => attachment.fileUrl !== attachmentUrl && attachment.url !== attachmentUrl
+    attachment => (attachment.fileUrl || attachment.url) !== attachmentUrl
   );
   
   return {

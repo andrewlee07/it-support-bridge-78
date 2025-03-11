@@ -1,8 +1,36 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import { BacklogItem, BacklogItemAttachment, BacklogItemComment } from '@/utils/types/backlogTypes';
 import { mockReleases } from '@/utils/api/release/mockData';
 import { sampleAttachments, sampleComments, sampleHistoryEntries } from './sampleData';
+
+// Function to convert Attachment to BacklogItemAttachment
+function convertToBacklogItemAttachment(attachment: any): BacklogItemAttachment {
+  return {
+    id: attachment.id,
+    filename: attachment.filename || attachment.fileName || '',
+    url: attachment.url || attachment.fileUrl || '',
+    uploadedBy: attachment.uploadedBy,
+    uploadedAt: attachment.uploadedAt,
+    fileUrl: attachment.fileUrl || attachment.url || '',
+    fileType: attachment.fileType || 'unknown',
+    fileSize: attachment.fileSize || 0,
+    fileName: attachment.fileName || attachment.filename || ''
+  };
+}
+
+// Function to convert Comment to BacklogItemComment
+function convertToBacklogItemComment(comment: any): BacklogItemComment {
+  return {
+    id: comment.id,
+    text: comment.text || comment.content || '',
+    content: comment.content || comment.text || '',
+    author: comment.author,
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
+    parentId: comment.parentId
+  };
+}
 
 // Mock Backlog Items data
 export let backlogItems: BacklogItem[] = [
@@ -21,10 +49,10 @@ export let backlogItems: BacklogItem[] = [
     createdAt: new Date('2023-10-01'),
     updatedAt: new Date('2023-10-05'),
     // Enhanced features
-    attachments: [sampleAttachments[0]],
-    comments: [sampleComments[0], sampleComments[1]],
+    attachments: [convertToBacklogItemAttachment(sampleAttachments[0])],
+    comments: [convertToBacklogItemComment(sampleComments[0]), convertToBacklogItemComment(sampleComments[1])],
     watchers: ['user-1', 'user-3'],
-    history: [sampleHistoryEntries[0], sampleHistoryEntries[2]]
+    history: sampleHistoryEntries.slice(0, 2)
   },
   {
     id: 'BLGI-1002',
@@ -41,8 +69,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: new Date('2023-10-03'),
     updatedAt: new Date('2023-10-03'),
     // Enhanced features
-    attachments: [sampleAttachments[1]],
-    comments: [sampleComments[2]],
+    attachments: [convertToBacklogItemAttachment(sampleAttachments[1])],
+    comments: [convertToBacklogItemComment(sampleComments[2])],
     watchers: ['user-2'],
     history: [sampleHistoryEntries[1]]
   },
@@ -76,7 +104,7 @@ export let backlogItems: BacklogItem[] = [
     createdAt: new Date('2023-10-05'),
     updatedAt: new Date('2023-10-05'),
     // Enhanced features
-    attachments: [sampleAttachments[2]],
+    attachments: [convertToBacklogItemAttachment(sampleAttachments[2])],
     history: [sampleHistoryEntries[0]]
   },
 ];
