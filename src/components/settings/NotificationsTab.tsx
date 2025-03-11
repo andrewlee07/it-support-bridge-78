@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import NotificationCategoriesSection from './notifications/NotificationCategoriesSection';
 import DeliveryMethodsSection from './notifications/DeliveryMethodsSection';
 import PriorityLevelsSection from './notifications/PriorityLevelsSection';
-import { NotificationSettings } from '@/hooks/useUserSettings';
+import { NotificationSettings } from '@/components/shared/notifications/types';
 
 interface NotificationsTabProps {
   notificationSettings: NotificationSettings;

@@ -58,7 +58,7 @@ const RelatedTasksList: React.FC<RelatedTasksListProps> = ({
       createdAt: new Date(),
       updatedAt: new Date(),
       relatedItemId,
-      relatedItemType
+      relatedItemType: relatedItemType as 'incident' | 'service-request' | 'task'
     }]);
   };
   
