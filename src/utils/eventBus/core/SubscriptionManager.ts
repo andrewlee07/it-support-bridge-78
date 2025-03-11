@@ -57,9 +57,9 @@ class SubscriptionManager {
    * @param eventType The event type to match
    * @param filterFn Additional filter function to apply
    */
-  public findMatchingSubscribers(eventType: EventType, filterFn?: (subscriber: EventSubscriber) => boolean): EventSubscriber[] {
+  public findMatchingSubscribers(eventType: EventType | string, filterFn?: (subscriber: EventSubscriber) => boolean): EventSubscriber[] {
     return this.subscribers.filter(sub => 
-      sub.eventTypes.includes(eventType) && 
+      sub.eventTypes.includes(eventType as EventType) && 
       (!filterFn || filterFn(sub))
     );
   }
