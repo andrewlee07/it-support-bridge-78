@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,7 +31,8 @@ const mockTemplates: NotificationTemplate[] = [
     subject: 'New incident created: {{incident.title}}',
     body: 'A new incident has been created with ID {{incident.id}}. Please check the details.',
     lastModified: new Date().toISOString(),
-    lastModifiedBy: 'John Doe'
+    lastModifiedBy: 'John Doe',
+    isActive: true  // Add the missing isActive property
   },
   {
     id: 'template-2',
@@ -41,7 +41,8 @@ const mockTemplates: NotificationTemplate[] = [
     subject: 'Problem assigned: {{problem.title}}',
     body: 'A problem has been assigned to you: {{problem.description}}',
     lastModified: new Date().toISOString(),
-    lastModifiedBy: 'Jane Smith'
+    lastModifiedBy: 'Jane Smith',
+    isActive: true  // Add the missing isActive property
   }
 ];
 
@@ -105,7 +106,8 @@ const NotificationTemplateList: React.FC = () => {
       subject: data.subject,
       body: data.body,
       lastModified: new Date().toISOString(),
-      lastModifiedBy: 'Current User'
+      lastModifiedBy: 'Current User',
+      isActive: true  // Add the missing isActive property
     };
     
     setTemplates(prev => [...prev, newTemplate]);

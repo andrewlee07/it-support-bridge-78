@@ -136,6 +136,7 @@ const mockChannels: NotificationChannel[] = [
   }
 ];
 
+// Make sure all properties are required, not optional
 interface NewChannelParams {
   name: string;
   type: string;
