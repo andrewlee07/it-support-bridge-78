@@ -1,75 +1,50 @@
-import React from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom";
 
-// Layouts
-import MainLayout from "@/layouts/MainLayout";
+import { createBrowserRouter } from 'react-router-dom';
+import React from 'react';
+import MainLayout from '@/layouts/MainLayout';
+import Login from '@/pages/Login';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import ErrorPage from '@/pages/ErrorPage';
 
-// Import routes
-import dashboardRoutes from "./dashboardRoutes";
-import ticketRoutes from "./ticketRoutes";
-import changeRoutes from "./changeRoutes";
-import assetRoutes from "./assetRoutes";
-import { adminRoutes } from "./adminRoutes";
-import testManagementRoutes from "./testManagementRoutes";
-import { otherRoutes } from "./otherRoutes";
-
-// Auth-related pages
-import Login from "@/pages/Login";
-import MFAVerification from "@/pages/MFAVerification";
-import SecurityQuestionRecovery from "@/pages/SecurityQuestionRecovery";
-
-// Other standalone pages
-import NotFound from "@/pages/NotFound";
-import ServiceCatalog from "@/pages/ServiceCatalog";
-import ServiceManagementPage from "@/pages/ServiceManagementPage";
-import AdminSettings from "@/pages/AdminSettings";
+// Import domain-specific routes with named imports
+import { backlogRoutes } from './backlogRoutes';
+import { ticketRoutes } from './ticketRoutes';
+import { changeRoutes } from './changeRoutes';
+import { adminRoutes } from './adminRoutes';
+import { problemRoutes } from './problemRoutes';
+import { userRoutes } from './userRoutes';
+import { serviceAssetRoutes } from './serviceAssetRoutes';
+import { testBugRoutes } from './testBugRoutes';
+import { releaseRoutes } from './releaseRoutes';
+import { taskRoutes } from './taskRoutes';
+import { miscRoutes } from './miscRoutes';
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Navigate to="/login" replace />,
+    path: '/login',
+    element: React.createElement(Login)
   },
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/mfa-verification",
-    element: <MFAVerification />,
-  },
-  {
-    path: "/security-recovery",
-    element: <SecurityQuestionRecovery />,
-  },
-  {
-    element: <MainLayout />,
+    path: '/',
+    element: React.createElement(ProtectedRoute, null, 
+      React.createElement(MainLayout)
+    ),
+    errorElement: React.createElement(ErrorPage),
     children: [
-      // Main routes within the authenticated layout
-      ...dashboardRoutes,
+      // Add all routes from domain-specific files
+      ...miscRoutes,
       ...ticketRoutes,
+      ...problemRoutes,
       ...changeRoutes,
-      ...assetRoutes,
-      {
-        path: "/admin",
-        element: <AdminSettings />,
-      },
-      ...adminRoutes, // Administrative routes
-      ...testManagementRoutes,
-      ...otherRoutes,
-      {
-        path: "/service-catalog",
-        element: <ServiceCatalog />,
-      },
-      {
-        path: "/service-management",
-        element: <ServiceManagementPage />,
-      },
-    ],
-  },
-  {
-    path: "*",
-    element: <NotFound />,
-  },
+      ...releaseRoutes,
+      ...backlogRoutes,
+      ...serviceAssetRoutes,
+      ...testBugRoutes,
+      ...userRoutes,
+      ...adminRoutes,
+      ...taskRoutes
+    ]
+  }
 ]);
 
 export default router;
