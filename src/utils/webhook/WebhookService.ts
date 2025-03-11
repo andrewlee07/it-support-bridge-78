@@ -1,6 +1,5 @@
-
 import { v4 as uuidv4 } from 'uuid';
-import { SystemEvent, EventType, WebhookConfig, WebhookDeliveryLog } from '../types/eventBus';
+import { SystemEvent, EventType, WebhookConfig, WebhookDeliveryLog, EventSource, EventOrigin } from '../types/eventBus';
 
 /**
  * Service to manage and execute webhooks
@@ -49,7 +48,7 @@ class WebhookService {
   public getWebhooksForEventType(eventType: string): WebhookConfig[] {
     return this.webhooks.filter(webhook => 
       webhook.enabled && 
-      webhook.eventTypes.includes(eventType as any)
+      webhook.eventTypes.includes(eventType as EventType)
     );
   }
   
@@ -64,6 +63,13 @@ class WebhookService {
     );
     
     await Promise.allSettled(deliveryPromises);
+  }
+  
+  /**
+   * Initialize the webhook service to listen for events
+   */
+  public initialize(): void {
+    console.log('WebhookService initialized');
   }
   
   /**
@@ -255,15 +261,15 @@ class WebhookService {
     // Create a test event
     const testEvent: SystemEvent = {
       id: `test-${uuidv4()}`,
-      type: webhook.eventTypes[0] as EventType,
-      source: 'webhook-service',
+      type: webhook.eventTypes[0],
+      source: 'external-system' as EventSource,
       timestamp: new Date().toISOString(),
       data: {
         message: 'This is a test event',
         timestamp: new Date().toISOString()
       },
       metadata: {
-        origin: 'webhook-test',
+        origin: 'background-job' as EventOrigin,
         isTest: true
       }
     };

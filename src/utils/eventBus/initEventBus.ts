@@ -1,36 +1,55 @@
 
+import { v4 as uuidv4 } from 'uuid';
 import EventBus from './EventBus';
-import NotificationSubscriber from './NotificationSubscriber';
+import { SystemEvent, EventType } from '../types/eventBus';
 import WebhookService from '../webhook/WebhookService';
 
-/**
- * Initialize the event bus system and all subscribers
- */
-export const initEventBus = () => {
-  console.log('Initializing Event Bus system...');
+// Get the event bus instance
+const eventBus = EventBus.getInstance();
+
+// Get the webhook service for event processing
+const webhookService = WebhookService.getInstance();
+
+// Initialize on app startup
+export const initializeEventBus = () => {
+  console.log('Initializing event bus system...');
   
-  // Get event bus instance
-  const eventBus = EventBus.getInstance();
-  eventBus.setDebugMode(process.env.NODE_ENV === 'development');
-  
-  // Initialize notification subscriber
-  const notificationSubscriber = NotificationSubscriber.getInstance();
-  notificationSubscriber.initialize();
-  
-  // Initialize webhook service
-  const webhookService = WebhookService.getInstance();
+  // Initialize the webhook service
   webhookService.initialize();
   
-  console.log('Event Bus system initialized successfully');
-  
-  return {
-    eventBus,
-    notificationSubscriber,
-    webhookService
-  };
+  console.log('Event bus system initialized');
 };
 
 /**
- * Helper function to publish events to the event bus
+ * Helper function to publish events
  */
-export const publishEvent = EventBus.getInstance().publish.bind(EventBus.getInstance());
+export const publishEvent = (
+  type: EventType,
+  source: string,
+  data: any,
+  metadata: Record<string, any> = {}
+): string => {
+  const eventId = `evt-${uuidv4()}`;
+  
+  const event: SystemEvent = {
+    id: eventId,
+    type,
+    source: source as any, // Cast to EventSource
+    timestamp: new Date().toISOString(),
+    data,
+    metadata: {
+      ...metadata,
+      timestamp: new Date().toISOString()
+    }
+  };
+  
+  // Publish to event bus
+  eventBus.publish(event);
+  
+  // Also send to webhook service
+  webhookService.processEvent(event).catch(err => {
+    console.error('Error processing webhooks for event', eventId, err);
+  });
+  
+  return eventId;
+};
