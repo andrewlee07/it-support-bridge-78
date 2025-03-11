@@ -7,8 +7,21 @@ import { useTheme } from 'next-themes';
 import GlobalSearch from '@/components/shared/search/GlobalSearch';
 import NotificationCenter from '@/components/shared/notifications/NotificationCenter';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  toggleDarkMode?: () => void;
+  isDarkMode?: boolean;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ toggleDarkMode, isDarkMode }) => {
   const { theme, setTheme } = useTheme();
+
+  const handleThemeToggle = () => {
+    if (toggleDarkMode) {
+      toggleDarkMode();
+    } else {
+      setTheme(theme === 'dark' ? 'light' : 'dark');
+    }
+  };
 
   return (
     <div className="border-b">
@@ -23,7 +36,7 @@ const Navbar: React.FC = () => {
             size="icon"
             aria-label="Toggle theme"
             className="mr-2"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            onClick={handleThemeToggle}
           >
             <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

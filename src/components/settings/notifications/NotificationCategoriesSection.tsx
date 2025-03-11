@@ -9,7 +9,8 @@ import {
   ClipboardList,
   Package,
   Box,
-  Calendar
+  Calendar,
+  CheckSquare
 } from 'lucide-react';
 
 interface NotificationCategoriesSectionProps {
@@ -21,6 +22,8 @@ interface NotificationCategoriesSectionProps {
     releases: boolean;
     assets: boolean;
     changes: boolean;
+    knowledge: boolean;
+    tasks: boolean;
   };
   onToggle: (category: string, value: string) => void;
 }
@@ -107,6 +110,17 @@ const NotificationCategoriesSection: React.FC<NotificationCategoriesSectionProps
         <Switch 
           checked={categories.changes} 
           onCheckedChange={(checked) => onToggle('categories', 'changes')}
+        />
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <CheckSquare className="h-5 w-5 text-emerald-500" />
+          <Label>Tasks</Label>
+        </div>
+        <Switch 
+          checked={categories.tasks} 
+          onCheckedChange={(checked) => onToggle('categories', 'tasks')}
         />
       </div>
     </div>

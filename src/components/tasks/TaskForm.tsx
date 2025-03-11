@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -110,6 +109,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
         const result = await createTask({
           ...values,
           creator: user.id,
+          title: values.title,
+          description: values.description,
+          status: values.status,
+          priority: values.priority
         });
 
         if (result.success) {

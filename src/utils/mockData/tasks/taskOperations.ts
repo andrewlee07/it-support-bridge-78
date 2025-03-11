@@ -1,4 +1,3 @@
-
 import { Task, TaskPriority, TaskStatus } from '@/utils/types/taskTypes';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -66,8 +65,36 @@ let tasks: Task[] = [
 ];
 
 // API functions
-export const fetchTasks = async (): Promise<{ success: boolean; data: Task[] }> => {
-  return { success: true, data: tasks };
+export const fetchTasks = async (
+  assignee?: string,
+  statusFilters?: TaskStatus[],
+  priorityFilters?: TaskPriority[],
+  searchQuery?: string
+): Promise<{ success: boolean; data: Task[] }> => {
+  let filteredTasks = [...tasks];
+  
+  // Apply filters
+  if (assignee) {
+    filteredTasks = filteredTasks.filter(t => t.assignee === assignee);
+  }
+  
+  if (statusFilters && statusFilters.length > 0) {
+    filteredTasks = filteredTasks.filter(t => statusFilters.includes(t.status));
+  }
+  
+  if (priorityFilters && priorityFilters.length > 0) {
+    filteredTasks = filteredTasks.filter(t => priorityFilters.includes(t.priority));
+  }
+  
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+    filteredTasks = filteredTasks.filter(t => 
+      t.title.toLowerCase().includes(query) || 
+      t.description.toLowerCase().includes(query)
+    );
+  }
+  
+  return { success: true, data: filteredTasks };
 };
 
 export const fetchTaskById = async (id: string): Promise<{ success: boolean; data: Task | null }> => {
@@ -146,15 +173,17 @@ export const addTaskNote = async (taskId: string, noteContent: string, authorId:
   return { success: true, data: updatedTask };
 };
 
-export const getTaskStats = async (): Promise<{ success: boolean; data: any }> => {
+export const getTaskStats = async (userId?: string): Promise<{ success: boolean; data: any }> => {
+  let filteredTasks = userId ? tasks.filter(t => t.assignee === userId) : tasks;
+  
   const stats = {
-    totalTasks: tasks.length,
-    newTasks: tasks.filter(t => t.status === 'new').length,
-    inProgressTasks: tasks.filter(t => t.status === 'in-progress').length,
-    onHoldTasks: tasks.filter(t => t.status === 'on-hold').length,
-    completedTasks: tasks.filter(t => t.status === 'completed').length,
-    cancelledTasks: tasks.filter(t => t.status === 'cancelled').length,
-    overdueCount: tasks.filter(t => 
+    totalTasks: filteredTasks.length,
+    newTasks: filteredTasks.filter(t => t.status === 'new').length,
+    inProgressTasks: filteredTasks.filter(t => t.status === 'in-progress').length,
+    onHoldTasks: filteredTasks.filter(t => t.status === 'on-hold').length,
+    completedTasks: filteredTasks.filter(t => t.status === 'completed').length,
+    cancelledTasks: filteredTasks.filter(t => t.status === 'cancelled').length,
+    overdueCount: filteredTasks.filter(t => 
       t.dueDate && 
       new Date(t.dueDate) < new Date() && 
       t.status !== 'completed' && 
@@ -165,12 +194,18 @@ export const getTaskStats = async (): Promise<{ success: boolean; data: any }> =
   return { success: true, data: stats };
 };
 
-export const getTasksDueToday = async (): Promise<{ success: boolean; data: Task[] }> => {
+export const getTasksDueToday = async (userId?: string): Promise<{ success: boolean; data: Task[] }> => {
   const today = new Date();
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
   
-  const tasksDueToday = tasks.filter(t => 
+  let filteredTasks = tasks;
+  
+  if (userId) {
+    filteredTasks = filteredTasks.filter(t => t.assignee === userId);
+  }
+  
+  const tasksDueToday = filteredTasks.filter(t => 
     t.dueDate && 
     new Date(t.dueDate) >= todayStart && 
     new Date(t.dueDate) <= todayEnd &&
