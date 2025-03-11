@@ -1,67 +1,44 @@
-import { useState } from 'react';
 import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
-import { BacklogItem } from '@/utils/types/backlogTypes';
 import { KanbanBoardConfig, sprintColumnsConfig, defaultKanbanConfig } from '@/utils/types/kanbanTypes';
-import { KanbanActions } from './types';
+import { BacklogItem } from '@/utils/types/backlogTypes';
+import { UseKanbanBoardProps } from './types';
 
-export const useKanbanBoardActions = (
-  backlogItems: BacklogItem[],
+export function useKanbanBoardActions(
+  props: UseKanbanBoardProps,
   boardConfig: KanbanBoardConfig,
-  collapsedColumns: string[],
-  setCollapsedColumns: React.Dispatch<React.SetStateAction<string[]>>,
-  setBoardConfig: React.Dispatch<React.SetStateAction<KanbanBoardConfig>>,
-  setEditingItem: React.Dispatch<React.SetStateAction<BacklogItem | null>>,
-  setNewItemDialogOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setDefaultStatus: React.Dispatch<React.SetStateAction<string | undefined>>,
-  viewDimension: 'status' | 'sprint' | 'assignee' | 'priority' | 'label',
-  onCreateItem: (defaultStatus?: string) => void
-): KanbanActions => {
+  setBoardConfig: (config: KanbanBoardConfig) => void,
+  setCollapsedColumns: (columns: string[]) => void,
+  setNewItemDialogOpen: (open: boolean) => void,
+  setEditingItem: (item: BacklogItem | null) => void,
+  setDefaultStatus: (status: string | undefined) => void,
+  collapsedColumns: string[]
+) {
+  const { onCreateItem } = props;
 
-  const toggleColumn = (columnId: string) => {
-    setCollapsedColumns(prev => 
-      prev.includes(columnId)
-        ? prev.filter(s => s !== columnId)
-        : [...prev, columnId]
-    );
+  // Setup event listener for custom events
+  const setupEventListeners = (callback: () => void) => {
+    const handleOpenConfigEvent = () => {
+      callback();
+    };
+
+    const boardElement = document.querySelector('[data-kanban-board]');
+    if (boardElement) {
+      boardElement.addEventListener('openConfig', handleOpenConfigEvent);
+    }
+
+    return () => {
+      if (boardElement) {
+        boardElement.removeEventListener('openConfig', handleOpenConfigEvent);
+      }
+    };
   };
 
-  const getItemsForColumn = (column: string, columnId: string) => {
-    if (viewDimension === 'status') {
-      return backlogItems.filter(item => item.status === column);
-    } 
-    else if (viewDimension === 'sprint') {
-      return backlogItems.filter(item => 
-        column === 'backlog' 
-          ? !item.releaseId 
-          : columnId === item.releaseId
-      );
-    }
-    else if (viewDimension === 'assignee') {
-      const assigneeValue = columnId.replace('assignee-', '');
-      return backlogItems.filter(item => 
-        assigneeValue === 'unassigned' 
-          ? !item.assignee 
-          : item.assignee === assigneeValue
-      );
-    }
-    else if (viewDimension === 'priority') {
-      const priority = columnId.replace('priority-', '');
-      return backlogItems.filter(item => 
-        priority === 'none' 
-          ? !item.priority 
-          : item.priority === priority
-      );
-    }
-    else if (viewDimension === 'label') {
-      const label = columnId.replace('label-', '');
-      return backlogItems.filter(item => 
-        label === 'No Label' 
-          ? !item.labels || item.labels.length === 0 
-          : item.labels && item.labels.includes(label)
-      );
-    }
-    return [];
+  const toggleColumn = (columnId: string) => {
+    setCollapsedColumns(
+      collapsedColumns.includes(columnId)
+        ? collapsedColumns.filter(s => s !== columnId)
+        : [...collapsedColumns, columnId]
+    );
   };
 
   const updateBoardConfig = (newConfig: KanbanBoardConfig) => {
@@ -79,7 +56,6 @@ export const useKanbanBoardActions = (
     }
     
     setBoardConfig(newConfig);
-    setConfigOpen(false);
   };
 
   const handleNewItemSuccess = () => {
@@ -94,29 +70,6 @@ export const useKanbanBoardActions = (
     setDefaultStatus(undefined);
   };
 
-  const handleAddBucket = () => {
-    // Create a new column/bucket
-    const newBucketId = uuidv4();
-    const newBucketName = `Bucket ${boardConfig.columns.length + 1}`;
-    const newStatusValue = `bucket-${boardConfig.columns.length + 1}`;
-    
-    const newColumn = {
-      id: newBucketId,
-      displayName: newBucketName,
-      statusValue: newStatusValue,
-      order: boardConfig.columns.length + 1,
-      color: 'bg-gray-50 dark:bg-gray-950'
-    };
-    
-    const updatedConfig = {
-      ...boardConfig,
-      columns: [...boardConfig.columns, newColumn]
-    };
-    
-    setBoardConfig(updatedConfig);
-    toast.success(`New bucket "${newBucketName}" added`);
-  };
-
   const handleAddItem = (status: string) => {
     setDefaultStatus(status);
     onCreateItem(status);
@@ -126,21 +79,13 @@ export const useKanbanBoardActions = (
     onCreateItem();
   };
 
-  const setConfigOpen = (open: boolean) => {
-    setNewItemDialogOpen(open);
-  };
-
   return {
-    setConfigOpen,
-    setNewItemDialogOpen,
-    setEditingItem,
+    setupEventListeners,
     toggleColumn,
-    getItemsForColumn,
     updateBoardConfig,
     handleNewItemSuccess,
     handleNewItemCancel,
-    handleAddBucket,
     handleAddItem,
     handleCreateItem
   };
-};
+}

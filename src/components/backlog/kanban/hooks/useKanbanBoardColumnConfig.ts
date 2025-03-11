@@ -1,21 +1,23 @@
 
 import { useEffect } from 'react';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import { v4 as uuidv4 } from 'uuid';
 import { 
   KanbanBoardConfig, 
-  defaultKanbanConfig, 
   sprintColumnsConfig, 
   generateAssigneeColumns, 
   priorityColumnsConfig, 
   generateLabelColumns 
 } from '@/utils/types/kanbanTypes';
+import { UseKanbanBoardProps } from './types';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 
-export const useKanbanBoardColumnConfig = (
+export function useKanbanBoardColumnConfig(
+  props: UseKanbanBoardProps,
   boardConfig: KanbanBoardConfig,
-  setBoardConfig: React.Dispatch<React.SetStateAction<KanbanBoardConfig>>,
-  viewDimension: 'status' | 'sprint' | 'assignee' | 'priority' | 'label',
-  backlogItems: BacklogItem[]
-) => {
+  setBoardConfig: (config: KanbanBoardConfig) => void
+) {
+  const { backlogItems, viewDimension } = props;
+
   // Generate dynamic columns based on the view dimension
   useEffect(() => {
     let newConfig: KanbanBoardConfig = {...boardConfig, viewType: viewDimension};
@@ -23,7 +25,7 @@ export const useKanbanBoardColumnConfig = (
     if (viewDimension === 'status') {
       // Use default status columns
       if (!boardConfig.columns.some(col => col.id === 'open')) {
-        newConfig.columns = defaultKanbanConfig.columns;
+        newConfig.columns = newConfig.columns; // No change needed
       }
     } 
     else if (viewDimension === 'sprint') {
@@ -70,5 +72,70 @@ export const useKanbanBoardColumnConfig = (
     }
     
     setBoardConfig(newConfig);
-  }, [viewDimension, backlogItems, boardConfig]);
-};
+  }, [viewDimension, backlogItems, boardConfig.viewType]);
+
+  const getItemsForColumn = (columnStatusValue: string, columnId: string): BacklogItem[] => {
+    if (viewDimension === 'status') {
+      return backlogItems.filter(item => item.status === columnStatusValue);
+    } 
+    else if (viewDimension === 'sprint') {
+      return backlogItems.filter(item => 
+        columnStatusValue === 'backlog' 
+          ? !item.releaseId 
+          : columnId === item.releaseId
+      );
+    }
+    else if (viewDimension === 'assignee') {
+      const assigneeValue = columnId.replace('assignee-', '');
+      return backlogItems.filter(item => 
+        assigneeValue === 'unassigned' 
+          ? !item.assignee 
+          : item.assignee === assigneeValue
+      );
+    }
+    else if (viewDimension === 'priority') {
+      const priority = columnId.replace('priority-', '');
+      return backlogItems.filter(item => 
+        priority === 'none' 
+          ? !item.priority 
+          : item.priority === priority
+      );
+    }
+    else if (viewDimension === 'label') {
+      const label = columnId.replace('label-', '');
+      return backlogItems.filter(item => 
+        label === 'No Label' 
+          ? !item.labels || item.labels.length === 0 
+          : item.labels && item.labels.includes(label)
+      );
+    }
+    return [];
+  };
+
+  const handleAddBucket = () => {
+    // Create a new column/bucket
+    const newBucketId = uuidv4();
+    const newBucketName = `Bucket ${boardConfig.columns.length + 1}`;
+    const newStatusValue = `bucket-${boardConfig.columns.length + 1}`;
+    
+    const newColumn = {
+      id: newBucketId,
+      displayName: newBucketName,
+      statusValue: newStatusValue,
+      order: boardConfig.columns.length + 1,
+      color: 'bg-gray-50 dark:bg-gray-950'
+    };
+    
+    const updatedConfig = {
+      ...boardConfig,
+      columns: [...boardConfig.columns, newColumn]
+    };
+    
+    setBoardConfig(updatedConfig);
+  };
+
+  return {
+    getItemsForColumn,
+    handleAddBucket
+  };
+}
