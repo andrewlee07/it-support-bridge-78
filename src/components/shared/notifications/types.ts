@@ -1,19 +1,17 @@
 
-export interface Notification {
+export interface SearchResult {
   id: string;
   title: string;
-  message: string;
-  timestamp: Date;
-  read: boolean;
-  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'knowledge' | 'task';
-  priority?: 'critical' | 'high' | 'medium' | 'low';
-  entityId: string;
+  description?: string;
+  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'task';
   url: string;
-  actor?: {
-    id: string;
-    name: string;
-    initials: string;
-  };
+  status?: string;
+  priority?: string;
+  date?: Date;
+}
+
+export interface GlobalSearchProps {
+  placeholder?: string;
 }
 
 export interface NotificationSettings {
@@ -38,4 +36,16 @@ export interface NotificationSettings {
     medium: boolean;
     low: boolean;
   };
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'knowledge' | 'task';
+  priority?: 'critical' | 'high' | 'medium' | 'low';
+  date: Date;
+  read: boolean;
+  actionUrl?: string;
+  sender?: string;
 }
