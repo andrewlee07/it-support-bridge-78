@@ -81,8 +81,8 @@ const EventDocumentationPage: React.FC = () => {
                   <li>
                     <div className="font-medium">Time Qualifiers</div>
                     <div className="flex gap-2 mt-1">
-                      <code className="bg-muted px-1 rounded">approaching</code> (>75% of time elapsed)
-                      <code className="bg-muted px-1 rounded">imminent</code> (>90% of time elapsed)
+                      <code className="bg-muted px-1 rounded">approaching</code> (75% or more of time elapsed)
+                      <code className="bg-muted px-1 rounded">imminent</code> (90% or more of time elapsed)
                     </div>
                   </li>
                   <li>
