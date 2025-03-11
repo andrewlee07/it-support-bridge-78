@@ -4,6 +4,7 @@ import PageTransition from '@/components/shared/PageTransition';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
 import KanbanHeader from '@/components/backlog/kanban/header/KanbanHeader';
 import { useBacklogKanban } from '@/hooks/backlog/useBacklogKanban';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const BacklogKanban: React.FC = () => {
   const {
@@ -19,25 +20,27 @@ const BacklogKanban: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="container py-6">
-        <KanbanHeader 
-          viewDimension={viewDimension}
-          onViewDimensionChange={handleViewDimensionChange}
-        />
-
-        <div data-kanban-board>
-          <KanbanBoard 
-            backlogItems={backlogItems} 
-            isLoading={isLoading} 
-            onDragEnd={handleDragEnd}
-            onEditItem={handleEditItem}
-            onQuickStatusChange={handleQuickStatusChange}
-            columnSize="standard"
-            onCreateItem={handleCreateItem}
+      <TooltipProvider>
+        <div className="container py-6">
+          <KanbanHeader 
             viewDimension={viewDimension}
+            onViewDimensionChange={handleViewDimensionChange}
           />
+
+          <div data-kanban-board>
+            <KanbanBoard 
+              backlogItems={backlogItems} 
+              isLoading={isLoading} 
+              onDragEnd={handleDragEnd}
+              onEditItem={handleEditItem}
+              onQuickStatusChange={handleQuickStatusChange}
+              columnSize="standard"
+              onCreateItem={handleCreateItem}
+              viewDimension={viewDimension}
+            />
+          </div>
         </div>
-      </div>
+      </TooltipProvider>
     </PageTransition>
   );
 };
