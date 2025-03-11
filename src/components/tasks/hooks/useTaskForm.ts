@@ -2,10 +2,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Task } from '@/utils/types/taskTypes';
+import { Task, ChecklistItem } from '@/utils/types/taskTypes';
 import { useAuth } from '@/contexts/AuthContext';
 import { createTask, updateTask } from '@/utils/api/taskApi';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 // Form schema
 export const taskFormSchema = z.object({
@@ -18,6 +19,17 @@ export const taskFormSchema = z.object({
   dueTime: z.string().optional(),
   relatedItemId: z.string().optional(),
   relatedItemType: z.enum(['incident', 'service-request', 'task']).optional(),
+  // New enhanced fields
+  estimatedHours: z.number().min(0).optional(),
+  dependsOn: z.array(z.string()).optional(),
+  blockedBy: z.array(z.string()).optional(),
+  checklist: z.array(z.object({
+    id: z.string(),
+    text: z.string(),
+    completed: z.boolean(),
+  })).optional(),
+  isTemplate: z.boolean().optional(),
+  templateId: z.string().optional(),
 });
 
 export type TaskFormValues = z.infer<typeof taskFormSchema>;
@@ -26,15 +38,35 @@ interface UseTaskFormProps {
   initialData?: Task;
   onTaskCreated?: (task: Task) => void;
   onTaskUpdated?: (task: Task) => void;
+  templateData?: Task; // For creating from template
 }
 
 export const useTaskForm = ({ 
   initialData, 
   onTaskCreated, 
-  onTaskUpdated 
-}: UseTaskFormProps) => {
+  onTaskUpdated,
+  templateData
+}: UseTaskFormProps = {}) => {
   const { user } = useAuth();
   const isEditMode = !!initialData;
+  const isFromTemplate = !!templateData;
+
+  const getInitialChecklist = () => {
+    if (initialData?.checklist) {
+      return initialData.checklist.map(item => ({
+        id: item.id,
+        text: item.text,
+        completed: item.completed
+      }));
+    } else if (templateData?.checklist) {
+      return templateData.checklist.map(item => ({
+        id: uuidv4(),
+        text: item.text,
+        completed: false
+      }));
+    }
+    return [];
+  };
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema),
@@ -48,6 +80,29 @@ export const useTaskForm = ({
       dueTime: initialData.dueDate ? new Date(initialData.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : undefined,
       relatedItemId: initialData.relatedItemId || '',
       relatedItemType: initialData.relatedItemType,
+      // New enhanced fields
+      estimatedHours: initialData.estimatedHours,
+      dependsOn: initialData.dependsOn || [],
+      blockedBy: initialData.blockedBy || [],
+      checklist: getInitialChecklist(),
+      isTemplate: initialData.isTemplate || false,
+    } : templateData ? {
+      title: templateData.isTemplate ? `Copy of ${templateData.title}` : templateData.title,
+      description: templateData.description,
+      status: 'new',
+      priority: templateData.priority,
+      assignee: user?.id || '',
+      dueDate: undefined,
+      dueTime: undefined,
+      relatedItemId: '',
+      relatedItemType: undefined,
+      // New enhanced fields
+      estimatedHours: templateData.estimatedHours,
+      dependsOn: [],
+      blockedBy: [],
+      checklist: getInitialChecklist(),
+      isTemplate: false,
+      templateId: templateData.id,
     } : {
       title: '',
       description: '',
@@ -58,8 +113,27 @@ export const useTaskForm = ({
       dueTime: undefined,
       relatedItemId: '',
       relatedItemType: undefined,
+      // New enhanced fields
+      estimatedHours: undefined,
+      dependsOn: [],
+      blockedBy: [],
+      checklist: [],
+      isTemplate: false,
     },
   });
+
+  const addChecklistItem = () => {
+    const currentChecklist = form.getValues('checklist') || [];
+    form.setValue('checklist', [
+      ...currentChecklist,
+      { id: uuidv4(), text: '', completed: false }
+    ]);
+  };
+
+  const removeChecklistItem = (id: string) => {
+    const currentChecklist = form.getValues('checklist') || [];
+    form.setValue('checklist', currentChecklist.filter(item => item.id !== id));
+  };
 
   const onSubmit = async (values: TaskFormValues) => {
     try {
@@ -76,12 +150,22 @@ export const useTaskForm = ({
         dueDateTime.setHours(hours, minutes);
       }
 
+      // Format checklist items properly
+      const checklist: ChecklistItem[] = values.checklist?.map(item => ({
+        id: item.id,
+        text: item.text,
+        completed: item.completed,
+        createdAt: new Date(),
+        completedAt: item.completed ? new Date() : undefined,
+      })) || [];
+
       if (isEditMode && initialData) {
         // Update existing task
         const result = await updateTask(initialData.id, {
           ...values,
           dueDate: dueDateTime,
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          checklist
         });
 
         if (result.success) {
@@ -101,11 +185,18 @@ export const useTaskForm = ({
           assignee: values.assignee,
           dueDate: dueDateTime,
           relatedItemId: values.relatedItemId,
-          relatedItemType: values.relatedItemType
+          relatedItemType: values.relatedItemType,
+          // New enhanced fields
+          estimatedHours: values.estimatedHours,
+          dependsOn: values.dependsOn,
+          blockedBy: values.blockedBy,
+          checklist,
+          isTemplate: values.isTemplate,
+          templateId: values.templateId,
         });
 
         if (result.success) {
-          toast.success('Task created successfully');
+          toast.success(values.isTemplate ? 'Task template created successfully' : 'Task created successfully');
           onTaskCreated?.(result.data);
           form.reset();
         } else {
@@ -121,6 +212,9 @@ export const useTaskForm = ({
   return {
     form,
     isEditMode,
+    isFromTemplate,
     onSubmit,
+    addChecklistItem,
+    removeChecklistItem
   };
 };

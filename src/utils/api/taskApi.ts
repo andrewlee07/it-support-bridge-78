@@ -7,7 +7,9 @@ import {
   deleteTask,
   addTaskNote,
   getTaskStats,
-  getTasksDueToday
+  getTasksDueToday,
+  fetchTaskTemplates,
+  fetchTaskDependencies
 } from '@/utils/mockData/tasks/taskOperations';
 
 // Just re-export the functions from taskOperations
@@ -19,7 +21,9 @@ export {
   deleteTask,
   addTaskNote,
   getTaskStats,
-  getTasksDueToday
+  getTasksDueToday,
+  fetchTaskTemplates,
+  fetchTaskDependencies
 };
 
 // Add new API functions for reminders
@@ -73,6 +77,78 @@ export const snoozeReminder = async (id, duration) => {
     data: {
       id,
       snoozedUntil: new Date(Date.now() + duration),
+    }
+  };
+};
+
+// Time tracking functions
+export const startTimeTracking = async (taskId, userId) => {
+  console.log("Starting time tracking:", taskId, userId);
+  return {
+    success: true,
+    data: {
+      id: `time-entry-${Date.now()}`,
+      taskId,
+      userId,
+      startTime: new Date(),
+    }
+  };
+};
+
+export const stopTimeTracking = async (timeEntryId, description) => {
+  console.log("Stopping time tracking:", timeEntryId, description);
+  const endTime = new Date();
+  return {
+    success: true,
+    data: {
+      id: timeEntryId,
+      endTime,
+      description
+    }
+  };
+};
+
+export const addChecklistItem = async (taskId, itemText) => {
+  console.log("Adding checklist item:", taskId, itemText);
+  return {
+    success: true,
+    data: {
+      id: `checklist-${Date.now()}`,
+      text: itemText,
+      completed: false,
+      createdAt: new Date()
+    }
+  };
+};
+
+export const updateChecklistItem = async (taskId, itemId, updates) => {
+  console.log("Updating checklist item:", taskId, itemId, updates);
+  return {
+    success: true,
+    data: {
+      id: itemId,
+      ...updates,
+      updatedAt: new Date()
+    }
+  };
+};
+
+export const deleteChecklistItem = async (taskId, itemId) => {
+  console.log("Deleting checklist item:", taskId, itemId);
+  return {
+    success: true
+  };
+};
+
+// Task duplication
+export const duplicateTask = async (taskId, options = {}) => {
+  console.log("Duplicating task:", taskId, options);
+  return {
+    success: true,
+    data: {
+      id: `task-${Date.now()}`,
+      // Original task data would be duplicated here
+      createdAt: new Date()
     }
   };
 };

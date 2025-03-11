@@ -21,6 +21,14 @@ export interface Task {
   updatedAt: Date;
   notes?: TaskNote[];
   attachments?: TaskAttachment[];
+  // New enhanced features
+  dependsOn?: string[]; // IDs of tasks this task depends on
+  blockedBy?: string[]; // IDs of tasks blocking this one
+  checklist?: ChecklistItem[];
+  timeTracking?: TimeTracking;
+  estimatedHours?: number;
+  isTemplate?: boolean;
+  templateId?: string; // If created from a template
 }
 
 export interface TaskNote {
@@ -37,6 +45,29 @@ export interface TaskAttachment {
   fileType: string;
   uploadedBy: string;
   uploadedAt: Date;
+}
+
+// New interfaces for enhanced features
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  completed: boolean;
+  createdAt: Date;
+  completedAt?: Date;
+}
+
+export interface TimeTracking {
+  totalTimeSpent: number; // In minutes
+  entries: TimeEntry[];
+}
+
+export interface TimeEntry {
+  id: string;
+  userId: string;
+  startTime: Date;
+  endTime?: Date;
+  duration?: number; // In minutes
+  description?: string;
 }
 
 // Task stats for dashboard
