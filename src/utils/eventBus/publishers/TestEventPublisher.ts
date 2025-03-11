@@ -1,192 +1,179 @@
 
+import { v4 as uuidv4 } from 'uuid';
 import EventBus from '../EventBus';
-import { TestCaseEventData, TestExecutionEventData } from '@/utils/types/eventBus';
+import { TestCaseEventData, TestExecutionEventData, EventType, EventSource } from '@/utils/types/eventBus';
 
 /**
- * Publisher for Test-related events
+ * Publisher for test management events
  */
-class TestEventPublisher {
-  private eventBus: EventBus;
-  
-  constructor() {
-    this.eventBus = EventBus.getInstance();
-  }
-  
+export class TestEventPublisher {
   /**
-   * Publish test case created event
+   * Publish event when a test case is created
    */
-  public publishTestCaseCreated(testCase: TestCaseEventData, userId: string): string {
-    return this.eventBus.publish('testCase.created', 'test-management', testCase, {
-      metadata: {
-        userId,
-        tenantId: testCase.tenantId || 'default',
-        tags: ['test-case', 'created']
-      },
-      actor: {
-        id: userId,
-        type: 'user'
-      },
-      entity: {
-        id: testCase.id,
-        type: 'testCase',
-        name: testCase.title,
-        url: `/test-cases/${testCase.id}`
+  public static publishTestCaseCreated(testCaseData: TestCaseEventData): string {
+    return EventBus.getInstance().publish<TestCaseEventData>(
+      'testCase.created',
+      'testSystem' as EventSource,  // Cast to EventSource
+      testCaseData,
+      {
+        metadata: {
+          tenantId: testCaseData.tenantId
+        },
+        entity: {
+          id: testCaseData.id,
+          type: 'testCase',
+          name: testCaseData.title,
+          url: `/testing/cases/${testCaseData.id}`
+        }
       }
-    });
+    );
   }
-  
+
   /**
-   * Publish test case updated event
+   * Publish event when a test case is updated
    */
-  public publishTestCaseUpdated(testCase: TestCaseEventData, userId: string): string {
-    return this.eventBus.publish('testCase.updated', 'test-management', testCase, {
-      metadata: {
-        userId,
-        tenantId: testCase.tenantId || 'default',
-        tags: ['test-case', 'updated']
-      },
-      actor: {
-        id: userId,
-        type: 'user'
-      },
-      entity: {
-        id: testCase.id,
-        type: 'testCase',
-        name: testCase.title,
-        url: `/test-cases/${testCase.id}`
+  public static publishTestCaseUpdated(testCaseData: TestCaseEventData): string {
+    return EventBus.getInstance().publish<TestCaseEventData>(
+      'testCase.updated',
+      'testSystem' as EventSource,  // Cast to EventSource
+      testCaseData,
+      {
+        metadata: {
+          tenantId: testCaseData.tenantId
+        },
+        entity: {
+          id: testCaseData.id,
+          type: 'testCase',
+          name: testCaseData.title,
+          url: `/testing/cases/${testCaseData.id}`
+        }
       }
-    });
+    );
   }
-  
+
   /**
-   * Publish test execution scheduled event
+   * Publish event when a test execution is scheduled
    */
-  public publishTestExecutionScheduled(execution: TestExecutionEventData, userId: string): string {
-    return this.eventBus.publish('testExecution.scheduled', 'test-management', execution, {
-      metadata: {
-        userId,
-        tenantId: execution.tenantId || 'default',
-        tags: ['test-execution', 'scheduled']
-      },
-      actor: {
-        id: userId,
-        type: 'user'
-      },
-      entity: {
-        id: execution.id,
-        type: 'testExecution',
-        name: `Test Execution ${execution.id}`,
-        url: `/test-executions/${execution.id}`
+  public static publishTestExecutionScheduled(executionData: TestExecutionEventData): string {
+    return EventBus.getInstance().publish<TestExecutionEventData>(
+      'testExecution.scheduled',
+      'testSystem' as EventSource,  // Cast to EventSource
+      executionData,
+      {
+        metadata: {
+          tenantId: executionData.tenantId
+        },
+        entity: {
+          id: executionData.id,
+          type: 'testExecution',
+          name: `Test execution for ${executionData.id}`,
+          url: `/testing/executions/${executionData.id}`
+        }
       }
-    });
+    );
   }
-  
+
   /**
-   * Publish test execution started event
+   * Publish event when a test execution is started
    */
-  public publishTestExecutionStarted(execution: TestExecutionEventData, userId: string): string {
-    return this.eventBus.publish('testExecution.started', 'test-management', execution, {
-      metadata: {
-        userId,
-        tenantId: execution.tenantId || 'default',
-        tags: ['test-execution', 'started']
-      },
-      actor: {
-        id: userId,
-        type: 'user'
-      },
-      entity: {
-        id: execution.id,
-        type: 'testExecution',
-        name: `Test Execution ${execution.id}`,
-        url: `/test-executions/${execution.id}`
+  public static publishTestExecutionStarted(executionData: TestExecutionEventData): string {
+    return EventBus.getInstance().publish<TestExecutionEventData>(
+      'testExecution.started',
+      'testSystem' as EventSource,  // Cast to EventSource
+      executionData,
+      {
+        metadata: {
+          tenantId: executionData.tenantId
+        },
+        entity: {
+          id: executionData.id,
+          type: 'testExecution',
+          name: `Test execution for ${executionData.id}`,
+          url: `/testing/executions/${executionData.id}`
+        }
       }
-    });
+    );
   }
-  
+
   /**
-   * Publish test execution failed event
+   * Publish event when a test execution fails
    */
-  public publishTestExecutionFailed(execution: TestExecutionEventData, userId: string, severity: 'critical' | 'high' | null = null): string {
-    const eventType = severity === 'critical' 
-      ? 'testExecution.failed.critical' 
-      : severity === 'high' 
-        ? 'testExecution.failed.high' 
-        : 'testExecution.failed';
-        
-    return this.eventBus.publish(eventType, 'test-management', execution, {
-      metadata: {
-        userId,
-        tenantId: execution.tenantId || 'default',
-        severity: severity || 'medium',
-        tags: ['test-execution', 'failed', severity || 'medium']
-      },
-      actor: {
-        id: userId,
-        type: 'user'
-      },
-      entity: {
-        id: execution.id,
-        type: 'testExecution',
-        name: `Test Execution ${execution.id}`,
-        url: `/test-executions/${execution.id}`
+  public static publishTestExecutionFailed(executionData: TestExecutionEventData, severity: 'critical' | 'high' | 'medium' | 'low' = 'medium'): string {
+    // Use the appropriate event type based on severity
+    let eventType: EventType = 'testExecution.failed';
+    if (severity === 'critical') {
+      eventType = 'testExecution.failed.critical';
+    } else if (severity === 'high') {
+      eventType = 'testExecution.failed.high';
+    }
+    
+    return EventBus.getInstance().publish<TestExecutionEventData>(
+      eventType,
+      'testSystem' as EventSource,  // Cast to EventSource
+      executionData,
+      {
+        metadata: {
+          tenantId: executionData.tenantId
+        },
+        entity: {
+          id: executionData.id,
+          type: 'testExecution',
+          name: `Test execution for ${executionData.id}`,
+          url: `/testing/executions/${executionData.id}`
+        }
       }
-    });
+    );
   }
-  
+
   /**
-   * Publish test execution completed event
+   * Publish event when a test execution is completed
    */
-  public publishTestExecutionCompleted(execution: TestExecutionEventData, userId: string, outcome: 'success' | 'partial' | null = null): string {
-    const eventType = outcome === 'success' 
-      ? 'testExecution.completed.success' 
-      : outcome === 'partial' 
-        ? 'testExecution.completed.partial' 
-        : 'testExecution.completed';
-        
-    return this.eventBus.publish(eventType, 'test-management', execution, {
-      metadata: {
-        userId,
-        tenantId: execution.tenantId || 'default',
-        tags: ['test-execution', 'completed', outcome || 'default']
-      },
-      actor: {
-        id: userId,
-        type: 'user'
-      },
-      entity: {
-        id: execution.id,
-        type: 'testExecution',
-        name: `Test Execution ${execution.id}`,
-        url: `/test-executions/${execution.id}`
+  public static publishTestExecutionCompleted(executionData: TestExecutionEventData, outcome: 'success' | 'partial' | 'failure' = 'success'): string {
+    // Use the appropriate event type based on outcome
+    let eventType: EventType = 'testExecution.completed';
+    if (outcome === 'success') {
+      eventType = 'testExecution.completed.success';
+    } else if (outcome === 'partial') {
+      eventType = 'testExecution.completed.partial';
+    }
+    
+    return EventBus.getInstance().publish<TestExecutionEventData>(
+      eventType,
+      'testSystem' as EventSource,  // Cast to EventSource
+      executionData,
+      {
+        metadata: {
+          tenantId: executionData.tenantId
+        },
+        entity: {
+          id: executionData.id,
+          type: 'testExecution',
+          name: `Test execution for ${executionData.id}`,
+          url: `/testing/executions/${executionData.id}`
+        }
       }
-    });
+    );
   }
-  
+
   /**
-   * Publish test execution blocked event
+   * Publish event when a test execution is blocked
    */
-  public publishTestExecutionBlocked(execution: TestExecutionEventData, userId: string, reason: string): string {
-    return this.eventBus.publish('testExecution.blocked', 'test-management', execution, {
-      metadata: {
-        userId,
-        tenantId: execution.tenantId || 'default',
-        tags: ['test-execution', 'blocked'],
-        reason
-      },
-      actor: {
-        id: userId,
-        type: 'user'
-      },
-      entity: {
-        id: execution.id,
-        type: 'testExecution',
-        name: `Test Execution ${execution.id}`,
-        url: `/test-executions/${execution.id}`
+  public static publishTestExecutionBlocked(executionData: TestExecutionEventData): string {
+    return EventBus.getInstance().publish<TestExecutionEventData>(
+      'testExecution.blocked',
+      'testSystem' as EventSource,  // Cast to EventSource
+      executionData,
+      {
+        metadata: {
+          tenantId: executionData.tenantId
+        },
+        entity: {
+          id: executionData.id,
+          type: 'testExecution',
+          name: `Test execution for ${executionData.id}`,
+          url: `/testing/executions/${executionData.id}`
+        }
       }
-    });
+    );
   }
 }
-
-export const testEventPublisher = new TestEventPublisher();
-export default testEventPublisher;

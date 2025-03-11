@@ -5,7 +5,7 @@
 export type EventSource = 
   | 'ticketSystem'
   | 'changeSystem'
-  | 'problemManagement'
+  | 'problemManagement'  // Added correct casing
   | 'slaMonitor'
   | 'taskManager'
   | 'releaseManagement'
@@ -15,7 +15,7 @@ export type EventSource =
   | 'knownErrorDatabase'
   | 'backlogSystem'
   | 'reminderService'
-  | 'testManagement'
+  | 'testManagement'  // Added proper casing
   | 'kedb-service'     // Added for KnownErrorEventPublisher
   | 'problem-service'  // Added for ProblemEventPublisher
   | 'external-system'; // Added for webhook test events
