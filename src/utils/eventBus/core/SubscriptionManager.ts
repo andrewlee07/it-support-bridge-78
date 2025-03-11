@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { EventSubscriber } from '@/utils/types/eventBus';
+import { EventSubscriber, EventType } from '@/utils/types/eventBus';
 
 /**
  * Manages event subscriptions for the EventBus
@@ -57,7 +57,7 @@ class SubscriptionManager {
    * @param eventType The event type to match
    * @param filterFn Additional filter function to apply
    */
-  public findMatchingSubscribers(eventType: string, filterFn?: (subscriber: EventSubscriber) => boolean): EventSubscriber[] {
+  public findMatchingSubscribers(eventType: EventType, filterFn?: (subscriber: EventSubscriber) => boolean): EventSubscriber[] {
     return this.subscribers.filter(sub => 
       sub.eventTypes.includes(eventType) && 
       (!filterFn || filterFn(sub))
