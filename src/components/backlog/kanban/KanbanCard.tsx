@@ -13,7 +13,7 @@ interface KanbanCardProps {
   onEdit: () => void;
   onStatusChange: (status: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
-  // Add the index prop but make it optional
+  // Add the index prop but make it optional to maintain compatibility
   index?: number;
 }
 
