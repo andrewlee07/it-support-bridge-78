@@ -52,5 +52,13 @@ export const EVENT_TITLE_MAP: Record<EventType, string> = {
   'knownError.updated': 'Known error updated',
   'knownError.workaroundUpdated': 'Workaround updated',
   'knownError.planToFix': 'Fix scheduled',
-  'knownError.resolved': 'Known error resolved'
+  'knownError.resolved': 'Known error resolved',
+  // Add mappings for backlog item events
+  'backlogItem.created': 'New backlog item created',
+  'backlogItem.priorityChanged': 'Backlog item priority changed',
+  'backlogItem.addedToSprint': 'Backlog item added to sprint',
+  'backlogItem.removedFromSprint': 'Backlog item removed from sprint',
+  'backlogItem.statusChanged': 'Backlog item status changed',
+  'backlogItem.readyForReview': 'Backlog item ready for review',
+  'backlogItem.completed': 'Backlog item completed'
 };

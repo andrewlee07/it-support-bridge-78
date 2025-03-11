@@ -53,5 +53,13 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'knownError.updated': 'knowledge',
   'knownError.workaroundUpdated': 'knowledge',
   'knownError.planToFix': 'knowledge',
-  'knownError.resolved': 'knowledge'
+  'knownError.resolved': 'knowledge',
+  // Add mappings for backlog item events
+  'backlogItem.created': 'backlogItem',
+  'backlogItem.priorityChanged': 'backlogItem',
+  'backlogItem.addedToSprint': 'backlogItem',
+  'backlogItem.removedFromSprint': 'backlogItem',
+  'backlogItem.statusChanged': 'backlogItem',
+  'backlogItem.readyForReview': 'backlogItem',
+  'backlogItem.completed': 'backlogItem'
 };
