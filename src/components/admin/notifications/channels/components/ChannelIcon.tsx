@@ -6,7 +6,7 @@ import {
   Bell, 
   Smartphone, 
   Webhook,
-  BrandMicrosoft
+  Microsoft
 } from 'lucide-react';
 
 interface ChannelIconProps {
@@ -21,7 +21,7 @@ const ChannelIcon: React.FC<ChannelIconProps> = ({ type, className = "h-4 w-4" }
     case 'slack':
       return <MessageSquare className={className} />;
     case 'teams':
-      return <BrandMicrosoft className={className} />;
+      return <Microsoft className={className} />;
     case 'inApp':
       return <Bell className={className} />;
     case 'sms':

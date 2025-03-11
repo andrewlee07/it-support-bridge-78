@@ -21,6 +21,7 @@ interface ServiceManagementDialogProps {
   isLoading: boolean;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  onAddService?: () => void;
 }
 
 const ServiceManagementDialog: React.FC<ServiceManagementDialogProps> = ({
@@ -30,7 +31,8 @@ const ServiceManagementDialog: React.FC<ServiceManagementDialogProps> = ({
   canConfigureCatalog,
   isLoading,
   isOpen,
-  setIsOpen
+  setIsOpen,
+  onAddService
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -54,7 +56,7 @@ const ServiceManagementDialog: React.FC<ServiceManagementDialogProps> = ({
             services={services || []}
             categories={categories || []}
             onEditService={onEditService}
-            onAddService={canConfigureCatalog ? () => console.log("Add service") : undefined}
+            onAddService={canConfigureCatalog ? onAddService : undefined}
             isLoading={isLoading}
           />
         </div>

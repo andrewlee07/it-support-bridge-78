@@ -64,6 +64,14 @@ const DeliveryChannelsSection: React.FC<DeliveryChannelsSectionProps> = ({
                 />
                 <Label htmlFor={`sms-${priority}`}>SMS</Label>
               </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id={`webhook-${priority}`}
+                  checked={channels.includes('webhook')}
+                  onCheckedChange={() => handleChannelToggle(priority as any, 'webhook')}
+                />
+                <Label htmlFor={`webhook-${priority}`}>Webhook</Label>
+              </div>
             </div>
           </div>
         ))}

@@ -52,6 +52,7 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
           isLoading={isLoading}
           isOpen={isOpen}
           setIsOpen={setIsOpen}
+          onAddService={handleAddService}
         />
       )}
 
