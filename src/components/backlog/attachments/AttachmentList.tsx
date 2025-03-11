@@ -43,6 +43,8 @@ const AttachmentList: React.FC<AttachmentListProps> = ({
     <div className="space-y-2 mt-2">
       {attachments.map((attachment) => {
         const uploader = getUserById(attachment.uploadedBy);
+        const fileName = attachment.filename || attachment.fileName || 'File';
+        const fileUrl = attachment.fileUrl || attachment.url || '#';
         
         return (
           <div 
@@ -54,7 +56,7 @@ const AttachmentList: React.FC<AttachmentListProps> = ({
             </div>
             
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-medium truncate">{attachment.fileName}</h4>
+              <h4 className="text-sm font-medium truncate">{fileName}</h4>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>{formatFileSize(attachment.fileSize)}</span>
                 <span>•</span>
@@ -70,7 +72,7 @@ const AttachmentList: React.FC<AttachmentListProps> = ({
             
             <div className="flex items-center gap-1">
               <Button variant="ghost" size="icon" asChild>
-                <a href={attachment.fileUrl} download={attachment.fileName}>
+                <a href={fileUrl} download={fileName}>
                   <Download className="h-4 w-4" />
                 </a>
               </Button>

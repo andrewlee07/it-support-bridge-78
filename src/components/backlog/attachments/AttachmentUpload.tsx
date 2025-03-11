@@ -29,12 +29,16 @@ const AttachmentUpload: React.FC<AttachmentUploadProps> = ({ onUpload }) => {
       // Mock successful upload with file details
       const attachment: Attachment = {
         id: uuidv4(),
-        fileName: file.name,
+        filename: file.name,
         fileUrl: URL.createObjectURL(file), // In a real app, this would be a server URL
         fileType: file.type,
         fileSize: file.size,
         uploadedBy: user.id,
-        uploadedAt: new Date()
+        uploadedAt: new Date(),
+        // Add backward compatibility fields
+        fileName: file.name,
+        name: file.name,
+        url: URL.createObjectURL(file)
       };
       
       onUpload(attachment);

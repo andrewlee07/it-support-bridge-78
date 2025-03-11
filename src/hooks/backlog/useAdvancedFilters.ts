@@ -1,144 +1,173 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BacklogItem } from '@/utils/types/backlogTypes';
 
-export interface FilterPreset {
-  id: string;
-  name: string;
-  filters: {
-    sprints: string[];
-    statuses: string[];
-    releases: string[];
-    goals: string[];
-    finishDate: {
-      type: 'today' | 'this-week' | 'this-month' | 'custom';
-      customDate?: Date;
-    };
-  };
+export type DateFilterType = 'any' | 'today' | 'this-week' | 'this-month' | 'custom';
+
+export interface DateFilter {
+  type: DateFilterType;
+  customDate?: Date;
 }
 
-export function useAdvancedFilters() {
-  const [activeFilters, setActiveFilters] = useState<{
-    sprints: string[];
-    statuses: string[];
-    releases: string[];
-    goals: string[];
-    finishDate: {
-      type: 'any' | 'today' | 'this-week' | 'this-month' | 'custom';
-      customDate?: Date;
-    };
-  }>({
-    sprints: [],
-    statuses: [],
-    releases: [],
-    goals: [],
-    finishDate: { type: 'any' }
+export interface FilterState {
+  status: string[];
+  priority: string[];
+  type: string[];
+  assignee: string[];
+  label: string[];
+  releaseId: string[];
+  dateFilter: DateFilter;
+}
+
+interface UseAdvancedFiltersProps {
+  items: BacklogItem[];
+}
+
+export const useAdvancedFilters = ({ items }: UseAdvancedFiltersProps) => {
+  const [activeFilters, setActiveFilters] = useState<FilterState>({
+    status: [],
+    priority: [],
+    type: [],
+    assignee: [],
+    label: [],
+    releaseId: [],
+    dateFilter: {
+      type: 'any',
+      customDate: undefined
+    }
   });
+  const [filteredItems, setFilteredItems] = useState<BacklogItem[]>(items);
 
-  const [savedPresets, setSavedPresets] = useState<FilterPreset[]>([]);
+  useEffect(() => {
+    applyFilters();
+  }, [activeFilters, items]);
 
-  const applyFilters = (items: BacklogItem[]): BacklogItem[] => {
-    return items.filter(item => {
-      // Apply sprint filter
-      if (activeFilters.sprints.length > 0 && 
-          !activeFilters.sprints.includes(item.sprintId || 'unassigned')) {
-        return false;
-      }
+  const applyFilters = () => {
+    let newFilteredItems = [...items];
 
-      // Apply status filter
-      if (activeFilters.statuses.length > 0 && 
-          !activeFilters.statuses.includes(item.status)) {
-        return false;
-      }
+    if (activeFilters.status.length > 0) {
+      newFilteredItems = newFilteredItems.filter(item =>
+        activeFilters.status.includes(item.status)
+      );
+    }
 
-      // Apply release filter
-      if (activeFilters.releases.length > 0 && 
-          !activeFilters.releases.includes(item.releaseId || 'unassigned')) {
-        return false;
-      }
+    if (activeFilters.priority.length > 0) {
+      newFilteredItems = newFilteredItems.filter(item =>
+        activeFilters.priority.includes(item.priority)
+      );
+    }
 
-      // Apply goals filter
-      if (activeFilters.goals.length > 0 && 
-          !item.goals?.some(goal => activeFilters.goals.includes(goal))) {
-        return false;
-      }
+    if (activeFilters.type.length > 0) {
+      newFilteredItems = newFilteredItems.filter(item =>
+        activeFilters.type.includes(item.type)
+      );
+    }
 
-      // Apply finish date filter
-      if (activeFilters.finishDate.type !== 'any' && item.dueDate) {
-        const dueDate = new Date(item.dueDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+    if (activeFilters.assignee.length > 0) {
+      newFilteredItems = newFilteredItems.filter(item =>
+        activeFilters.assignee.includes(item.assignee || 'unassigned')
+      );
+    }
 
-        switch (activeFilters.finishDate.type) {
-          case 'today':
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            if (dueDate < today || dueDate >= tomorrow) return false;
-            break;
-
-          case 'this-week':
-            const weekEnd = new Date(today);
-            weekEnd.setDate(today.getDate() + (7 - today.getDay()));
-            if (dueDate < today || dueDate > weekEnd) return false;
-            break;
-
-          case 'this-month':
-            const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            if (dueDate < today || dueDate > monthEnd) return false;
-            break;
-
-          case 'custom':
-            if (activeFilters.finishDate.customDate) {
-              const customDate = new Date(activeFilters.finishDate.customDate);
-              customDate.setHours(0, 0, 0, 0);
-              const nextDay = new Date(customDate);
-              nextDay.setDate(customDate.getDate() + 1);
-              if (dueDate < customDate || dueDate >= nextDay) return false;
-            }
-            break;
+    if (activeFilters.label.length > 0) {
+      newFilteredItems = newFilteredItems.filter(item => {
+        if (activeFilters.label.includes('no-label')) {
+          return !item.labels || item.labels.length === 0;
         }
-      }
+        return item.labels?.some(label => activeFilters.label.includes(label));
+      });
+    }
 
-      return true;
-    });
+    if (activeFilters.releaseId.length > 0) {
+      newFilteredItems = newFilteredItems.filter(item =>
+        activeFilters.releaseId.includes(item.releaseId || 'none')
+      );
+    }
+
+    if (activeFilters.dateFilter.type !== 'any') {
+      newFilteredItems = filterByDate(newFilteredItems, activeFilters.dateFilter);
+    }
+
+    setFilteredItems(newFilteredItems);
   };
 
-  const savePreset = (name: string) => {
-    const newPreset: FilterPreset = {
-      id: `preset-${Date.now()}`,
-      name,
-      filters: {
-        sprints: activeFilters.sprints,
-        statuses: activeFilters.statuses,
-        releases: activeFilters.releases,
-        goals: activeFilters.goals,
-        finishDate: activeFilters.finishDate
-      }
-    };
-    setSavedPresets(prev => [...prev, newPreset]);
-  };
+  const filterByDate = (items: BacklogItem[], dateFilter: DateFilter): BacklogItem[] => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  const loadPreset = (presetId: string) => {
-    const preset = savedPresets.find(p => p.id === presetId);
-    if (preset) {
-      setActiveFilters(prev => ({
-        ...prev,
-        ...preset.filters
-      }));
+    switch (dateFilter.type) {
+      case 'today':
+        return items.filter(item => {
+          const itemDate = new Date(item.createdAt);
+          itemDate.setHours(0, 0, 0, 0);
+          return itemDate.getTime() === today.getTime();
+        });
+      case 'this-week':
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        return items.filter(item => {
+          const itemDate = new Date(item.createdAt);
+          itemDate.setHours(0, 0, 0, 0);
+          return itemDate >= startOfWeek && itemDate <= today;
+        });
+      case 'this-month':
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        return items.filter(item => {
+          const itemDate = new Date(item.createdAt);
+          itemDate.setHours(0, 0, 0, 0);
+          return itemDate >= startOfMonth && itemDate <= today;
+        });
+      case 'custom':
+        if (dateFilter.customDate) {
+          const customDate = new Date(dateFilter.customDate);
+          customDate.setHours(0, 0, 0, 0);
+          return items.filter(item => {
+            const itemDate = new Date(item.createdAt);
+            itemDate.setHours(0, 0, 0, 0);
+            return itemDate.getTime() === customDate.getTime();
+          });
+        }
+        return items;
+      default:
+        return items;
     }
   };
 
-  const deletePreset = (presetId: string) => {
-    setSavedPresets(prev => prev.filter(p => p.id !== presetId));
+  const updateFilter = (filterType: keyof FilterState, values: string[]) => {
+    setActiveFilters(prevFilters => ({
+      ...prevFilters,
+      [filterType]: values
+    }));
+  };
+
+  const updateDateFilter = (dateFilter: DateFilter) => {
+    setActiveFilters(prevFilters => ({
+      ...prevFilters,
+      dateFilter: dateFilter
+    }));
+  };
+
+  const resetFilters = () => {
+    setActiveFilters({
+      status: [],
+      priority: [],
+      type: [],
+      assignee: [],
+      label: [],
+      releaseId: [],
+      dateFilter: {
+        type: 'any',
+        customDate: undefined
+      }
+    });
   };
 
   return {
+    filteredItems,
     activeFilters,
-    setActiveFilters,
-    savedPresets,
-    applyFilters,
-    savePreset,
-    loadPreset,
-    deletePreset
+    updateFilter,
+    updateDateFilter,
+    resetFilters
   };
-}
+};

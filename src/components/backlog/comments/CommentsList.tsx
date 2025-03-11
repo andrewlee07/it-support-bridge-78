@@ -38,7 +38,7 @@ const CommentsList: React.FC<CommentsListProps> = ({
   
   const handleStartEdit = (comment: Comment) => {
     setEditingId(comment.id);
-    setEditContent(comment.content);
+    setEditContent(comment.content || comment.text || '');
   };
   
   const handleSaveEdit = (id: string) => {
@@ -137,7 +137,7 @@ const CommentsList: React.FC<CommentsListProps> = ({
               </div>
             ) : (
               <>
-                <p className="text-sm mt-1">{comment.content}</p>
+                <p className="text-sm mt-1">{comment.content || comment.text}</p>
                 
                 <div className="mt-2">
                   <Button

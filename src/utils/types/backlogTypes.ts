@@ -3,38 +3,76 @@ export type BacklogItemStatus = 'open' | 'in-progress' | 'ready' | 'blocked' | '
 export type BacklogItemPriority = 'critical' | 'high' | 'medium' | 'low';
 export type BacklogItemType = 'feature' | 'bug' | 'task' | 'enhancement' | 'technical-debt';
 
-// Add missing types for test coverage
+// Test coverage interface to match usage in TestCoverageIndicator and related components
 export interface BacklogTestCoverage {
   totalTests: number;
   passedTests: number;
   failedTests: number;
   skippedTests: number;
   lastRun?: Date;
+  
+  // Add these for backward compatibility with existing code
+  coveragePercentage?: number;
+  totalTestCases?: number;
+  notExecutedTests?: number;
+  passed?: number;
+  failed?: number;
+  covered?: number;
+  total?: number;
 }
 
-// Update Comment interface to include both text and content
+// Update Comment interface to include both text and content fields for compatibility
 export interface Comment {
   id: string;
-  text?: string; // For backward compatibility
-  content: string;
+  content: string; // Primary field for comment content
+  text?: string;   // For backward compatibility
   author: string;
   createdAt: Date;
   updatedAt?: Date;
   parentId?: string;
 }
 
-// Update Attachment interface
+// Update BacklogItemComment to be compatible with Comment
+export interface BacklogItemComment {
+  id: string;
+  text: string;         // Primary field for backward compatibility
+  content?: string;     // For forward compatibility
+  author: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  parentId?: string;    // Add support for nested comments
+}
+
+// Attachment interface with proper naming conventions
 export interface Attachment {
   id: string;
-  filename: string;
+  filename: string;     // Primary field
   fileUrl: string;
   fileType: string;
   fileSize: number;
   uploadedBy: string;
   uploadedAt: Date;
+  
+  // For backward compatibility
+  fileName?: string;
+  name?: string;
+  url?: string;
 }
 
-// Update HistoryEntry interface
+// BacklogItemAttachment with backward compatibility
+export interface BacklogItemAttachment {
+  id: string;
+  filename: string;     // Align with new naming
+  url: string;          // For backward compatibility
+  uploadedBy: string;
+  uploadedAt: Date;
+  
+  // Add fields to improve compatibility with Attachment
+  fileUrl?: string;
+  fileName?: string;
+}
+
+// HistoryEntry interface
 export interface HistoryEntry {
   id: string;
   field: string;
@@ -44,24 +82,7 @@ export interface HistoryEntry {
   changedAt: Date;
 }
 
-export interface BacklogItemComment {
-  id: string;
-  text: string;
-  author: string;
-  createdAt: Date;
-  updatedAt?: Date;
-  parentId?: string; // Add support for nested comments
-}
-
-export interface BacklogItemAttachment {
-  id: string;
-  filename: string;
-  url: string;
-  uploadedBy: string;
-  uploadedAt: Date;
-}
-
-// Update BacklogItem interface with missing properties
+// Update BacklogItem interface with all needed properties
 export interface BacklogItem {
   id: string;
   title: string;
@@ -70,7 +91,7 @@ export interface BacklogItem {
   priority: BacklogItemPriority;
   type: BacklogItemType;
   assignee?: string;
-  creator: string; // Add creator field
+  creator: string;
   releaseId?: string;
   relatedItemId?: string;
   relatedItemType?: 'bug' | 'testcase';
@@ -83,11 +104,11 @@ export interface BacklogItem {
   sprintId?: string;
   goals?: string[];
   storyPoints?: number;
-  labels?: string[]; // Add labels field
-  dueDate?: Date; // Add dueDate field
-  testCoverage?: BacklogTestCoverage; // Add test coverage
-  relatedBugIds?: string[]; // Add related bugs
-  relatedTestCaseIds?: string[]; // Add related test cases
+  labels?: string[];
+  dueDate?: Date;
+  testCoverage?: BacklogTestCoverage;
+  relatedBugIds?: string[];
+  relatedTestCaseIds?: string[];
 }
 
 export interface BacklogStats {
@@ -116,7 +137,13 @@ export const filterBacklogItemsByTestCoverage = (items: BacklogItem[], minCovera
   return items.filter(item => {
     const coverage = item.testCoverage;
     if (!coverage) return false;
-    return (coverage.passedTests / coverage.totalTests) * 100 >= minCoverage;
+    
+    // Calculate percentage based on available properties
+    const total = coverage.totalTests || coverage.total || 0;
+    const passed = coverage.passedTests || coverage.passed || 0;
+    if (total === 0) return false;
+    
+    return (passed / total) * 100 >= minCoverage;
   });
 };
 
@@ -125,7 +152,10 @@ export const getBacklogItemsWithoutTests = (items: BacklogItem[]): BacklogItem[]
 };
 
 export const getBacklogItemsWithFailingTests = (items: BacklogItem[]): BacklogItem[] => {
-  return items.filter(item => item.testCoverage?.failedTests > 0);
+  return items.filter(item => {
+    const failedTests = item.testCoverage?.failedTests || item.testCoverage?.failed || 0;
+    return failedTests > 0;
+  });
 };
 
 export interface Sprint {

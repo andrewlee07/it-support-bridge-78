@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { BacklogItem } from '@/utils/types/backlogTypes';
+import { BacklogItem, Attachment, Comment, BacklogItemComment } from '@/utils/types/backlogTypes';
 import { format } from 'date-fns';
 import { getReleases } from '@/utils/api/release';
 import { Paperclip, MessageSquare, History, Users, Clock } from 'lucide-react';
@@ -37,11 +37,54 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   const [activeTab, setActiveTab] = useState<string>('details');
   
   // States for each feature
-  const [attachments, setAttachments] = useState(item.attachments || []);
-  const [comments, setComments] = useState(item.comments || []);
+  const [attachments, setAttachments] = useState<Attachment[]>(mapBacklogAttachmentsToAttachments(item.attachments || []));
+  const [comments, setComments] = useState<Comment[]>(mapBacklogCommentsToComments(item.comments || []));
   const [history, setHistory] = useState(item.history || []);
   const [watchers, setWatchers] = useState(item.watchers || []);
   const [availableUsers, setAvailableUsers] = useState<any[]>([]);
+
+  // Function to convert BacklogItemAttachment to Attachment
+  function mapBacklogAttachmentsToAttachments(backlogAttachments: BacklogItemAttachment[]): Attachment[] {
+    return backlogAttachments.map(att => ({
+      id: att.id,
+      filename: att.filename || att.fileName || '',
+      fileUrl: att.fileUrl || att.url || '',
+      fileType: 'unknown', // Default value as it's not in the old type
+      fileSize: 0, // Default value as it's not in the old type
+      uploadedBy: att.uploadedBy,
+      uploadedAt: att.uploadedAt,
+      // Backward compatibility fields
+      fileName: att.filename || att.fileName,
+      name: att.filename || att.fileName,
+      url: att.fileUrl || att.url
+    }));
+  }
+
+  // Function to convert BacklogItemComment to Comment
+  function mapBacklogCommentsToComments(backlogComments: BacklogItemComment[]): Comment[] {
+    return backlogComments.map(comment => ({
+      id: comment.id,
+      content: comment.content || comment.text || '',
+      text: comment.text || comment.content || '',
+      author: comment.author,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+      parentId: comment.parentId
+    }));
+  }
+
+  // Function to convert Comments back to BacklogItemComments
+  function mapCommentsToBacklogComments(comments: Comment[]): BacklogItemComment[] {
+    return comments.map(comment => ({
+      id: comment.id,
+      text: comment.text || comment.content || '',
+      content: comment.content || comment.text || '',
+      author: comment.author,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+      parentId: comment.parentId
+    }));
+  }
   
   // Get release name and available users
   useEffect(() => {
@@ -73,41 +116,42 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     getUsers();
     
     // Update component state when the item prop changes
-    setAttachments(item.attachments || []);
-    setComments(item.comments || []);
+    setAttachments(mapBacklogAttachmentsToAttachments(item.attachments || []));
+    setComments(mapBacklogCommentsToComments(item.comments || []));
     setHistory(item.history || []);
     setWatchers(item.watchers || []);
   }, [item]);
 
   // Handlers for attachments
-  const handleAddAttachment = (attachment) => {
+  const handleAddAttachment = (attachment: Attachment) => {
     const updatedAttachments = [...attachments, attachment];
     setAttachments(updatedAttachments);
     updateItemWithHistory('attachments', `${attachments.length} files`, `${updatedAttachments.length} files`);
     setActiveTab('attachments');
   };
   
-  const handleDeleteAttachment = (id) => {
+  const handleDeleteAttachment = (id: string) => {
     const deletedAttachment = attachments.find(a => a.id === id);
     const updatedAttachments = attachments.filter(a => a.id !== id);
     setAttachments(updatedAttachments);
     
     updateItemWithHistory(
       'attachments', 
-      `Attachment: ${deletedAttachment?.fileName || 'file'}`, 
+      `Attachment: ${deletedAttachment?.filename || 'file'}`, 
       'Removed'
     );
     toast.success('Attachment deleted');
   };
   
   // Handlers for comments
-  const handleAddComment = (content, parentId) => {
+  const handleAddComment = (content: string, parentId?: string) => {
     if (!item.creator) return;
     
     const { user } = require('@/contexts/AuthContext');
-    const newComment = {
+    const newComment: Comment = {
       id: uuidv4(),
       content,
+      text: content, // Set both for compatibility
       author: user?.id,
       createdAt: new Date(),
       parentId
@@ -119,7 +163,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     if (onUpdate) {
       const updatedItem = {
         ...item,
-        comments: updatedComments,
+        comments: mapCommentsToBacklogComments(updatedComments),
         updatedAt: new Date()
       };
       
@@ -128,30 +172,30 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     }
   };
   
-  const handleEditComment = (id, content) => {
+  const handleEditComment = (id: string, content: string) => {
     const updatedComments = comments.map(comment => 
       comment.id === id 
-        ? { ...comment, content, updatedAt: new Date() } 
+        ? { ...comment, content, text: content, updatedAt: new Date() } 
         : comment
     );
     
     setComments(updatedComments);
-    updateItem({ comments: updatedComments });
+    updateItem({ comments: mapCommentsToBacklogComments(updatedComments) });
     toast.success('Comment updated');
   };
   
-  const handleDeleteComment = (id) => {
+  const handleDeleteComment = (id: string) => {
     const updatedComments = comments.filter(
       comment => comment.id !== id && comment.parentId !== id
     );
     
     setComments(updatedComments);
-    updateItem({ comments: updatedComments });
+    updateItem({ comments: mapCommentsToBacklogComments(updatedComments) });
     toast.success('Comment deleted');
   };
   
   // Handlers for watchers
-  const handleToggleWatch = (isWatching) => {
+  const handleToggleWatch = (isWatching: boolean) => {
     const { user } = require('@/contexts/AuthContext');
     if (!user) return;
     
@@ -173,7 +217,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     toast.success(isWatching ? 'Now watching this item' : 'No longer watching this item');
   };
   
-  const handleAddWatcher = (userId) => {
+  const handleAddWatcher = (userId: string) => {
     if (watchers.includes(userId)) return;
     
     const updatedWatchers = [...watchers, userId];
@@ -183,7 +227,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     toast.success('Watcher added');
   };
   
-  const handleRemoveWatcher = (userId) => {
+  const handleRemoveWatcher = (userId: string) => {
     const updatedWatchers = watchers.filter(id => id !== userId);
     setWatchers(updatedWatchers);
     
@@ -192,7 +236,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   };
   
   // Helper functions
-  const updateItem = (partialUpdate) => {
+  const updateItem = (partialUpdate: Partial<BacklogItem>) => {
     if (onUpdate) {
       const updatedItem = {
         ...item,
@@ -204,7 +248,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     }
   };
   
-  const updateItemWithHistory = (field, previousValue, newValue) => {
+  const updateItemWithHistory = (field: string, previousValue: any, newValue: any) => {
     const { user } = require('@/contexts/AuthContext');
     if (!user || !onUpdate) return;
     
@@ -220,11 +264,24 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
     const updatedHistory = [...history, historyEntry];
     setHistory(updatedHistory);
     
-    const updates = {
-      [field]: field === 'watchers' ? watchers : attachments,
+    const updates: Partial<BacklogItem> = {
       history: updatedHistory,
       updatedAt: new Date()
     };
+    
+    if (field === 'watchers') {
+      updates.watchers = watchers;
+    } else if (field === 'attachments') {
+      // Convert Attachment[] back to BacklogItemAttachment[]
+      const backlogAttachments = attachments.map(att => ({
+        id: att.id,
+        filename: att.filename || att.fileName || '',
+        url: att.fileUrl || att.url || '',
+        uploadedBy: att.uploadedBy,
+        uploadedAt: att.uploadedAt
+      }));
+      updates.attachments = backlogAttachments;
+    }
     
     updateItem(updates);
   };
