@@ -1,18 +1,22 @@
-import { v4 as uuidv4 } from 'uuid';
-import { SystemEvent, EventType, WebhookConfig, WebhookDeliveryLog, EventSource, EventOrigin } from '../types/eventBus';
+
+import { SystemEvent } from '../types/eventBus';
+import { WebhookConfigService } from './WebhookConfigService';
+import { WebhookDeliveryService } from './WebhookDeliveryService';
+import { WebhookLogService } from './WebhookLogService';
 
 /**
  * Service to manage and execute webhooks
  */
 class WebhookService {
   private static instance: WebhookService;
-  
-  // In-memory storage of webhook configurations - would be in database in production
-  private webhooks: WebhookConfig[] = [];
-  private deliveryLogs: WebhookDeliveryLog[] = [];
+  private configService: WebhookConfigService;
+  private deliveryService: WebhookDeliveryService;
+  private logService: WebhookLogService;
   
   private constructor() {
-    // Private constructor for singleton
+    this.configService = WebhookConfigService.getInstance();
+    this.deliveryService = WebhookDeliveryService.getInstance();
+    this.logService = WebhookLogService.getInstance();
   }
   
   /**
@@ -28,38 +32,19 @@ class WebhookService {
   /**
    * Register a new webhook
    */
-  public registerWebhook(config: Omit<WebhookConfig, 'id' | 'createdAt' | 'updatedAt'>): WebhookConfig {
-    const now = new Date().toISOString();
-    
-    const webhook: WebhookConfig = {
-      id: `webhook-${uuidv4()}`,
-      ...config,
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    this.webhooks.push(webhook);
-    return webhook;
-  }
-  
-  /**
-   * Get webhooks for a specific event type
-   */
-  public getWebhooksForEventType(eventType: string): WebhookConfig[] {
-    return this.webhooks.filter(webhook => 
-      webhook.enabled && 
-      webhook.eventTypes.includes(eventType as EventType)
-    );
+  public registerWebhook(config: any): any {
+    return this.configService.registerWebhook(config);
   }
   
   /**
    * Process an event and send it to applicable webhooks
    */
   public async processEvent(event: SystemEvent): Promise<void> {
-    const applicableWebhooks = this.getWebhooksForEventType(event.type);
+    const applicableWebhooks = this.configService.getWebhooksForEventType(event.type);
     
     const deliveryPromises = applicableWebhooks.map(webhook => 
-      this.deliverEventToWebhook(event, webhook)
+      this.deliveryService.deliverEventToWebhook(event, webhook)
+        .then(log => this.logService.storeDeliveryLog(log))
     );
     
     await Promise.allSettled(deliveryPromises);
@@ -73,209 +58,62 @@ class WebhookService {
   }
   
   /**
-   * Deliver an event to a specific webhook
-   */
-  private async deliverEventToWebhook(
-    event: SystemEvent,
-    webhook: WebhookConfig
-  ): Promise<WebhookDeliveryLog> {
-    const deliveryId = `delivery-${uuidv4()}`;
-    const requestTimestamp = new Date().toISOString();
-    
-    // Create log entry
-    const deliveryLog: WebhookDeliveryLog = {
-      id: deliveryId,
-      webhookId: webhook.id,
-      eventId: event.id,
-      requestTimestamp,
-      status: 'failed',
-      retryCount: 0
-    };
-    
-    try {
-      // Prepare the payload
-      const payload = this.formatPayload(event);
-      
-      // Prepare headers
-      const headers = {
-        'Content-Type': 'application/json',
-        ...webhook.headers
-      };
-      
-      // Add authentication if needed
-      if (webhook.authentication.type !== 'none') {
-        this.applyAuthentication(headers, webhook.authentication);
-      }
-      
-      // Send the request
-      const response = await fetch(webhook.url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(payload)
-      });
-      
-      // Update log with response
-      deliveryLog.responseTimestamp = new Date().toISOString();
-      deliveryLog.statusCode = response.status;
-      
-      if (response.ok) {
-        deliveryLog.status = 'success';
-        deliveryLog.responseBody = await response.text();
-      } else {
-        deliveryLog.status = 'failed';
-        deliveryLog.error = `HTTP Error ${response.status}: ${response.statusText}`;
-        deliveryLog.responseBody = await response.text();
-        
-        // Handle retry logic here if needed
-      }
-    } catch (error) {
-      // Update log with error
-      deliveryLog.status = 'failed';
-      deliveryLog.error = error instanceof Error ? error.message : String(error);
-      
-      // Handle retry logic here if needed
-    }
-    
-    // Store the log
-    this.deliveryLogs.push(deliveryLog);
-    return deliveryLog;
-  }
-  
-  /**
-   * Format the payload for webhook delivery
-   */
-  private formatPayload(event: SystemEvent): any {
-    return {
-      meta: {
-        eventId: event.id,
-        eventType: event.type,
-        timestamp: event.timestamp,
-        source: event.source
-      },
-      data: event.data,
-      links: {
-        self: `/api/events/${event.id}`
-      }
-    };
-  }
-  
-  /**
-   * Apply authentication to request headers
-   */
-  private applyAuthentication(
-    headers: Record<string, string>,
-    auth: WebhookConfig['authentication']
-  ): void {
-    switch (auth.type) {
-      case 'bearer':
-        if (auth.token) {
-          headers['Authorization'] = `Bearer ${auth.token}`;
-        }
-        break;
-      case 'basic':
-        if (auth.username && auth.password) {
-          const credentials = btoa(`${auth.username}:${auth.password}`);
-          headers['Authorization'] = `Basic ${credentials}`;
-        }
-        break;
-      case 'custom':
-        if (auth.customHeader && auth.token) {
-          headers[auth.customHeader] = auth.token;
-        }
-        break;
-    }
-  }
-  
-  /**
    * Get all webhook configurations
    */
-  public getWebhooks(): WebhookConfig[] {
-    return [...this.webhooks];
+  public getWebhooks(): any[] {
+    return this.configService.getWebhooks();
   }
   
   /**
    * Get a specific webhook by ID
    */
-  public getWebhookById(id: string): WebhookConfig | undefined {
-    return this.webhooks.find(webhook => webhook.id === id);
+  public getWebhookById(id: string): any | undefined {
+    return this.configService.getWebhookById(id);
   }
   
   /**
    * Update a webhook configuration
    */
-  public updateWebhook(id: string, updates: Partial<Omit<WebhookConfig, 'id' | 'createdAt' | 'updatedAt'>>): WebhookConfig | null {
-    const index = this.webhooks.findIndex(webhook => webhook.id === id);
-    
-    if (index === -1) {
-      return null;
-    }
-    
-    const webhook = this.webhooks[index];
-    
-    const updatedWebhook: WebhookConfig = {
-      ...webhook,
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
-    
-    this.webhooks[index] = updatedWebhook;
-    return updatedWebhook;
+  public updateWebhook(id: string, updates: any): any | null {
+    return this.configService.updateWebhook(id, updates);
   }
   
   /**
    * Delete a webhook
    */
   public deleteWebhook(id: string): boolean {
-    const initialLength = this.webhooks.length;
-    this.webhooks = this.webhooks.filter(webhook => webhook.id !== id);
-    return this.webhooks.length < initialLength;
+    return this.configService.deleteWebhook(id);
   }
   
   /**
    * Get delivery logs, optionally filtered by webhook ID
    */
-  public getDeliveryLogs(webhookId?: string): WebhookDeliveryLog[] {
-    if (webhookId) {
-      return this.deliveryLogs.filter(log => log.webhookId === webhookId);
-    }
-    return [...this.deliveryLogs];
+  public getDeliveryLogs(webhookId?: string): any[] {
+    return this.logService.getDeliveryLogs(webhookId);
   }
   
   /**
    * Get all delivery logs for a specific event
    */
-  public getDeliveryLogsByEventId(eventId: string): WebhookDeliveryLog[] {
-    return this.deliveryLogs.filter(log => log.eventId === eventId);
+  public getDeliveryLogsByEventId(eventId: string): any[] {
+    return this.logService.getDeliveryLogsByEventId(eventId);
   }
   
   /**
    * Test a webhook by sending a test event
    */
-  public async testWebhook(webhookId: string): Promise<WebhookDeliveryLog | null> {
-    const webhook = this.getWebhookById(webhookId);
+  public async testWebhook(webhookId: string): Promise<any | null> {
+    const webhook = this.configService.getWebhookById(webhookId);
     
     if (!webhook) {
       return null;
     }
     
-    // Create a test event
-    const testEvent: SystemEvent = {
-      id: `test-${uuidv4()}`,
-      type: webhook.eventTypes[0],
-      source: 'external-system' as EventSource,
-      timestamp: new Date().toISOString(),
-      data: {
-        message: 'This is a test event',
-        timestamp: new Date().toISOString()
-      },
-      metadata: {
-        origin: 'background-job' as EventOrigin,
-        isTest: true
-      }
-    };
+    const testEvent = this.deliveryService.createTestEvent(webhook);
+    const deliveryLog = await this.deliveryService.deliverEventToWebhook(testEvent, webhook);
+    this.logService.storeDeliveryLog(deliveryLog);
     
-    // Deliver the test event
-    return this.deliverEventToWebhook(testEvent, webhook);
+    return deliveryLog;
   }
 }
 
