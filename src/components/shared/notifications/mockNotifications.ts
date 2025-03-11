@@ -38,6 +38,7 @@ export const mockNotifications: Notification[] = [
     title: "Task Reminder",
     message: "Your task 'Update server configurations' is due in 2 hours",
     timestamp: hoursAgo(1),
+    date: hoursAgo(1), // Added date property, matching timestamp
     read: false,
     type: 'task',
     priority: 'high',
@@ -54,6 +55,7 @@ export const mockNotifications: Notification[] = [
     title: "Incident Update",
     message: "New comment on incident #INC-2023: 'Database connection issues'",
     timestamp: hoursAgo(3),
+    date: hoursAgo(3), // Added date property, matching timestamp
     read: false,
     type: 'incident',
     priority: 'critical',
@@ -70,6 +72,7 @@ export const mockNotifications: Notification[] = [
     title: "Task Assigned",
     message: "You have been assigned to task 'Review security patches'",
     timestamp: daysAgo(1),
+    date: daysAgo(1), // Added date property, matching timestamp
     read: true,
     type: 'task',
     priority: 'medium',
@@ -86,6 +89,7 @@ export const mockNotifications: Notification[] = [
     title: "Change Approved",
     message: "Change request #CR-789 has been approved",
     timestamp: daysAgo(2),
+    date: daysAgo(2), // Added date property, matching timestamp
     read: true,
     type: 'change',
     priority: 'medium',
@@ -102,6 +106,7 @@ export const mockNotifications: Notification[] = [
     title: "Service Outage",
     message: "Critical service outage reported for Email Server",
     timestamp: minutesAgo(45),
+    date: minutesAgo(45), // Added date property, matching timestamp
     read: false,
     type: 'incident',
     priority: 'critical',
@@ -118,6 +123,7 @@ export const mockNotifications: Notification[] = [
     title: "Knowledge Article Published",
     message: "New knowledge article 'Troubleshooting VPN Issues' has been published",
     timestamp: daysAgo(3),
+    date: daysAgo(3), // Added date property, matching timestamp
     read: true,
     type: 'knowledge',
     entityId: "kb-article-123",
@@ -133,6 +139,7 @@ export const mockNotifications: Notification[] = [
     title: "Bug Resolved",
     message: "Bug #BUG-567 'Login page error' has been resolved",
     timestamp: daysAgo(1),
+    date: daysAgo(1), // Added date property, matching timestamp
     read: true,
     type: 'bug',
     priority: 'high',
@@ -149,6 +156,7 @@ export const mockNotifications: Notification[] = [
     title: "Test Case Failed",
     message: "Test case TC-890 'User Authentication' has failed",
     timestamp: hoursAgo(12),
+    date: hoursAgo(12), // Added date property, matching timestamp
     read: false,
     type: 'testCase',
     priority: 'high',
@@ -165,6 +173,7 @@ export const mockNotifications: Notification[] = [
     title: "Release Scheduled",
     message: "Release v2.5.0 has been scheduled for next Monday",
     timestamp: daysAgo(2),
+    date: daysAgo(2), // Added date property, matching timestamp
     read: true,
     type: 'release',
     entityId: "release-250",
@@ -180,6 +189,7 @@ export const mockNotifications: Notification[] = [
     title: "Asset Update",
     message: "Asset 'Firewall-Main' configuration has been updated",
     timestamp: daysAgo(4),
+    date: daysAgo(4), // Added date property, matching timestamp
     read: true,
     type: 'asset',
     entityId: "asset-firewall-1",
