@@ -1,12 +1,7 @@
-
-// Backlog Item Management Types
-
-// Status types
 export type BacklogItemStatus = 'open' | 'in-progress' | 'ready' | 'blocked' | 'completed' | 'deferred';
 export type BacklogItemPriority = 'critical' | 'high' | 'medium' | 'low';
 export type BacklogItemType = 'feature' | 'bug' | 'task' | 'enhancement' | 'technical-debt';
 
-// BacklogItem entity
 export interface BacklogItem {
   id: string;
   title: string;
@@ -14,141 +9,73 @@ export interface BacklogItem {
   status: BacklogItemStatus;
   priority: BacklogItemPriority;
   type: BacklogItemType;
-  assignee?: string; // User ID
-  creator: string; // User ID
-  releaseId?: string; // Related Release ID
-  relatedItemId?: string; // Related Bug ID or TestCase ID
+  assignee?: string;
+  releaseId?: string;
+  relatedItemId?: string;
   relatedItemType?: 'bug' | 'testcase';
-  storyPoints?: number; // For capacity planning
-  dueDate?: Date; // Important for release planning
-  labels: string[]; // Tags for filtering
   createdAt: Date;
   updatedAt: Date;
-  // Test coverage related fields
-  testCoverage?: BacklogTestCoverage;
-  relatedTestCaseIds?: string[]; // IDs of associated test cases
-  relatedBugIds?: string[]; // IDs of associated bugs
-  // New fields for enhanced features
-  attachments?: Attachment[];
-  comments?: Comment[];
-  watchers?: string[]; // Array of user IDs watching this item
-  history?: HistoryEntry[];
+  history?: BacklogItemHistory[];
+  attachments?: BacklogItemAttachment[];
+  comments?: BacklogItemComment[];
+  watchers?: string[];
+  sprintId?: string;
+  goals?: string[];
+  storyPoints?: number;
 }
 
-// New types for enhanced features
-export interface Attachment {
-  id: string;
-  fileName: string;
-  fileUrl: string;
-  fileType: string;
-  fileSize: number;
-  uploadedBy: string;
-  uploadedAt: Date;
-  name?: string; // For backward compatibility
-  url?: string; // For backward compatibility
-}
-
-export interface Comment {
-  id: string;
-  content: string;
-  author: string; // User ID
-  createdAt: Date;
-  updatedAt?: Date;
-  parentId?: string; // For threaded comments
-  mentions?: string[]; // User IDs mentioned in the comment
-  text?: string; // For backward compatibility
-}
-
-export interface HistoryEntry {
+export interface BacklogItemHistory {
   id: string;
   field: string;
   previousValue: any;
   newValue: any;
-  changedBy: string; // User ID
+  changedBy: string;
   changedAt: Date;
 }
 
-// Test coverage metrics for backlog items
-export interface BacklogTestCoverage {
-  totalTestCases: number; // Total number of test cases
-  passedTests: number;
-  failedTests: number;
-  notExecutedTests: number;
-  coveragePercentage: number;
-  lastUpdated: Date;
-  // Additional properties for backward compatibility with TestCoverageIndicator
-  total?: number; // For backward compatibility with TestCoverageIndicator
-  covered?: number; // For backward compatibility with TestCoverageIndicator
-  passed?: number; // For backward compatibility with TestCoverageIndicator
-  failed?: number; // For backward compatibility with TestCoverageIndicator
+export interface BacklogItemAttachment {
+  id: string;
+  filename: string;
+  url: string;
+  uploadedBy: string;
+  uploadedAt: Date;
 }
 
-// API response types for Backlog Management
+export interface BacklogItemComment {
+  id: string;
+  text: string;
+  author: string;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
 export interface BacklogStats {
   totalItems: number;
   openItems: number;
   completedItems: number;
+  inProgressItems: number;
   blockedItems: number;
-  inProgressItems?: number; // Add this for backward compatibility
-  byRelease?: {
-    releaseId: string;
-    releaseName: string;
-    itemCount: number;
-    completedCount: number;
-  }[];
-  byAssignee?: {
-    assigneeId: string;
-    assigneeName: string;
-    itemCount: number;
-  }[];
 }
 
-// For CSV Export
-export interface ExportableBacklogItem extends Omit<BacklogItem, 'createdAt' | 'updatedAt' | 'dueDate'> {
-  createdAt: string;
-  updatedAt: string;
-  dueDate?: string;
-}
-
-// Traceability mapping
-export interface TraceabilityMapping {
-  backlogItemId: string;
-  testCaseIds: string[];
-  bugIds: string[];
-  requirementIds: string[];
-  coverage: number; // Percentage of test coverage
-}
-
-// Helper function to calculate capacity percentage for a release
-export const calculateReleaseCapacity = (
-  backlogItems: BacklogItem[],
-  targetCapacity: number
-): number => {
+export const calculateReleaseCapacity = (backlogItems: BacklogItem[], targetCapacity: number): number => {
   const totalPoints = backlogItems.reduce((sum, item) => sum + (item.storyPoints || 0), 0);
-  return Math.min(100, Math.round((totalPoints / targetCapacity) * 100));
+  return targetCapacity > 0 ? Math.min((totalPoints / targetCapacity) * 100, 100) : 0;
 };
 
-// Helper functions for filtering backlog items
-export const filterBacklogItemsByRelease = (items: BacklogItem[], releaseId?: string): BacklogItem[] => {
-  if (!releaseId) {
-    return items.filter(item => !item.releaseId); // Unassigned items
-  }
-  return items.filter(item => item.releaseId === releaseId);
-};
+export interface Sprint {
+  id: string;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+  capacity: number;
+  items: BacklogItem[];
+  releaseId?: string;
+}
 
-export const filterBacklogItemsByLabel = (items: BacklogItem[], label: string): BacklogItem[] => {
-  return items.filter(item => item.labels.includes(label));
-};
-
-// New helper functions for test coverage
-export const filterBacklogItemsByTestCoverage = (items: BacklogItem[], minCoverage: number): BacklogItem[] => {
-  return items.filter(item => (item.testCoverage?.coveragePercentage || 0) >= minCoverage);
-};
-
-export const getBacklogItemsWithoutTests = (items: BacklogItem[]): BacklogItem[] => {
-  return items.filter(item => !item.testCoverage || item.testCoverage.totalTestCases === 0);
-};
-
-export const getBacklogItemsWithFailingTests = (items: BacklogItem[]): BacklogItem[] => {
-  return items.filter(item => item.testCoverage && item.testCoverage.failedTests > 0);
-};
+export interface SprintRelease {
+  id: string;
+  name: string;
+  plannedDate: Date;
+  sprints: Sprint[];
+  items: BacklogItem[];
+}
