@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
 import { ArrowRight, Loader2, Shield } from 'lucide-react';
-import { isPasswordValid } from '@/utils/securityUtils';
 
 const Login = () => {
   const [email, setEmail] = useState('');
