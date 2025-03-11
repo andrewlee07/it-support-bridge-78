@@ -8,14 +8,11 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { 
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  Switch,
-  Input
-} from '@/components/ui/components';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import {
   Mail,
   MessageSquare,

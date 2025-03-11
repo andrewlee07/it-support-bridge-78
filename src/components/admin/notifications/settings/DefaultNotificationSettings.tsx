@@ -23,18 +23,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { 
-  Input,
-  Separator,
-  RadioGroup,
-  RadioGroupItem
-} from '@/components/ui/components';
-import {
-  Bell,
-  Clock,
-  AlertTriangle,
-  Save
-} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Bell, Clock, AlertTriangle, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Default notification preferences
