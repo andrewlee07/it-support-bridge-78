@@ -18,7 +18,8 @@ const TaskEventPublisher = {
       priority: task.priority,
       status: task.status,
       assignee: task.assignee,
-      dueDate: task.dueDate
+      // Convert Date to ISO string
+      dueDate: task.dueDate ? task.dueDate.toISOString() : undefined
     };
     
     return publishEvent(
@@ -42,7 +43,8 @@ const TaskEventPublisher = {
       priority: task.priority,
       status: task.status,
       assignee: task.assignee,
-      dueDate: task.dueDate,
+      // Convert Date to ISO string
+      dueDate: task.dueDate ? task.dueDate.toISOString() : undefined,
       updatedFields
     };
     
