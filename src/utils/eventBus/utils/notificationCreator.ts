@@ -1,5 +1,5 @@
 
-import { SystemEvent, EventType } from '@/utils/types/eventBus';
+import { SystemEvent, EventType, ProblemEventData } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 import { v4 as uuidv4 } from 'uuid';
 import { EVENT_TITLE_MAP, EVENT_TO_NOTIFICATION_TYPE, EVENT_TO_PRIORITY } from '../constants/eventMappings';
@@ -28,6 +28,38 @@ export const createNotificationFromEvent = (event: SystemEvent): Notification =>
       message = taskData.description || `Task ${event.type.split('.')[1]}`;
       actionUrl = `/tasks/${taskData.taskId}`;
       entityId = taskData.taskId;
+      break;
+    
+    case 'problem.created':
+    case 'problem.updated':
+    case 'problem.assigned':
+    case 'problem.rootCauseIdentified':
+    case 'problem.workaroundAvailable':
+    case 'problem.resolved':
+    case 'problem.closed':
+      const problemData = event.data as ProblemEventData;
+      title = `${title}: ${problemData.title}`;
+      
+      // Create appropriate message based on event type
+      if (event.type === 'problem.created') {
+        message = `New problem record created: ${problemData.description || problemData.title}`;
+      } else if (event.type === 'problem.assigned') {
+        message = `Problem assigned to ${problemData.assignee}`;
+        if (problemData.previousAssignee) {
+          message += ` (previously: ${problemData.previousAssignee})`;
+        }
+      } else if (event.type === 'problem.rootCauseIdentified') {
+        message = `Root cause identified: ${problemData.rootCause}`;
+      } else if (event.type === 'problem.workaroundAvailable') {
+        message = `Workaround available: ${problemData.workaround}`;
+      } else if (event.type === 'problem.resolved') {
+        message = `Problem resolved: ${problemData.resolution}`;
+      } else if (event.type === 'problem.closed') {
+        message = `Problem closed: ${problemData.closureDetails || 'No closure details provided'}`;
+      }
+      
+      actionUrl = `/problems/${problemData.problemId}`;
+      entityId = problemData.problemId;
       break;
     
     // Add more event type handling as needed

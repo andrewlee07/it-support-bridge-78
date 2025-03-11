@@ -40,6 +40,10 @@ export type EventType =
   | 'problem.created'
   | 'problem.updated'
   | 'problem.resolved'
+  | 'problem.assigned'
+  | 'problem.rootCauseIdentified'
+  | 'problem.workaroundAvailable'
+  | 'problem.closed'
   | 'sla.warning'
   | 'sla.breached'
   | 'task.created'
@@ -71,10 +75,35 @@ export interface TaskEventData {
   updatedFields?: string[];
 }
 
+// Problem-specific event data
+export interface ProblemEventData {
+  problemId: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  affectedServices?: string[];
+  relatedIncidents?: string[];
+  assignee?: string;
+  previousAssignee?: string;
+  rootCause?: string;
+  workaround?: string;
+  resolution?: string;
+  closureDetails?: string;
+  updatedFields?: string[];
+}
+
 // Map of event types to their data structures
 export interface EventDataMap {
   'task.created': TaskEventData;
   'task.updated': TaskEventData;
   'task.completed': TaskEventData;
+  'problem.created': ProblemEventData;
+  'problem.updated': ProblemEventData;
+  'problem.assigned': ProblemEventData;
+  'problem.rootCauseIdentified': ProblemEventData;
+  'problem.workaroundAvailable': ProblemEventData;
+  'problem.resolved': ProblemEventData;
+  'problem.closed': ProblemEventData;
   // Add more event type to data mappings as needed
 }

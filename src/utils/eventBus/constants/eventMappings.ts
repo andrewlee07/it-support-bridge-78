@@ -20,6 +20,10 @@ export const EVENT_TITLE_MAP: Record<EventType, string> = {
   'problem.created': 'New problem record',
   'problem.updated': 'Problem record updated',
   'problem.resolved': 'Problem resolved',
+  'problem.assigned': 'Problem assigned',
+  'problem.rootCauseIdentified': 'Root cause identified',
+  'problem.workaroundAvailable': 'Workaround available',
+  'problem.closed': 'Problem closed',
   'sla.warning': 'SLA Warning',
   'sla.breached': 'SLA Breached',
   'task.created': 'New task created',
@@ -58,6 +62,10 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'problem.created': 'incident',
   'problem.updated': 'incident',
   'problem.resolved': 'incident',
+  'problem.assigned': 'incident',
+  'problem.rootCauseIdentified': 'incident',
+  'problem.workaroundAvailable': 'incident',
+  'problem.closed': 'incident',
   'sla.warning': 'incident',
   'sla.breached': 'incident',
   'task.created': 'task',
@@ -96,6 +104,10 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'problem.created': 'high',
   'problem.updated': 'medium',
   'problem.resolved': 'medium',
+  'problem.assigned': 'medium',
+  'problem.rootCauseIdentified': 'high',
+  'problem.workaroundAvailable': 'high',
+  'problem.closed': 'medium',
   'sla.warning': 'high',
   'sla.breached': 'critical',
   'task.created': 'medium',
@@ -114,4 +126,28 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'test.executed': 'low',
   'test.passed': 'medium',
   'test.failed': 'high'
+};
+
+/**
+ * Maps problem event types to recipient groups
+ */
+export const PROBLEM_EVENT_RECIPIENTS: Record<EventType, string[]> = {
+  'problem.created': ['problem-manager', 'service-owner', 'it-management'],
+  'problem.assigned': ['assignee', 'previous-assignee', 'problem-manager'],
+  'problem.rootCauseIdentified': ['problem-manager', 'service-owner', 'related-incident-owners'],
+  'problem.workaroundAvailable': ['related-incident-owners', 'service-users', 'support-staff'],
+  'problem.resolved': ['stakeholders', 'related-incident-owners', 'service-users'],
+  'problem.closed': ['problem-manager', 'service-owner', 'it-management']
+};
+
+/**
+ * Maps problem event types to recommended notification channels
+ */
+export const PROBLEM_EVENT_CHANNELS: Record<EventType, ('email' | 'teams' | 'inApp' | 'sms')[]> = {
+  'problem.created': ['email', 'teams', 'inApp'],
+  'problem.assigned': ['email', 'teams', 'inApp'],
+  'problem.rootCauseIdentified': ['email', 'teams', 'inApp'],
+  'problem.workaroundAvailable': ['email', 'teams', 'inApp'],
+  'problem.resolved': ['email', 'teams', 'inApp', 'sms'],
+  'problem.closed': ['email', 'inApp']
 };

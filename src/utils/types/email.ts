@@ -7,7 +7,8 @@ export interface EmailTemplate {
   triggerOn: 'ticket-created' | 'ticket-updated' | 'ticket-assigned' | 'ticket-resolved' | 
     'sla-breach' | 'change-approved' | 'change-submitted' | 'problem-created' | 
     'problem-resolved' | 'service-request-approval-required' | 'incident-created' | 
-    'incident-assigned' | 'incident-resolved' | 'service-request-completed';
+    'incident-assigned' | 'incident-resolved' | 'service-request-completed' |
+    'problem-assigned' | 'problem-rootCauseIdentified' | 'problem-workaroundAvailable' | 'problem-closed';
   isActive: boolean;
   lastModified?: string;
   lastModifiedBy?: string;
@@ -73,7 +74,12 @@ export type EventType =
   | 'change-approved' 
   | 'change-submitted' 
   | 'problem-created' 
+  | 'problem-updated'
   | 'problem-resolved'
+  | 'problem-assigned'
+  | 'problem-rootCauseIdentified'
+  | 'problem-workaroundAvailable'
+  | 'problem-closed'
   | 'service-request-approval-required'
   | 'incident-created'
   | 'incident-assigned'

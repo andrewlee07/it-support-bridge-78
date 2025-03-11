@@ -21,6 +21,9 @@ const PriorityLevelsSection: React.FC<PriorityLevelsSectionProps> = ({
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Priority Levels</h3>
+      <p className="text-sm text-muted-foreground mb-4">
+        Control which notification priority levels you receive. Critical notifications for problem events like root cause identification and workarounds are always sent.
+      </p>
       
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Notification, NotificationSettings } from '@/components/shared/notifications/types';
 import { toast } from 'sonner';
@@ -39,7 +40,14 @@ const categoryToEventTypes: Record<string, EventType[]> = {
     'ticket.assigned', 
     'ticket.resolved', 
     'ticket.closed', 
-    'ticket.reopened'
+    'ticket.reopened',
+    'problem.created',
+    'problem.updated',
+    'problem.assigned',
+    'problem.rootCauseIdentified',
+    'problem.workaroundAvailable',
+    'problem.resolved',
+    'problem.closed'
   ],
   bugs: ['test.failed'],
   testCases: ['test.created', 'test.executed', 'test.passed'],
