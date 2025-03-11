@@ -35,8 +35,8 @@ const EventDocumentationPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  <li><code className="bg-muted px-1 rounded">{'{process}.{action}'}</code>: Basic event format</li>
-                  <li><code className="bg-muted px-1 rounded">{'{process}.{action}.{qualifier}'}</code>: Extended format with qualifier</li>
+                  <li><code className="bg-muted px-1 rounded">&#123;process&#125;.&#123;action&#125;</code>: Basic event format</li>
+                  <li><code className="bg-muted px-1 rounded">&#123;process&#125;.&#123;action&#125;.&#123;qualifier&#125;</code>: Extended format with qualifier</li>
                 </ul>
                 
                 <div className="mt-4">
