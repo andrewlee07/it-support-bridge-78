@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { EnhancedNotificationTemplate } from '@/utils/types/eventBus/notificationTypes';
 import { mockEmailTemplates } from '@/utils/mockData/emailTemplates';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 
 // Convert email templates to enhanced templates for the mockup
 const mockTemplates: EnhancedNotificationTemplate[] = mockEmailTemplates.map(template => ({
@@ -72,6 +74,10 @@ const getChannelIcon = (channel: string) => {
 const NotificationTemplateList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [templates, setTemplates] = useState<EnhancedNotificationTemplate[]>(mockTemplates);
+  const [isNewTemplateDialogOpen, setIsNewTemplateDialogOpen] = useState(false);
+  const [isEditTemplateDialogOpen, setIsEditTemplateDialogOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<EnhancedNotificationTemplate | null>(null);
+  const { toast } = useToast();
   
   // Filter templates based on search query
   const filteredTemplates = searchQuery
@@ -81,6 +87,68 @@ const NotificationTemplateList: React.FC = () => {
         template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : templates;
+  
+  const handleNewTemplate = () => {
+    setIsNewTemplateDialogOpen(true);
+  };
+  
+  const handleEditTemplate = (template: EnhancedNotificationTemplate) => {
+    setSelectedTemplate(template);
+    setIsEditTemplateDialogOpen(true);
+  };
+  
+  const handleAddTemplate = () => {
+    const newTemplate: EnhancedNotificationTemplate = {
+      id: `template-${Date.now()}`,
+      name: "New Template",
+      category: "notification",
+      tags: ["custom"],
+      description: "New notification template",
+      metadata: {
+        processType: "notification",
+        audience: ["users"],
+        importance: "medium"
+      },
+      baseTemplate: {
+        subject: "New Notification",
+        body: "This is a new notification template."
+      },
+      channelVariants: {
+        email: {
+          format: "html",
+          content: "<p>This is a new notification template.</p>"
+        },
+        inApp: {
+          format: "text",
+          content: "New notification"
+        }
+      },
+      currentVersion: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    setTemplates(prev => [...prev, newTemplate]);
+    setIsNewTemplateDialogOpen(false);
+    toast({
+      title: "Template created",
+      description: "New notification template has been created successfully."
+    });
+  };
+  
+  const handleUpdateTemplate = () => {
+    if (selectedTemplate) {
+      setTemplates(prev => prev.map(template => 
+        template.id === selectedTemplate.id ? 
+        {...selectedTemplate, updatedAt: new Date().toISOString()} : template
+      ));
+      setIsEditTemplateDialogOpen(false);
+      toast({
+        title: "Template updated",
+        description: "Notification template has been updated successfully."
+      });
+    }
+  };
     
   return (
     <div className="space-y-4">
@@ -94,7 +162,7 @@ const NotificationTemplateList: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button>
+        <Button onClick={handleNewTemplate}>
           <Plus className="h-4 w-4 mr-2" />
           New Template
         </Button>
@@ -148,7 +216,7 @@ const NotificationTemplateList: React.FC = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">Edit</Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleEditTemplate(template)}>Edit</Button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -163,6 +231,57 @@ const NotificationTemplateList: React.FC = () => {
           </Table>
         </CardContent>
       </Card>
+      
+      {/* New Template Dialog */}
+      <Dialog open={isNewTemplateDialogOpen} onOpenChange={setIsNewTemplateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Template</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground mb-4">
+              This is a placeholder for the template creation form. In a production environment, this would include fields for template name, content, and channel variant configuration.
+            </p>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setIsNewTemplateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddTemplate}>
+              Create Template
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Template Dialog */}
+      <Dialog open={isEditTemplateDialogOpen} onOpenChange={setIsEditTemplateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Template</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground mb-4">
+              This is a placeholder for the template editing form. In a production environment, this would include fields for editing template name, content, and channel variants.
+            </p>
+            {selectedTemplate && (
+              <div className="space-y-2">
+                <p><strong>Name:</strong> {selectedTemplate.name}</p>
+                <p><strong>Category:</strong> {selectedTemplate.category}</p>
+                <p><strong>Description:</strong> {selectedTemplate.description}</p>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setIsEditTemplateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateTemplate}>
+              Update Template
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

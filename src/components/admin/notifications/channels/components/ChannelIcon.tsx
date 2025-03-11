@@ -18,6 +18,7 @@ const ChannelIcon: React.FC<ChannelIconProps> = ({ type, className = "h-4 w-4" }
     case 'email':
       return <Mail className={className} />;
     case 'slack':
+      return <MessageSquare className={className} />;
     case 'teams':
       return <MessageSquare className={className} />;
     case 'inApp':

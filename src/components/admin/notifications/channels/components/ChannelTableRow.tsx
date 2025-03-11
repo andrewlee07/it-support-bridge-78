@@ -13,11 +13,13 @@ import ChannelIcon from './ChannelIcon';
 interface ChannelTableRowProps {
   channel: NotificationChannel;
   onToggleChannel: (id: string) => void;
+  onConfigureChannel: (id: string) => void;
 }
 
 const ChannelTableRow: React.FC<ChannelTableRowProps> = ({ 
   channel,
-  onToggleChannel
+  onToggleChannel,
+  onConfigureChannel
 }) => {
   return (
     <TableRow key={channel.id}>
@@ -53,7 +55,13 @@ const ChannelTableRow: React.FC<ChannelTableRowProps> = ({
         />
       </TableCell>
       <TableCell className="text-right">
-        <Button variant="ghost" size="sm">Configure</Button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => onConfigureChannel(channel.id)}
+        >
+          Configure
+        </Button>
       </TableCell>
     </TableRow>
   );

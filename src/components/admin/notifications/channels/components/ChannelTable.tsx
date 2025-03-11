@@ -15,11 +15,13 @@ import ChannelTableRow from './ChannelTableRow';
 interface ChannelTableProps {
   channels: NotificationChannel[];
   onToggleChannel: (id: string) => void;
+  onConfigureChannel: (id: string) => void;
 }
 
 const ChannelTable: React.FC<ChannelTableProps> = ({ 
   channels,
-  onToggleChannel
+  onToggleChannel,
+  onConfigureChannel
 }) => {
   return (
     <Table>
@@ -45,6 +47,7 @@ const ChannelTable: React.FC<ChannelTableProps> = ({
               key={channel.id}
               channel={channel}
               onToggleChannel={onToggleChannel}
+              onConfigureChannel={onConfigureChannel}
             />
           ))
         ) : (

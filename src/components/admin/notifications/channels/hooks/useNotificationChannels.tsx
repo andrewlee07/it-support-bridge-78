@@ -112,8 +112,35 @@ const mockChannels: NotificationChannel[] = [
     description: 'Integration with external systems via webhooks',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'channel-6',
+    name: 'Microsoft Teams',
+    type: 'teams',
+    enabled: true,
+    priority: 2,
+    capabilities: {
+      supportsFormatting: true,
+      supportsAttachments: true,
+      supportsThreading: true,
+      supportsAcknowledgement: false,
+      supportsReply: true
+    },
+    deliverySettings: {
+      retryCount: 3,
+      retryInterval: 5
+    },
+    description: 'Notifications via Microsoft Teams webhooks',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
+
+interface NewChannelParams {
+  name: string;
+  type: string;
+  description: string;
+}
 
 export const useNotificationChannels = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -124,6 +151,33 @@ export const useNotificationChannels = () => {
     setChannels(prev => prev.map(channel => 
       channel.id === id ? { ...channel, enabled: !channel.enabled } : channel
     ));
+  };
+  
+  // Add a new channel
+  const addNewChannel = (params: NewChannelParams) => {
+    const newChannel: NotificationChannel = {
+      id: `channel-${Date.now()}`,
+      name: params.name,
+      type: params.type as any,
+      enabled: true,
+      priority: channels.length + 1,
+      capabilities: {
+        supportsFormatting: true,
+        supportsAttachments: true,
+        supportsThreading: true,
+        supportsAcknowledgement: false,
+        supportsReply: true
+      },
+      deliverySettings: {
+        retryCount: 3,
+        retryInterval: 15
+      },
+      description: params.description,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    setChannels(prev => [...prev, newChannel]);
   };
   
   // Filter channels based on search query
@@ -140,6 +194,7 @@ export const useNotificationChannels = () => {
     setSearchQuery,
     channels,
     filteredChannels,
-    toggleChannelEnabled
+    toggleChannelEnabled,
+    addNewChannel
   };
 };

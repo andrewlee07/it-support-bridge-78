@@ -56,6 +56,14 @@ const DeliveryChannelsSection: React.FC<DeliveryChannelsSectionProps> = ({
                 />
                 <Label htmlFor={`sms-${priority}`}>SMS</Label>
               </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id={`teams-${priority}`}
+                  checked={channels.includes('teams')}
+                  onCheckedChange={() => handleChannelToggle(priority as any, 'teams')}
+                />
+                <Label htmlFor={`teams-${priority}`}>MS Teams</Label>
+              </div>
             </div>
           </div>
         ))}
