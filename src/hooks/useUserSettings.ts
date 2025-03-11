@@ -1,28 +1,7 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-
-export interface NotificationSettings {
-  categories: {
-    incidents: boolean;
-    bugs: boolean;
-    testCases: boolean;
-    backlogItems: boolean;
-    releases: boolean;
-    assets: boolean;
-    changes: boolean;
-  };
-  deliveryMethods: {
-    inApp: boolean;
-    email: boolean;
-  };
-  priorityLevels: {
-    critical: boolean;
-    high: boolean;
-    medium: boolean;
-    low: boolean;
-  };
-}
+import { NotificationSettings } from '@/components/shared/notifications/types';
 
 export const useUserSettings = () => {
   const { toast } = useToast();
@@ -38,7 +17,9 @@ export const useUserSettings = () => {
       backlogItems: true,
       releases: true,
       assets: true,
-      changes: true
+      changes: true,
+      knowledge: true,
+      tasks: true
     },
     deliveryMethods: {
       inApp: true,

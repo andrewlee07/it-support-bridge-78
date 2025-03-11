@@ -48,4 +48,14 @@ export interface Notification {
   read: boolean;
   actionUrl?: string;
   sender?: string;
+  
+  // Additional fields used in the components
+  url: string;
+  timestamp: Date;
+  entityId?: string;
+  actor?: {
+    id: string;
+    name: string;
+    initials: string;
+  };
 }
