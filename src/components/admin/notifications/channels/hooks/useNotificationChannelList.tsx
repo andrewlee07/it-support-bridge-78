@@ -32,9 +32,9 @@ export const useNotificationChannelList = () => {
   };
   
   const handleAddChannel = (data: ChannelFormValues) => {
-    // Since ChannelFormValues comes from a Zod schema with required fields,
-    // we can be confident these fields exist, but TypeScript doesn't know that.
-    // We need to explicitly make sure all required fields are present.
+    // The error occurs here - we need to ensure all required properties are explicitly passed
+    // Since ChannelFormValues is defined with a Zod schema that requires these fields,
+    // we can be confident they exist, but we need to make this clear to TypeScript
     addNewChannel({
       name: data.name,         // Required by NewChannelParams
       type: data.type,         // Required by NewChannelParams
