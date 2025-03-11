@@ -7,6 +7,9 @@ import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import EventDocumentationTable from '@/components/admin/notifications/EventDocumentationTable';
+import NotificationTemplateList from '@/components/admin/notifications/templates/NotificationTemplateList';
+import NotificationChannelList from '@/components/admin/notifications/channels/NotificationChannelList';
+import DefaultNotificationSettings from '@/components/admin/notifications/settings/DefaultNotificationSettings';
 
 const NotificationConfiguration = () => {
   return (
@@ -54,8 +57,7 @@ const NotificationConfiguration = () => {
                   <CardTitle>Notification Templates</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>Configure notification templates for different event types.</p>
-                  {/* Template management UI would go here */}
+                  <NotificationTemplateList />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -66,8 +68,7 @@ const NotificationConfiguration = () => {
                   <CardTitle>Notification Channels</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>Configure notification delivery channels (email, in-app, etc.)</p>
-                  {/* Channel configuration UI would go here */}
+                  <NotificationChannelList />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -78,8 +79,7 @@ const NotificationConfiguration = () => {
                   <CardTitle>Default Notification Settings</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>Configure system-wide default notification preferences</p>
-                  {/* Default settings configuration UI would go here */}
+                  <DefaultNotificationSettings />
                 </CardContent>
               </Card>
             </TabsContent>

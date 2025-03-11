@@ -21,10 +21,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   EVENT_GROUPS, 
-  EVENT_DOCUMENTATION,
   getEventDocumentation,
   getProcessEvents,
-  EventDocumentation
+  EventDocumentation,
+  EventDataField,
 } from '@/utils/eventBus/docs/EventDocumentation';
 
 const EventDocumentationTable: React.FC = () => {
@@ -42,7 +42,7 @@ const EventDocumentationTable: React.FC = () => {
   
   // Handle event selection for detail view
   const handleEventSelect = (eventType: string) => {
-    const eventDoc = getEventDocumentation(eventType as any);
+    const eventDoc = getEventDocumentation(eventType);
     if (eventDoc) {
       setCurrentEvent(eventDoc);
     }
@@ -170,7 +170,7 @@ const EventDocumentationTable: React.FC = () => {
                       <div>
                         <h3 className="font-medium mb-2">Default Recipients</h3>
                         <div className="flex flex-wrap gap-2">
-                          {/* This is a placeholder - we'll need to add recipient data to the EventDocumentation type */}
+                          {/* This is a placeholder - we'll need to add recipient data */}
                           <span className="text-muted-foreground">Recipients based on event context</span>
                         </div>
                       </div>
