@@ -1,6 +1,7 @@
 
 import { EventType } from '@/utils/types/eventBus';
-import NotificationSubscriber from '@/utils/eventBus/NotificationSubscriber';
+import NotificationSubscriber from '@/utils/eventBus/subscribers/NotificationSubscriber';
+import { toggleToastNotifications, updateDisabledEvents } from '@/utils/eventBus/subscribers/userNotificationSettings';
 import { Notification } from '@/components/shared/notifications/types';
 import { toast } from 'sonner';
 
@@ -55,14 +56,14 @@ export class NotificationSubscriptionManager {
    * Update subscriber settings based on disabled categories
    */
   public updateDisabledEvents(disabledEvents: EventType[]): void {
-    this.subscriber.updateSettings({ disabledEvents });
+    updateDisabledEvents(disabledEvents);
   }
   
   /**
    * Toggle toast notifications
    */
   public toggleToastNotifications(showToast: boolean): void {
-    this.subscriber.updateSettings({ showToast });
+    toggleToastNotifications(showToast);
   }
 }
 

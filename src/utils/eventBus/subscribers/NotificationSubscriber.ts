@@ -1,9 +1,9 @@
 
-import EventBus from './EventBus';
-import { SystemEvent, EventType } from '../types/eventBus';
+import EventBus from '../core';
+import { SystemEvent, EventType } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
-import { createNotificationFromEvent } from './utils/notificationCreator';
-import { showToastForNotification } from './utils/toastHandler';
+import { notificationProcessor } from './notificationProcessor';
+import { getUserNotificationSettings } from './userNotificationSettings';
 
 /**
  * Class to handle turning events into notifications
@@ -11,15 +11,6 @@ import { showToastForNotification } from './utils/toastHandler';
 class NotificationSubscriber {
   private static instance: NotificationSubscriber;
   private subscriberId: string | null = null;
-  private userSettings: {
-    showToast: boolean;
-    disabledEvents: EventType[];
-  } = {
-    showToast: true,
-    disabledEvents: []
-  };
-  
-  // Mock storage for notifications (would connect to a real data store in production)
   private notifications: Notification[] = [];
   
   private constructor() {
@@ -46,11 +37,13 @@ class NotificationSubscriber {
     
     const eventBus = EventBus.getInstance();
     
-    // Subscribe to all event types
+    // Subscribe to all event types and handle filtering in the filter function
     this.subscriberId = eventBus.subscribe({
-      eventTypes: Object.keys(require('./constants/eventMappings').EVENT_TITLE_MAP) as EventType[],
-      // Filter out disabled events
-      filter: (event) => !this.userSettings.disabledEvents.includes(event.type),
+      eventTypes: Object.keys(require('../constants/eventMappings').EVENT_TITLE_MAP) as EventType[],
+      filter: (event) => {
+        const userSettings = getUserNotificationSettings();
+        return !userSettings.disabledEvents.includes(event.type);
+      },
       callback: this.handleEvent.bind(this)
     });
     
@@ -62,16 +55,11 @@ class NotificationSubscriber {
    */
   private async handleEvent(event: SystemEvent): Promise<void> {
     try {
-      // Create a notification object
-      const notification = createNotificationFromEvent(event);
+      // Process the event using the separate processor
+      const notification = await notificationProcessor.processEvent(event);
       
       // Store the notification
       this.notifications.push(notification);
-      
-      // Show toast if enabled
-      if (this.userSettings.showToast) {
-        showToastForNotification(notification);
-      }
       
       console.log(`NotificationSubscriber: Processed event ${event.id} into notification ${notification.id}`);
     } catch (error) {
@@ -115,16 +103,6 @@ class NotificationSubscriber {
    */
   public clearAll(): void {
     this.notifications = [];
-  }
-  
-  /**
-   * Update user settings
-   */
-  public updateSettings(settings: Partial<typeof this.userSettings>): void {
-    this.userSettings = {
-      ...this.userSettings,
-      ...settings
-    };
   }
   
   /**
