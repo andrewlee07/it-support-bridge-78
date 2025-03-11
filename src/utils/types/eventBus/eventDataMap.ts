@@ -9,6 +9,7 @@ import { KnowledgeArticleEventData } from './knowledgeEventTypes';
 import { KnownErrorEventData } from './knownErrorEventTypes';
 import { ReleaseEventData } from './releaseEventTypes';
 import { BacklogItemEventData } from './backlogItemEventTypes';
+import { ReminderEventData } from './reminderEventTypes';
 
 // Map of event types to their data structures
 export interface EventDataMap {
@@ -52,5 +53,11 @@ export interface EventDataMap {
   'backlogItem.statusChanged': BacklogItemEventData;
   'backlogItem.readyForReview': BacklogItemEventData;
   'backlogItem.completed': BacklogItemEventData;
+  // Reminder events
+  'reminder.upcoming': ReminderEventData;
+  'reminder.due': ReminderEventData;
+  'reminder.recurring': ReminderEventData;
+  'reminder.snoozed': ReminderEventData;
+  'reminder.canceled': ReminderEventData;
   // Add more event type to data mappings as needed
 }

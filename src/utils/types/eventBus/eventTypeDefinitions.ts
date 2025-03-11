@@ -57,10 +57,15 @@ export type EventType =
   | 'knownError.workaroundUpdated' 
   | 'knownError.planToFix'      
   | 'knownError.resolved'       
-  | 'backlogItem.created'         // New: When a backlog item is created
-  | 'backlogItem.priorityChanged' // New: When a backlog item's priority changes
-  | 'backlogItem.addedToSprint'   // New: When a backlog item is added to a sprint
-  | 'backlogItem.removedFromSprint' // New: When a backlog item is removed from a sprint
-  | 'backlogItem.statusChanged'   // New: When a backlog item's status changes
-  | 'backlogItem.readyForReview'  // New: When a backlog item is ready for review
-  | 'backlogItem.completed';      // New: When a backlog item is completed
+  | 'backlogItem.created'         
+  | 'backlogItem.priorityChanged' 
+  | 'backlogItem.addedToSprint'   
+  | 'backlogItem.removedFromSprint' 
+  | 'backlogItem.statusChanged'   
+  | 'backlogItem.readyForReview'  
+  | 'backlogItem.completed'
+  | 'reminder.upcoming'           // When a reminder is approaching its due time
+  | 'reminder.due'                // When a reminder is due
+  | 'reminder.recurring'          // When a recurring reminder is triggered
+  | 'reminder.snoozed'            // When a reminder is snoozed
+  | 'reminder.canceled';          // When a reminder is canceled

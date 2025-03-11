@@ -1,5 +1,4 @@
-
-import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData, KnowledgeArticleEventData, BacklogItemEventData, TaskEventData } from '@/utils/types/eventBus';
+import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData, KnowledgeArticleEventData, BacklogItemEventData, TaskEventData, ReminderEventData } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 import { v4 as uuidv4 } from 'uuid';
 import { EVENT_TITLE_MAP, EVENT_TO_NOTIFICATION_TYPE, EVENT_TO_PRIORITY } from '../constants/eventMappings';
@@ -220,6 +219,67 @@ export const createNotificationFromEvent = (event: SystemEvent): Notification =>
       
       actionUrl = `/backlog/${backlogData.backlogItemId}`;
       entityId = backlogData.backlogItemId;
+      break;
+    
+    // Reminder events
+    case 'reminder.upcoming':
+    case 'reminder.due':
+    case 'reminder.recurring':
+    case 'reminder.snoozed':
+    case 'reminder.canceled':
+      const reminderData = event.data as ReminderEventData;
+      title = `${title}: ${reminderData.title}`;
+      
+      // Create appropriate message based on event type
+      if (event.type === 'reminder.upcoming') {
+        message = `Reminder coming up: ${reminderData.description || reminderData.title}`;
+        if (reminderData.timeRemaining) {
+          message += `. Due in: ${reminderData.timeRemaining}`;
+        }
+      } else if (event.type === 'reminder.due') {
+        message = `Reminder is now due: ${reminderData.description || reminderData.title}`;
+        if (reminderData.actionRequired) {
+          message += `. Action required: ${reminderData.actionRequired}`;
+        }
+      } else if (event.type === 'reminder.recurring') {
+        message = `Recurring reminder: ${reminderData.description || reminderData.title}`;
+        if (reminderData.frequency) {
+          message += `. Frequency: ${reminderData.frequency}`;
+        }
+      } else if (event.type === 'reminder.snoozed') {
+        message = `Reminder snoozed: ${reminderData.description || reminderData.title}`;
+        if (reminderData.snoozeDuration) {
+          message += `. Snoozed for: ${reminderData.snoozeDuration}`;
+        }
+        if (reminderData.newReminderTime) {
+          message += `. New reminder time: ${reminderData.newReminderTime}`;
+        }
+      } else if (event.type === 'reminder.canceled') {
+        message = `Reminder canceled: ${reminderData.description || reminderData.title}`;
+        if (reminderData.cancellationReason) {
+          message += `. Reason: ${reminderData.cancellationReason}`;
+        }
+      }
+      
+      actionUrl = `/reminders/${reminderData.reminderId}`;
+      entityId = reminderData.reminderId;
+      
+      // Add related item information if available
+      if (reminderData.relatedItemId && reminderData.relatedItemType) {
+        message += `. Related to: ${reminderData.relatedItemType} #${reminderData.relatedItemId}`;
+        // Update actionUrl to point to related item instead if available
+        if (reminderData.relatedItemType === 'ticket') {
+          actionUrl = `/tickets/${reminderData.relatedItemId}`;
+        } else if (reminderData.relatedItemType === 'task') {
+          actionUrl = `/tasks/${reminderData.relatedItemId}`;
+        } else if (reminderData.relatedItemType === 'change') {
+          actionUrl = `/changes/${reminderData.relatedItemId}`;
+        } else if (reminderData.relatedItemType === 'release') {
+          actionUrl = `/releases/${reminderData.relatedItemId}`;
+        } else if (reminderData.relatedItemType === 'backlogItem') {
+          actionUrl = `/backlog/${reminderData.relatedItemId}`;
+        }
+      }
       break;
     
     // Add more event type handling as needed

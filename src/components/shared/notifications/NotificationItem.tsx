@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Check } from 'lucide-react';
+import { Check, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getIconForResultType } from './iconHelpers';
@@ -14,11 +14,16 @@ interface NotificationItemProps {
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onMarkAsRead }) => {
+  // Check if it's a reminder notification
+  const isReminder = notification.title.toLowerCase().includes('reminder');
+  
   return (
     <div className={`p-3 border-b last:border-0 ${notification.read ? 'bg-background' : 'bg-muted/30'}`}>
       <div className="flex items-start">
         <div className="mr-3 mt-0.5">
-          {getIconForResultType(notification.type)}
+          {isReminder 
+            ? <Clock className={`h-4 w-4 ${notification.priority === 'critical' ? 'text-destructive' : 'text-muted-foreground'}`} />
+            : getIconForResultType(notification.type)}
         </div>
         <div className="flex-1">
           <Link to={notification.url} className="font-medium hover:underline">

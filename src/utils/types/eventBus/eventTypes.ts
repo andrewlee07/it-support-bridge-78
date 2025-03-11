@@ -13,4 +13,5 @@ export * from './knownErrorEventTypes';
 export * from './knowledgeEventTypes';
 export * from './releaseEventTypes';
 export * from './backlogItemEventTypes';
+export * from './reminderEventTypes';
 export * from './eventDataMap';

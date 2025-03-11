@@ -58,12 +58,18 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'knownError.workaroundUpdated': 'high',
   'knownError.planToFix': 'medium',
   'knownError.resolved': 'medium',
-  // Add mappings for backlog item events
+  // Backlog item events
   'backlogItem.created': 'medium',
   'backlogItem.priorityChanged': 'high',
   'backlogItem.addedToSprint': 'medium',
   'backlogItem.removedFromSprint': 'high',
   'backlogItem.statusChanged': 'medium',
   'backlogItem.readyForReview': 'high',
-  'backlogItem.completed': 'medium'
+  'backlogItem.completed': 'medium',
+  // Reminder events - priorities based on nature of the event
+  'reminder.upcoming': 'high',
+  'reminder.due': 'critical',
+  'reminder.recurring': 'medium',
+  'reminder.snoozed': 'low',
+  'reminder.canceled': 'low'
 };

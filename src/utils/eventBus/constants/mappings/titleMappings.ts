@@ -57,12 +57,18 @@ export const EVENT_TITLE_MAP: Record<EventType, string> = {
   'knownError.workaroundUpdated': 'Workaround updated',
   'knownError.planToFix': 'Fix scheduled',
   'knownError.resolved': 'Known error resolved',
-  // Add mappings for backlog item events
+  // Backlog item events
   'backlogItem.created': 'New backlog item created',
   'backlogItem.priorityChanged': 'Backlog item priority changed',
   'backlogItem.addedToSprint': 'Backlog item added to sprint',
   'backlogItem.removedFromSprint': 'Backlog item removed from sprint',
   'backlogItem.statusChanged': 'Backlog item status changed',
   'backlogItem.readyForReview': 'Backlog item ready for review',
-  'backlogItem.completed': 'Backlog item completed'
+  'backlogItem.completed': 'Backlog item completed',
+  // Reminder events
+  'reminder.upcoming': 'Reminder coming up',
+  'reminder.due': 'Reminder now due',
+  'reminder.recurring': 'Recurring reminder',
+  'reminder.snoozed': 'Reminder snoozed',
+  'reminder.canceled': 'Reminder canceled'
 };

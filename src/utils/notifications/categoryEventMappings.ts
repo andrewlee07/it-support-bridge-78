@@ -61,7 +61,16 @@ export const categoryToEventTypes: Record<string, EventType[]> = {
     'knownError.planToFix',
     'knownError.resolved'
   ],
-  tasks: ['task.created', 'task.updated', 'task.completed']
+  tasks: [
+    'task.created', 
+    'task.updated', 
+    'task.completed',
+    'reminder.upcoming',
+    'reminder.due',
+    'reminder.recurring',
+    'reminder.snoozed',
+    'reminder.canceled'
+  ]
 };
 
 /**

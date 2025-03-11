@@ -58,12 +58,18 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'knownError.workaroundUpdated': 'knowledge',
   'knownError.planToFix': 'knowledge',
   'knownError.resolved': 'knowledge',
-  // Add mappings for backlog item events
+  // Backlog item events
   'backlogItem.created': 'backlogItem',
   'backlogItem.priorityChanged': 'backlogItem',
   'backlogItem.addedToSprint': 'backlogItem',
   'backlogItem.removedFromSprint': 'backlogItem',
   'backlogItem.statusChanged': 'backlogItem',
   'backlogItem.readyForReview': 'backlogItem',
-  'backlogItem.completed': 'backlogItem'
+  'backlogItem.completed': 'backlogItem',
+  // Reminder events - using 'task' type as it's most similar for reminders
+  'reminder.upcoming': 'task',
+  'reminder.due': 'task',
+  'reminder.recurring': 'task',
+  'reminder.snoozed': 'task',
+  'reminder.canceled': 'task'
 };
