@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import PageTransition from '@/components/shared/PageTransition';
@@ -60,6 +61,13 @@ const getStatusColor = (status: string): string => {
   }
 };
 
+// Define the line interface for dependencies
+interface DependencyLine {
+  from: string;
+  to: string;
+  points: { x: number; y: number }[];
+}
+
 // Define the timeline item type with additional properties
 interface TimelineItem extends BacklogItem {
   startOffset: number;
@@ -67,11 +75,7 @@ interface TimelineItem extends BacklogItem {
   startDate: Date;
   endDate: Date;
   dependencies?: string[];
-  dependencyLines?: {
-    from: string;
-    to: string;
-    points: { x: number; y: number }[];
-  }[];
+  dependencyLines?: DependencyLine[];
 }
 
 const BacklogTimeline: React.FC = () => {
@@ -147,7 +151,8 @@ const BacklogTimeline: React.FC = () => {
           duration,
           startDate: itemStartDate,
           endDate: itemEndDate,
-          dependencies: item.dependsOn || []
+          dependencies: item.dependsOn || [],
+          dependencyLines: [] as DependencyLine[]
         };
       })
       .sort((a, b) => a.id.localeCompare(b.id)); // Sort by ID for stable order
@@ -156,17 +161,21 @@ const BacklogTimeline: React.FC = () => {
     if (showDependencies) {
       items.forEach(item => {
         if (item.dependencies && item.dependencies.length > 0) {
-          item.dependencyLines = item.dependencies.map(depId => {
+          const lines: DependencyLine[] = [];
+          
+          item.dependencies.forEach(depId => {
             const dependencyItem = items.find(i => i.id === depId);
-            if (!dependencyItem) return null;
-            
-            // Calculate connection points
-            return {
-              from: depId,
-              to: item.id,
-              points: calculateDependencyLine(dependencyItem, item)
-            };
-          }).filter(Boolean) as any;
+            if (dependencyItem) {
+              // Calculate connection points
+              lines.push({
+                from: depId,
+                to: item.id,
+                points: calculateDependencyLine(dependencyItem, item)
+              });
+            }
+          });
+          
+          item.dependencyLines = lines;
         }
       });
     }
@@ -423,44 +432,46 @@ const BacklogTimeline: React.FC = () => {
                       </TooltipContent>
                     </Tooltip>
                     
-                    <Popover>
+                    <Tooltip>
                       <TooltipTrigger asChild>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" size="icon">
-                            <SwatchBookIcon className="h-4 w-4" />
-                          </Button>
-                        </PopoverTrigger>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="icon">
+                              <SwatchBookIcon className="h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-56">
+                            <div className="space-y-2">
+                              <h4 className="font-medium">Color Scheme</h4>
+                              <Select value={colorScheme} onValueChange={handleColorSchemeChange}>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select color scheme" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="default">Default</SelectItem>
+                                  <SelectItem value="pastel">Pastel</SelectItem>
+                                  <SelectItem value="vibrant">Vibrant</SelectItem>
+                                  <SelectItem value="status">By Status</SelectItem>
+                                  <SelectItem value="custom">Custom</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {Object.entries(backlogColorThemes[colorScheme === 'status' ? 'status' : 'default']).map(([key, color]) => (
+                                  <div 
+                                    key={key} 
+                                    className={cn("w-6 h-6 rounded", color)} 
+                                    title={key}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </TooltipTrigger>
                       <TooltipContent>
                         Color Schemes
                       </TooltipContent>
-                      <PopoverContent className="w-56">
-                        <div className="space-y-2">
-                          <h4 className="font-medium">Color Scheme</h4>
-                          <Select value={colorScheme} onValueChange={handleColorSchemeChange}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select color scheme" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="default">Default</SelectItem>
-                              <SelectItem value="pastel">Pastel</SelectItem>
-                              <SelectItem value="vibrant">Vibrant</SelectItem>
-                              <SelectItem value="status">By Status</SelectItem>
-                              <SelectItem value="custom">Custom</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {Object.entries(backlogColorThemes[colorScheme === 'status' ? 'status' : 'default']).map(([key, color]) => (
-                              <div 
-                                key={key} 
-                                className={cn("w-6 h-6 rounded", color)} 
-                                title={key}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    </Tooltip>
                     
                     <Button
                       variant="outline"
