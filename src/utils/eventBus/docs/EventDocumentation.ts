@@ -1,4 +1,27 @@
+
 import { EventType } from '@/utils/types/eventBus';
+
+// Event field definition type
+export interface EventFieldDefinition {
+  name: string;
+  type: string;
+  description: string;
+  required: boolean;
+}
+
+// Event documentation interface
+export interface EventDocumentation {
+  name: EventType;
+  description: string;
+  source: string;
+  category: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  fields?: EventFieldDefinition[];
+  examples?: string[];
+  notes?: string[];
+  relatedEvents?: EventType[];
+  timeToProcess?: string;
+}
 
 // Fixing the type error by ensuring the array contains only valid EventTypes
 const testExecutionEvents: EventType[] = [
@@ -11,7 +34,7 @@ const testExecutionEvents: EventType[] = [
   'testExecution.completed.success',
   'testExecution.completed.partial',
   'testExecution.blocked'
-] as const;
+];
 
 /**
  * Event Documentation
@@ -23,7 +46,7 @@ const testExecutionEvents: EventType[] = [
 /**
  * Incident Events
  */
-const incidentEvents = [
+export const incidentEvents: EventType[] = [
   'incident.created',
   'incident.updated',
   'incident.assigned',
@@ -45,7 +68,7 @@ const incidentEvents = [
 /**
  * Service Request Events
  */
-const serviceRequestEvents = [
+export const serviceRequestEvents: EventType[] = [
   'service.created',
   'service.updated',
   'service.assigned',
@@ -62,7 +85,7 @@ const serviceRequestEvents = [
 /**
  * Change Events
  */
-const changeEvents = [
+export const changeEvents: EventType[] = [
   'change.created',
   'change.updated',
   'change.approved',
@@ -83,7 +106,7 @@ const changeEvents = [
 /**
  * Problem Events
  */
-const problemEvents = [
+export const problemEvents: EventType[] = [
   'problem.created',
   'problem.updated',
   'problem.resolved',
@@ -100,7 +123,7 @@ const problemEvents = [
 /**
  * SLA Events
  */
-const slaEvents = [
+export const slaEvents: EventType[] = [
   'sla.warning',
   'sla.warning.response',
   'sla.warning.resolution',
@@ -116,7 +139,7 @@ const slaEvents = [
 /**
  * Task Events
  */
-const taskEvents = [
+export const taskEvents: EventType[] = [
   'task.created',
   'task.updated',
   'task.assigned',
@@ -135,7 +158,7 @@ const taskEvents = [
 /**
  * Release Events
  */
-const releaseEvents = [
+export const releaseEvents: EventType[] = [
   'release.created',
   'release.updated',
   'release.deployed',
@@ -160,7 +183,7 @@ const releaseEvents = [
 /**
  * Asset Events
  */
-const assetEvents = [
+export const assetEvents: EventType[] = [
   'asset.created',
   'asset.updated',
   'asset.retired',
@@ -173,7 +196,7 @@ const assetEvents = [
 /**
  * Test Events
  */
-const testEvents = [
+export const testEvents: EventType[] = [
   'test.created',
   'test.executed',
   'test.passed',
@@ -185,7 +208,7 @@ const testEvents = [
 /**
  * Knowledge Events
  */
-const knowledgeEvents = [
+export const knowledgeEvents: EventType[] = [
   'knowledge.created',
   'knowledge.updated',
   'knowledge.published',
@@ -194,7 +217,7 @@ const knowledgeEvents = [
 /**
  * Known Error Events
  */
-const knownErrorEvents = [
+export const knownErrorEvents: EventType[] = [
   'knownError.created',
   'knownError.updated',
   'knownError.workaroundUpdated',
@@ -205,7 +228,7 @@ const knownErrorEvents = [
 /**
  * Backlog Item Events
  */
-const backlogItemEvents = [
+export const backlogItemEvents: EventType[] = [
   'backlogItem.created',
   'backlogItem.priorityChanged',
   'backlogItem.addedToSprint',
@@ -220,7 +243,7 @@ const backlogItemEvents = [
 /**
  * Reminder Events
  */
-const reminderEvents = [
+export const reminderEvents: EventType[] = [
   'reminder.upcoming',
   'reminder.upcoming.approaching',
   'reminder.upcoming.imminent',
@@ -233,103 +256,120 @@ const reminderEvents = [
 /**
  * Test Case Events
  */
-const testCaseEvents = [
+export const testCaseEvents: EventType[] = [
   'testCase.created',
   'testCase.updated',
 ];
 
-/**
- * Event Examples
- *
- * Below are examples of how to publish and subscribe to events.
- */
+// Group all event types for easier reference
+export const EVENT_GROUPS = {
+  incidents: incidentEvents,
+  serviceRequests: serviceRequestEvents,
+  changes: changeEvents,
+  problems: problemEvents,
+  sla: slaEvents,
+  tasks: taskEvents,
+  releases: releaseEvents,
+  assets: assetEvents,
+  tests: testEvents,
+  knowledge: knowledgeEvents,
+  knownErrors: knownErrorEvents,
+  backlogItems: backlogItemEvents,
+  reminders: reminderEvents,
+  testCases: testCaseEvents,
+  testExecutions: testExecutionEvents
+};
 
-/**
- * Example: Publishing an Incident Event
- */
-function publishIncidentEvent() {
-  // Example data for an incident event
-  const incidentData = {
-    incidentId: 'INC-123',
-    title: 'Network Outage',
-    description: 'Major network outage affecting multiple services.',
-    status: 'Open',
-    priority: 'High',
-  };
+// Event documentation examples
+export const EVENT_DOCUMENTATION: EventDocumentation[] = [
+  {
+    name: 'incident.created',
+    description: 'Triggered when a new incident is created in the system',
+    source: 'incident-management',
+    category: 'Incident',
+    priority: 'medium',
+    fields: [
+      { name: 'incidentId', type: 'string', description: 'Unique identifier for the incident', required: true },
+      { name: 'title', type: 'string', description: 'Title of the incident', required: true },
+      { name: 'description', type: 'string', description: 'Detailed description of the incident', required: false },
+      { name: 'priority', type: 'string', description: 'Priority level of the incident', required: true },
+      { name: 'status', type: 'string', description: 'Current status of the incident', required: true }
+    ],
+    examples: [
+      `EventBus.publish('incident.created', 'incident-management', { 
+        incidentId: 'INC-001', 
+        title: 'Network Outage', 
+        description: 'Complete network outage in the east region',
+        priority: 'high',
+        status: 'new'
+      })`
+    ]
+  },
+  {
+    name: 'sla.warning.approaching',
+    description: 'Triggered when an SLA breach is approaching (75% or more of time elapsed)',
+    source: 'sla-monitoring',
+    category: 'SLA',
+    priority: 'high',
+    fields: [
+      { name: 'ticketId', type: 'string', description: 'ID of the ticket approaching SLA breach', required: true },
+      { name: 'slaType', type: 'string', description: 'Type of SLA (response, resolution)', required: true },
+      { name: 'elapsedPercent', type: 'number', description: 'Percentage of SLA time elapsed', required: true },
+      { name: 'remainingTime', type: 'string', description: 'Time remaining before breach', required: true }
+    ]
+  },
+  {
+    name: 'sla.warning.imminent',
+    description: 'Triggered when an SLA breach is imminent (90% or more of time elapsed)',
+    source: 'sla-monitoring',
+    category: 'SLA',
+    priority: 'critical',
+    fields: [
+      { name: 'ticketId', type: 'string', description: 'ID of the ticket with imminent SLA breach', required: true },
+      { name: 'slaType', type: 'string', description: 'Type of SLA (response, resolution)', required: true },
+      { name: 'elapsedPercent', type: 'number', description: 'Percentage of SLA time elapsed', required: true },
+      { name: 'remainingTime', type: 'string', description: 'Time remaining before breach', required: true }
+    ]
+  }
+];
 
-  // Publish the incident event
-  // EventBus.getInstance().publish('incident.created', 'ticketSystem', incidentData);
+// Helper functions for event documentation
+
+// Get documentation for a specific event
+export function getEventDocumentation(eventType: EventType): EventDocumentation | undefined {
+  return EVENT_DOCUMENTATION.find(doc => doc.name === eventType);
 }
 
-/**
- * Example: Subscribing to a Task Event
- */
-function subscribeToTaskEvent() {
-  // Subscribe to the 'task.completed' event
-  // EventBus.getInstance().subscribe({
-  //   eventTypes: ['task.completed'],
-  //   callback: (event) => {
-  //     console.log('Task Completed Event:', event);
-  //     // Perform actions when a task is completed
-  //   },
-  // });
-}
-
-/**
- * Example: Publishing a Release Event
- */
-function publishReleaseEvent() {
-  // Example data for a release event
-  const releaseData = {
-    releaseId: 'REL-001',
-    title: 'Version 2.0 Deployment',
-    version: '2.0',
-    status: 'Deployed',
-  };
-
-  // Publish the release event
-  // EventBus.getInstance().publish('release.deployed', 'releaseManagement', releaseData);
-}
-
-/**
- * Example: Subscribing to a Problem Event
- */
-function subscribeToProblemEvent() {
-  // Subscribe to the 'problem.resolved' event
-  // EventBus.getInstance().subscribe({
-  //   eventTypes: ['problem.resolved'],
-  //   callback: (event) => {
-  //     console.log('Problem Resolved Event:', event);
-  //     // Perform actions when a problem is resolved
-  //   },
-  // });
-}
-
-/**
- * Example: Publishing a Knowledge Event
- */
-function publishKnowledgeEvent() {
-  // Example data for a knowledge event
-  const knowledgeData = {
-    articleId: 'KA-001',
-    title: 'Troubleshooting Network Issues',
-    status: 'Published',
-  };
-
-  // Publish the knowledge event
-  // EventBus.getInstance().publish('knowledge.published', 'knowledgeBase', knowledgeData);
-}
-
-/**
- * Example: Subscribing to a Known Error Event
- */
-function subscribeToKnownErrorEvent() {
-  // Subscribe to the 'knownError.resolved' event
-  // EventBus.getInstance().subscribe({
-  //   eventTypes: ['knownError.resolved'],
-  //   callback: (event) => {
-  //     console.log('Known Error Resolved Event:', event);
-  //     // Perform actions when a known error is resolved
-  //   },
-  // });
+// Get all events related to a specific process
+export function getProcessEvents(process: string): EventType[] {
+  switch (process.toLowerCase()) {
+    case 'incident':
+      return EVENT_GROUPS.incidents;
+    case 'service':
+      return EVENT_GROUPS.serviceRequests;
+    case 'change':
+      return EVENT_GROUPS.changes;
+    case 'problem':
+      return EVENT_GROUPS.problems;
+    case 'sla':
+      return EVENT_GROUPS.sla;
+    case 'task':
+      return EVENT_GROUPS.tasks;
+    case 'release':
+      return EVENT_GROUPS.releases;
+    case 'asset':
+      return EVENT_GROUPS.assets;
+    case 'test':
+      return [...EVENT_GROUPS.tests, ...EVENT_GROUPS.testCases, ...EVENT_GROUPS.testExecutions];
+    case 'knowledge':
+      return EVENT_GROUPS.knowledge;
+    case 'known-error':
+      return EVENT_GROUPS.knownErrors;
+    case 'backlog':
+      return EVENT_GROUPS.backlogItems;
+    case 'reminder':
+      return EVENT_GROUPS.reminders;
+    default:
+      return [];
+  }
 }

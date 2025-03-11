@@ -1,5 +1,5 @@
 
-import { EventBus } from '@/utils/eventBus';
+import EventBus from '../EventBus';
 import { TestCaseEventData, TestExecutionEventData } from '@/utils/types/eventBus';
 
 /**
