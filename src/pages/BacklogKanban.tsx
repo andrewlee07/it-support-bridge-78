@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
-import { fetchBacklogItems } from '@/utils/api/backlogApi';
+import { fetchBacklogItems, updateBacklogItemStatus, createBacklogItem } from '@/utils/api/backlogApi';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -43,24 +43,75 @@ const BacklogKanban: React.FC = () => {
     loadBacklogItems();
   }, []);
 
-  const handleDragEnd = (result: DropResult) => {
-    // This would update the status of the item when dragged between columns
-    console.log('Item dragged:', result);
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination) return; // Dropped outside the list
+    
+    const { draggableId, destination } = result;
+    const newStatus = destination.droppableId as BacklogItemStatus;
+    
+    try {
+      // Find the item in the current state
+      const draggedItem = backlogItems.find(item => item.id === draggableId);
+      if (!draggedItem) return;
+      
+      // Optimistically update UI
+      const updatedItems = backlogItems.map(item => 
+        item.id === draggableId ? { ...item, status: newStatus } : item
+      );
+      setBacklogItems(updatedItems);
+      
+      // Update in backend
+      await updateBacklogItemStatus(draggableId, newStatus);
+      toast.success(`Item moved to ${newStatus}`);
+    } catch (error) {
+      // Revert on error
+      toast.error('Failed to update item status');
+      // Reload items to ensure UI consistency
+      const response = await fetchBacklogItems();
+      if (Array.isArray(response)) {
+        setBacklogItems(response);
+      } else if (response.data) {
+        setBacklogItems(response.data);
+      }
+    }
   };
 
   const handleEditItem = (item: BacklogItem) => {
-    // This would open the item edit dialog
-    console.log('Edit item:', item);
+    // Navigate to edit page for the backlog item
+    navigate(`/backlog/edit/${item.id}`, { state: { item } });
   };
 
-  const handleQuickStatusChange = (itemId: string, newStatus: BacklogItemStatus) => {
-    // This would update the status of the item directly
-    console.log('Quick status change:', itemId, newStatus);
+  const handleQuickStatusChange = async (itemId: string, newStatus: BacklogItemStatus) => {
+    try {
+      // Optimistically update UI
+      const updatedItems = backlogItems.map(item => 
+        item.id === itemId ? { ...item, status: newStatus } : item
+      );
+      setBacklogItems(updatedItems);
+      
+      // Update in backend
+      await updateBacklogItemStatus(itemId, newStatus);
+      toast.success(`Item status updated to ${newStatus}`);
+    } catch (error) {
+      toast.error('Failed to update item status');
+      // Reload items to ensure UI consistency
+      const response = await fetchBacklogItems();
+      if (Array.isArray(response)) {
+        setBacklogItems(response);
+      } else if (response.data) {
+        setBacklogItems(response.data);
+      }
+    }
   };
 
-  const handleCreateItem = (defaultStatus?: string) => {
-    // This would create a new item
-    console.log('Create item with default status:', defaultStatus);
+  const handleCreateItem = async (defaultStatus?: string) => {
+    try {
+      const status = defaultStatus as BacklogItemStatus || 'todo';
+      // Navigate to create page with default status
+      navigate('/backlog/create', { state: { defaultStatus: status } });
+    } catch (error) {
+      toast.error('Failed to initialize new item creation');
+    }
   };
 
   return (
