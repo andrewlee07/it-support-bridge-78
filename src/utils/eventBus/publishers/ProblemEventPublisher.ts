@@ -1,157 +1,116 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import EventBus from '../EventBus';
-import { ProblemEventData, EventType, EventSource } from '@/utils/types/eventBus';
+import EventBus from '../core';
+import { EventType, EventSource, EventMetadata } from '@/utils/types/eventBus';
+import { ProblemEventData } from '@/utils/types/eventBus/problemEventTypes';
 
 /**
- * Publisher for problem management events
+ * Publisher for problem-related events
  */
-export class ProblemEventPublisher {
+class ProblemEventPublisher {
+  private eventBus: EventBus;
+  private source: EventSource = 'problemManagement';
+  
+  constructor() {
+    this.eventBus = EventBus.getInstance();
+  }
+  
   /**
-   * Publish event when a problem is created
+   * Publish a problem created event
    */
-  public static publishProblemCreated(problemData: ProblemEventData): string {
-    // Determine if this is a critical or high priority problem
-    let eventType: EventType = 'problem.created';
+  public publishProblemCreated(
+    problemData: ProblemEventData, 
+    options?: { metadata?: Partial<EventMetadata>, userId?: string }
+  ): string {
+    return this.publishProblemEvent('problem.created', problemData, options);
+  }
+  
+  /**
+   * Publish a problem updated event
+   */
+  public publishProblemUpdated(
+    problemData: ProblemEventData, 
+    options?: { metadata?: Partial<EventMetadata>, userId?: string }
+  ): string {
+    return this.publishProblemEvent('problem.updated', problemData, options);
+  }
+  
+  /**
+   * Publish a problem assigned event
+   */
+  public publishProblemAssigned(
+    problemData: ProblemEventData, 
+    options?: { metadata?: Partial<EventMetadata>, userId?: string }
+  ): string {
+    return this.publishProblemEvent('problem.assigned', problemData, options);
+  }
+  
+  /**
+   * Publish a root cause identified event
+   */
+  public publishRootCauseIdentified(
+    problemData: ProblemEventData, 
+    options?: { metadata?: Partial<EventMetadata>, userId?: string }
+  ): string {
+    return this.publishProblemEvent('problem.rootCauseIdentified', problemData, options);
+  }
+  
+  /**
+   * Publish a workaround available event
+   */
+  public publishWorkaroundAvailable(
+    problemData: ProblemEventData, 
+    options?: { metadata?: Partial<EventMetadata>, userId?: string }
+  ): string {
+    return this.publishProblemEvent('problem.workaroundAvailable', problemData, options);
+  }
+  
+  /**
+   * Publish a problem resolved event
+   */
+  public publishProblemResolved(
+    problemData: ProblemEventData, 
+    options?: { metadata?: Partial<EventMetadata>, userId?: string }
+  ): string {
+    return this.publishProblemEvent('problem.resolved', problemData, options);
+  }
+  
+  /**
+   * Publish a problem closed event
+   */
+  public publishProblemClosed(
+    problemData: ProblemEventData, 
+    options?: { metadata?: Partial<EventMetadata>, userId?: string }
+  ): string {
+    return this.publishProblemEvent('problem.closed', problemData, options);
+  }
+  
+  /**
+   * Generic method to publish a problem event
+   */
+  private publishProblemEvent(
+    type: EventType,
+    data: ProblemEventData,
+    options?: { metadata?: Partial<EventMetadata>, userId?: string }
+  ): string {
+    const eventId = this.eventBus.publish(type, this.source, data, {
+      metadata: options?.metadata,
+      actor: options?.userId ? {
+        id: options.userId,
+        type: 'user'
+      } : undefined,
+      entity: {
+        id: data.problemId,
+        type: 'problem',
+        name: data.title
+      }
+    });
     
-    if (problemData.severity === 'critical') {
-      eventType = 'problem.created.critical';
-    } else if (problemData.severity === 'high') {
-      eventType = 'problem.created.high';
-    }
-    
-    return EventBus.getInstance().publish<ProblemEventData>(
-      eventType,
-      'problemManagement' as EventSource,  // Cast to EventSource
-      problemData,
-      {
-        metadata: {
-          tenantId: problemData.tenantId,
-          severity: problemData.severity,
-          priority: `Priority: ${problemData.severity}`
-        },
-        entity: {
-          id: problemData.id,
-          type: 'problem',
-          name: problemData.title,
-          url: `/problems/${problemData.id}`
-        }
-      }
-    );
-  }
-
-  /**
-   * Publish event when a problem is updated
-   */
-  public static publishProblemUpdated(problemData: ProblemEventData): string {
-    return EventBus.getInstance().publish<ProblemEventData>(
-      'problem.updated',
-      'problemManagement' as EventSource,  // Cast to EventSource
-      problemData,
-      {
-        metadata: {
-          tenantId: problemData.tenantId,
-          severity: problemData.severity
-        },
-        entity: {
-          id: problemData.id,
-          type: 'problem',
-          name: problemData.title,
-          url: `/problems/${problemData.id}`
-        }
-      }
-    );
-  }
-
-  /**
-   * Publish event when a problem is assigned
-   */
-  public static publishProblemAssigned(problemData: ProblemEventData): string {
-    return EventBus.getInstance().publish<ProblemEventData>(
-      'problem.assigned',
-      'problemManagement' as EventSource,  // Cast to EventSource
-      problemData,
-      {
-        metadata: {
-          tenantId: problemData.tenantId,
-          severity: problemData.severity
-        },
-        entity: {
-          id: problemData.id,
-          type: 'problem',
-          name: problemData.title,
-          url: `/problems/${problemData.id}`
-        }
-      }
-    );
-  }
-
-  /**
-   * Publish event when a problem's root cause is identified
-   */
-  public static publishProblemRootCauseIdentified(problemData: ProblemEventData): string {
-    return EventBus.getInstance().publish<ProblemEventData>(
-      'problem.rootCauseIdentified',
-      'problemManagement' as EventSource,  // Cast to EventSource
-      problemData,
-      {
-        metadata: {
-          tenantId: problemData.tenantId,
-          severity: problemData.severity
-        },
-        entity: {
-          id: problemData.id,
-          type: 'problem',
-          name: problemData.title,
-          url: `/problems/${problemData.id}`
-        }
-      }
-    );
-  }
-
-  /**
-   * Publish event when a workaround is available for a problem
-   */
-  public static publishProblemWorkaroundAvailable(problemData: ProblemEventData): string {
-    return EventBus.getInstance().publish<ProblemEventData>(
-      'problem.workaroundAvailable',
-      'problemManagement' as EventSource,  // Cast to EventSource
-      problemData,
-      {
-        metadata: {
-          tenantId: problemData.tenantId,
-          severity: problemData.severity
-        },
-        entity: {
-          id: problemData.id,
-          type: 'problem',
-          name: problemData.title,
-          url: `/problems/${problemData.id}`
-        }
-      }
-    );
-  }
-
-  /**
-   * Publish event when a problem is resolved
-   */
-  public static publishProblemResolved(problemData: ProblemEventData): string {
-    return EventBus.getInstance().publish<ProblemEventData>(
-      'problem.resolved',
-      'problemManagement' as EventSource,  // Cast to EventSource
-      problemData,
-      {
-        metadata: {
-          tenantId: problemData.tenantId,
-          severity: problemData.severity
-        },
-        entity: {
-          id: problemData.id,
-          type: 'problem',
-          name: problemData.title,
-          url: `/problems/${problemData.id}`
-        }
-      }
-    );
+    console.log(`ProblemEventPublisher: Published ${type} event (${eventId})`);
+    return eventId;
   }
 }
+
+// Create singleton instance
+const problemEventPublisher = new ProblemEventPublisher();
+export default problemEventPublisher;

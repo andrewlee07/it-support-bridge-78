@@ -4,7 +4,7 @@ import { SystemEvent, EventType } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 import { notificationProcessor } from './notificationProcessor';
 import { getUserNotificationSettings } from './userNotificationSettings';
-import { EVENT_TITLE_MAP } from '../constants/eventMappings';
+import { EVENT_TITLE_MAP } from '../constants/mappings';
 
 /**
  * Class to handle turning events into notifications
@@ -39,7 +39,6 @@ class NotificationSubscriber {
     const eventBus = EventBus.getInstance();
     
     // Subscribe to all event types and handle filtering in the filter function
-    // Use Object.keys with type assertion instead of require
     this.subscriberId = eventBus.subscribe({
       eventTypes: Object.keys(EVENT_TITLE_MAP) as EventType[],
       filter: (event) => {

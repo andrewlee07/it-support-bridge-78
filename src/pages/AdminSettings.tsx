@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { 
   AlertCircle, Headphones, PanelRightIcon, OctagonAlert, 
   BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert, 
-  Sliders, ArrowUpDown, LibraryIcon
+  Sliders, ArrowUpDown, LibraryIcon, Bell
 } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -70,6 +70,12 @@ const AdminSettings = () => {
       description: 'Configure how statuses are synchronized between related items',
       icon: <ArrowUpDown className="h-8 w-8 text-primary/80" />,
       path: '/admin/status-synchronization'
+    },
+    {
+      title: 'Notification Configuration',
+      description: 'Configure event notifications, templates, and delivery channels',
+      icon: <Bell className="h-8 w-8 text-primary/80" />,
+      path: '/admin/notification-configuration'
     },
     {
       title: 'SLA Settings',

@@ -45,6 +45,7 @@ import TestConfiguration from '@/pages/admin/TestConfiguration';
 import StatusSynchronizationConfig from '@/pages/admin/StatusSynchronizationConfig';
 import Tasks from '@/pages/Tasks';
 import TaskDashboard from '@/pages/TaskDashboard';
+import NotificationConfiguration from '@/pages/admin/NotificationConfiguration';
 
 const router = createBrowserRouter([
   {
@@ -189,6 +190,10 @@ const router = createBrowserRouter([
       {
         path: '/admin/status-synchronization',
         element: React.createElement(StatusSynchronizationConfig)
+      },
+      {
+        path: '/admin/notification-configuration',
+        element: React.createElement(NotificationConfiguration)
       },
       {
         path: '/profile',
