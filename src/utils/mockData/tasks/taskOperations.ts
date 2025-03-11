@@ -1,282 +1,182 @@
 
-import { Task, TaskStatus, TaskPriority, TaskStats } from '@/utils/types/taskTypes';
-import { ApiResponse, PaginatedResponse } from '@/utils/types/api';
+import { Task, TaskPriority, TaskStatus } from '@/utils/types/taskTypes';
 import { v4 as uuidv4 } from 'uuid';
-import { mockTasks } from './tasksMockData';
 
-// In-memory store for tasks
-let tasks = [...mockTasks];
+// Mock data storage
+let tasks: Task[] = [
+  {
+    id: 'task-1',
+    title: 'Server Maintenance',
+    description: 'Schedule downtime and perform server updates',
+    status: 'new',
+    priority: 'high',
+    assignee: 'user-1',
+    creator: 'user-1',
+    dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  },
+  {
+    id: 'task-2',
+    title: 'Update Security Certificates',
+    description: 'Renew SSL certificates before they expire',
+    status: 'in-progress',
+    priority: 'critical',
+    assignee: 'user-2',
+    creator: 'user-1',
+    dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago (overdue)
+    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  },
+  {
+    id: 'task-3',
+    title: 'Review Incident Reports',
+    description: 'Analyze recent incident reports and summarize findings',
+    status: 'completed',
+    priority: 'medium',
+    assignee: 'user-3',
+    creator: 'user-2',
+    dueDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    createdAt: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)
+  },
+  {
+    id: 'task-4',
+    title: 'Upgrade Database',
+    description: 'Implement database migration to newer version',
+    status: 'on-hold',
+    priority: 'medium',
+    assignee: 'user-1',
+    creator: 'user-3',
+    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+  },
+  {
+    id: 'task-5',
+    title: 'Implement New Feature',
+    description: 'Add requested feature to improve user experience',
+    status: 'new',
+    priority: 'low',
+    creator: 'user-2',
+    dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+  }
+];
 
-// Get all tasks with filtering options
-export const fetchTasks = (
-  assignee?: string,
-  status?: TaskStatus | TaskStatus[],
-  priority?: TaskPriority | TaskPriority[],
-  searchQuery?: string,
-  dueDateFrom?: Date,
-  dueDateTo?: Date
-): PaginatedResponse<Task> => {
-  let filteredTasks = [...tasks];
-  
-  // Filter by assignee
-  if (assignee) {
-    filteredTasks = filteredTasks.filter(task => task.assignee === assignee);
-  }
-  
-  // Filter by status
-  if (status) {
-    if (Array.isArray(status)) {
-      filteredTasks = filteredTasks.filter(task => status.includes(task.status));
-    } else {
-      filteredTasks = filteredTasks.filter(task => task.status === status);
-    }
-  }
-  
-  // Filter by priority
-  if (priority) {
-    if (Array.isArray(priority)) {
-      filteredTasks = filteredTasks.filter(task => priority.includes(task.priority));
-    } else {
-      filteredTasks = filteredTasks.filter(task => task.priority === priority);
-    }
-  }
-  
-  // Filter by search query (title or description)
-  if (searchQuery) {
-    const query = searchQuery.toLowerCase();
-    filteredTasks = filteredTasks.filter(task => 
-      task.title.toLowerCase().includes(query) || 
-      task.description.toLowerCase().includes(query) || 
-      task.id.toLowerCase().includes(query)
-    );
-  }
-  
-  // Filter by due date range
-  if (dueDateFrom) {
-    filteredTasks = filteredTasks.filter(task => 
-      task.dueDate && new Date(task.dueDate) >= new Date(dueDateFrom)
-    );
-  }
-  
-  if (dueDateTo) {
-    filteredTasks = filteredTasks.filter(task => 
-      task.dueDate && new Date(task.dueDate) <= new Date(dueDateTo)
-    );
-  }
-  
-  return {
-    items: filteredTasks,
-    data: filteredTasks, // For backward compatibility
-    total: filteredTasks.length,
-    page: 1,
-    limit: filteredTasks.length,
-    totalPages: 1,
-    pagination: {
-      total: filteredTasks.length,
-      page: 1,
-      pageSize: filteredTasks.length,
-      totalPages: 1
-    }
-  };
+// API functions
+export const fetchTasks = async (): Promise<{ success: boolean; data: Task[] }> => {
+  return { success: true, data: tasks };
 };
 
-// Get task by ID
-export const fetchTaskById = (id: string): ApiResponse<Task> => {
-  const task = tasks.find(task => task.id === id);
-  
-  if (!task) {
-    return {
-      success: false,
-      error: 'Task not found',
-      status: 404,
-      statusCode: 404,
-      data: null as any
-    };
-  }
-  
-  return {
-    success: true,
-    data: task,
-    status: 200,
-    statusCode: 200
-  };
+export const fetchTaskById = async (id: string): Promise<{ success: boolean; data: Task | null }> => {
+  const task = tasks.find(t => t.id === id);
+  return { success: !!task, data: task || null };
 };
 
-// Create a new task
-export const createTask = (
-  taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>
-): ApiResponse<Task> => {
+// Define what's required for task creation
+type CreateTaskInput = {
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignee?: string;
+  creator: string;
+  dueDate?: Date;
+  relatedItemId?: string;
+  relatedItemType?: 'incident' | 'service-request' | 'task';
+};
+
+export const createTask = async (taskData: CreateTaskInput): Promise<{ success: boolean; data: Task }> => {
   const newTask: Task = {
-    id: `TASK-${1000 + tasks.length + 1}`,
+    id: `task-${uuidv4().slice(0, 8)}`,
     ...taskData,
     createdAt: new Date(),
     updatedAt: new Date()
   };
   
   tasks.push(newTask);
-  
-  return {
-    success: true,
-    data: newTask,
-    status: 201,
-    statusCode: 201
-  };
+  return { success: true, data: newTask };
 };
 
-// Update an existing task
-export const updateTask = (
-  id: string,
-  updates: Partial<Task>
-): ApiResponse<Task> => {
-  const taskIndex = tasks.findIndex(task => task.id === id);
-  
-  if (taskIndex === -1) {
-    return {
-      success: false,
-      error: 'Task not found',
-      status: 404,
-      statusCode: 404,
-      data: null as any
-    };
+export const updateTask = async (id: string, taskData: Partial<Task>): Promise<{ success: boolean; data: Task | null }> => {
+  const index = tasks.findIndex(t => t.id === id);
+  if (index === -1) {
+    return { success: false, data: null };
   }
   
-  const updatedTask: Task = {
-    ...tasks[taskIndex],
-    ...updates,
+  const updatedTask = {
+    ...tasks[index],
+    ...taskData,
     updatedAt: new Date()
   };
   
-  tasks[taskIndex] = updatedTask;
-  
-  return {
-    success: true,
-    data: updatedTask,
-    status: 200,
-    statusCode: 200
-  };
+  tasks[index] = updatedTask;
+  return { success: true, data: updatedTask };
 };
 
-// Delete a task
-export const deleteTask = (id: string): ApiResponse<boolean> => {
-  const taskIndex = tasks.findIndex(task => task.id === id);
-  
-  if (taskIndex === -1) {
-    return {
-      success: false,
-      error: 'Task not found',
-      status: 404,
-      statusCode: 404,
-      data: false
-    };
-  }
-  
-  tasks.splice(taskIndex, 1);
-  
-  return {
-    success: true,
-    data: true,
-    status: 200,
-    statusCode: 200
-  };
+export const deleteTask = async (id: string): Promise<{ success: boolean }> => {
+  const initialLength = tasks.length;
+  tasks = tasks.filter(t => t.id !== id);
+  return { success: tasks.length < initialLength };
 };
 
-// Add a note to a task
-export const addTaskNote = (
-  taskId: string,
-  content: string,
-  author: string
-): ApiResponse<Task> => {
-  const taskIndex = tasks.findIndex(task => task.id === taskId);
-  
-  if (taskIndex === -1) {
-    return {
-      success: false,
-      error: 'Task not found',
-      status: 404,
-      statusCode: 404,
-      data: null as any
-    };
+export const addTaskNote = async (taskId: string, noteContent: string, authorId: string): Promise<{ success: boolean; data: Task | null }> => {
+  const index = tasks.findIndex(t => t.id === taskId);
+  if (index === -1) {
+    return { success: false, data: null };
   }
   
-  const updatedTask = { ...tasks[taskIndex] };
-  
+  const task = tasks[index];
   const newNote = {
-    id: uuidv4(),
-    content,
-    author,
+    id: `note-${uuidv4().slice(0, 8)}`,
+    content: noteContent,
+    author: authorId,
     createdAt: new Date()
   };
   
-  updatedTask.notes = updatedTask.notes ? [...updatedTask.notes, newNote] : [newNote];
-  updatedTask.updatedAt = new Date();
-  
-  tasks[taskIndex] = updatedTask;
-  
-  return {
-    success: true,
-    data: updatedTask,
-    status: 200,
-    statusCode: 200
+  const updatedTask = {
+    ...task,
+    notes: task.notes ? [...task.notes, newNote] : [newNote],
+    updatedAt: new Date()
   };
+  
+  tasks[index] = updatedTask;
+  return { success: true, data: updatedTask };
 };
 
-// Get task statistics
-export const getTaskStats = (userId?: string): ApiResponse<TaskStats> => {
-  let filteredTasks = tasks;
-  
-  // Filter by user if provided
-  if (userId) {
-    filteredTasks = tasks.filter(task => task.assignee === userId);
-  }
-  
-  const now = new Date();
-  
-  const stats: TaskStats = {
-    totalTasks: filteredTasks.length,
-    newTasks: filteredTasks.filter(task => task.status === 'new').length,
-    inProgressTasks: filteredTasks.filter(task => task.status === 'in-progress').length,
-    onHoldTasks: filteredTasks.filter(task => task.status === 'on-hold').length,
-    completedTasks: filteredTasks.filter(task => task.status === 'completed').length,
-    cancelledTasks: filteredTasks.filter(task => task.status === 'cancelled').length,
-    overdueCount: filteredTasks.filter(task => 
-      task.dueDate && 
-      new Date(task.dueDate) < now && 
-      task.status !== 'completed' && 
-      task.status !== 'cancelled'
+export const getTaskStats = async (): Promise<{ success: boolean; data: any }> => {
+  const stats = {
+    totalTasks: tasks.length,
+    newTasks: tasks.filter(t => t.status === 'new').length,
+    inProgressTasks: tasks.filter(t => t.status === 'in-progress').length,
+    onHoldTasks: tasks.filter(t => t.status === 'on-hold').length,
+    completedTasks: tasks.filter(t => t.status === 'completed').length,
+    cancelledTasks: tasks.filter(t => t.status === 'cancelled').length,
+    overdueCount: tasks.filter(t => 
+      t.dueDate && 
+      new Date(t.dueDate) < new Date() && 
+      t.status !== 'completed' && 
+      t.status !== 'cancelled'
     ).length
   };
   
-  return {
-    success: true,
-    data: stats,
-    status: 200,
-    statusCode: 200
-  };
+  return { success: true, data: stats };
 };
 
-// Get tasks due today
-export const getTasksDueToday = (userId?: string): ApiResponse<Task[]> => {
-  const now = new Date();
-  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+export const getTasksDueToday = async (): Promise<{ success: boolean; data: Task[] }> => {
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
   
-  let filteredTasks = tasks.filter(task => 
-    task.dueDate && 
-    new Date(task.dueDate) >= startOfDay && 
-    new Date(task.dueDate) <= endOfDay &&
-    task.status !== 'completed' &&
-    task.status !== 'cancelled'
+  const tasksDueToday = tasks.filter(t => 
+    t.dueDate && 
+    new Date(t.dueDate) >= todayStart && 
+    new Date(t.dueDate) <= todayEnd &&
+    t.status !== 'completed' &&
+    t.status !== 'cancelled'
   );
   
-  // Filter by user if provided
-  if (userId) {
-    filteredTasks = filteredTasks.filter(task => task.assignee === userId);
-  }
-  
-  return {
-    success: true,
-    data: filteredTasks,
-    status: 200,
-    statusCode: 200
-  };
+  return { success: true, data: tasksDueToday };
 };
