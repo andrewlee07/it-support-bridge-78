@@ -75,6 +75,7 @@ const NotificationChannelList: React.FC = () => {
   };
   
   const handleAddChannel = (data: ChannelFormValues) => {
+    // Pass the data directly - it now has all required properties as non-optional
     addNewChannel(data);
     setIsNewChannelDialogOpen(false);
     toast({
