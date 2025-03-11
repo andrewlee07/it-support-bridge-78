@@ -1,3 +1,4 @@
+
 // Email notification
 export interface EmailTemplate {
   id: string;
@@ -8,7 +9,9 @@ export interface EmailTemplate {
     'sla-breach' | 'change-approved' | 'change-submitted' | 'problem-created' | 
     'problem-resolved' | 'service-request-approval-required' | 'incident-created' | 
     'incident-assigned' | 'incident-resolved' | 'service-request-completed' |
-    'problem-assigned' | 'problem-rootCauseIdentified' | 'problem-workaroundAvailable' | 'problem-closed';
+    'problem-assigned' | 'problem-rootCauseIdentified' | 'problem-workaroundAvailable' | 'problem-closed' |
+    'knownError-created' | 'knownError-updated' | 'knownError-workaroundUpdated' | 
+    'knownError-planToFix' | 'knownError-resolved';
   isActive: boolean;
   lastModified?: string;
   lastModifiedBy?: string;
@@ -84,7 +87,12 @@ export type EventType =
   | 'incident-created'
   | 'incident-assigned'
   | 'incident-resolved'
-  | 'service-request-completed';
+  | 'service-request-completed'
+  | 'knownError-created'
+  | 'knownError-updated'
+  | 'knownError-workaroundUpdated'
+  | 'knownError-planToFix'
+  | 'knownError-resolved';
 
 // Define WebhookConfig
 export interface WebhookConfig {
@@ -101,3 +109,4 @@ export interface WebhookConfig {
     responseCode?: number;
   };
 }
+

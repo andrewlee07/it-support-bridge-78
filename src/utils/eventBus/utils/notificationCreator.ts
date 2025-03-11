@@ -1,5 +1,5 @@
 
-import { SystemEvent, EventType, ProblemEventData } from '@/utils/types/eventBus';
+import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 import { v4 as uuidv4 } from 'uuid';
 import { EVENT_TITLE_MAP, EVENT_TO_NOTIFICATION_TYPE, EVENT_TO_PRIORITY } from '../constants/eventMappings';
@@ -60,6 +60,32 @@ export const createNotificationFromEvent = (event: SystemEvent): Notification =>
       
       actionUrl = `/problems/${problemData.problemId}`;
       entityId = problemData.problemId;
+      break;
+    
+    case 'knownError.created':
+    case 'knownError.updated':
+    case 'knownError.workaroundUpdated':
+    case 'knownError.planToFix':
+    case 'knownError.resolved':
+      const kedbData = event.data as KnownErrorEventData;
+      title = `${title}: ${kedbData.title}`;
+      
+      // Create appropriate message based on event type
+      if (event.type === 'knownError.created') {
+        message = `New known error added: ${kedbData.description || kedbData.title}`;
+      } else if (event.type === 'knownError.updated') {
+        const updatedFieldsList = kedbData.updatedFields?.join(', ') || 'multiple fields';
+        message = `Known error updated: ${updatedFieldsList}`;
+      } else if (event.type === 'knownError.workaroundUpdated') {
+        message = `Workaround updated: ${kedbData.workaround}`;
+      } else if (event.type === 'knownError.planToFix') {
+        message = `Fix scheduled: ${kedbData.permanentFix} on ${kedbData.scheduledFixDate}`;
+      } else if (event.type === 'knownError.resolved') {
+        message = `Known error resolved: ${kedbData.resolution}`;
+      }
+      
+      actionUrl = `/knowledge/known-errors/${kedbData.knownErrorId}`;
+      entityId = kedbData.knownErrorId;
       break;
     
     // Add more event type handling as needed

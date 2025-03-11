@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Notification, NotificationSettings } from '@/components/shared/notifications/types';
 import { toast } from 'sonner';
@@ -61,7 +60,16 @@ const categoryToEventTypes: Record<string, EventType[]> = {
     'change.rejected', 
     'change.implemented'
   ],
-  knowledge: ['knowledge.created', 'knowledge.updated', 'knowledge.published'],
+  knowledge: [
+    'knowledge.created', 
+    'knowledge.updated', 
+    'knowledge.published',
+    'knownError.created',
+    'knownError.updated',
+    'knownError.workaroundUpdated',
+    'knownError.planToFix',
+    'knownError.resolved'
+  ],
   tasks: ['task.created', 'task.updated', 'task.completed']
 };
 

@@ -41,7 +41,12 @@ export const EVENT_TITLE_MAP: Record<EventType, string> = {
   'test.created': 'New test case created',
   'test.executed': 'Test executed',
   'test.passed': 'Test passed',
-  'test.failed': 'Test failed'
+  'test.failed': 'Test failed',
+  'knownError.created': 'New known error added',
+  'knownError.updated': 'Known error updated',
+  'knownError.workaroundUpdated': 'Workaround updated',
+  'knownError.planToFix': 'Fix scheduled',
+  'knownError.resolved': 'Known error resolved'
 };
 
 /**
@@ -83,7 +88,12 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'test.created': 'testCase',
   'test.executed': 'testCase',
   'test.passed': 'testCase',
-  'test.failed': 'bug'
+  'test.failed': 'bug',
+  'knownError.created': 'knowledge',
+  'knownError.updated': 'knowledge',
+  'knownError.workaroundUpdated': 'knowledge',
+  'knownError.planToFix': 'knowledge',
+  'knownError.resolved': 'knowledge'
 };
 
 /**
@@ -125,7 +135,12 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'test.created': 'low',
   'test.executed': 'low',
   'test.passed': 'medium',
-  'test.failed': 'high'
+  'test.failed': 'high',
+  'knownError.created': 'high',
+  'knownError.updated': 'medium',
+  'knownError.workaroundUpdated': 'high',
+  'knownError.planToFix': 'medium',
+  'knownError.resolved': 'medium'
 };
 
 /**
@@ -153,3 +168,28 @@ export const PROBLEM_EVENT_CHANNELS: Partial<Record<EventType, ('email' | 'teams
   'problem.resolved': ['email', 'teams', 'inApp', 'sms'],
   'problem.closed': ['email', 'inApp']
 };
+
+/**
+ * Maps known error event types to recipient groups
+ * Using Partial<Record> as we're only defining a subset of events
+ */
+export const KEDB_EVENT_RECIPIENTS: Partial<Record<EventType, string[]>> = {
+  'knownError.created': ['support-staff', 'service-owner', 'affected-service-users'],
+  'knownError.updated': ['support-staff', 'previous-viewers'],
+  'knownError.workaroundUpdated': ['support-staff', 'affected-service-users'],
+  'knownError.planToFix': ['support-staff', 'service-owner', 'affected-service-users'],
+  'knownError.resolved': ['support-staff', 'service-owner', 'affected-service-users']
+};
+
+/**
+ * Maps known error event types to recommended notification channels
+ * Using Partial<Record> as we're only defining a subset of events
+ */
+export const KEDB_EVENT_CHANNELS: Partial<Record<EventType, ('email' | 'teams' | 'inApp' | 'sms')[]>> = {
+  'knownError.created': ['email', 'teams', 'inApp'],
+  'knownError.updated': ['email', 'teams', 'inApp'],
+  'knownError.workaroundUpdated': ['email', 'teams', 'inApp'],
+  'knownError.planToFix': ['email', 'teams', 'inApp'],
+  'knownError.resolved': ['email', 'teams', 'inApp']
+};
+

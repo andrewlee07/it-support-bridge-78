@@ -16,6 +16,7 @@ export type EventSource =
   | 'test-service'
   | 'task-service'
   | 'user-service'
+  | 'kedb-service'  // Added for Known Error Database
   | 'external-system';
 
 export type EventOrigin = 
@@ -61,7 +62,12 @@ export type EventType =
   | 'test.created'
   | 'test.executed'
   | 'test.passed'
-  | 'test.failed';
+  | 'test.failed'
+  | 'knownError.created'        // Added for Known Error Database
+  | 'knownError.updated'        // Added for Known Error Database
+  | 'knownError.workaroundUpdated' // Added for Known Error Database
+  | 'knownError.planToFix'      // Added for Known Error Database
+  | 'knownError.resolved';      // Added for Known Error Database
 
 // Task-specific event data
 export interface TaskEventData {
@@ -93,6 +99,22 @@ export interface ProblemEventData {
   updatedFields?: string[];
 }
 
+// Known Error Database event data
+export interface KnownErrorEventData {
+  knownErrorId: string;
+  title: string;
+  description?: string;
+  status: string;
+  affectedServices?: string[];
+  workaround?: string;
+  previousWorkaround?: string;
+  permanentFix?: string;
+  scheduledFixDate?: string;
+  resolution?: string;
+  viewedBy?: string[];
+  updatedFields?: string[];
+}
+
 // Map of event types to their data structures
 export interface EventDataMap {
   'task.created': TaskEventData;
@@ -105,5 +127,11 @@ export interface EventDataMap {
   'problem.workaroundAvailable': ProblemEventData;
   'problem.resolved': ProblemEventData;
   'problem.closed': ProblemEventData;
+  'knownError.created': KnownErrorEventData;
+  'knownError.updated': KnownErrorEventData;
+  'knownError.workaroundUpdated': KnownErrorEventData;
+  'knownError.planToFix': KnownErrorEventData;
+  'knownError.resolved': KnownErrorEventData;
   // Add more event type to data mappings as needed
 }
+
