@@ -1,165 +1,151 @@
 
 import React, { useState } from 'react';
-import { 
-  Table, 
-  TableBody,
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Plus, 
-  Search, 
-  FileText, 
-  Mail, 
-  MessageSquare,
-  Bell 
-} from 'lucide-react';
-import { EnhancedNotificationTemplate } from '@/utils/types/eventBus/notificationTypes';
-import { mockEmailTemplates } from '@/utils/mockData/emailTemplates';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
+import { Plus, Search, Edit, Trash } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { NotificationTemplate } from '@/utils/types/email';
 
-// Convert email templates to enhanced templates for the mockup
-const mockTemplates: EnhancedNotificationTemplate[] = mockEmailTemplates.map(template => ({
-  id: template.id,
-  name: template.name,
-  category: template.triggerOn.split('-')[0],
-  tags: [template.triggerOn],
-  description: template.subject,
-  metadata: {
-    processType: template.triggerOn.split('-')[0],
-    audience: ['users', 'agents'],
-    importance: 'medium' as const
-  },
-  baseTemplate: {
-    subject: template.subject,
-    body: template.body
-  },
-  channelVariants: {
-    email: {
-      format: 'html',
-      content: template.body
-    },
-    inApp: {
-      format: 'text',
-      content: template.subject
-    }
-  },
-  currentVersion: 1,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
-}));
+const templateSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  eventType: z.string().min(1, "Event type is required"),
+  subject: z.string().min(1, "Subject is required"),
+  body: z.string().min(1, "Template body is required")
+});
 
-// Get channel icon based on channel name
-const getChannelIcon = (channel: string) => {
-  switch (channel) {
-    case 'email':
-      return <Mail className="h-4 w-4" />;
-    case 'slack':
-    case 'teams':
-      return <MessageSquare className="h-4 w-4" />;
-    case 'inApp':
-      return <Bell className="h-4 w-4" />;
-    default:
-      return <FileText className="h-4 w-4" />;
+type TemplateFormValues = z.infer<typeof templateSchema>;
+
+const mockTemplates: NotificationTemplate[] = [
+  {
+    id: 'template-1',
+    name: 'Incident Created',
+    eventType: 'incident-created',
+    subject: 'New incident created: {{incident.title}}',
+    body: 'A new incident has been created with ID {{incident.id}}. Please check the details.',
+    lastModified: new Date().toISOString(),
+    lastModifiedBy: 'John Doe'
+  },
+  {
+    id: 'template-2',
+    name: 'Problem Assigned',
+    eventType: 'problem-assigned',
+    subject: 'Problem assigned: {{problem.title}}',
+    body: 'A problem has been assigned to you: {{problem.description}}',
+    lastModified: new Date().toISOString(),
+    lastModifiedBy: 'Jane Smith'
   }
-};
+];
 
 const NotificationTemplateList: React.FC = () => {
+  const [templates, setTemplates] = useState<NotificationTemplate[]>(mockTemplates);
   const [searchQuery, setSearchQuery] = useState('');
-  const [templates, setTemplates] = useState<EnhancedNotificationTemplate[]>(mockTemplates);
   const [isNewTemplateDialogOpen, setIsNewTemplateDialogOpen] = useState(false);
   const [isEditTemplateDialogOpen, setIsEditTemplateDialogOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<EnhancedNotificationTemplate | null>(null);
-  const { toast } = useToast();
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   
-  // Filter templates based on search query
+  const form = useForm<TemplateFormValues>({
+    resolver: zodResolver(templateSchema),
+    defaultValues: {
+      name: '',
+      eventType: '',
+      subject: '',
+      body: ''
+    }
+  });
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+  
   const filteredTemplates = searchQuery
     ? templates.filter(template => 
         template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+        template.eventType.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : templates;
   
   const handleNewTemplate = () => {
+    form.reset({
+      name: '',
+      eventType: '',
+      subject: '',
+      body: ''
+    });
     setIsNewTemplateDialogOpen(true);
   };
   
-  const handleEditTemplate = (template: EnhancedNotificationTemplate) => {
-    setSelectedTemplate(template);
-    setIsEditTemplateDialogOpen(true);
+  const handleEditTemplate = (id: string) => {
+    const template = templates.find(t => t.id === id);
+    if (template) {
+      form.reset({
+        name: template.name,
+        eventType: template.eventType,
+        subject: template.subject,
+        body: template.body
+      });
+      setSelectedTemplateId(id);
+      setIsEditTemplateDialogOpen(true);
+    }
   };
   
-  const handleAddTemplate = () => {
-    const newTemplate: EnhancedNotificationTemplate = {
+  const handleAddTemplate = (data: TemplateFormValues) => {
+    const newTemplate: NotificationTemplate = {
       id: `template-${Date.now()}`,
-      name: "New Template",
-      category: "notification",
-      tags: ["custom"],
-      description: "New notification template",
-      metadata: {
-        processType: "notification",
-        audience: ["users"],
-        importance: "medium"
-      },
-      baseTemplate: {
-        subject: "New Notification",
-        body: "This is a new notification template."
-      },
-      channelVariants: {
-        email: {
-          format: "html",
-          content: "<p>This is a new notification template.</p>"
-        },
-        inApp: {
-          format: "text",
-          content: "New notification"
-        }
-      },
-      currentVersion: 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      name: data.name,
+      eventType: data.eventType,
+      subject: data.subject,
+      body: data.body,
+      lastModified: new Date().toISOString(),
+      lastModifiedBy: 'Current User'
     };
     
     setTemplates(prev => [...prev, newTemplate]);
     setIsNewTemplateDialogOpen(false);
-    toast({
-      title: "Template created",
-      description: "New notification template has been created successfully."
-    });
+    toast.success('Template created successfully');
   };
   
-  const handleUpdateTemplate = () => {
-    if (selectedTemplate) {
-      setTemplates(prev => prev.map(template => 
-        template.id === selectedTemplate.id ? 
-        {...selectedTemplate, updatedAt: new Date().toISOString()} : template
-      ));
-      setIsEditTemplateDialogOpen(false);
-      toast({
-        title: "Template updated",
-        description: "Notification template has been updated successfully."
-      });
-    }
+  const handleUpdateTemplate = (data: TemplateFormValues) => {
+    setTemplates(prev => prev.map(template => 
+      template.id === selectedTemplateId
+        ? {
+            ...template,
+            name: data.name,
+            eventType: data.eventType,
+            subject: data.subject,
+            body: data.body,
+            lastModified: new Date().toISOString(),
+            lastModifiedBy: 'Current User'
+          }
+        : template
+    ));
+    setIsEditTemplateDialogOpen(false);
+    toast.success('Template updated successfully');
   };
-    
+  
+  const handleDeleteTemplate = (id: string) => {
+    setTemplates(prev => prev.filter(template => template.id !== id));
+    toast.success('Template deleted successfully');
+  };
+  
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="relative w-full md:w-1/3">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="relative w-64">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search templates..."
             className="pl-8"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
         <Button onClick={handleNewTemplate}>
@@ -173,56 +159,44 @@ const NotificationTemplateList: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Channels</TableHead>
-                <TableHead>Last Updated</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Template Name</TableHead>
+                <TableHead>Event Type</TableHead>
+                <TableHead>Last Modified</TableHead>
+                <TableHead>Modified By</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredTemplates.length > 0 ? (
-                filteredTemplates.map((template) => (
+                filteredTemplates.map(template => (
                   <TableRow key={template.id}>
-                    <TableCell className="font-medium">
-                      <div>
-                        {template.name}
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {template.description}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize">
-                        {template.category}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-1">
-                        {template.channelVariants && Object.keys(template.channelVariants).map(channel => (
-                          <div key={channel} className="flex items-center" title={channel}>
-                            {getChannelIcon(channel)}
-                          </div>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(template.updatedAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={template.metadata.importance === 'critical' ? 'destructive' : 'secondary'}>
-                        {template.metadata.importance}
-                      </Badge>
-                    </TableCell>
+                    <TableCell className="font-medium">{template.name}</TableCell>
+                    <TableCell>{template.eventType}</TableCell>
+                    <TableCell>{new Date(template.lastModified).toLocaleDateString()}</TableCell>
+                    <TableCell>{template.lastModifiedBy}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" onClick={() => handleEditTemplate(template)}>Edit</Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditTemplate(template.id)}
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteTemplate(template.id)}
+                      >
+                        <Trash className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
                     No templates found. Try adjusting your search or create a new template.
                   </TableCell>
                 </TableRow>
@@ -234,52 +208,181 @@ const NotificationTemplateList: React.FC = () => {
       
       {/* New Template Dialog */}
       <Dialog open={isNewTemplateDialogOpen} onOpenChange={setIsNewTemplateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Create New Template</DialogTitle>
+            <DialogTitle>Create New Notification Template</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-muted-foreground mb-4">
-              This is a placeholder for the template creation form. In a production environment, this would include fields for template name, content, and channel variant configuration.
-            </p>
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsNewTemplateDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddTemplate}>
-              Create Template
-            </Button>
-          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleAddTemplate)} className="space-y-4 py-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Template Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter template name" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="eventType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Type</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select event type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="incident-created">Incident Created</SelectItem>
+                        <SelectItem value="incident-updated">Incident Updated</SelectItem>
+                        <SelectItem value="incident-resolved">Incident Resolved</SelectItem>
+                        <SelectItem value="problem-created">Problem Created</SelectItem>
+                        <SelectItem value="problem-assigned">Problem Assigned</SelectItem>
+                        <SelectItem value="problem-resolved">Problem Resolved</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subject</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter email subject" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="body"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Body Template</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enter template body" 
+                        className="min-h-[150px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter className="pt-4">
+                <Button variant="outline" type="button" onClick={() => setIsNewTemplateDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">Create Template</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
       
       {/* Edit Template Dialog */}
       <Dialog open={isEditTemplateDialogOpen} onOpenChange={setIsEditTemplateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Edit Template</DialogTitle>
+            <DialogTitle>Edit Notification Template</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-muted-foreground mb-4">
-              This is a placeholder for the template editing form. In a production environment, this would include fields for editing template name, content, and channel variants.
-            </p>
-            {selectedTemplate && (
-              <div className="space-y-2">
-                <p><strong>Name:</strong> {selectedTemplate.name}</p>
-                <p><strong>Category:</strong> {selectedTemplate.category}</p>
-                <p><strong>Description:</strong> {selectedTemplate.description}</p>
-              </div>
-            )}
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsEditTemplateDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleUpdateTemplate}>
-              Update Template
-            </Button>
-          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleUpdateTemplate)} className="space-y-4 py-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Template Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter template name" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="eventType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Type</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select event type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="incident-created">Incident Created</SelectItem>
+                        <SelectItem value="incident-updated">Incident Updated</SelectItem>
+                        <SelectItem value="incident-resolved">Incident Resolved</SelectItem>
+                        <SelectItem value="problem-created">Problem Created</SelectItem>
+                        <SelectItem value="problem-assigned">Problem Assigned</SelectItem>
+                        <SelectItem value="problem-resolved">Problem Resolved</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Subject</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter email subject" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="body"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Body Template</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enter template body" 
+                        className="min-h-[150px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter className="pt-4">
+                <Button variant="outline" type="button" onClick={() => setIsEditTemplateDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">Update Template</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
