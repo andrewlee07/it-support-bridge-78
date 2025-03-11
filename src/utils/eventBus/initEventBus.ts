@@ -29,8 +29,17 @@ export const publishEvent = (
   data: any,
   metadata: Record<string, any> = {}
 ): string => {
-  const eventId = `evt-${uuidv4()}`;
+  const eventId = uuidv4();
   
+  // Looking at EventBus.publish method signature, it expects type, source, data, and metadata
+  eventBus.publish(
+    type,
+    source as any, // Cast to EventSource
+    data,
+    metadata
+  );
+  
+  // Also send to webhook service
   const event: SystemEvent = {
     id: eventId,
     type,
@@ -39,14 +48,10 @@ export const publishEvent = (
     data,
     metadata: {
       ...metadata,
-      timestamp: new Date().toISOString()
+      correlationId: metadata.correlationId || uuidv4()
     }
   };
   
-  // Publish to event bus
-  eventBus.publish(event);
-  
-  // Also send to webhook service
   webhookService.processEvent(event).catch(err => {
     console.error('Error processing webhooks for event', eventId, err);
   });
