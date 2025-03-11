@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
-import { fetchBacklogItems, updateBacklogItemStatus, createBacklogItem } from '@/utils/api/backlogApi';
+import { fetchBacklogItems, updateBacklogItem, createBacklogItem } from '@/utils/api/backlogApi';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -60,8 +60,8 @@ const BacklogKanban: React.FC = () => {
       );
       setBacklogItems(updatedItems);
       
-      // Update in backend
-      await updateBacklogItemStatus(draggableId, newStatus);
+      // Update in backend - using updateBacklogItem instead of updateBacklogItemStatus
+      await updateBacklogItem(draggableId, { status: newStatus });
       toast.success(`Item moved to ${newStatus}`);
     } catch (error) {
       // Revert on error
@@ -89,8 +89,8 @@ const BacklogKanban: React.FC = () => {
       );
       setBacklogItems(updatedItems);
       
-      // Update in backend
-      await updateBacklogItemStatus(itemId, newStatus);
+      // Update in backend - using updateBacklogItem instead of updateBacklogItemStatus
+      await updateBacklogItem(itemId, { status: newStatus });
       toast.success(`Item status updated to ${newStatus}`);
     } catch (error) {
       toast.error('Failed to update item status');
