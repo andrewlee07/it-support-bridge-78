@@ -177,3 +177,5 @@ export interface SprintRelease {
   sprints: Sprint[];
   items: BacklogItem[];
 }
+
+export type BacklogViewType = 'kanban' | 'list' | 'timeline' | 'calendar' | 'reporting';

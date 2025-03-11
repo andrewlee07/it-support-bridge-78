@@ -5,6 +5,8 @@ import PageTransition from '@/components/shared/PageTransition';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
 import KanbanHeader from '@/components/backlog/kanban/header/KanbanHeader';
 import { useBacklogKanban } from '@/hooks/backlog/useBacklogKanban';
+import { BacklogViewSelector } from '@/components/backlog/views/BacklogViewSelector';
+import { useBacklogViews } from '@/hooks/backlog/useBacklogViews';
 
 const BacklogKanban: React.FC = () => {
   const {
@@ -18,14 +20,22 @@ const BacklogKanban: React.FC = () => {
     handleViewDimensionChange,
   } = useBacklogKanban();
 
+  const { currentView, handleViewChange } = useBacklogViews();
+
   return (
     <PageTransition>
       <TooltipProvider>
         <div className="container py-6">
-          <KanbanHeader 
-            viewDimension={viewDimension}
-            onViewDimensionChange={handleViewDimensionChange}
-          />
+          <div className="flex justify-between items-center mb-6">
+            <KanbanHeader 
+              viewDimension={viewDimension}
+              onViewDimensionChange={handleViewDimensionChange}
+            />
+            <BacklogViewSelector 
+              currentView={currentView}
+              onViewChange={handleViewChange}
+            />
+          </div>
 
           <div data-kanban-board>
             <KanbanBoard 
