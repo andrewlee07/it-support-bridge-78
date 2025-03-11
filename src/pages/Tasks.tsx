@@ -30,6 +30,11 @@ const Tasks: React.FC = () => {
   const [onlyAssignedToMe, setOnlyAssignedToMe] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<TaskViewMode>('grid');
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState<boolean>(false);
+  
+  // Advanced filtering state
+  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const [finishDateOption, setFinishDateOption] = useState<string>('any');
+  const [customFinishDate, setCustomFinishDate] = useState<Date | undefined>(undefined);
 
   // Load tasks
   useEffect(() => {
@@ -61,16 +66,93 @@ const Tasks: React.FC = () => {
     loadTasks();
   }, [searchQuery, statusFilter, priorityFilter, onlyAssignedToMe, user?.id]);
 
-  // Apply client-side filters (overdue)
+  // Apply client-side filters (overdue, goals, finish date)
   useEffect(() => {
     let result = [...tasks];
     
+    // Apply overdue filter
     if (onlyOverdue) {
       result = result.filter(task => isTaskOverdue(task));
     }
     
+    // Apply goals filter
+    if (selectedGoals.length > 0) {
+      // In a real app, tasks would have a goals field
+      // This is a placeholder implementation
+      result = result.filter(task => {
+        // Mock - in reality you'd check if any of selectedGoals are in task.goals
+        // For now, we'll just filter based on task.id to demonstrate
+        return selectedGoals.some(goal => task.id.includes(goal.slice(-1)));
+      });
+    }
+    
+    // Apply finish date filter
+    if (finishDateOption !== 'any') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const oneWeekLater = new Date(today);
+      oneWeekLater.setDate(oneWeekLater.getDate() + 7);
+      
+      const oneMonthLater = new Date(today);
+      oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+      
+      switch (finishDateOption) {
+        case 'today':
+          result = result.filter(task => {
+            if (!task.dueDate) return false;
+            const dueDate = new Date(task.dueDate);
+            return dueDate >= today && dueDate < tomorrow;
+          });
+          break;
+        case 'tomorrow':
+          result = result.filter(task => {
+            if (!task.dueDate) return false;
+            const dueDate = new Date(task.dueDate);
+            const nextDay = new Date(tomorrow);
+            nextDay.setDate(nextDay.getDate() + 1);
+            return dueDate >= tomorrow && dueDate < nextDay;
+          });
+          break;
+        case 'this-week':
+          result = result.filter(task => {
+            if (!task.dueDate) return false;
+            const dueDate = new Date(task.dueDate);
+            return dueDate >= today && dueDate < oneWeekLater;
+          });
+          break;
+        case 'this-month':
+          result = result.filter(task => {
+            if (!task.dueDate) return false;
+            const dueDate = new Date(task.dueDate);
+            return dueDate >= today && dueDate < oneMonthLater;
+          });
+          break;
+        case 'overdue':
+          result = result.filter(task => isTaskOverdue(task));
+          break;
+        case 'no-date':
+          result = result.filter(task => !task.dueDate);
+          break;
+        case 'custom':
+          if (customFinishDate) {
+            const nextDay = new Date(customFinishDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            result = result.filter(task => {
+              if (!task.dueDate) return false;
+              const dueDate = new Date(task.dueDate);
+              return dueDate >= customFinishDate && dueDate < nextDay;
+            });
+          }
+          break;
+      }
+    }
+    
     setFilteredTasks(result);
-  }, [tasks, onlyOverdue]);
+  }, [tasks, onlyOverdue, selectedGoals, finishDateOption, customFinishDate]);
 
   const handleTaskClick = (taskId: string) => {
     navigate(`/tasks/${taskId}`);
@@ -104,6 +186,7 @@ const Tasks: React.FC = () => {
           <h3 className="text-xl font-medium mb-2">No tasks found</h3>
           <p className="text-muted-foreground mb-4">
             {searchQuery || statusFilter !== 'all' || priorityFilter !== 'all' || onlyOverdue || onlyAssignedToMe
+              || selectedGoals.length > 0 || finishDateOption !== 'any'
               ? "Try adjusting your filters"
               : "Get started by creating your first task"}
           </p>
@@ -159,6 +242,13 @@ const Tasks: React.FC = () => {
                 onOverdueChange={setOnlyOverdue}
                 onlyAssignedToMe={onlyAssignedToMe}
                 onAssignedToMeChange={setOnlyAssignedToMe}
+                // New advanced filtering props
+                selectedGoals={selectedGoals}
+                onGoalsChange={setSelectedGoals}
+                finishDateOption={finishDateOption}
+                onFinishDateOptionChange={setFinishDateOption}
+                customFinishDate={customFinishDate}
+                onCustomFinishDateChange={setCustomFinishDate}
               />
               
               <div className="flex justify-end">
