@@ -1,3 +1,4 @@
+
 import { toast } from 'sonner';
 import { KanbanBoardConfig, sprintColumnsConfig, defaultKanbanConfig } from '@/utils/types/kanbanTypes';
 import { BacklogItem } from '@/utils/types/backlogTypes';
@@ -76,7 +77,14 @@ export function useKanbanBoardActions(
   };
 
   const handleCreateItem = () => {
+    setNewItemDialogOpen(true);
     onCreateItem();
+  };
+
+  const handleAddColumn = () => {
+    // Open the board configuration dialog to add a column
+    toast.info("Opening board configuration where you can add new columns");
+    setBoardConfig({...boardConfig});
   };
 
   return {
@@ -86,6 +94,7 @@ export function useKanbanBoardActions(
     handleNewItemSuccess,
     handleNewItemCancel,
     handleAddItem,
-    handleCreateItem
+    handleCreateItem,
+    handleAddColumn
   };
 }

@@ -83,7 +83,8 @@ export function useKanbanBoard({
     handleNewItemSuccess: actionHandleNewItemSuccess,
     handleNewItemCancel: actionHandleNewItemCancel,
     handleAddItem: actionHandleAddItem,
-    handleCreateItem: actionHandleCreateItem
+    handleCreateItem: actionHandleCreateItem,
+    handleAddColumn: actionHandleAddColumn
   } = useKanbanBoardActions(
     { backlogItems, viewDimension, onCreateItem },
     boardConfig,
@@ -140,7 +141,13 @@ export function useKanbanBoard({
   };
 
   const handleCreateItem = () => {
+    setNewItemDialogOpen(true);
     onCreateItem();
+  };
+  
+  const handleAddColumn = () => {
+    setConfigOpen(true);
+    toast.info("Use the configuration panel to add new columns");
   };
 
   return {
@@ -160,6 +167,7 @@ export function useKanbanBoard({
     handleNewItemCancel,
     handleAddBucket,
     handleAddItem,
-    handleCreateItem
+    handleCreateItem,
+    handleAddColumn
   };
 }

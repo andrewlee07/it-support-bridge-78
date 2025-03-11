@@ -50,7 +50,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     handleNewItemCancel,
     handleAddBucket,
     handleAddItem,
-    handleCreateItem
+    handleCreateItem,
+    handleAddColumn
   } = useKanbanBoard({
     backlogItems,
     viewDimension,
@@ -67,7 +68,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         <KanbanBoardHeader 
           onConfigOpen={() => setConfigOpen(true)} 
           onCreateItem={handleCreateItem}
-          onAddColumn={handleAddBucket}
+          onAddColumn={handleAddColumn}
           viewDimension={viewDimension}
         />
 
