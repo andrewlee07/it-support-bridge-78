@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import KanbanBoard from '@/components/backlog/kanban/KanbanBoard';
 import { fetchBacklogItems, updateBacklogItem, createBacklogItem } from '@/utils/api/backlogApi';
-import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
+import { BacklogItem, BacklogItemStatus, BacklogItemPriority } from '@/utils/types/backlogTypes';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ListIcon, Settings, Filter } from 'lucide-react';
@@ -77,43 +77,43 @@ const BacklogKanban: React.FC = () => {
         toast.success(`Item moved to ${newStatus}`);
       } 
       else if (viewDimension === 'sprint') {
-        const newSprint = destination.droppableId.replace('sprint-', '');
+        const releaseId = destination.droppableId.replace('sprint-', '');
         
         // Optimistically update UI
         const updatedItems = backlogItems.map(item => 
-          item.id === draggableId ? { ...item, sprint: newSprint } : item
+          item.id === draggableId ? { ...item, releaseId } : item
         );
         setBacklogItems(updatedItems);
         
         // Update in backend
-        await updateBacklogItem(draggableId, { sprint: newSprint });
+        await updateBacklogItem(draggableId, { releaseId });
         toast.success(`Item moved to ${destination.droppableId}`);
       }
       else if (viewDimension === 'assignee') {
-        const newAssigneeId = destination.droppableId.replace('assignee-', '');
+        const assignee = destination.droppableId.replace('assignee-', '');
         
         // Optimistically update UI
         const updatedItems = backlogItems.map(item => 
-          item.id === draggableId ? { ...item, assigneeId: newAssigneeId } : item
+          item.id === draggableId ? { ...item, assignee } : item
         );
         setBacklogItems(updatedItems);
         
         // Update in backend
-        await updateBacklogItem(draggableId, { assigneeId: newAssigneeId });
+        await updateBacklogItem(draggableId, { assignee });
         toast.success(`Item assigned to new team member`);
       }
       else if (viewDimension === 'priority') {
-        const newPriority = destination.droppableId.replace('priority-', '');
+        const priorityValue = destination.droppableId.replace('priority-', '') as BacklogItemPriority;
         
         // Optimistically update UI
         const updatedItems = backlogItems.map(item => 
-          item.id === draggableId ? { ...item, priority: newPriority } : item
+          item.id === draggableId ? { ...item, priority: priorityValue } : item
         );
         setBacklogItems(updatedItems);
         
         // Update in backend
-        await updateBacklogItem(draggableId, { priority: newPriority });
-        toast.success(`Item priority changed to ${newPriority}`);
+        await updateBacklogItem(draggableId, { priority: priorityValue });
+        toast.success(`Item priority changed to ${priorityValue}`);
       }
       else if (viewDimension === 'label') {
         const newLabel = destination.droppableId.replace('label-', '');
@@ -185,7 +185,7 @@ const BacklogKanban: React.FC = () => {
 
   const handleCreateItem = async (defaultStatus?: string) => {
     try {
-      const status = defaultStatus as BacklogItemStatus || 'todo';
+      const status = defaultStatus as BacklogItemStatus || 'open';
       // Navigate to create page with default status
       navigate('/backlog/create', { state: { defaultStatus: status } });
     } catch (error) {

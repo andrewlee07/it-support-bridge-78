@@ -72,8 +72,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           backlogItems
             .filter(item => item.assignee)
             .map(item => ({
-              id: item.assigneeId || 'unassigned',
-              name: item.assignee?.name || 'Unassigned'
+              id: item.assignee || 'unassigned',
+              name: typeof item.assignee === 'string' ? item.assignee : 'Unassigned'
             }))
         )
       );
@@ -161,19 +161,20 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       return backlogItems.filter(item => item.status === column);
     } 
     else if (viewDimension === 'sprint') {
-      const sprintValue = columnId.replace('sprint-', '');
+      // Sprint is not in the BacklogItem type, so we'll handle it differently
+      // This is a placeholder. We would need to extend BacklogItem to include sprint
       return backlogItems.filter(item => 
-        sprintValue === 'backlog' 
-          ? !item.sprint 
-          : item.sprint === sprintValue
+        column === 'backlog' 
+          ? !item.releaseId 
+          : columnId === item.releaseId
       );
     }
     else if (viewDimension === 'assignee') {
-      const assigneeId = columnId.replace('assignee-', '');
+      const assigneeValue = columnId.replace('assignee-', '');
       return backlogItems.filter(item => 
-        assigneeId === 'unassigned' 
-          ? !item.assigneeId 
-          : item.assigneeId === assigneeId
+        assigneeValue === 'unassigned' 
+          ? !item.assignee 
+          : item.assignee === assigneeValue
       );
     }
     else if (viewDimension === 'priority') {

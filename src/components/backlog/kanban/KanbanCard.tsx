@@ -145,7 +145,7 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
           <div className="w-full flex justify-between items-center">
             <span>#{item.id.substring(0, 8)}</span>
             {item.assignee && (
-              <span>Assigned: {item.assignee.substring(0, 8)}</span>
+              <span>Assigned: {typeof item.assignee === 'string' ? item.assignee.substring(0, 8) : item.assignee}</span>
             )}
           </div>
         </CardFooter>

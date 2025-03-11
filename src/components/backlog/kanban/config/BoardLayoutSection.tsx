@@ -27,7 +27,7 @@ const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
       <CardContent className="space-y-4">
         <div>
           <Label className="mb-2 block">View Dimension</Label>
-          <Select value={viewType} onValueChange={onViewTypeChange}>
+          <Select value={viewType} onValueChange={(value) => onViewTypeChange(value as 'status' | 'sprint' | 'assignee' | 'priority' | 'label')}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select view type" />
             </SelectTrigger>
@@ -46,7 +46,7 @@ const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
         
         <div>
           <Label className="mb-2 block">Layout Style</Label>
-          <RadioGroup value={layout} onValueChange={value => onLayoutChange(value as 'horizontal' | 'grid')}>
+          <RadioGroup value={layout} onValueChange={(value) => onLayoutChange(value as 'horizontal' | 'grid')}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="horizontal" id="horizontal" />
               <Label htmlFor="horizontal">Horizontal (Scrollable)</Label>

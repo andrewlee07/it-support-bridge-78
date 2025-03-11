@@ -53,7 +53,10 @@ const KanbanColumns: React.FC<KanbanColumnsProps> = ({
           className="w-full h-full pb-4"
           type="always"
         >
-          <div className="flex gap-4 min-w-max pb-4 pr-4 pl-1 pt-1">
+          <div className={cn(
+            "flex gap-4 pb-4 pr-4 pl-1 pt-1",
+            boardConfig.layout === 'horizontal' ? "min-w-max" : "flex-wrap"
+          )}>
             {sortedColumns.map((column) => (
               <KanbanColumn
                 key={column.id}
