@@ -11,16 +11,15 @@ import {
   TooltipTrigger 
 } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
+import { ViewDimension } from '@/hooks/backlog/kanban/types';
 
 interface KanbanBoardHeaderProps {
-  onConfigOpen: () => void;
   onCreateItem: () => void;
   onAddColumn: () => void;
-  viewDimension?: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
+  viewDimension?: ViewDimension;
 }
 
 const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({ 
-  onConfigOpen, 
   onCreateItem,
   onAddColumn,
   viewDimension = 'status'
@@ -30,7 +29,10 @@ const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({
     sprint: 'Sprint',
     assignee: 'Assignee',
     priority: 'Priority',
-    label: 'Label'
+    label: 'Label',
+    release: 'Release',
+    progress: 'Progress',
+    'due-date': 'Due Date'
   }[viewDimension];
   
   return (
@@ -40,7 +42,7 @@ const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({
           View: By {dimensionLabel}
         </Badge>
         <span className="text-sm text-muted-foreground">
-          Drag items between columns to update their {viewDimension.toLowerCase()}
+          Drag items between columns to update their {viewDimension.replace('-', ' ').toLowerCase()}
         </span>
       </div>
       <div className="flex gap-2">

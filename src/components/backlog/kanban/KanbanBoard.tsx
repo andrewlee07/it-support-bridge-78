@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { DropResult } from 'react-beautiful-dnd';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { ViewDimension } from '@/hooks/backlog/kanban/types';
 
 // Component imports
 import KanbanBoardHeader from './components/KanbanBoardHeader';
@@ -19,7 +20,7 @@ interface KanbanBoardProps {
   onQuickStatusChange: (itemId: string, newStatus: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
   onCreateItem: (defaultStatus?: string) => void;
-  viewDimension?: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
+  viewDimension?: ViewDimension;
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
@@ -66,7 +67,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     <TooltipProvider>
       <div ref={boardRef} className="h-full">
         <KanbanBoardHeader 
-          onConfigOpen={() => setConfigOpen(true)} 
           onCreateItem={handleCreateItem}
           onAddColumn={handleAddColumn}
           viewDimension={viewDimension}

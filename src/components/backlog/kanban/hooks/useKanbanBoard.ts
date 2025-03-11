@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { BacklogItem } from '@/utils/types/backlogTypes';
@@ -92,7 +93,8 @@ export function useKanbanBoard({
     setNewItemDialogOpen,
     setEditingItem,
     setDefaultStatus,
-    collapsedColumns
+    collapsedColumns,
+    setConfigOpen
   );
 
   // Create wrapper functions to handle local state properly
@@ -136,6 +138,7 @@ export function useKanbanBoard({
 
   const handleAddItem = (status: string) => {
     setDefaultStatus(status);
+    setNewItemDialogOpen(true);
     onCreateItem(status);
   };
 
