@@ -68,4 +68,12 @@ export type EventType =
   | 'reminder.due'                // When a reminder is due
   | 'reminder.recurring'          // When a recurring reminder is triggered
   | 'reminder.snoozed'            // When a reminder is snoozed
-  | 'reminder.canceled';          // When a reminder is canceled
+  | 'reminder.canceled'           // When a reminder is canceled
+  | 'testCase.created'            // When a new test case is created
+  | 'testCase.updated'            // When a test case is modified
+  | 'testExecution.scheduled'     // When test execution is scheduled
+  | 'testExecution.started'       // When test execution begins
+  | 'testExecution.failed'        // When a test execution fails
+  | 'testExecution.completed'     // When test execution is completed
+  | 'testExecution.blocked';      // When test execution is blocked
+

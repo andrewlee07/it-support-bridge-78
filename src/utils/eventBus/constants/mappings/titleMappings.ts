@@ -70,5 +70,15 @@ export const EVENT_TITLE_MAP: Record<EventType, string> = {
   'reminder.due': 'Reminder now due',
   'reminder.recurring': 'Recurring reminder',
   'reminder.snoozed': 'Reminder snoozed',
-  'reminder.canceled': 'Reminder canceled'
+  'reminder.canceled': 'Reminder canceled',
+  // Test case events
+  'testCase.created': 'New test case created',
+  'testCase.updated': 'Test case updated',
+  // Test execution events
+  'testExecution.scheduled': 'Test execution scheduled',
+  'testExecution.started': 'Test execution started',
+  'testExecution.failed': 'Test execution failed',
+  'testExecution.completed': 'Test execution completed',
+  'testExecution.blocked': 'Test execution blocked'
 };
+

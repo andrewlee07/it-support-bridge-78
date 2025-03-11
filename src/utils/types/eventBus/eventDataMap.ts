@@ -10,6 +10,7 @@ import { KnownErrorEventData } from './knownErrorEventTypes';
 import { ReleaseEventData } from './releaseEventTypes';
 import { BacklogItemEventData } from './backlogItemEventTypes';
 import { ReminderEventData } from './reminderEventTypes';
+import { TestCaseEventData, TestExecutionEventData } from './testEventTypes';
 
 // Map of event types to their data structures
 export interface EventDataMap {
@@ -59,5 +60,15 @@ export interface EventDataMap {
   'reminder.recurring': ReminderEventData;
   'reminder.snoozed': ReminderEventData;
   'reminder.canceled': ReminderEventData;
+  // Test case events
+  'testCase.created': TestCaseEventData;
+  'testCase.updated': TestCaseEventData;
+  // Test execution events
+  'testExecution.scheduled': TestExecutionEventData;
+  'testExecution.started': TestExecutionEventData;
+  'testExecution.failed': TestExecutionEventData;
+  'testExecution.completed': TestExecutionEventData;
+  'testExecution.blocked': TestExecutionEventData;
   // Add more event type to data mappings as needed
 }
+

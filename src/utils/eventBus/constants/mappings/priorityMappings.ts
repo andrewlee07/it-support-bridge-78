@@ -66,10 +66,20 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'backlogItem.statusChanged': 'medium',
   'backlogItem.readyForReview': 'high',
   'backlogItem.completed': 'medium',
-  // Reminder events - priorities based on nature of the event
+  // Reminder events
   'reminder.upcoming': 'high',
   'reminder.due': 'critical',
   'reminder.recurring': 'medium',
   'reminder.snoozed': 'low',
-  'reminder.canceled': 'low'
+  'reminder.canceled': 'low',
+  // Test case events
+  'testCase.created': 'medium',
+  'testCase.updated': 'low',
+  // Test execution events
+  'testExecution.scheduled': 'medium',
+  'testExecution.started': 'medium',
+  'testExecution.failed': 'high',
+  'testExecution.completed': 'medium',
+  'testExecution.blocked': 'high'
 };
+

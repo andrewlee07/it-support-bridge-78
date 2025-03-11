@@ -20,8 +20,21 @@ export const categoryToEventTypes: Record<string, EventType[]> = {
     'problem.resolved',
     'problem.closed'
   ],
-  bugs: ['test.failed'],
-  testCases: ['test.created', 'test.executed', 'test.passed'],
+  bugs: [
+    'test.failed', 
+    'testExecution.failed',
+    'testExecution.blocked'
+  ],
+  testCases: [
+    'test.created', 
+    'test.executed', 
+    'test.passed',
+    'testCase.created',
+    'testCase.updated',
+    'testExecution.scheduled',
+    'testExecution.started',
+    'testExecution.completed'
+  ],
   backlogItems: [
     'backlogItem.created',
     'backlogItem.priorityChanged',
@@ -65,6 +78,10 @@ export const categoryToEventTypes: Record<string, EventType[]> = {
     'task.created', 
     'task.updated', 
     'task.completed',
+    'task.assigned',
+    'task.dueDateApproaching',
+    'task.overdue',
+    'task.statusChanged',
     'reminder.upcoming',
     'reminder.due',
     'reminder.recurring',
@@ -99,3 +116,4 @@ export const defaultSettings = {
     low: true
   }
 };
+

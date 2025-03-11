@@ -66,10 +66,20 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'backlogItem.statusChanged': 'backlogItem',
   'backlogItem.readyForReview': 'backlogItem',
   'backlogItem.completed': 'backlogItem',
-  // Reminder events - using 'task' type as it's most similar for reminders
+  // Reminder events
   'reminder.upcoming': 'task',
   'reminder.due': 'task',
   'reminder.recurring': 'task',
   'reminder.snoozed': 'task',
-  'reminder.canceled': 'task'
+  'reminder.canceled': 'task',
+  // Test case events
+  'testCase.created': 'testCase',
+  'testCase.updated': 'testCase',
+  // Test execution events
+  'testExecution.scheduled': 'testCase',
+  'testExecution.started': 'testCase',
+  'testExecution.failed': 'bug',
+  'testExecution.completed': 'testCase',
+  'testExecution.blocked': 'bug'
 };
+
