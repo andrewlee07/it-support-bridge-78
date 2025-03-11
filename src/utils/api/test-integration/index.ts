@@ -52,6 +52,7 @@ export const getBacklogItemCoverage = async (
     tc.status === 'fail' || tc.status === 'failed'
   ).length;
   const notExecutedTests = totalTestCases - passedTests - failedTests;
+  const skippedTests = notExecutedTests; // For compatibility with new interface
   
   // Calculate coverage percentage - for simplicity, we're just using the
   // number of test cases as a proxy for coverage
@@ -59,14 +60,20 @@ export const getBacklogItemCoverage = async (
     Math.min(100, Math.round((totalTestCases / 5) * 100)) : 0;
   
   const coverage: BacklogTestCoverage = {
-    totalTestCases,
+    totalTests: totalTestCases > 0 ? 5 : 0, // Assuming 5 test cases would be 100% coverage
     passedTests,
     failedTests,
+    skippedTests,
+    lastRun: new Date(),
+    
+    // For backward compatibility
+    totalTestCases,
     notExecutedTests,
     coveragePercentage,
     lastUpdated: new Date(),
+    
     // For compatibility with TestCoverageIndicator
-    total: totalTestCases > 0 ? 5 : 0, // Assuming 5 test cases would be 100% coverage
+    total: totalTestCases > 0 ? 5 : 0,
     covered: totalTestCases,
     passed: passedTests,
     failed: failedTests

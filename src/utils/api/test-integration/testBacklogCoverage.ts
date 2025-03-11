@@ -1,79 +1,37 @@
+import { delay, createApiSuccessResponse } from '../apiHelpers';
+import { ApiResponse } from '@/utils/types/api';
+import { BacklogTestCoverage } from '@/utils/types/backlogTypes';
 
-import {
-  delay,
-  createApiSuccessResponse,
-  createApiErrorResponse,
-  testCases,
-  backlogItems,
-  testBacklogRelationships,
-  ApiResponse
-} from './common';
-import { TestCase } from '../../types/test';
-import { BacklogTestCoverage } from '../../types/backlogTypes';
-
-// Get all test cases linked to a backlog item
-export const getLinkedTestCases = async (backlogItemId: string): Promise<ApiResponse<TestCase[]>> => {
-  await delay(500);
+// Get the test coverage for a backlog item
+export const getBacklogItemTestCoverage = async (
+  backlogItemId: string
+): Promise<ApiResponse<BacklogTestCoverage>> => {
+  // Mock implementation - generate random coverage data
+  const totalTestCases = Math.floor(Math.random() * 10) + 5; // 5-15 test cases
+  const passedTests = Math.floor(Math.random() * totalTestCases);
+  const failedTests = Math.floor(Math.random() * (totalTestCases - passedTests));
+  const notExecutedTests = totalTestCases - passedTests - failedTests;
   
-  // Find all relationships for this backlog item
-  const relationships = testBacklogRelationships.filter(rel => rel.backlogItemId === backlogItemId);
-  
-  if (relationships.length === 0) {
-    return createApiSuccessResponse([]);
-  }
-  
-  // Get test case IDs from relationships
-  const testCaseIds = relationships.map(rel => rel.testCaseId);
-  
-  // Find the test cases
-  const linkedTestCases = testCases.filter(tc => testCaseIds.includes(tc.id));
-  
-  return createApiSuccessResponse(linkedTestCases);
-};
-
-// Get coverage statistics for a backlog item
-export const getBacklogItemCoverage = async (backlogItemId: string): Promise<ApiResponse<BacklogTestCoverage>> => {
-  await delay(500);
-  
-  // Find all relationships for this backlog item
-  const relationships = testBacklogRelationships.filter(rel => rel.backlogItemId === backlogItemId);
-  
-  // Get total number of test cases linked to this backlog item
-  const totalTestCases = relationships.length;
-  
-  // Mock data for test execution status (in a real system, this would be fetched from test runs)
-  const passedTests = Math.floor(totalTestCases * 0.7); // 70% of tests are passed
-  const failedTests = Math.floor(totalTestCases * 0.2); // 20% are failed
-  const notExecutedTests = totalTestCases - passedTests - failedTests; // Remaining are not executed
-  
-  // Calculate coverage percentage
-  const coveragePercentage = totalTestCases > 0 ? Math.round((passedTests + failedTests) * 100 / totalTestCases) : 0;
-  
-  // Create coverage object
+  // Build the coverage object
   const coverage: BacklogTestCoverage = {
-    totalTestCases,
+    totalTests: totalTestCases,
     passedTests,
     failedTests,
-    notExecutedTests,
-    coveragePercentage,
-    lastUpdated: new Date()
+    skippedTests: notExecutedTests,
+    lastRun: new Date(),
+    
+    // Backward compatibility fields
+    totalTestCases,
+    notExecutedTests, 
+    coveragePercentage: Math.round((passedTests / totalTestCases) * 100),
+    lastUpdated: new Date(),
+    
+    // For compatibility with TestCoverageIndicator
+    total: totalTestCases,
+    covered: passedTests + failedTests,
+    passed: passedTests,
+    failed: failedTests
   };
   
   return createApiSuccessResponse(coverage);
-};
-
-// Mock data for unlinked test cases
-export const getUnlinkedTestCases = async (backlogItemId: string): Promise<ApiResponse<TestCase[]>> => {
-  await delay(500);
-  
-  // Find all relationships for this backlog item
-  const relationships = testBacklogRelationships.filter(rel => rel.backlogItemId === backlogItemId);
-  
-  // Get test case IDs from relationships
-  const linkedTestCaseIds = relationships.map(rel => rel.testCaseId);
-  
-  // Find test cases not linked to this backlog item
-  const unlinkedTestCases = testCases.filter(tc => !linkedTestCaseIds.includes(tc.id));
-  
-  return createApiSuccessResponse(unlinkedTestCases);
 };

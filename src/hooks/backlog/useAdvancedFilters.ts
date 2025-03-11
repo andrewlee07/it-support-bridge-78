@@ -1,11 +1,12 @@
-import { useState, useCallback, useMemo } from 'react';
+
+import { useState, useMemo } from 'react';
 import { BacklogItem } from '@/utils/types/backlogTypes';
-import { addDays, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isAfter, isBefore, isWithinInterval, isSameDay } from 'date-fns';
+import { format, isAfter, isBefore, isWithinInterval, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
+import { BacklogFilter, FilterPreset } from './kanban/types';
 
-// Define date filter types with 'any' as a valid option
-type DateFilterType = 'any' | 'today' | 'this-week' | 'this-month' | 'custom';
+export type DateFilterType = 'any' | 'today' | 'this-week' | 'this-month' | 'custom';
 
-interface DateFilter {
+export interface DateFilter {
   type: DateFilterType;
   customDate?: Date;
 }
