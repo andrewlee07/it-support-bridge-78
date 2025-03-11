@@ -8,6 +8,7 @@ import { ProblemEventData } from './problemEventTypes';
 import { KnowledgeArticleEventData } from './knowledgeEventTypes';
 import { KnownErrorEventData } from './knownErrorEventTypes';
 import { ReleaseEventData } from './releaseEventTypes';
+import { BacklogItemEventData } from './backlogItemEventTypes';
 
 // Map of event types to their data structures
 export interface EventDataMap {
@@ -39,5 +40,13 @@ export interface EventDataMap {
   'release.deploymentCompleted': ReleaseEventData;
   'release.deployed': ReleaseEventData;
   'release.rollback': ReleaseEventData;
+  // Backlog item events
+  'backlogItem.created': BacklogItemEventData;
+  'backlogItem.priorityChanged': BacklogItemEventData;
+  'backlogItem.addedToSprint': BacklogItemEventData;
+  'backlogItem.removedFromSprint': BacklogItemEventData;
+  'backlogItem.statusChanged': BacklogItemEventData;
+  'backlogItem.readyForReview': BacklogItemEventData;
+  'backlogItem.completed': BacklogItemEventData;
   // Add more event type to data mappings as needed
 }

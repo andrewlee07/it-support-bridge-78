@@ -31,13 +31,13 @@ export type EventType =
   | 'release.created'
   | 'release.updated'
   | 'release.deployed'
-  | 'release.planApproved'     // New: When a release plan is approved
-  | 'release.readyForTest'     // New: When a release is ready for testing
-  | 'release.testCompleted'    // New: When testing is completed for a release
-  | 'release.scheduledDeployment' // New: When deployment is scheduled
-  | 'release.deploymentStarted'   // New: When deployment begins
-  | 'release.deploymentCompleted' // New: When deployment is finished 
-  | 'release.rollback'         // New: When a release must be rolled back
+  | 'release.planApproved'     
+  | 'release.readyForTest'     
+  | 'release.testCompleted'    
+  | 'release.scheduledDeployment' 
+  | 'release.deploymentStarted'   
+  | 'release.deploymentCompleted' 
+  | 'release.rollback'         
   | 'asset.created'
   | 'asset.updated'
   | 'asset.retired'
@@ -45,11 +45,18 @@ export type EventType =
   | 'test.executed'
   | 'test.passed'
   | 'test.failed'
-  | 'knowledge.created'        // Added for Knowledge Articles
-  | 'knowledge.updated'        // Added for Knowledge Articles
-  | 'knowledge.published'      // Added for Knowledge Articles
-  | 'knownError.created'        // Added for Known Error Database
-  | 'knownError.updated'        // Added for Known Error Database
-  | 'knownError.workaroundUpdated' // Added for Known Error Database
-  | 'knownError.planToFix'      // Added for Known Error Database
-  | 'knownError.resolved';      // Added for Known Error Database
+  | 'knowledge.created'        
+  | 'knowledge.updated'        
+  | 'knowledge.published'      
+  | 'knownError.created'        
+  | 'knownError.updated'        
+  | 'knownError.workaroundUpdated' 
+  | 'knownError.planToFix'      
+  | 'knownError.resolved'       
+  | 'backlogItem.created'         // New: When a backlog item is created
+  | 'backlogItem.priorityChanged' // New: When a backlog item's priority changes
+  | 'backlogItem.addedToSprint'   // New: When a backlog item is added to a sprint
+  | 'backlogItem.removedFromSprint' // New: When a backlog item is removed from a sprint
+  | 'backlogItem.statusChanged'   // New: When a backlog item's status changes
+  | 'backlogItem.readyForReview'  // New: When a backlog item is ready for review
+  | 'backlogItem.completed';      // New: When a backlog item is completed

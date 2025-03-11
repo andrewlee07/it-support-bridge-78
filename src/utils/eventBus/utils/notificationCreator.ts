@@ -1,5 +1,4 @@
-
-import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData, KnowledgeArticleEventData } from '@/utils/types/eventBus';
+import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData, KnowledgeArticleEventData, BacklogItemEventData } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 import { v4 as uuidv4 } from 'uuid';
 import { EVENT_TITLE_MAP, EVENT_TO_NOTIFICATION_TYPE, EVENT_TO_PRIORITY } from '../constants/eventMappings';
@@ -146,6 +145,43 @@ export const createNotificationFromEvent = (event: SystemEvent): Notification =>
       
       actionUrl = `/releases/${releaseData.releaseId}`;
       entityId = releaseData.releaseId;
+      break;
+    
+    case 'backlogItem.created':
+    case 'backlogItem.priorityChanged':
+    case 'backlogItem.addedToSprint':
+    case 'backlogItem.removedFromSprint':
+    case 'backlogItem.statusChanged':
+    case 'backlogItem.readyForReview':
+    case 'backlogItem.completed':
+      const backlogData = event.data as BacklogItemEventData;
+      title = `${title}: ${backlogData.title}`;
+      
+      // Create appropriate message based on event type
+      if (event.type === 'backlogItem.created') {
+        message = `New backlog item created: ${backlogData.title}`;
+      } else if (event.type === 'backlogItem.priorityChanged') {
+        message = `Priority changed to ${backlogData.priority}`;
+        if (backlogData.reason) {
+          message += ` - Reason: ${backlogData.reason}`;
+        }
+      } else if (event.type === 'backlogItem.addedToSprint') {
+        message = `Added to sprint: ${backlogData.sprintName || ''}`;
+      } else if (event.type === 'backlogItem.removedFromSprint') {
+        message = `Removed from sprint${backlogData.sprintName ? `: ${backlogData.sprintName}` : ''}`;
+        if (backlogData.reason) {
+          message += ` - Reason: ${backlogData.reason}`;
+        }
+      } else if (event.type === 'backlogItem.statusChanged') {
+        message = `Status changed to ${backlogData.status}`;
+      } else if (event.type === 'backlogItem.readyForReview') {
+        message = `Ready for review. ${backlogData.reviewInstructions || ''}`;
+      } else if (event.type === 'backlogItem.completed') {
+        message = `Backlog item completed. ${backlogData.completionDetails || ''}`;
+      }
+      
+      actionUrl = `/backlog/${backlogData.backlogItemId}`;
+      entityId = backlogData.backlogItemId;
       break;
     
     // Add more event type handling as needed

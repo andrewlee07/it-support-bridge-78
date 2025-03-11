@@ -12,4 +12,5 @@ export * from './problemEventTypes';
 export * from './knownErrorEventTypes';
 export * from './knowledgeEventTypes';
 export * from './releaseEventTypes';
+export * from './backlogItemEventTypes';
 export * from './eventDataMap';
