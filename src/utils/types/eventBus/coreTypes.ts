@@ -2,7 +2,8 @@
 /**
  * Core event bus types defining the standard event structure and interfaces
  */
-import { EventType, EventSource, EventOrigin } from './eventTypes';
+import { EventType, EventSource } from './eventTypes';
+import { EventOrigin } from './sourceTypes';
 
 /**
  * Standard event structure for all system events

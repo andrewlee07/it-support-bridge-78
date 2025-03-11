@@ -15,5 +15,19 @@ export type EventSource =
   | 'knownErrorDatabase'
   | 'backlogSystem'
   | 'reminderService'
-  | 'testManagement';
+  | 'testManagement'
+  | 'kedb-service'     // Added for KnownErrorEventPublisher
+  | 'problem-service'  // Added for ProblemEventPublisher
+  | 'external-system'; // Added for webhook test events
 
+/**
+ * Event origin types
+ */
+export type EventOrigin = 
+  | 'web-app'
+  | 'mobile-app'
+  | 'api'
+  | 'scheduled-job'
+  | 'system'
+  | 'integration'
+  | 'background-job';

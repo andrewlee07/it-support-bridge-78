@@ -1,5 +1,5 @@
 
-import { EventBus } from '../EventBus';
+import EventBus from '../EventBus';
 import { TestCaseEventData, TestExecutionEventData } from '@/utils/types/eventBus/testEventTypes';
 import { EventSource } from '@/utils/types/eventBus/sourceTypes';
 
@@ -23,67 +23,87 @@ export class TestEventPublisher {
 
   // Test Case Events
   public publishTestCaseCreated(data: TestCaseEventData): void {
-    this.eventBus.publish({
-      type: 'testCase.created',
-      source: 'testManagement' as EventSource,
+    this.eventBus.publish(
+      'testCase.created',
+      'testManagement',
       data,
-      timestamp: new Date()
-    });
+      {
+        origin: 'web-app',
+        userId: data.createdBy
+      }
+    );
   }
 
   public publishTestCaseUpdated(data: TestCaseEventData): void {
-    this.eventBus.publish({
-      type: 'testCase.updated',
-      source: 'testManagement' as EventSource,
+    this.eventBus.publish(
+      'testCase.updated',
+      'testManagement',
       data,
-      timestamp: new Date()
-    });
+      {
+        origin: 'web-app',
+        userId: data.createdBy
+      }
+    );
   }
 
   // Test Execution Events
   public publishTestExecutionScheduled(data: TestExecutionEventData): void {
-    this.eventBus.publish({
-      type: 'testExecution.scheduled',
-      source: 'testManagement' as EventSource,
+    this.eventBus.publish(
+      'testExecution.scheduled',
+      'testManagement',
       data,
-      timestamp: new Date()
-    });
+      {
+        origin: 'web-app',
+        userId: data.scheduledBy
+      }
+    );
   }
 
   public publishTestExecutionStarted(data: TestExecutionEventData): void {
-    this.eventBus.publish({
-      type: 'testExecution.started',
-      source: 'testManagement' as EventSource,
+    this.eventBus.publish(
+      'testExecution.started',
+      'testManagement',
       data,
-      timestamp: new Date()
-    });
+      {
+        origin: 'web-app',
+        userId: data.executedBy
+      }
+    );
   }
 
   public publishTestExecutionFailed(data: TestExecutionEventData): void {
-    this.eventBus.publish({
-      type: 'testExecution.failed',
-      source: 'testManagement' as EventSource,
+    this.eventBus.publish(
+      'testExecution.failed',
+      'testManagement',
       data,
-      timestamp: new Date()
-    });
+      {
+        origin: 'web-app',
+        userId: data.executedBy
+      }
+    );
   }
 
   public publishTestExecutionCompleted(data: TestExecutionEventData): void {
-    this.eventBus.publish({
-      type: 'testExecution.completed',
-      source: 'testManagement' as EventSource,
+    this.eventBus.publish(
+      'testExecution.completed',
+      'testManagement',
       data,
-      timestamp: new Date()
-    });
+      {
+        origin: 'web-app',
+        userId: data.executedBy
+      }
+    );
   }
 
   public publishTestExecutionBlocked(data: TestExecutionEventData): void {
-    this.eventBus.publish({
-      type: 'testExecution.blocked',
-      source: 'testManagement' as EventSource,
+    this.eventBus.publish(
+      'testExecution.blocked',
+      'testManagement',
       data,
-      timestamp: new Date()
-    });
+      {
+        origin: 'web-app',
+        userId: data.executedBy
+      }
+    );
   }
 }
-

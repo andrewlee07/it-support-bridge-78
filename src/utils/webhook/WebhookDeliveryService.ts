@@ -1,6 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { SystemEvent, WebhookConfig, WebhookDeliveryLog, EventSource, EventOrigin } from '../types/eventBus';
+import { SystemEvent, WebhookConfig, WebhookDeliveryLog, EventSource } from '../types/eventBus';
+import { EventOrigin } from '../types/eventBus/sourceTypes';
 
 /**
  * Service to handle webhook delivery
@@ -141,14 +142,14 @@ export class WebhookDeliveryService {
     return {
       id: `test-${uuidv4()}`,
       type: webhook.eventTypes[0],
-      source: 'external-system' as EventSource,
+      source: 'external-system',
       timestamp: new Date().toISOString(),
       data: {
         message: 'This is a test event',
         timestamp: new Date().toISOString()
       },
       metadata: {
-        origin: 'background-job' as EventOrigin,
+        origin: 'background-job',
         isTest: true
       }
     };

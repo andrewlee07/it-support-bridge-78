@@ -20,4 +20,5 @@ export * from './knowledgeEventTypes';
 export * from './releaseEventTypes';
 export * from './backlogItemEventTypes';
 export * from './reminderEventTypes';
+export * from './testEventTypes';
 export * from './eventDataMap';
