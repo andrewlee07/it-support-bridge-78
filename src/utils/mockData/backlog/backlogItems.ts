@@ -36,6 +36,39 @@ function convertToBacklogItemComment(comment: any): BacklogItemComment {
 // Get current date for creating relative dates in the sample data
 const today = new Date();
 
+// Define color themes for backlog items
+export const backlogColorThemes = {
+  default: {
+    feature: "bg-blue-500",
+    bug: "bg-red-500",
+    enhancement: "bg-green-500",
+    "technical-debt": "bg-purple-500",
+    task: "bg-yellow-500"
+  },
+  pastel: {
+    feature: "bg-blue-300",
+    bug: "bg-red-300",
+    enhancement: "bg-green-300",
+    "technical-debt": "bg-purple-300",
+    task: "bg-yellow-300"
+  },
+  vibrant: {
+    feature: "bg-blue-600",
+    bug: "bg-red-600",
+    enhancement: "bg-green-600",
+    "technical-debt": "bg-purple-600",
+    task: "bg-amber-600"
+  },
+  status: {
+    "open": "bg-gray-500",
+    "in-progress": "bg-blue-500",
+    "ready": "bg-yellow-500",
+    "blocked": "bg-red-500",
+    "completed": "bg-green-500",
+    "deferred": "bg-purple-500"
+  }
+};
+
 // Mock Backlog Items data
 export let backlogItems: BacklogItem[] = [
   {
@@ -53,6 +86,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 30),
     updatedAt: subDays(today, 25),
     dueDate: addDays(today, 14),
+    dependsOn: [],
+    customColor: "",
     // Enhanced features
     attachments: [convertToBacklogItemAttachment(sampleAttachments[0])],
     comments: [convertToBacklogItemComment(sampleComments[0]), convertToBacklogItemComment(sampleComments[1])],
@@ -74,6 +109,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 28),
     updatedAt: subDays(today, 28),
     dueDate: addDays(today, 7),
+    dependsOn: ['BLGI-1001'],
+    customColor: "",
     // Enhanced features
     attachments: [convertToBacklogItemAttachment(sampleAttachments[1])],
     comments: [convertToBacklogItemComment(sampleComments[2])],
@@ -93,6 +130,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 20),
     updatedAt: subDays(today, 20),
     dueDate: addDays(today, 21),
+    dependsOn: ['BLGI-1001'],
+    customColor: "",
     // Enhanced features
     watchers: ['user-1', 'user-2', 'user-3']
   },
@@ -110,6 +149,8 @@ export let backlogItems: BacklogItem[] = [
     labels: ['api', 'quality'],
     createdAt: subDays(today, 15),
     updatedAt: subDays(today, 15),
+    dependsOn: [],
+    customColor: "",
     // Enhanced features
     attachments: [convertToBacklogItemAttachment(sampleAttachments[2])],
     history: [sampleHistoryEntries[0]]
@@ -129,6 +170,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 40),
     updatedAt: subDays(today, 5),
     dueDate: addDays(today, 10),
+    dependsOn: ['BLGI-1004'],
+    customColor: "bg-teal-500",
   },
   {
     id: 'BLGI-1006',
@@ -144,6 +187,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 25),
     updatedAt: subDays(today, 10),
     dueDate: addDays(today, 3),
+    dependsOn: [],
+    customColor: "",
   },
   {
     id: 'BLGI-1007',
@@ -159,6 +204,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 50),
     updatedAt: subDays(today, 2),
     dueDate: subDays(today, 2),
+    dependsOn: [],
+    customColor: "",
   },
   {
     id: 'BLGI-1008',
@@ -174,6 +221,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 10),
     updatedAt: subDays(today, 8),
     dueDate: addDays(today, 5),
+    dependsOn: ['BLGI-1002'],
+    customColor: "bg-pink-500",
   },
   {
     id: 'BLGI-1009',
@@ -189,6 +238,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 35),
     updatedAt: subDays(today, 15),
     dueDate: addDays(today, 25),
+    dependsOn: ['BLGI-1001', 'BLGI-1005'],
+    customColor: "",
   },
   {
     id: 'BLGI-1010',
@@ -203,6 +254,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 60),
     updatedAt: subDays(today, 30),
     dueDate: addDays(today, 45),
+    dependsOn: [],
+    customColor: "",
   },
   {
     id: 'BLGI-1011',
@@ -218,6 +271,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 15),
     updatedAt: subDays(today, 10),
     dueDate: addDays(today, 8),
+    dependsOn: [],
+    customColor: "bg-indigo-400",
   },
   {
     id: 'BLGI-1012',
@@ -233,6 +288,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 5),
     updatedAt: subDays(today, 3),
     dueDate: addDays(today, 2),
+    dependsOn: ['BLGI-1001'],
+    customColor: "",
   },
   {
     id: 'BLGI-1013',
@@ -247,6 +304,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 12),
     updatedAt: subDays(today, 12),
     dueDate: addDays(today, 40),
+    dependsOn: ['BLGI-1001'],
+    customColor: "",
   },
   {
     id: 'BLGI-1014',
@@ -261,6 +320,8 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 8),
     updatedAt: subDays(today, 8),
     dueDate: addDays(today, 30),
+    dependsOn: [],
+    customColor: "bg-emerald-500",
   },
   {
     id: 'BLGI-1015',
@@ -276,6 +337,91 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 18),
     updatedAt: subDays(today, 7),
     dueDate: addDays(today, 15),
+    dependsOn: ['BLGI-1008'],
+    customColor: "",
+  },
+  // Additional items for the timeline
+  {
+    id: 'BLGI-1016',
+    title: 'Implement API rate limiting',
+    description: 'Add rate limiting to prevent API abuse and improve security',
+    status: 'open',
+    priority: 'medium',
+    type: 'technical-debt',
+    creator: 'user-2',
+    storyPoints: 5,
+    labels: ['api', 'security'],
+    createdAt: subDays(today, 14),
+    updatedAt: subDays(today, 14),
+    dueDate: addDays(today, 18),
+    dependsOn: ['BLGI-1004'],
+    customColor: "",
+  },
+  {
+    id: 'BLGI-1017',
+    title: 'Create user activity dashboard',
+    description: 'Build an admin dashboard showing user activity metrics',
+    status: 'open',
+    priority: 'low',
+    type: 'feature',
+    creator: 'user-1',
+    storyPoints: 8,
+    labels: ['dashboard', 'admin'],
+    createdAt: subDays(today, 10),
+    updatedAt: subDays(today, 10),
+    dueDate: addDays(today, 35),
+    dependsOn: ['BLGI-1005'],
+    customColor: "",
+  },
+  {
+    id: 'BLGI-1018',
+    title: 'Fix navigation sidebar responsiveness',
+    description: 'Sidebar doesn\'t collapse properly on smaller screens',
+    status: 'ready',
+    priority: 'medium',
+    type: 'bug',
+    creator: 'user-3',
+    assignee: 'user-2',
+    storyPoints: 3,
+    labels: ['ui', 'responsive'],
+    createdAt: subDays(today, 7),
+    updatedAt: subDays(today, 5),
+    dueDate: addDays(today, 4),
+    dependsOn: [],
+    customColor: "",
+  },
+  {
+    id: 'BLGI-1019',
+    title: 'Add keyboard shortcuts',
+    description: 'Implement keyboard shortcuts for common actions',
+    status: 'in-progress',
+    priority: 'low',
+    type: 'enhancement',
+    creator: 'user-2',
+    assignee: 'user-1',
+    storyPoints: 3,
+    labels: ['ux', 'accessibility'],
+    createdAt: subDays(today, 20),
+    updatedAt: subDays(today, 15),
+    dueDate: addDays(today, 7),
+    dependsOn: [],
+    customColor: "bg-cyan-500",
+  },
+  {
+    id: 'BLGI-1020',
+    title: 'Implement content moderation system',
+    description: 'Create system to filter inappropriate content in user-generated content',
+    status: 'open',
+    priority: 'high',
+    type: 'feature',
+    creator: 'user-1',
+    storyPoints: 13,
+    labels: ['moderation', 'security'],
+    createdAt: subDays(today, 5),
+    updatedAt: subDays(today, 5),
+    dueDate: addDays(today, 25),
+    dependsOn: [],
+    customColor: "",
   }
 ];
 

@@ -1,3 +1,4 @@
+
 export type BacklogItemStatus = 'open' | 'in-progress' | 'ready' | 'blocked' | 'completed' | 'deferred';
 export type BacklogItemPriority = 'critical' | 'high' | 'medium' | 'low';
 export type BacklogItemType = 'feature' | 'bug' | 'task' | 'enhancement' | 'technical-debt';
@@ -111,6 +112,8 @@ export interface BacklogItem {
   testCoverage?: BacklogTestCoverage;
   relatedBugIds?: string[];
   relatedTestCaseIds?: string[];
+  dependsOn?: string[]; // Items this backlog item depends on
+  customColor?: string; // Custom color for the item in the timeline
 }
 
 export interface BacklogStats {
