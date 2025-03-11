@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { Grid, List, PlusCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import PageTransition from '@/components/shared/PageTransition';
 import TaskGrid from '@/components/tasks/TaskGrid';
 import TaskTable from '@/components/tasks/TaskTable';
+import TaskCalendarView from '@/components/tasks/TaskCalendarView';
 import TaskForm from '@/components/tasks/TaskForm';
 import TaskSearch from '@/components/tasks/TaskSearch';
+import TaskViewToggle, { TaskViewMode } from '@/components/tasks/TaskViewToggle';
 import { fetchTasks } from '@/utils/api/taskApi';
 import { Task, TaskStatus, TaskPriority, isTaskOverdue } from '@/utils/types/taskTypes';
 import { toast } from 'sonner';
@@ -26,7 +28,7 @@ const Tasks: React.FC = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [onlyOverdue, setOnlyOverdue] = useState<boolean>(false);
   const [onlyAssignedToMe, setOnlyAssignedToMe] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [viewMode, setViewMode] = useState<TaskViewMode>('grid');
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState<boolean>(false);
 
   // Load tasks
@@ -83,6 +85,47 @@ const Tasks: React.FC = () => {
     setTasks(prev => [task, ...prev]);
   };
 
+  const handleViewChange = (newView: TaskViewMode) => {
+    setViewMode(newView);
+  };
+
+  const renderTaskView = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center h-64" role="status" aria-live="polite">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" aria-label="Loading"></div>
+        </div>
+      );
+    }
+    
+    if (filteredTasks.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 text-center">
+          <h3 className="text-xl font-medium mb-2">No tasks found</h3>
+          <p className="text-muted-foreground mb-4">
+            {searchQuery || statusFilter !== 'all' || priorityFilter !== 'all' || onlyOverdue || onlyAssignedToMe
+              ? "Try adjusting your filters"
+              : "Get started by creating your first task"}
+          </p>
+          <Button onClick={handleCreateTask}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Task
+          </Button>
+        </div>
+      );
+    }
+
+    switch (viewMode) {
+      case 'list':
+        return <TaskTable tasks={filteredTasks} onTaskClick={handleTaskClick} />;
+      case 'calendar':
+        return <TaskCalendarView tasks={filteredTasks} onTaskClick={handleTaskClick} />;
+      case 'grid':
+      default:
+        return <TaskGrid tasks={filteredTasks} onTaskClick={handleTaskClick} />;
+    }
+  };
+
   return (
     <PageTransition>
       <div className="container py-6">
@@ -119,51 +162,13 @@ const Tasks: React.FC = () => {
               />
               
               <div className="flex justify-end">
-                <div className="flex rounded-md border">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                    size="icon"
-                    className="rounded-none rounded-l-md"
-                    onClick={() => setViewMode('grid')}
-                  >
-                    <Grid className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'table' ? 'default' : 'ghost'}
-                    size="icon"
-                    className="rounded-none rounded-r-md"
-                    onClick={() => setViewMode('table')}
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
+                <TaskViewToggle activeView={viewMode} onViewChange={handleViewChange} />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-          </div>
-        ) : filteredTasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-center">
-            <h3 className="text-xl font-medium mb-2">No tasks found</h3>
-            <p className="text-muted-foreground mb-4">
-              {searchQuery || statusFilter !== 'all' || priorityFilter !== 'all' || onlyOverdue || onlyAssignedToMe
-                ? "Try adjusting your filters"
-                : "Get started by creating your first task"}
-            </p>
-            <Button onClick={handleCreateTask}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Create Task
-            </Button>
-          </div>
-        ) : viewMode === 'grid' ? (
-          <TaskGrid tasks={filteredTasks} onTaskClick={handleTaskClick} />
-        ) : (
-          <TaskTable tasks={filteredTasks} onTaskClick={handleTaskClick} />
-        )}
+        {renderTaskView()}
 
         <Dialog open={isNewTaskDialogOpen} onOpenChange={setIsNewTaskDialogOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
