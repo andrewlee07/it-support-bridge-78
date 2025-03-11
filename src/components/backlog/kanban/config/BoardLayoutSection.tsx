@@ -1,23 +1,15 @@
 
 import React from 'react';
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent 
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { KanbanBoardConfig } from '@/utils/types/kanbanTypes';
-import { Layers, Kanban } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface BoardLayoutSectionProps {
   layout: 'horizontal' | 'grid';
-  viewType: 'status' | 'sprint';
+  viewType: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
   onLayoutChange: (layout: 'horizontal' | 'grid') => void;
-  onViewTypeChange: (viewType: 'status' | 'sprint') => void;
+  onViewTypeChange: (viewType: 'status' | 'sprint' | 'assignee' | 'priority' | 'label') => void;
 }
 
 const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
@@ -30,37 +22,40 @@ const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Board Layout</CardTitle>
-        <CardDescription>
-          Configure how the kanban board is displayed
-        </CardDescription>
+        <CardDescription>Configure the appearance and organization of your board</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <h3 className="text-sm font-medium mb-2">Layout Type</h3>
-          <RadioGroup value={layout} onValueChange={(v) => onLayoutChange(v as 'horizontal' | 'grid')}>
+          <Label className="mb-2 block">View Dimension</Label>
+          <Select value={viewType} onValueChange={onViewTypeChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select view type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="status">By Status</SelectItem>
+              <SelectItem value="sprint">By Sprint</SelectItem>
+              <SelectItem value="assignee">By Assignee</SelectItem>
+              <SelectItem value="priority">By Priority</SelectItem>
+              <SelectItem value="label">By Label</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground mt-1">
+            This determines how cards are grouped on the board
+          </p>
+        </div>
+        
+        <div>
+          <Label className="mb-2 block">Layout Style</Label>
+          <RadioGroup value={layout} onValueChange={value => onLayoutChange(value as 'horizontal' | 'grid')}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="horizontal" id="horizontal" />
-              <Label htmlFor="horizontal">Horizontal</Label>
+              <Label htmlFor="horizontal">Horizontal (Scrollable)</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="grid" id="grid" />
-              <Label htmlFor="grid">Grid</Label>
+              <Label htmlFor="grid">Grid (Wrap columns)</Label>
             </div>
           </RadioGroup>
-        </div>
-
-        <div>
-          <h3 className="text-sm font-medium mb-2">View Type</h3>
-          <ToggleGroup type="single" value={viewType} onValueChange={(v) => v && onViewTypeChange(v as 'status' | 'sprint')}>
-            <ToggleGroupItem value="status" aria-label="Status View">
-              <Layers className="h-4 w-4 mr-2" />
-              Status
-            </ToggleGroupItem>
-            <ToggleGroupItem value="sprint" aria-label="Sprint View">
-              <Kanban className="h-4 w-4 mr-2" />
-              Sprint
-            </ToggleGroupItem>
-          </ToggleGroup>
         </div>
       </CardContent>
     </Card>

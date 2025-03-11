@@ -2,11 +2,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DropResult } from 'react-beautiful-dnd';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
-import { defaultKanbanConfig, KanbanBoardConfig, sprintColumnsConfig } from '@/utils/types/kanbanTypes';
+import { 
+  defaultKanbanConfig, 
+  KanbanBoardConfig, 
+  sprintColumnsConfig,
+  priorityColumnsConfig,
+  generateAssigneeColumns,
+  generateLabelColumns
+} from '@/utils/types/kanbanTypes';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 
-// New component imports
+// Component imports
 import KanbanBoardHeader from './components/KanbanBoardHeader';
 import KanbanColumns from './components/KanbanColumns';
 import KanbanLoading from './components/KanbanLoading';
@@ -21,6 +28,7 @@ interface KanbanBoardProps {
   onQuickStatusChange: (itemId: string, newStatus: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
   onCreateItem: (defaultStatus?: string) => void;
+  viewDimension?: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
@@ -30,7 +38,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onEditItem,
   onQuickStatusChange,
   columnSize,
-  onCreateItem
+  onCreateItem,
+  viewDimension = 'status'
 }) => {
   const [collapsedColumns, setCollapsedColumns] = useState<string[]>([]);
   const [boardConfig, setBoardConfig] = useState<KanbanBoardConfig>(defaultKanbanConfig);
@@ -40,13 +49,72 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const [defaultStatus, setDefaultStatus] = useState<string | undefined>(undefined);
   const boardRef = useRef<HTMLDivElement>(null);
 
+  // Generate dynamic columns based on the view dimension
+  useEffect(() => {
+    let newConfig: KanbanBoardConfig = {...boardConfig, viewType: viewDimension};
+    
+    if (viewDimension === 'status') {
+      // Use default status columns
+      if (!boardConfig.columns.some(col => col.id === 'open')) {
+        newConfig.columns = defaultKanbanConfig.columns;
+      }
+    } 
+    else if (viewDimension === 'sprint') {
+      // Use sprint columns
+      if (!boardConfig.columns.some(col => col.id.startsWith('sprint-'))) {
+        newConfig.columns = sprintColumnsConfig;
+      }
+    }
+    else if (viewDimension === 'assignee') {
+      // Generate columns based on unique assignees in backlog items
+      const uniqueAssignees = Array.from(
+        new Set(
+          backlogItems
+            .filter(item => item.assignee)
+            .map(item => ({
+              id: item.assigneeId || 'unassigned',
+              name: item.assignee?.name || 'Unassigned'
+            }))
+        )
+      );
+      
+      // Add an unassigned column if not already included
+      if (!uniqueAssignees.some(a => a.id === 'unassigned')) {
+        uniqueAssignees.push({ id: 'unassigned', name: 'Unassigned' });
+      }
+      
+      newConfig.columns = generateAssigneeColumns(uniqueAssignees);
+    }
+    else if (viewDimension === 'priority') {
+      // Use priority columns
+      newConfig.columns = priorityColumnsConfig;
+    }
+    else if (viewDimension === 'label') {
+      // Generate columns based on unique labels in backlog items
+      const allLabels = backlogItems.flatMap(item => item.labels || []);
+      const uniqueLabels = Array.from(new Set(allLabels));
+      
+      // Add a "No Label" option
+      if (uniqueLabels.length > 0 && !uniqueLabels.includes('No Label')) {
+        uniqueLabels.push('No Label');
+      }
+      
+      newConfig.columns = generateLabelColumns(uniqueLabels.length > 0 ? uniqueLabels : ['No Label']);
+    }
+    
+    setBoardConfig(newConfig);
+  }, [viewDimension, backlogItems]);
+
   // Load configuration from localStorage if available
   useEffect(() => {
     const savedConfig = localStorage.getItem('kanbanBoardConfig');
     if (savedConfig) {
       try {
         const parsedConfig = JSON.parse(savedConfig);
-        setBoardConfig(parsedConfig);
+        setBoardConfig(prev => ({
+          ...parsedConfig,
+          viewType: viewDimension // Always use the current view dimension
+        }));
         
         // Load collapsed columns from saved config
         if (parsedConfig.defaultCollapsed) {
@@ -63,7 +131,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     localStorage.setItem('kanbanBoardConfig', JSON.stringify(boardConfig));
   }, [boardConfig]);
 
-  // Setup event listener for the custom addBucket event
+  // Setup event listener for custom events
   useEffect(() => {
     const handleAddBucketEvent = () => {
       handleAddBucket();
@@ -87,6 +155,46 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     };
   }, [boardConfig]); // Re-attach when boardConfig changes
 
+  // Group items based on the current view dimension
+  const getItemsForColumn = (column: string, columnId: string) => {
+    if (viewDimension === 'status') {
+      return backlogItems.filter(item => item.status === column);
+    } 
+    else if (viewDimension === 'sprint') {
+      const sprintValue = columnId.replace('sprint-', '');
+      return backlogItems.filter(item => 
+        sprintValue === 'backlog' 
+          ? !item.sprint 
+          : item.sprint === sprintValue
+      );
+    }
+    else if (viewDimension === 'assignee') {
+      const assigneeId = columnId.replace('assignee-', '');
+      return backlogItems.filter(item => 
+        assigneeId === 'unassigned' 
+          ? !item.assigneeId 
+          : item.assigneeId === assigneeId
+      );
+    }
+    else if (viewDimension === 'priority') {
+      const priority = columnId.replace('priority-', '');
+      return backlogItems.filter(item => 
+        priority === 'none' 
+          ? !item.priority 
+          : item.priority === priority
+      );
+    }
+    else if (viewDimension === 'label') {
+      const label = columnId.replace('label-', '');
+      return backlogItems.filter(item => 
+        label === 'No Label' 
+          ? !item.labels || item.labels.length === 0 
+          : item.labels && item.labels.includes(label)
+      );
+    }
+    return [];
+  };
+
   const toggleColumn = (columnId: string) => {
     setCollapsedColumns(prev => 
       prev.includes(columnId)
@@ -101,7 +209,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       // If changing to sprint view and there are no sprint columns
       if (newConfig.viewType === 'sprint' && !newConfig.columns.some(col => col.statusValue.startsWith('sprint'))) {
         // Add sprint columns
-        newConfig.columns = [...newConfig.columns, ...sprintColumnsConfig];
+        newConfig.columns = [...sprintColumnsConfig];
+      }
+      else if (newConfig.viewType === 'status' && !newConfig.columns.some(col => ['open', 'in-progress', 'ready', 'blocked', 'completed', 'deferred'].includes(col.statusValue))) {
+        // Restore default status columns
+        newConfig.columns = [...defaultKanbanConfig.columns];
       }
     }
     
@@ -163,6 +275,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       <KanbanBoardHeader 
         onConfigOpen={() => setConfigOpen(true)} 
         onCreateItem={handleCreateItem}
+        viewDimension={viewDimension}
       />
 
       {backlogItems.length === 0 ? (
@@ -178,6 +291,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           onQuickStatusChange={onQuickStatusChange}
           columnSize={columnSize}
           onAddItem={handleAddItem}
+          getItemsForColumn={getItemsForColumn}
+          viewDimension={viewDimension}
         />
       )}
 

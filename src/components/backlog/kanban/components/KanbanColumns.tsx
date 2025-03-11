@@ -17,6 +17,8 @@ interface KanbanColumnsProps {
   onQuickStatusChange: (itemId: string, newStatus: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
   onAddItem: (status: string) => void;
+  getItemsForColumn?: (columnStatusValue: string, columnId: string) => BacklogItem[];
+  viewDimension?: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
 }
 
 const KanbanColumns: React.FC<KanbanColumnsProps> = ({
@@ -28,15 +30,17 @@ const KanbanColumns: React.FC<KanbanColumnsProps> = ({
   onEditItem,
   onQuickStatusChange,
   columnSize,
-  onAddItem
+  onAddItem,
+  getItemsForColumn,
+  viewDimension = 'status'
 }) => {
-  // Group items by status
-  const itemsByStatus = boardConfig.columns.reduce((acc, column) => {
-    acc[column.statusValue as BacklogItemStatus] = backlogItems.filter(
-      item => item.status === column.statusValue
-    );
-    return acc;
-  }, {} as Record<BacklogItemStatus, BacklogItem[]>);
+  // Group items using the provided function or by default status
+  const getColumnItems = (column: KanbanColumnConfig) => {
+    if (getItemsForColumn) {
+      return getItemsForColumn(column.statusValue, column.id);
+    }
+    return backlogItems.filter(item => item.status === column.statusValue);
+  };
 
   // Sort columns by order
   const sortedColumns = [...boardConfig.columns].sort((a, b) => a.order - b.order);
@@ -54,13 +58,14 @@ const KanbanColumns: React.FC<KanbanColumnsProps> = ({
               <KanbanColumn
                 key={column.id}
                 columnConfig={column}
-                items={itemsByStatus[column.statusValue as BacklogItemStatus] || []}
+                items={getColumnItems(column)}
                 isCollapsed={collapsedColumns.includes(column.id)}
                 onToggleCollapse={() => toggleColumn(column.id)}
                 onEditItem={onEditItem}
                 onQuickStatusChange={onQuickStatusChange}
                 columnSize={columnSize}
                 onAddItem={onAddItem}
+                viewDimension={viewDimension}
               />
             ))}
           </div>

@@ -1,14 +1,13 @@
 
 import React from 'react';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable } from 'react-beautiful-dnd';
+import { PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
-import KanbanCard from './KanbanCard';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { KanbanColumnConfig } from '@/utils/types/kanbanTypes';
+import { Button } from '@/components/ui/button';
+import KanbanCard from './KanbanCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 interface KanbanColumnProps {
   columnConfig: KanbanColumnConfig;
@@ -19,6 +18,7 @@ interface KanbanColumnProps {
   onQuickStatusChange: (itemId: string, newStatus: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
   onAddItem: (status: string) => void;
+  viewDimension?: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
 }
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
@@ -29,100 +29,79 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   onEditItem,
   onQuickStatusChange,
   columnSize,
-  onAddItem
+  onAddItem,
+  viewDimension = 'status'
 }) => {
-  // Calculate column height based on viewport height
-  const getColumnHeight = () => {
-    const baseHeight = columnSize === 'compact' ? 
-      'min-h-[400px] h-[calc(70vh-100px)]' : 
-      'min-h-[600px] h-[calc(80vh-100px)]';
-    return baseHeight;
-  };
-
-  // Calculate scroll area height based on viewport height
-  const getScrollAreaHeight = () => {
-    return columnSize === 'compact' ? 
-      'h-[calc(70vh-180px)]' : 
-      'h-[calc(80vh-180px)]';
+  // Get action label based on view dimension
+  const getAddItemLabel = () => {
+    switch (viewDimension) {
+      case 'status':
+        return `Add item as ${columnConfig.displayName}`;
+      case 'sprint':
+        return `Add to ${columnConfig.displayName}`;
+      case 'assignee':
+        return `Assign to ${columnConfig.displayName}`;
+      case 'priority':
+        return `Add as ${columnConfig.displayName} priority`;
+      case 'label':
+        return `Add with ${columnConfig.displayName} label`;
+      default:
+        return 'Add item';
+    }
   };
 
   return (
-    <Card className={cn(
-      "flex-shrink-0 w-[300px] flex flex-col border-2 border-slate-200 dark:border-slate-700 bg-background",
-      getColumnHeight()
-    )}>
-      <CardHeader className={cn(
-        "p-3 pb-2 flex flex-row items-center justify-between",
-        "border-b border-slate-200 dark:border-slate-700"
-      )}>
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          {columnConfig.displayName}
-          <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
-            {items.length}
-          </span>
-        </CardTitle>
+    <div
+      className={cn(
+        "flex flex-col border rounded-md shadow-sm bg-background",
+        isCollapsed ? "w-[200px]" : columnSize === 'compact' ? "w-[280px]" : "w-[320px]"
+      )}
+    >
+      <div 
+        className={cn(
+          "p-3 font-medium border-b flex items-center justify-between sticky top-0 z-10",
+          columnConfig.color
+        )}
+      >
         <div className="flex items-center">
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => onAddItem(columnConfig.statusValue)}
-            className="h-6 w-6 mr-1"
-            title={`Add item to ${columnConfig.displayName}`}
+            className="h-5 w-5 mr-1 text-muted-foreground" 
+            onClick={onToggleCollapse}
           >
-            <Plus className="h-4 w-4" />
+            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onToggleCollapse} 
-            className="h-6 w-6"
-          >
-            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-          </Button>
+          <span>{columnConfig.displayName}</span>
+          <span className="ml-2 text-xs bg-background/80 px-1.5 py-0.5 rounded-full">
+            {items.length}
+          </span>
         </div>
-      </CardHeader>
-      
+      </div>
+
       {!isCollapsed && (
-        <CardContent className="p-2 flex-grow overflow-hidden">
-          <Droppable droppableId={columnConfig.statusValue}>
+        <>
+          <Droppable droppableId={columnConfig.id}>
             {(provided, snapshot) => (
               <div 
-                className="h-full relative"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className={cn(
+                  "flex-grow p-2 overflow-hidden",
+                  snapshot.isDraggingOver && "bg-accent/50"
+                )}
               >
-                <ScrollArea 
-                  className={`w-full ${getScrollAreaHeight()}`}
-                  orientation="vertical"
-                  type="always"
-                >
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className={cn(
-                      "min-h-[100px] transition-colors duration-200 rounded p-1",
-                      snapshot.isDraggingOver ? "bg-muted/50" : "transparent"
-                    )}
-                  >
+                <ScrollArea className="h-[calc(100vh-300px)]">
+                  <div className="space-y-2 min-h-[200px] p-1">
                     {items.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={cn(
-                              "mb-2 transition-transform",
-                              snapshot.isDragging ? "rotate-1 scale-105" : ""
-                            )}
-                          >
-                            <KanbanCard
-                              item={item}
-                              onEdit={() => onEditItem(item)}
-                              onStatusChange={(newStatus) => onQuickStatusChange(item.id, newStatus)}
-                              columnSize={columnSize}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
+                      <KanbanCard 
+                        key={item.id} 
+                        item={item} 
+                        index={index}
+                        onEditItem={onEditItem}
+                        onQuickStatusChange={onQuickStatusChange}
+                        compact={columnSize === 'compact'}
+                      />
                     ))}
                     {provided.placeholder}
                   </div>
@@ -130,9 +109,21 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
               </div>
             )}
           </Droppable>
-        </CardContent>
+
+          <div className="p-2 border-t">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => onAddItem(columnConfig.statusValue)}
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
+            >
+              <PlusCircle className="h-4 w-4 mr-1" />
+              {getAddItemLabel()}
+            </Button>
+          </div>
+        </>
       )}
-    </Card>
+    </div>
   );
 };
 
