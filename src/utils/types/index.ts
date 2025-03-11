@@ -1,5 +1,5 @@
 
-// Re-export all types from domain-specific files for backward compatibility
+// Re-export all types from domain-specific files
 export * from './user';
 export * from './sla';
 export * from './change';
@@ -10,27 +10,12 @@ export * from './email';
 export * from './dashboard';
 export * from './api';
 export * from './configuration';
-export * from './StatusSynchronizationSettings'; // Add this export
+export * from './StatusSynchronizationSettings';
 
-// Explicitly re-export from backlogTypes to avoid name conflicts
-export type {
-  BacklogItem,
-  BacklogItemStatus,
-  BacklogItemPriority,
-  BacklogItemType,
-  BacklogTestCoverage
-} from './backlogTypes';
+// Export everything from backlogTypes
+export * from './backlogTypes';
 
-export {
-  calculateReleaseCapacity,
-  filterBacklogItemsByRelease,
-  filterBacklogItemsByLabel,
-  filterBacklogItemsByTestCoverage,
-  getBacklogItemsWithoutTests,
-  getBacklogItemsWithFailingTests,
-} from './backlogTypes';
-
-// Explicitly re-export from ticket to avoid name conflicts
+// Export from ticket
 export type {
   Ticket,
   TicketStatus,
@@ -41,5 +26,5 @@ export type {
   TestCoverageRelationship,
 } from './ticket';
 
-// Re-export test-related types from new location
+// Re-export test-related types
 export * from './test';
