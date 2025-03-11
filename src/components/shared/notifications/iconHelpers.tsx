@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Bell,
@@ -24,25 +23,25 @@ export const getIconForResultType = (type: string, props: IconProps = {}) => {
   
   switch (type) {
     case 'incident':
-      return <AlertTriangle className={`${className} text-red-500`} />;
+      return React.createElement(AlertTriangle, { className: `${className} text-red-500` });
     case 'bug':
-      return <Bug className={`${className} text-red-500`} />;
+      return React.createElement(Bug, { className: `${className} text-red-500` });
     case 'testCase':
-      return <FileCheck className={`${className} text-purple-500`} />;
+      return React.createElement(FileCheck, { className: `${className} text-purple-500` });
     case 'backlogItem':
-      return <ClipboardList className={`${className} text-orange-500`} />;
+      return React.createElement(ClipboardList, { className: `${className} text-orange-500` });
     case 'release':
-      return <Package className={`${className} text-green-500`} />;
+      return React.createElement(Package, { className: `${className} text-green-500` });
     case 'asset':
-      return <Box className={`${className} text-blue-500`} />;
+      return React.createElement(Box, { className: `${className} text-blue-500` });
     case 'change':
-      return <Calendar className={`${className} text-cyan-500`} />;
+      return React.createElement(Calendar, { className: `${className} text-cyan-500` });
     case 'knowledge':
-      return <FileText className={`${className} text-indigo-500`} />;
+      return React.createElement(FileText, { className: `${className} text-indigo-500` });
     case 'task':
-      return <CheckSquare className={`${className} text-emerald-500`} />;
+      return React.createElement(CheckSquare, { className: `${className} text-emerald-500` });
     default:
-      return <Bell className={`${className} text-muted-foreground`} />;
+      return React.createElement(Bell, { className: `${className} text-muted-foreground` });
   }
 };
 

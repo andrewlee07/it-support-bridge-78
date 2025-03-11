@@ -1,4 +1,3 @@
-
 import EventBus from './EventBus';
 import { SystemEvent, EventType } from '../types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
@@ -248,7 +247,7 @@ class NotificationSubscriber {
    * Show a toast notification
    */
   private showToastForNotification(notification: Notification): void {
-    const IconComponent = getIconForResultType(notification.type);
+    const icon = getIconForResultType(notification.type);
     
     toast(notification.title, {
       description: notification.message,
@@ -256,7 +255,7 @@ class NotificationSubscriber {
         label: "View",
         onClick: () => window.location.href = notification.actionUrl || '#'
       },
-      icon: <IconComponent className="h-4 w-4" />
+      icon
     });
   }
   
