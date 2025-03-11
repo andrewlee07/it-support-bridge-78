@@ -1,4 +1,5 @@
-import { delay, createApiSuccessResponse } from '../apiHelpers';
+
+import { delay, createApiSuccessResponse } from '@/utils/mockData/apiHelpers';
 import { ApiResponse } from '@/utils/types/api';
 import { BacklogTestCoverage } from '@/utils/types/backlogTypes';
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageTransition from '@/components/shared/PageTransition';
@@ -6,6 +5,17 @@ import TraceabilityMatrix from '@/components/test-management/traceability/Tracea
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { FileText, BarChart2 } from 'lucide-react';
+
+const mockData = [
+  {
+    id: '1',
+    title: 'Sample Backlog Item',
+    testCases: [
+      { id: 'tc1', title: 'Test Case 1', status: 'passed' },
+      { id: 'tc2', title: 'Test Case 2', status: 'failed' }
+    ]
+  }
+];
 
 const TestTraceability = () => {
   return (
@@ -41,7 +51,7 @@ const TestTraceability = () => {
           </TabsList>
 
           <TabsContent value="matrix">
-            <TraceabilityMatrix />
+            <TraceabilityMatrix data={mockData} />
           </TabsContent>
           
           <TabsContent value="metrics">

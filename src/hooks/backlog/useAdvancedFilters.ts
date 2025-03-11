@@ -1,5 +1,4 @@
-
-import { useState, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { BacklogItem } from '@/utils/types/backlogTypes';
 import { format, isAfter, isBefore, isWithinInterval, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import { BacklogFilter, FilterPreset } from './kanban/types';
