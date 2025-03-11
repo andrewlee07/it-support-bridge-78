@@ -96,11 +96,10 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                     {items.map((item, index) => (
                       <KanbanCard 
                         key={item.id} 
-                        item={item} 
-                        index={index}
-                        onEditItem={onEditItem}
-                        onQuickStatusChange={onQuickStatusChange}
-                        compact={columnSize === 'compact'}
+                        item={item}
+                        onEdit={() => onEditItem(item)}
+                        onStatusChange={(newStatus) => onQuickStatusChange(item.id, newStatus)}
+                        columnSize={columnSize}
                       />
                     ))}
                     {provided.placeholder}

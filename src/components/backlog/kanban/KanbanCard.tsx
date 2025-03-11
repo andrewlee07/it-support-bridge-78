@@ -13,6 +13,8 @@ interface KanbanCardProps {
   onEdit: () => void;
   onStatusChange: (status: BacklogItemStatus) => void;
   columnSize: 'compact' | 'standard';
+  // Add the index prop but make it optional
+  index?: number;
 }
 
 const KanbanCard: React.FC<KanbanCardProps> = ({
@@ -20,6 +22,8 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
   onEdit,
   onStatusChange,
   columnSize,
+  // We won't use the index prop, but we're adding it to the props interface
+  // to satisfy TypeScript
 }) => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
