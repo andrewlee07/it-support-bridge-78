@@ -69,7 +69,7 @@ class EventBus {
     source: EventSource,
     data: T,
     options: {
-      metadata?: Omit<EventMetadata, 'correlationId'>;
+      metadata?: Partial<Omit<EventMetadata, 'correlationId'>>;
       actor?: EventActor;
       entity?: EventEntity;
       changes?: EventChanges;

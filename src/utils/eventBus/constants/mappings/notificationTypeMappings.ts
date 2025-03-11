@@ -5,7 +5,7 @@ import { Notification } from '@/components/shared/notifications/types';
 /**
  * Maps event types to notification types
  */
-export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']> = {
+export const EVENT_TO_NOTIFICATION_TYPE: Partial<Record<EventType, Notification['type']>> = {
   // Original ticket events
   'ticket.created': 'incident',
   'ticket.updated': 'incident',
@@ -57,6 +57,10 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'change.rollback': 'change',
   'change.emergency.created': 'change',
   'change.emergency.approved': 'change',
+  'change.submitted': 'change',
+  'change.reviewed': 'change',
+  'change.tested': 'change',
+  'change.canceled': 'change',
   
   // Problem events
   'problem.created': 'incident',
@@ -64,6 +68,8 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'problem.created.high': 'incident',
   'problem.updated': 'incident',
   'problem.resolved': 'incident',
+  'problem.resolved.success': 'incident',
+  'problem.resolved.partial': 'incident',
   'problem.assigned': 'incident',
   'problem.rootCauseIdentified': 'incident',
   'problem.workaroundAvailable': 'incident',
@@ -94,6 +100,7 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'task.completed': 'task',
   'task.completed.success': 'task',
   'task.completed.partial': 'task',
+  'task.deleted': 'task',
   
   // Release events
   'release.created': 'release',
@@ -109,6 +116,12 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'release.deploymentCompleted.failure': 'release',
   'release.deploymentCompleted.partial': 'release',
   'release.rollback': 'release',
+  'release.verified': 'release',
+  'release.buildStarted': 'release',
+  'release.buildCompleted': 'release',
+  'release.buildCompleted.success': 'release',
+  'release.buildCompleted.failure': 'release',
+  'release.canceled': 'release',
   
   // Asset events
   'asset.created': 'asset',
@@ -174,3 +187,4 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'testExecution.completed.partial': 'testCase',
   'testExecution.blocked': 'bug'
 };
+

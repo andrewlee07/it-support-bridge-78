@@ -53,6 +53,10 @@ export type EventType =
   | 'change.implemented.success'
   | 'change.implemented.failure'
   | 'change.implemented.partial'
+  | 'change.submitted'
+  | 'change.reviewed'
+  | 'change.tested'
+  | 'change.canceled'
   // Problem events
   | 'problem.created'
   | 'problem.updated'
@@ -63,6 +67,8 @@ export type EventType =
   | 'problem.closed'
   | 'problem.created.critical'
   | 'problem.created.high'
+  | 'problem.resolved.success'
+  | 'problem.resolved.partial'
   // SLA events
   | 'sla.warning'
   | 'sla.warning.response'
@@ -87,6 +93,7 @@ export type EventType =
   | 'task.completed'
   | 'task.completed.success'
   | 'task.completed.partial'
+  | 'task.deleted'
   // Release events
   | 'release.created'
   | 'release.updated'
@@ -101,6 +108,12 @@ export type EventType =
   | 'release.deploymentCompleted.failure'
   | 'release.deploymentCompleted.partial'
   | 'release.rollback'         
+  | 'release.verified'
+  | 'release.buildStarted'
+  | 'release.buildCompleted'
+  | 'release.buildCompleted.success'
+  | 'release.buildCompleted.failure'
+  | 'release.canceled'
   // Asset events
   | 'asset.created'
   | 'asset.updated'
@@ -164,3 +177,4 @@ export type SeverityQualifier = 'critical' | 'high' | 'medium' | 'low';
 export type TimeQualifier = 'approaching' | 'imminent';
 export type SLATypeQualifier = 'response' | 'resolution' | 'update';
 export type OutcomeQualifier = 'success' | 'failure' | 'partial';
+

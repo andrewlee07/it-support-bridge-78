@@ -1,149 +1,151 @@
 
-import EventBus from '../EventBus';
-import { EventSource, EventOrigin, KnownErrorEventData } from '@/utils/types/eventBus';
+import { EventBus } from '@/utils/eventBus';
+import { KnownErrorEventData } from '@/utils/types/eventBus';
 
 /**
- * Class to publish Known Error Database events to the EventBus
+ * Publisher for Known Error events
  */
-export class KnownErrorEventPublisher {
+class KnownErrorEventPublisher {
   private eventBus: EventBus;
-  private source: EventSource = 'kedb-service';
-  private origin: EventOrigin = 'web-app';
-
+  
   constructor() {
     this.eventBus = EventBus.getInstance();
   }
-
+  
   /**
-   * Publish a knownError.created event
-   * @param knownError The known error that was created
+   * Publish known error created event
    */
-  public publishCreated(knownError: any): void {
-    const eventData: KnownErrorEventData = {
-      knownErrorId: knownError.id,
-      title: knownError.title,
-      description: knownError.description,
-      status: knownError.status,
-      affectedServices: knownError.affectedServices,
-      workaround: knownError.workaround
-    };
-
-    this.eventBus.publish(
-      'knownError.created',
-      this.source,
-      eventData,
-      {
-        origin: this.origin,
-        userId: knownError.createdBy
+  public publishKnownErrorCreated(knownError: KnownErrorEventData, userId: string): string {
+    return this.eventBus.publish('knownError.created', 'kedb-service', knownError, {
+      metadata: {
+        userId,
+        tenantId: knownError.tenantId || 'default',
+        severity: 'info',
+        tags: ['known-error', 'created']
+      },
+      actor: {
+        id: userId,
+        type: 'user'
+      },
+      entity: {
+        id: knownError.id,
+        type: 'knownError',
+        name: knownError.title,
+        url: `/known-errors/${knownError.id}`
       }
-    );
+    });
   }
-
+  
   /**
-   * Publish a knownError.updated event
-   * @param knownError The known error that was updated
+   * Publish known error updated event
    */
-  public publishUpdated(knownError: any, updatedFields: string[]): void {
-    const eventData: KnownErrorEventData = {
-      knownErrorId: knownError.id,
-      title: knownError.title,
-      status: knownError.status,
-      updatedFields: updatedFields,
-      viewedBy: knownError.viewedBy
-    };
-
-    this.eventBus.publish(
-      'knownError.updated',
-      this.source,
-      eventData,
-      {
-        origin: this.origin,
-        userId: knownError.updatedBy
+  public publishKnownErrorUpdated(knownError: KnownErrorEventData, userId: string, changedFields: string[] = []): string {
+    return this.eventBus.publish('knownError.updated', 'kedb-service', knownError, {
+      metadata: {
+        userId,
+        tenantId: knownError.tenantId || 'default',
+        severity: 'info',
+        tags: ['known-error', 'updated']
+      },
+      actor: {
+        id: userId,
+        type: 'user'
+      },
+      entity: {
+        id: knownError.id,
+        type: 'knownError',
+        name: knownError.title,
+        url: `/known-errors/${knownError.id}`
+      },
+      changes: {
+        fields: changedFields
       }
-    );
+    });
   }
-
+  
   /**
-   * Publish a knownError.workaroundUpdated event
-   * @param knownError The known error whose workaround was updated
+   * Publish workaround updated event
    */
-  public publishWorkaroundUpdated(knownError: any): void {
-    const eventData: KnownErrorEventData = {
-      knownErrorId: knownError.id,
-      title: knownError.title,
-      status: knownError.status,
-      workaround: knownError.workaround,
-      previousWorkaround: knownError.previousWorkaround,
-      affectedServices: knownError.affectedServices
-    };
-
-    this.eventBus.publish(
-      'knownError.workaroundUpdated',
-      this.source,
-      eventData,
-      {
-        origin: this.origin,
-        userId: knownError.updatedBy
+  public publishWorkaroundUpdated(knownError: KnownErrorEventData, userId: string): string {
+    return this.eventBus.publish('knownError.workaroundUpdated', 'kedb-service', knownError, {
+      metadata: {
+        userId,
+        tenantId: knownError.tenantId || 'default',
+        severity: 'info',
+        tags: ['known-error', 'workaround', 'updated']
+      },
+      actor: {
+        id: userId,
+        type: 'user'
+      },
+      entity: {
+        id: knownError.id,
+        type: 'knownError',
+        name: knownError.title,
+        url: `/known-errors/${knownError.id}`
+      },
+      changes: {
+        fields: ['workaround']
       }
-    );
+    });
   }
-
+  
   /**
-   * Publish a knownError.planToFix event
-   * @param knownError The known error with a scheduled fix
+   * Publish plan to fix event
    */
-  public publishPlanToFix(knownError: any): void {
-    const eventData: KnownErrorEventData = {
-      knownErrorId: knownError.id,
-      title: knownError.title,
-      status: knownError.status,
-      permanentFix: knownError.permanentFix,
-      scheduledFixDate: knownError.scheduledFixDate,
-      affectedServices: knownError.affectedServices
-    };
-
-    this.eventBus.publish(
-      'knownError.planToFix',
-      this.source,
-      eventData,
-      {
-        origin: this.origin,
-        userId: knownError.updatedBy
+  public publishPlanToFix(knownError: KnownErrorEventData, userId: string): string {
+    return this.eventBus.publish('knownError.planToFix', 'kedb-service', knownError, {
+      metadata: {
+        userId,
+        tenantId: knownError.tenantId || 'default',
+        severity: 'info',
+        tags: ['known-error', 'plan', 'fix']
+      },
+      actor: {
+        id: userId,
+        type: 'user'
+      },
+      entity: {
+        id: knownError.id,
+        type: 'knownError',
+        name: knownError.title,
+        url: `/known-errors/${knownError.id}`
+      },
+      changes: {
+        fields: ['fixPlan', 'fixScheduled']
       }
-    );
+    });
   }
-
+  
   /**
-   * Publish a knownError.resolved event
-   * @param knownError The known error that was resolved
+   * Publish known error resolved event
    */
-  public publishResolved(knownError: any): void {
-    const eventData: KnownErrorEventData = {
-      knownErrorId: knownError.id,
-      title: knownError.title,
-      status: knownError.status,
-      resolution: knownError.resolution,
-      affectedServices: knownError.affectedServices
-    };
-
-    this.eventBus.publish(
-      'knownError.resolved',
-      this.source,
-      eventData,
-      {
-        origin: this.origin,
-        userId: knownError.updatedBy || knownError.createdBy
+  public publishKnownErrorResolved(knownError: KnownErrorEventData, userId: string): string {
+    return this.eventBus.publish('knownError.resolved', 'kedb-service', knownError, {
+      metadata: {
+        userId,
+        tenantId: knownError.tenantId || 'default',
+        severity: 'info',
+        tags: ['known-error', 'resolved']
+      },
+      actor: {
+        id: userId,
+        type: 'user'
+      },
+      entity: {
+        id: knownError.id,
+        type: 'knownError',
+        name: knownError.title,
+        url: `/known-errors/${knownError.id}`
+      },
+      changes: {
+        fields: ['status'],
+        before: { status: 'active' },
+        after: { status: 'resolved' }
       }
-    );
-  }
-
-  /**
-   * Set the event origin (useful for publishing from different contexts)
-   * @param origin The new event origin
-   */
-  public setOrigin(origin: EventOrigin): void {
-    this.origin = origin;
+    });
   }
 }
 
-export default KnownErrorEventPublisher;
+export const knownErrorEventPublisher = new KnownErrorEventPublisher();
+export default knownErrorEventPublisher;

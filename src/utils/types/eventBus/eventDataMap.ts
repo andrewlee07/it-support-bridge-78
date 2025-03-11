@@ -27,6 +27,7 @@ export interface EventDataMap {
   'task.completed': TaskEventData;
   'task.completed.success': TaskEventData;
   'task.completed.partial': TaskEventData;
+  'task.deleted': TaskEventData;
   
   // Problem events
   'problem.created': ProblemEventData;
@@ -37,6 +38,8 @@ export interface EventDataMap {
   'problem.rootCauseIdentified': ProblemEventData;
   'problem.workaroundAvailable': ProblemEventData;
   'problem.resolved': ProblemEventData;
+  'problem.resolved.success': ProblemEventData;
+  'problem.resolved.partial': ProblemEventData;
   'problem.closed': ProblemEventData;
   
   // Incident specific events
@@ -96,6 +99,12 @@ export interface EventDataMap {
   'release.deploymentCompleted.partial': ReleaseEventData;
   'release.deployed': ReleaseEventData;
   'release.rollback': ReleaseEventData;
+  'release.verified': ReleaseEventData;
+  'release.buildStarted': ReleaseEventData;
+  'release.buildCompleted': ReleaseEventData;
+  'release.buildCompleted.success': ReleaseEventData;
+  'release.buildCompleted.failure': ReleaseEventData;
+  'release.canceled': ReleaseEventData;
   
   // SLA events
   'sla.warning': ProblemEventData;
@@ -121,6 +130,10 @@ export interface EventDataMap {
   'change.rollback': ReleaseEventData;
   'change.emergency.created': ReleaseEventData;
   'change.emergency.approved': ReleaseEventData;
+  'change.submitted': ReleaseEventData;
+  'change.reviewed': ReleaseEventData;
+  'change.tested': ReleaseEventData;
+  'change.canceled': ReleaseEventData;
   
   // Backlog item events
   'backlogItem.created': BacklogItemEventData;
