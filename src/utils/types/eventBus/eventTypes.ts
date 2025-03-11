@@ -1,3 +1,4 @@
+
 /**
  * Core event types used throughout the event bus system
  */
@@ -66,6 +67,9 @@ export type EventType =
   | 'test.executed'
   | 'test.passed'
   | 'test.failed'
+  | 'knowledge.created'        // Added for Knowledge Articles
+  | 'knowledge.updated'        // Added for Knowledge Articles
+  | 'knowledge.published'      // Added for Knowledge Articles
   | 'knownError.created'        // Added for Known Error Database
   | 'knownError.updated'        // Added for Known Error Database
   | 'knownError.workaroundUpdated' // Added for Known Error Database
@@ -118,6 +122,21 @@ export interface KnownErrorEventData {
   updatedFields?: string[];
 }
 
+// Knowledge Article event data
+export interface KnowledgeArticleEventData {
+  articleId: string;
+  title: string;
+  content?: string;
+  status: string;
+  category?: string;
+  tags?: string[];
+  author?: string;
+  updatedFields?: string[];
+  publishedBy?: string;
+  publishDate?: string;
+  version?: string;
+}
+
 // Release-specific event data
 export interface ReleaseEventData {
   releaseId: string;
@@ -159,6 +178,9 @@ export interface EventDataMap {
   'problem.workaroundAvailable': ProblemEventData;
   'problem.resolved': ProblemEventData;
   'problem.closed': ProblemEventData;
+  'knowledge.created': KnowledgeArticleEventData;
+  'knowledge.updated': KnowledgeArticleEventData;
+  'knowledge.published': KnowledgeArticleEventData;
   'knownError.created': KnownErrorEventData;
   'knownError.updated': KnownErrorEventData;
   'knownError.workaroundUpdated': KnownErrorEventData;

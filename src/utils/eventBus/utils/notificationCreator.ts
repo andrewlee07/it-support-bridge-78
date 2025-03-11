@@ -1,5 +1,5 @@
 
-import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData } from '@/utils/types/eventBus';
+import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData, KnowledgeArticleEventData } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 import { v4 as uuidv4 } from 'uuid';
 import { EVENT_TITLE_MAP, EVENT_TO_NOTIFICATION_TYPE, EVENT_TO_PRIORITY } from '../constants/eventMappings';
@@ -60,6 +60,26 @@ export const createNotificationFromEvent = (event: SystemEvent): Notification =>
       
       actionUrl = `/problems/${problemData.problemId}`;
       entityId = problemData.problemId;
+      break;
+    
+    case 'knowledge.created':
+    case 'knowledge.updated':
+    case 'knowledge.published':
+      const knowledgeData = event.data as KnowledgeArticleEventData;
+      title = `${title}: ${knowledgeData.title}`;
+
+      // Create appropriate message based on event type
+      if (event.type === 'knowledge.created') {
+        message = `New knowledge article created: ${knowledgeData.title}`;
+      } else if (event.type === 'knowledge.updated') {
+        const updatedFieldsList = knowledgeData.updatedFields?.join(', ') || 'multiple fields';
+        message = `Knowledge article updated: ${updatedFieldsList}`;
+      } else if (event.type === 'knowledge.published') {
+        message = `Knowledge article published by ${knowledgeData.publishedBy || 'system'} on ${knowledgeData.publishDate || 'now'}`;
+      }
+
+      actionUrl = `/knowledge/articles/${knowledgeData.articleId}`;
+      entityId = knowledgeData.articleId;
       break;
     
     case 'knownError.created':
