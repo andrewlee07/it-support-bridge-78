@@ -3,7 +3,7 @@ export interface SearchResult {
   id: string;
   title: string;
   description?: string;
-  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change';
+  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'task';
   url: string;
   status?: string;
   priority?: string;

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Notification, NotificationSettings } from '@/components/shared/notifications/types';
@@ -20,7 +19,8 @@ export const useNotificationCenterState = (initialNotifications: Notification[])
       releases: true,
       assets: true,
       changes: true,
-      knowledge: true
+      knowledge: true,
+      tasks: true
     },
     deliveryMethods: {
       inApp: true,
@@ -117,4 +117,3 @@ export const useNotificationCenterState = (initialNotifications: Notification[])
     itemsPerPage
   };
 };
-

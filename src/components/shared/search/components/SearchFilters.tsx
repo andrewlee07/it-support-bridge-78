@@ -16,7 +16,8 @@ const FILTER_OPTIONS = [
   { label: 'Backlog', value: 'backlogItem' },
   { label: 'Releases', value: 'release' },
   { label: 'Assets', value: 'asset' },
-  { label: 'Changes', value: 'change' }
+  { label: 'Changes', value: 'change' },
+  { label: 'Tasks', value: 'task' }
 ];
 
 const SearchFilters: React.FC<SearchFiltersProps> = ({

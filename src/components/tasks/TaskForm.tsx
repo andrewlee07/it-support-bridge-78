@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,7 +25,7 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { Task, TaskStatus, TaskPriority } from '@/utils/types/taskTypes';
 import { useAuth } from '@/contexts/AuthContext';
@@ -39,6 +40,7 @@ const taskFormSchema = z.object({
   priority: z.enum(['critical', 'high', 'medium', 'low'] as const),
   assignee: z.string().optional(),
   dueDate: z.date().optional(),
+  dueTime: z.string().optional(),
   relatedItemId: z.string().optional(),
   relatedItemType: z.enum(['incident', 'service-request', 'task']).optional(),
 });
@@ -70,6 +72,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
       priority: initialData.priority,
       assignee: initialData.assignee || '',
       dueDate: initialData.dueDate ? new Date(initialData.dueDate) : undefined,
+      dueTime: initialData.dueDate ? format(new Date(initialData.dueDate), 'HH:mm') : undefined,
       relatedItemId: initialData.relatedItemId || '',
       relatedItemType: initialData.relatedItemType,
     } : {
@@ -79,6 +82,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
       priority: 'medium',
       assignee: user?.id || '',
       dueDate: undefined,
+      dueTime: undefined,
       relatedItemId: '',
       relatedItemType: undefined,
     },
@@ -91,10 +95,19 @@ const TaskForm: React.FC<TaskFormProps> = ({
         return;
       }
 
+      // Combine date and time if both are provided
+      let dueDateTime = values.dueDate;
+      if (dueDateTime && values.dueTime) {
+        const [hours, minutes] = values.dueTime.split(':').map(Number);
+        dueDateTime = new Date(dueDateTime);
+        dueDateTime.setHours(hours, minutes);
+      }
+
       if (isEditMode && initialData) {
         // Update existing task
         const result = await updateTask(initialData.id, {
           ...values,
+          dueDate: dueDateTime,
           updatedAt: new Date()
         });
 
@@ -107,12 +120,15 @@ const TaskForm: React.FC<TaskFormProps> = ({
       } else {
         // Create new task
         const result = await createTask({
-          ...values,
-          creator: user.id,
           title: values.title,
           description: values.description,
           status: values.status,
-          priority: values.priority
+          priority: values.priority,
+          creator: user.id,
+          assignee: values.assignee,
+          dueDate: dueDateTime,
+          relatedItemId: values.relatedItemId,
+          relatedItemType: values.relatedItemType
         });
 
         if (result.success) {
@@ -233,40 +249,117 @@ const TaskForm: React.FC<TaskFormProps> = ({
             )}
           />
 
+          <div>
+            <FormField
+              control={form.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Due Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <FormField
+          control={form.control}
+          name="dueTime"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Due Time (24-hour format)</FormLabel>
+              <div className="flex">
+                <FormControl>
+                  <div className="flex items-center">
+                    <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      type="time" 
+                      placeholder="Select time"
+                      {...field}
+                    />
+                  </div>
+                </FormControl>
+              </div>
+              <FormDescription>
+                Optional. Specify a time for the due date if needed.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="dueDate"
+            name="relatedItemType"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Due Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+              <FormItem>
+                <FormLabel>Related Item Type</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select related item type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="incident">Incident</SelectItem>
+                    <SelectItem value="service-request">Service Request</SelectItem>
+                    <SelectItem value="task">Task</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Select what type of item this task relates to
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="relatedItemId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Related Item ID</FormLabel>
+                <FormControl>
+                  <Input placeholder="ID of the related item" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Enter the ID of the related item
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

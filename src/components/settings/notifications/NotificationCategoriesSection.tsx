@@ -10,6 +10,7 @@ import {
   Package,
   Box,
   Calendar,
+  BookOpen,
   CheckSquare
 } from 'lucide-react';
 
@@ -110,6 +111,17 @@ const NotificationCategoriesSection: React.FC<NotificationCategoriesSectionProps
         <Switch 
           checked={categories.changes} 
           onCheckedChange={(checked) => onToggle('categories', 'changes')}
+        />
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <BookOpen className="h-5 w-5 text-indigo-500" />
+          <Label>Knowledge</Label>
+        </div>
+        <Switch 
+          checked={categories.knowledge} 
+          onCheckedChange={(checked) => onToggle('categories', 'knowledge')}
         />
       </div>
       
