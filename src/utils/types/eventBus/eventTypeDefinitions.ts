@@ -17,6 +17,8 @@ export type EventType =
   | 'incident.updated'
   | 'incident.assigned'
   | 'incident.resolved'
+  | 'incident.resolved.success'
+  | 'incident.resolved.partial'
   | 'incident.closed'
   | 'incident.reopened'
   | 'incident.created.p1'
@@ -27,8 +29,6 @@ export type EventType =
   | 'incident.escalated.critical'
   | 'incident.escalated.high'
   | 'incident.updated.critical'
-  | 'incident.resolved.success'
-  | 'incident.resolved.partial'
   // Service request specific events
   | 'service.created'
   | 'service.updated'
@@ -61,14 +61,14 @@ export type EventType =
   | 'problem.created'
   | 'problem.updated'
   | 'problem.resolved'
+  | 'problem.resolved.success'
+  | 'problem.resolved.partial'
   | 'problem.assigned'
   | 'problem.rootCauseIdentified'
   | 'problem.workaroundAvailable'
   | 'problem.closed'
   | 'problem.created.critical'
   | 'problem.created.high'
-  | 'problem.resolved.success'
-  | 'problem.resolved.partial'
   // SLA events
   | 'sla.warning'
   | 'sla.warning.response'
@@ -177,4 +177,3 @@ export type SeverityQualifier = 'critical' | 'high' | 'medium' | 'low';
 export type TimeQualifier = 'approaching' | 'imminent';
 export type SLATypeQualifier = 'response' | 'resolution' | 'update';
 export type OutcomeQualifier = 'success' | 'failure' | 'partial';
-

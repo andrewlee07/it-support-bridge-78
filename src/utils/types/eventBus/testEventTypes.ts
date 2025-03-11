@@ -8,6 +8,7 @@ import { TestStatus } from '../test/testStatus';
 // Test Case event data
 export interface TestCaseEventData {
   testCaseId: string;
+  id: string; // Added for publisher compatibility
   title: string;
   description?: string;
   createdBy: string;
@@ -18,11 +19,13 @@ export interface TestCaseEventData {
   status?: TestStatus;
   changes?: string[];       // For testCase.updated
   impactedTestPlans?: string[];  // For testCase.updated
+  tenantId?: string; // Added for publisher compatibility
 }
 
 // Test Execution event data
 export interface TestExecutionEventData {
   executionId: string;
+  id: string; // Added for publisher compatibility
   testCycleId: string;
   testCaseIds: string[];
   title: string;
@@ -48,4 +51,5 @@ export interface TestExecutionEventData {
   blockerDetails?: string;  // For testExecution.blocked
   blockerImpact?: string;   // For testExecution.blocked
   requiredActions?: string; // For testExecution.blocked
+  tenantId?: string; // Added for publisher compatibility
 }

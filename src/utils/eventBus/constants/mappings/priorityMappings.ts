@@ -5,7 +5,7 @@ import { Notification } from '@/components/shared/notifications/types';
 /**
  * Maps event types to priority
  */
-export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
+export const EVENT_TO_PRIORITY: Partial<Record<EventType, Notification['priority']>> = {
   // Original ticket events
   'ticket.created': 'medium',
   'ticket.updated': 'low',
@@ -57,6 +57,10 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'change.rollback': 'critical',
   'change.emergency.created': 'high',
   'change.emergency.approved': 'high',
+  'change.submitted': 'medium',
+  'change.reviewed': 'medium',
+  'change.tested': 'medium',
+  'change.canceled': 'medium',
   
   // Problem events
   'problem.created': 'high',
@@ -64,6 +68,8 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'problem.created.high': 'high',
   'problem.updated': 'medium',
   'problem.resolved': 'medium',
+  'problem.resolved.success': 'medium',
+  'problem.resolved.partial': 'high',
   'problem.assigned': 'medium',
   'problem.rootCauseIdentified': 'high',
   'problem.workaroundAvailable': 'high',
@@ -94,6 +100,7 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'task.completed': 'medium',
   'task.completed.success': 'medium',
   'task.completed.partial': 'high',
+  'task.deleted': 'low',
   
   // Release events
   'release.created': 'medium',
@@ -109,6 +116,12 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'release.deploymentCompleted.failure': 'critical',
   'release.deploymentCompleted.partial': 'high',
   'release.rollback': 'critical',
+  'release.verified': 'medium',
+  'release.buildStarted': 'medium',
+  'release.buildCompleted': 'medium',
+  'release.buildCompleted.success': 'medium',
+  'release.buildCompleted.failure': 'critical',
+  'release.canceled': 'medium',
   
   // Asset events
   'asset.created': 'low',

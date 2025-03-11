@@ -1,5 +1,5 @@
 
-import { EventBus } from '@/utils/eventBus';
+import EventBus from '../../eventBus/EventBus';
 import { KnownErrorEventData } from '@/utils/types/eventBus';
 
 /**

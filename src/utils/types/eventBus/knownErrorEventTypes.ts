@@ -6,6 +6,7 @@
 // Known Error Database event data
 export interface KnownErrorEventData {
   knownErrorId: string;
+  id: string; // Added for publisher compatibility
   title: string;
   description?: string;
   status: string;
@@ -17,4 +18,5 @@ export interface KnownErrorEventData {
   resolution?: string;
   viewedBy?: string[];
   updatedFields?: string[];
+  tenantId?: string; // Added for publisher compatibility
 }
