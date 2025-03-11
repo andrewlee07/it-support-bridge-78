@@ -2,8 +2,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ListIcon, Sliders } from 'lucide-react';
+import { ListIcon, Filter, Sliders } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface KanbanHeaderProps {
   viewDimension: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
@@ -23,21 +28,31 @@ const KanbanHeader: React.FC<KanbanHeaderProps> = ({
         <p className="text-muted-foreground">Manage your backlog items using the kanban board</p>
       </div>
       <div className="flex gap-2">
-        <Select 
-          value={viewDimension} 
-          onValueChange={(val) => onViewDimensionChange(val as any)}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="View dimension" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="status">By Status</SelectItem>
-            <SelectItem value="sprint">By Sprint</SelectItem>
-            <SelectItem value="assignee">By Assignee</SelectItem>
-            <SelectItem value="priority">By Priority</SelectItem>
-            <SelectItem value="label">By Label</SelectItem>
-          </SelectContent>
-        </Select>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <Select 
+                value={viewDimension} 
+                onValueChange={(val) => onViewDimensionChange(val as any)}
+              >
+                <SelectTrigger className="w-[50px]">
+                  <Filter className="h-4 w-4" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="status">By Status</SelectItem>
+                  <SelectItem value="sprint">By Sprint</SelectItem>
+                  <SelectItem value="assignee">By Assignee</SelectItem>
+                  <SelectItem value="priority">By Priority</SelectItem>
+                  <SelectItem value="label">By Label</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            Group items by {viewDimension}
+          </TooltipContent>
+        </Tooltip>
+        
         <Button 
           variant="outline"
           onClick={() => navigate('/backlog')}

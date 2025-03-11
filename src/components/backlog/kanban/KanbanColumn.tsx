@@ -59,10 +59,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       )}
     >
       <div 
-        className={cn(
-          "p-3 font-medium border-b flex items-center justify-between sticky top-0 z-10",
-          columnConfig.color
-        )}
+        className="p-3 font-medium border-b flex items-center justify-between sticky top-0 z-10 bg-background"
       >
         <div className="flex items-center">
           <Button 
@@ -74,7 +71,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
           <span>{columnConfig.displayName}</span>
-          <span className="ml-2 text-xs bg-background/80 px-1.5 py-0.5 rounded-full">
+          <span className="ml-2 text-xs bg-accent/30 px-1.5 py-0.5 rounded-full">
             {items.length}
           </span>
         </div>

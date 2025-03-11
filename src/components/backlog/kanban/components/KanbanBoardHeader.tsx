@@ -3,7 +3,6 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   PlusCircle, 
-  Settings, 
   ListPlus 
 } from 'lucide-react';
 import { 
@@ -12,6 +11,7 @@ import {
   TooltipTrigger 
 } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 interface KanbanBoardHeaderProps {
   onConfigOpen: () => void;
@@ -34,6 +34,16 @@ const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({
     label: 'Label'
   }[viewDimension];
   
+  const handleAddColumn = () => {
+    toast.info("Add column functionality is not yet implemented");
+    onAddColumn();
+  };
+
+  const handleCreateItem = () => {
+    toast.info("Create item functionality is not yet implemented");
+    onCreateItem();
+  };
+  
   return (
     <div className="flex justify-between items-center mb-4">
       <div className="flex items-center">
@@ -50,7 +60,7 @@ const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={onAddColumn}
+              onClick={handleAddColumn}
             >
               <ListPlus className="h-4 w-4 mr-1" />
               Add Column
@@ -59,21 +69,7 @@ const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({
           <TooltipContent>Add a new column to your board</TooltipContent>
         </Tooltip>
         
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={onConfigOpen}
-            >
-              <Settings className="h-4 w-4 mr-1" />
-              Configure
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Configure board settings</TooltipContent>
-        </Tooltip>
-        
-        <Button size="sm" onClick={onCreateItem}>
+        <Button size="sm" onClick={handleCreateItem}>
           <PlusCircle className="h-4 w-4 mr-1" />
           New Item
         </Button>
