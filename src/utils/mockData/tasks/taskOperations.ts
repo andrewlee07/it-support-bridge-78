@@ -206,7 +206,7 @@ type CreateTaskInput = {
   blockedBy?: string[];
   checklist?: ChecklistItem[];
   estimatedHours?: number;
-  timeTracking?: { entries: TimeEntry[] };
+  timeTracking?: { entries: TimeEntry[]; totalTimeSpent?: number };
   attachments?: any[];
   isTemplate?: boolean;
   templateId?: string;
@@ -216,6 +216,10 @@ export const createTask = async (taskData: CreateTaskInput): Promise<{ success: 
   const newTask: Task = {
     id: taskData.isTemplate ? `template-${uuidv4().slice(0, 8)}` : `task-${uuidv4().slice(0, 8)}`,
     ...taskData,
+    timeTracking: taskData.timeTracking ? {
+      totalTimeSpent: taskData.timeTracking.totalTimeSpent || 0,
+      entries: taskData.timeTracking.entries || []
+    } : undefined,
     createdAt: new Date(),
     updatedAt: new Date()
   };
