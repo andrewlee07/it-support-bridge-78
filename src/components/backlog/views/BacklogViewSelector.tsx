@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { KanbanIcon, ListIcon, Clock, CalendarIcon, LineChartIcon } from 'lucide-react';
+import { KanbanIcon, ListIcon, Clock, LineChartIcon } from 'lucide-react';
 import { BacklogViewType } from '@/utils/types/backlogTypes';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -15,7 +15,6 @@ const viewOptions = [
   { value: 'kanban', label: 'Kanban', icon: KanbanIcon, path: '/backlog/kanban' },
   { value: 'list', label: 'List', icon: ListIcon, path: '/backlog/list' },
   { value: 'timeline', label: 'Timeline', icon: Clock, path: '/backlog/timeline' },
-  { value: 'calendar', label: 'Calendar', icon: CalendarIcon, path: '/backlog/calendar' },
   { value: 'reporting', label: 'Reporting', icon: LineChartIcon, path: '/backlog/reporting' },
 ] as const;
 
