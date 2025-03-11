@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ListIcon, Settings } from 'lucide-react';
+import { ListIcon, Sliders } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface KanbanHeaderProps {
@@ -49,8 +49,8 @@ const KanbanHeader: React.FC<KanbanHeaderProps> = ({
           variant="outline"
           onClick={() => document.querySelector('[data-kanban-board]')?.dispatchEvent(new Event('openConfig'))}
         >
-          <Settings className="mr-2 h-4 w-4" />
-          Configure Board
+          <Sliders className="mr-2 h-4 w-4" />
+          Board Settings
         </Button>
       </div>
     </div>

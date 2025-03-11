@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { DropResult } from 'react-beautiful-dnd';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
@@ -133,23 +132,17 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   // Setup event listener for custom events
   useEffect(() => {
-    const handleAddBucketEvent = () => {
-      handleAddBucket();
-    };
-
     const handleOpenConfigEvent = () => {
       setConfigOpen(true);
     };
 
     const boardElement = document.querySelector('[data-kanban-board]');
     if (boardElement) {
-      boardElement.addEventListener('addBucket', handleAddBucketEvent);
       boardElement.addEventListener('openConfig', handleOpenConfigEvent);
     }
 
     return () => {
       if (boardElement) {
-        boardElement.removeEventListener('addBucket', handleAddBucketEvent);
         boardElement.removeEventListener('openConfig', handleOpenConfigEvent);
       }
     };
@@ -276,6 +269,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       <KanbanBoardHeader 
         onConfigOpen={() => setConfigOpen(true)} 
         onCreateItem={handleCreateItem}
+        onAddColumn={handleAddBucket}
         viewDimension={viewDimension}
       />
 

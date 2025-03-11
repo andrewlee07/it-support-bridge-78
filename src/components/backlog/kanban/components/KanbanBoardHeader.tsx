@@ -16,12 +16,14 @@ import { Badge } from '@/components/ui/badge';
 interface KanbanBoardHeaderProps {
   onConfigOpen: () => void;
   onCreateItem: () => void;
+  onAddColumn: () => void;
   viewDimension?: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
 }
 
 const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({ 
   onConfigOpen, 
   onCreateItem,
+  onAddColumn,
   viewDimension = 'status'
 }) => {
   const dimensionLabel = {
@@ -48,7 +50,7 @@ const KanbanBoardHeader: React.FC<KanbanBoardHeaderProps> = ({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => document.querySelector('[data-kanban-board]')?.dispatchEvent(new Event('addBucket'))}
+              onClick={onAddColumn}
             >
               <ListPlus className="h-4 w-4 mr-1" />
               Add Column
