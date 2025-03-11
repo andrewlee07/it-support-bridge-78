@@ -1,5 +1,5 @@
 
-import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData } from '@/utils/types/eventBus';
+import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 import { v4 as uuidv4 } from 'uuid';
 import { EVENT_TITLE_MAP, EVENT_TO_NOTIFICATION_TYPE, EVENT_TO_PRIORITY } from '../constants/eventMappings';
@@ -86,6 +86,46 @@ export const createNotificationFromEvent = (event: SystemEvent): Notification =>
       
       actionUrl = `/knowledge/known-errors/${kedbData.knownErrorId}`;
       entityId = kedbData.knownErrorId;
+      break;
+    
+    case 'release.created':
+    case 'release.updated':
+    case 'release.planApproved':
+    case 'release.readyForTest':
+    case 'release.testCompleted':
+    case 'release.scheduledDeployment':
+    case 'release.deploymentStarted':
+    case 'release.deploymentCompleted':
+    case 'release.deployed':
+    case 'release.rollback':
+      const releaseData = event.data as ReleaseEventData;
+      title = `${title}: ${releaseData.title} v${releaseData.version}`;
+      
+      // Create appropriate message based on event type
+      if (event.type === 'release.created') {
+        message = `New release created: ${releaseData.description || releaseData.title}`;
+      } else if (event.type === 'release.updated') {
+        const updatedFieldsList = releaseData.updatedFields?.join(', ') || 'multiple fields';
+        message = `Release updated: ${updatedFieldsList}`;
+      } else if (event.type === 'release.planApproved') {
+        message = `Release plan approved for deployment on ${releaseData.plannedDate}`;
+      } else if (event.type === 'release.readyForTest') {
+        message = `Release is ready for testing in ${releaseData.deploymentDetails?.environment || 'test environment'}`;
+      } else if (event.type === 'release.testCompleted') {
+        const passRate = releaseData.testResults?.passRate || 0;
+        message = `Testing completed with ${passRate}% pass rate. ${releaseData.testResults?.failedTests || 0} test(s) failed.`;
+      } else if (event.type === 'release.scheduledDeployment') {
+        message = `Deployment scheduled for ${releaseData.deploymentDate}. Expected downtime: ${releaseData.deploymentDetails?.expectedDowntime || 'None'}.`;
+      } else if (event.type === 'release.deploymentStarted') {
+        message = `Deployment started at ${releaseData.deploymentDetails?.startTime}. Expected completion: ${releaseData.deploymentDetails?.endTime}.`;
+      } else if (event.type === 'release.deploymentCompleted' || event.type === 'release.deployed') {
+        message = `Deployment completed successfully. Release is now live.`;
+      } else if (event.type === 'release.rollback') {
+        message = `Release rollback initiated. Reason: ${releaseData.rollbackReason || 'Unknown issue'}.`;
+      }
+      
+      actionUrl = `/releases/${releaseData.releaseId}`;
+      entityId = releaseData.releaseId;
       break;
     
     // Add more event type handling as needed

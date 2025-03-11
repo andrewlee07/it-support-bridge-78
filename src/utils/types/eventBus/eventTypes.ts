@@ -1,4 +1,3 @@
-
 /**
  * Core event types used throughout the event bus system
  */
@@ -53,9 +52,13 @@ export type EventType =
   | 'release.created'
   | 'release.updated'
   | 'release.deployed'
-  | 'knowledge.created'
-  | 'knowledge.updated'
-  | 'knowledge.published'
+  | 'release.planApproved'     // New: When a release plan is approved
+  | 'release.readyForTest'     // New: When a release is ready for testing
+  | 'release.testCompleted'    // New: When testing is completed for a release
+  | 'release.scheduledDeployment' // New: When deployment is scheduled
+  | 'release.deploymentStarted'   // New: When deployment begins
+  | 'release.deploymentCompleted' // New: When deployment is finished 
+  | 'release.rollback'         // New: When a release must be rolled back
   | 'asset.created'
   | 'asset.updated'
   | 'asset.retired'
@@ -115,6 +118,35 @@ export interface KnownErrorEventData {
   updatedFields?: string[];
 }
 
+// Release-specific event data
+export interface ReleaseEventData {
+  releaseId: string;
+  title: string;
+  version: string;
+  description?: string;
+  status: string;
+  type?: string;
+  plannedDate?: string;
+  deploymentDate?: string;
+  owner?: string;
+  affectedServices?: string[];
+  testResults?: {
+    passRate?: number;
+    totalTests?: number;
+    failedTests?: number;
+    criticalIssues?: number;
+  };
+  deploymentDetails?: {
+    expectedDowntime?: string;
+    startTime?: string;
+    endTime?: string;
+    environment?: string;
+    rollbackPlan?: string;
+  };
+  rollbackReason?: string;
+  updatedFields?: string[];
+}
+
 // Map of event types to their data structures
 export interface EventDataMap {
   'task.created': TaskEventData;
@@ -132,6 +164,15 @@ export interface EventDataMap {
   'knownError.workaroundUpdated': KnownErrorEventData;
   'knownError.planToFix': KnownErrorEventData;
   'knownError.resolved': KnownErrorEventData;
+  'release.created': ReleaseEventData;
+  'release.updated': ReleaseEventData;
+  'release.planApproved': ReleaseEventData;
+  'release.readyForTest': ReleaseEventData;
+  'release.testCompleted': ReleaseEventData;
+  'release.scheduledDeployment': ReleaseEventData;
+  'release.deploymentStarted': ReleaseEventData;
+  'release.deploymentCompleted': ReleaseEventData;
+  'release.deployed': ReleaseEventData;
+  'release.rollback': ReleaseEventData;
   // Add more event type to data mappings as needed
 }
-

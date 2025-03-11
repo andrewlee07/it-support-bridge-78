@@ -23,7 +23,18 @@ export const categoryToEventTypes: Record<string, EventType[]> = {
   bugs: ['test.failed'],
   testCases: ['test.created', 'test.executed', 'test.passed'],
   backlogItems: [],
-  releases: ['release.created', 'release.updated', 'release.deployed'],
+  releases: [
+    'release.created', 
+    'release.updated',
+    'release.planApproved',
+    'release.readyForTest',
+    'release.testCompleted',
+    'release.scheduledDeployment',
+    'release.deploymentStarted',
+    'release.deploymentCompleted',
+    'release.deployed',
+    'release.rollback'
+  ],
   assets: ['asset.created', 'asset.updated', 'asset.retired'],
   changes: [
     'change.created', 

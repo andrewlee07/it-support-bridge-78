@@ -1,4 +1,3 @@
-
 import { EventType } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 
@@ -32,6 +31,13 @@ export const EVENT_TITLE_MAP: Record<EventType, string> = {
   'release.created': 'New release created',
   'release.updated': 'Release updated',
   'release.deployed': 'Release deployed',
+  'release.planApproved': 'Release plan approved',
+  'release.readyForTest': 'Release ready for testing',
+  'release.testCompleted': 'Release testing completed',
+  'release.scheduledDeployment': 'Release deployment scheduled',
+  'release.deploymentStarted': 'Release deployment started',
+  'release.deploymentCompleted': 'Release deployment completed',
+  'release.rollback': 'Release rollback initiated',
   'knowledge.created': 'New article created',
   'knowledge.updated': 'Article updated',
   'knowledge.published': 'Article published',
@@ -79,6 +85,13 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'release.created': 'release',
   'release.updated': 'release',
   'release.deployed': 'release',
+  'release.planApproved': 'release',
+  'release.readyForTest': 'release',
+  'release.testCompleted': 'release',
+  'release.scheduledDeployment': 'release',
+  'release.deploymentStarted': 'release',
+  'release.deploymentCompleted': 'release',
+  'release.rollback': 'release',
   'knowledge.created': 'knowledge',
   'knowledge.updated': 'knowledge',
   'knowledge.published': 'knowledge',
@@ -126,6 +139,13 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'release.created': 'medium',
   'release.updated': 'low',
   'release.deployed': 'high',
+  'release.planApproved': 'medium',
+  'release.readyForTest': 'medium',
+  'release.testCompleted': 'medium',
+  'release.scheduledDeployment': 'high',
+  'release.deploymentStarted': 'high',
+  'release.deploymentCompleted': 'high',
+  'release.rollback': 'critical',
   'knowledge.created': 'low',
   'knowledge.updated': 'low',
   'knowledge.published': 'medium',
@@ -141,6 +161,36 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'knownError.workaroundUpdated': 'high',
   'knownError.planToFix': 'medium',
   'knownError.resolved': 'medium'
+};
+
+/**
+ * Maps release event types to recipient groups
+ * Using Partial<Record> as we're only defining a subset of events
+ */
+export const RELEASE_EVENT_RECIPIENTS: Partial<Record<EventType, string[]>> = {
+  'release.created': ['release-manager', 'change-manager', 'dev-team', 'test-team'],
+  'release.planApproved': ['release-team', 'change-manager', 'service-owners', 'stakeholders'],
+  'release.readyForTest': ['test-team', 'qa-manager', 'release-manager'],
+  'release.testCompleted': ['release-manager', 'change-manager', 'dev-team', 'stakeholders'],
+  'release.scheduledDeployment': ['all-stakeholders', 'support-staff', 'affected-service-users'],
+  'release.deploymentStarted': ['release-team', 'support-staff', 'affected-service-users'],
+  'release.deploymentCompleted': ['all-stakeholders', 'support-staff', 'affected-service-users'],
+  'release.rollback': ['all-stakeholders', 'support-staff', 'affected-service-users']
+};
+
+/**
+ * Maps release event types to recommended notification channels
+ * Using Partial<Record> as we're only defining a subset of events
+ */
+export const RELEASE_EVENT_CHANNELS: Partial<Record<EventType, ('email' | 'teams' | 'inApp' | 'sms')[]>> = {
+  'release.created': ['email', 'teams', 'inApp'],
+  'release.planApproved': ['email', 'teams', 'inApp'],
+  'release.readyForTest': ['email', 'teams', 'inApp'],
+  'release.testCompleted': ['email', 'teams', 'inApp'],
+  'release.scheduledDeployment': ['email', 'teams', 'inApp'],
+  'release.deploymentStarted': ['email', 'teams', 'inApp'],
+  'release.deploymentCompleted': ['email', 'teams', 'inApp'],
+  'release.rollback': ['email', 'teams', 'inApp', 'sms']
 };
 
 /**
@@ -192,4 +242,3 @@ export const KEDB_EVENT_CHANNELS: Partial<Record<EventType, ('email' | 'teams' |
   'knownError.planToFix': ['email', 'teams', 'inApp'],
   'knownError.resolved': ['email', 'teams', 'inApp']
 };
-
