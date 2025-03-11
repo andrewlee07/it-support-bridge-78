@@ -1,4 +1,3 @@
-
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import MainLayout from '@/layouts/MainLayout';
@@ -25,6 +24,10 @@ import ProblemManagement from '@/pages/ProblemManagement';
 import Releases from '@/pages/Releases';
 import Backlog from '@/pages/Backlog';
 import BacklogKanban from '@/pages/BacklogKanban';
+import BacklogList from '@/pages/BacklogList';
+import BacklogTimeline from '@/pages/BacklogTimeline';
+import BacklogCalendar from '@/pages/BacklogCalendar';
+import BacklogReporting from '@/pages/BacklogReporting';
 import AdminSettings from '@/pages/AdminSettings';
 import IncidentDetail from '@/pages/IncidentDetail';
 import ServiceRequestDetail from '@/pages/ServiceRequestDetail';
@@ -222,6 +225,22 @@ const router = createBrowserRouter([
       {
         path: '/backlog/kanban',
         element: React.createElement(BacklogKanban)
+      },
+      {
+        path: '/backlog/list',
+        element: React.createElement(BacklogList)
+      },
+      {
+        path: '/backlog/timeline',
+        element: React.createElement(BacklogTimeline)
+      },
+      {
+        path: '/backlog/calendar',
+        element: React.createElement(BacklogCalendar)
+      },
+      {
+        path: '/backlog/reporting',
+        element: React.createElement(BacklogReporting)
       },
       {
         path: '/assets',
