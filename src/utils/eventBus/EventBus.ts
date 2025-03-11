@@ -4,7 +4,10 @@ import {
   SystemEvent, 
   EventType, 
   EventSource, 
-  EventMetadata, 
+  EventMetadata,
+  EventActor,
+  EventEntity,
+  EventChanges,
   EventSubscriber,
   EventProcessingStatus
 } from '../types/eventBus';
@@ -65,11 +68,16 @@ class EventBus {
     type: EventType,
     source: EventSource,
     data: T,
-    metadata: Omit<EventMetadata, 'correlationId'> = {}
+    options: {
+      metadata?: Omit<EventMetadata, 'correlationId'>;
+      actor?: EventActor;
+      entity?: EventEntity;
+      changes?: EventChanges;
+    } = {}
   ): string {
     const eventId = uuidv4();
     const timestamp = new Date().toISOString();
-    const correlationId = metadata.correlationId || uuidv4();
+    const correlationId = options.metadata?.correlationId || uuidv4();
     
     const event: SystemEvent<T> = {
       id: eventId,
@@ -78,10 +86,15 @@ class EventBus {
       timestamp,
       data,
       metadata: {
-        ...metadata,
+        ...options.metadata,
         correlationId
       }
     };
+    
+    // Add optional fields if provided
+    if (options.actor) event.actor = options.actor;
+    if (options.entity) event.entity = options.entity;
+    if (options.changes) event.changes = options.changes;
     
     if (this.debugMode) {
       console.log(`EventBus: Event published - ${type} from ${source} (${eventId})`);

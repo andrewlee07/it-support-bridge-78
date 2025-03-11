@@ -1,3 +1,4 @@
+
 /**
  * Map of event types to their data structures
  */
@@ -20,11 +21,17 @@ export interface EventDataMap {
   'task.dueDateApproaching': TaskEventData;
   'task.overdue': TaskEventData;
   'task.overdue.critical': TaskEventData;
+  'task.overdue.high': TaskEventData;
+  'task.overdue.medium': TaskEventData;
   'task.statusChanged': TaskEventData;
   'task.completed': TaskEventData;
+  'task.completed.success': TaskEventData;
+  'task.completed.partial': TaskEventData;
   
   // Problem events
   'problem.created': ProblemEventData;
+  'problem.created.critical': ProblemEventData;
+  'problem.created.high': ProblemEventData;
   'problem.updated': ProblemEventData;
   'problem.assigned': ProblemEventData;
   'problem.rootCauseIdentified': ProblemEventData;
@@ -34,17 +41,27 @@ export interface EventDataMap {
   
   // Incident specific events
   'incident.created': ProblemEventData;
-  'incident.updated': ProblemEventData;
-  'incident.assigned': ProblemEventData;
-  'incident.resolved': ProblemEventData;
-  'incident.closed': ProblemEventData;
-  'incident.reopened': ProblemEventData;
   'incident.created.p1': ProblemEventData;
   'incident.created.p2': ProblemEventData;
+  'incident.created.p3': ProblemEventData;
+  'incident.created.p4': ProblemEventData;
+  'incident.updated': ProblemEventData;
+  'incident.updated.critical': ProblemEventData;
+  'incident.assigned': ProblemEventData;
+  'incident.resolved': ProblemEventData;
+  'incident.resolved.success': ProblemEventData;
+  'incident.resolved.partial': ProblemEventData;
+  'incident.closed': ProblemEventData;
+  'incident.reopened': ProblemEventData;
   'incident.escalated': ProblemEventData;
+  'incident.escalated.critical': ProblemEventData;
+  'incident.escalated.high': ProblemEventData;
   
   // Service request specific events
   'service.created': TaskEventData;
+  'service.created.high': TaskEventData;
+  'service.created.medium': TaskEventData;
+  'service.created.low': TaskEventData;
   'service.updated': TaskEventData;
   'service.assigned': TaskEventData;
   'service.resolved': TaskEventData;
@@ -74,6 +91,9 @@ export interface EventDataMap {
   'release.scheduledDeployment': ReleaseEventData;
   'release.deploymentStarted': ReleaseEventData;
   'release.deploymentCompleted': ReleaseEventData;
+  'release.deploymentCompleted.success': ReleaseEventData;
+  'release.deploymentCompleted.failure': ReleaseEventData;
+  'release.deploymentCompleted.partial': ReleaseEventData;
   'release.deployed': ReleaseEventData;
   'release.rollback': ReleaseEventData;
   
@@ -81,9 +101,13 @@ export interface EventDataMap {
   'sla.warning': ProblemEventData;
   'sla.warning.response': ProblemEventData;
   'sla.warning.resolution': ProblemEventData;
+  'sla.warning.update': ProblemEventData;
+  'sla.warning.approaching': ProblemEventData;
+  'sla.warning.imminent': ProblemEventData;
   'sla.breached': ProblemEventData;
   'sla.breached.response': ProblemEventData;
   'sla.breached.resolution': ProblemEventData;
+  'sla.breached.update': ProblemEventData;
   
   // Change events
   'change.created': ReleaseEventData;
@@ -91,6 +115,9 @@ export interface EventDataMap {
   'change.approved': ReleaseEventData;
   'change.rejected': ReleaseEventData;
   'change.implemented': ReleaseEventData;
+  'change.implemented.success': ReleaseEventData;
+  'change.implemented.failure': ReleaseEventData;
+  'change.implemented.partial': ReleaseEventData;
   'change.rollback': ReleaseEventData;
   'change.emergency.created': ReleaseEventData;
   'change.emergency.approved': ReleaseEventData;
@@ -103,9 +130,13 @@ export interface EventDataMap {
   'backlogItem.statusChanged': BacklogItemEventData;
   'backlogItem.readyForReview': BacklogItemEventData;
   'backlogItem.completed': BacklogItemEventData;
+  'backlogItem.completed.success': BacklogItemEventData;
+  'backlogItem.completed.partial': BacklogItemEventData;
   
   // Reminder events
   'reminder.upcoming': ReminderEventData;
+  'reminder.upcoming.approaching': ReminderEventData;
+  'reminder.upcoming.imminent': ReminderEventData;
   'reminder.due': ReminderEventData;
   'reminder.recurring': ReminderEventData;
   'reminder.snoozed': ReminderEventData;
@@ -119,7 +150,11 @@ export interface EventDataMap {
   'testExecution.scheduled': TestExecutionEventData;
   'testExecution.started': TestExecutionEventData;
   'testExecution.failed': TestExecutionEventData;
+  'testExecution.failed.critical': TestExecutionEventData;
+  'testExecution.failed.high': TestExecutionEventData;
   'testExecution.completed': TestExecutionEventData;
+  'testExecution.completed.success': TestExecutionEventData;
+  'testExecution.completed.partial': TestExecutionEventData;
   'testExecution.blocked': TestExecutionEventData;
   
   // Asset events
@@ -127,6 +162,8 @@ export interface EventDataMap {
   'asset.updated': any;
   'asset.retired': any;
   'asset.expiring': any;
+  'asset.expiring.approaching': any;
+  'asset.expiring.imminent': any;
   'asset.maintenance.scheduled': any;
   
   // Original ticket events (keeping for backward compatibility)
@@ -142,4 +179,6 @@ export interface EventDataMap {
   'test.executed': TestExecutionEventData;
   'test.passed': TestExecutionEventData;
   'test.failed': TestExecutionEventData;
+  'test.failed.critical': TestExecutionEventData;
+  'test.failed.high': TestExecutionEventData;
 }

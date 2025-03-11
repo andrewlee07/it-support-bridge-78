@@ -21,7 +21,14 @@ export type EventType =
   | 'incident.reopened'
   | 'incident.created.p1'
   | 'incident.created.p2'
+  | 'incident.created.p3'
+  | 'incident.created.p4'
   | 'incident.escalated'
+  | 'incident.escalated.critical'
+  | 'incident.escalated.high'
+  | 'incident.updated.critical'
+  | 'incident.resolved.success'
+  | 'incident.resolved.partial'
   // Service request specific events
   | 'service.created'
   | 'service.updated'
@@ -31,6 +38,9 @@ export type EventType =
   | 'service.reopened'
   | 'service.approved'
   | 'service.rejected'
+  | 'service.created.high'
+  | 'service.created.medium'
+  | 'service.created.low'
   // Change events
   | 'change.created'
   | 'change.updated'
@@ -40,6 +50,9 @@ export type EventType =
   | 'change.rollback'
   | 'change.emergency.created'
   | 'change.emergency.approved'
+  | 'change.implemented.success'
+  | 'change.implemented.failure'
+  | 'change.implemented.partial'
   // Problem events
   | 'problem.created'
   | 'problem.updated'
@@ -48,13 +61,19 @@ export type EventType =
   | 'problem.rootCauseIdentified'
   | 'problem.workaroundAvailable'
   | 'problem.closed'
+  | 'problem.created.critical'
+  | 'problem.created.high'
   // SLA events
   | 'sla.warning'
   | 'sla.warning.response'
   | 'sla.warning.resolution'
+  | 'sla.warning.update'
+  | 'sla.warning.approaching'
+  | 'sla.warning.imminent'
   | 'sla.breached'
   | 'sla.breached.response'
   | 'sla.breached.resolution'
+  | 'sla.breached.update'
   // Task events
   | 'task.created'
   | 'task.updated'
@@ -62,8 +81,12 @@ export type EventType =
   | 'task.dueDateApproaching'
   | 'task.overdue'
   | 'task.overdue.critical'
+  | 'task.overdue.high'
+  | 'task.overdue.medium'
   | 'task.statusChanged'
   | 'task.completed'
+  | 'task.completed.success'
+  | 'task.completed.partial'
   // Release events
   | 'release.created'
   | 'release.updated'
@@ -74,18 +97,25 @@ export type EventType =
   | 'release.scheduledDeployment' 
   | 'release.deploymentStarted'   
   | 'release.deploymentCompleted' 
+  | 'release.deploymentCompleted.success'
+  | 'release.deploymentCompleted.failure'
+  | 'release.deploymentCompleted.partial'
   | 'release.rollback'         
   // Asset events
   | 'asset.created'
   | 'asset.updated'
   | 'asset.retired'
   | 'asset.expiring'
+  | 'asset.expiring.approaching'
+  | 'asset.expiring.imminent'
   | 'asset.maintenance.scheduled'
   // Test events
   | 'test.created'
   | 'test.executed'
   | 'test.passed'
   | 'test.failed'
+  | 'test.failed.critical'
+  | 'test.failed.high'
   // Knowledge events      
   | 'knowledge.created'        
   | 'knowledge.updated'        
@@ -104,8 +134,12 @@ export type EventType =
   | 'backlogItem.statusChanged'   
   | 'backlogItem.readyForReview'  
   | 'backlogItem.completed'
+  | 'backlogItem.completed.success'
+  | 'backlogItem.completed.partial'
   // Reminder events       
   | 'reminder.upcoming'           
+  | 'reminder.upcoming.approaching'
+  | 'reminder.upcoming.imminent'
   | 'reminder.due'                
   | 'reminder.recurring'          
   | 'reminder.snoozed'            
@@ -117,6 +151,16 @@ export type EventType =
   | 'testExecution.scheduled'     
   | 'testExecution.started'       
   | 'testExecution.failed'        
+  | 'testExecution.failed.critical'
+  | 'testExecution.failed.high'
   | 'testExecution.completed'     
+  | 'testExecution.completed.success'
+  | 'testExecution.completed.partial'
   | 'testExecution.blocked';      
 
+// Standardized event qualifiers
+export type PriorityQualifier = 'p1' | 'p2' | 'p3' | 'p4';
+export type SeverityQualifier = 'critical' | 'high' | 'medium' | 'low';
+export type TimeQualifier = 'approaching' | 'imminent';
+export type SLATypeQualifier = 'response' | 'resolution' | 'update';
+export type OutcomeQualifier = 'success' | 'failure' | 'partial';

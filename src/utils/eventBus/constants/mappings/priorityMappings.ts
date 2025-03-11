@@ -17,16 +17,26 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   // Incident specific events
   'incident.created': 'medium',
   'incident.updated': 'low',
+  'incident.updated.critical': 'high',
   'incident.assigned': 'medium',
   'incident.resolved': 'medium',
+  'incident.resolved.success': 'medium',
+  'incident.resolved.partial': 'high',
   'incident.closed': 'low',
   'incident.reopened': 'high',
   'incident.created.p1': 'critical',
   'incident.created.p2': 'high',
+  'incident.created.p3': 'medium',
+  'incident.created.p4': 'low',
   'incident.escalated': 'high',
+  'incident.escalated.critical': 'critical',
+  'incident.escalated.high': 'high',
   
   // Service request specific events
   'service.created': 'medium',
+  'service.created.high': 'high',
+  'service.created.medium': 'medium',
+  'service.created.low': 'low',
   'service.updated': 'low',
   'service.assigned': 'medium',
   'service.resolved': 'medium',
@@ -41,12 +51,17 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'change.approved': 'medium',
   'change.rejected': 'high',
   'change.implemented': 'medium',
+  'change.implemented.success': 'medium',
+  'change.implemented.failure': 'critical',
+  'change.implemented.partial': 'high',
   'change.rollback': 'critical',
   'change.emergency.created': 'high',
   'change.emergency.approved': 'high',
   
   // Problem events
   'problem.created': 'high',
+  'problem.created.critical': 'critical',
+  'problem.created.high': 'high',
   'problem.updated': 'medium',
   'problem.resolved': 'medium',
   'problem.assigned': 'medium',
@@ -58,9 +73,13 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'sla.warning': 'high',
   'sla.warning.response': 'high',
   'sla.warning.resolution': 'high',
+  'sla.warning.update': 'medium',
+  'sla.warning.approaching': 'high',
+  'sla.warning.imminent': 'critical',
   'sla.breached': 'critical',
   'sla.breached.response': 'critical',
   'sla.breached.resolution': 'critical',
+  'sla.breached.update': 'high',
   
   // Task events
   'task.created': 'medium',
@@ -69,8 +88,12 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'task.dueDateApproaching': 'high',
   'task.overdue': 'high',
   'task.overdue.critical': 'critical',
+  'task.overdue.high': 'high',
+  'task.overdue.medium': 'medium',
   'task.statusChanged': 'medium',
   'task.completed': 'medium',
+  'task.completed.success': 'medium',
+  'task.completed.partial': 'high',
   
   // Release events
   'release.created': 'medium',
@@ -82,6 +105,9 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'release.scheduledDeployment': 'high',
   'release.deploymentStarted': 'high',
   'release.deploymentCompleted': 'high',
+  'release.deploymentCompleted.success': 'medium',
+  'release.deploymentCompleted.failure': 'critical',
+  'release.deploymentCompleted.partial': 'high',
   'release.rollback': 'critical',
   
   // Asset events
@@ -89,6 +115,8 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'asset.updated': 'low',
   'asset.retired': 'medium',
   'asset.expiring': 'high',
+  'asset.expiring.approaching': 'medium',
+  'asset.expiring.imminent': 'high',
   'asset.maintenance.scheduled': 'medium',
   
   // Test events
@@ -96,6 +124,8 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'test.executed': 'low',
   'test.passed': 'medium',
   'test.failed': 'high',
+  'test.failed.critical': 'critical',
+  'test.failed.high': 'high',
   
   // Knowledge events
   'knowledge.created': 'low',
@@ -117,9 +147,13 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'backlogItem.statusChanged': 'medium',
   'backlogItem.readyForReview': 'high',
   'backlogItem.completed': 'medium',
+  'backlogItem.completed.success': 'medium',
+  'backlogItem.completed.partial': 'high',
   
   // Reminder events
   'reminder.upcoming': 'high',
+  'reminder.upcoming.approaching': 'medium',
+  'reminder.upcoming.imminent': 'high',
   'reminder.due': 'critical',
   'reminder.recurring': 'medium',
   'reminder.snoozed': 'low',
@@ -133,6 +167,10 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
   'testExecution.scheduled': 'medium',
   'testExecution.started': 'medium',
   'testExecution.failed': 'high',
+  'testExecution.failed.critical': 'critical',
+  'testExecution.failed.high': 'high',
   'testExecution.completed': 'medium',
+  'testExecution.completed.success': 'medium',
+  'testExecution.completed.partial': 'high',
   'testExecution.blocked': 'high'
 };

@@ -16,17 +16,27 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   
   // Incident specific events
   'incident.created': 'incident',
-  'incident.updated': 'incident',
-  'incident.assigned': 'incident',
-  'incident.resolved': 'incident',
-  'incident.closed': 'incident',
-  'incident.reopened': 'incident',
   'incident.created.p1': 'incident',
   'incident.created.p2': 'incident',
+  'incident.created.p3': 'incident',
+  'incident.created.p4': 'incident',
+  'incident.updated': 'incident',
+  'incident.updated.critical': 'incident',
+  'incident.assigned': 'incident',
+  'incident.resolved': 'incident',
+  'incident.resolved.success': 'incident',
+  'incident.resolved.partial': 'incident',
+  'incident.closed': 'incident',
+  'incident.reopened': 'incident',
   'incident.escalated': 'incident',
+  'incident.escalated.critical': 'incident',
+  'incident.escalated.high': 'incident',
   
   // Service request specific events
   'service.created': 'task',
+  'service.created.high': 'task',
+  'service.created.medium': 'task',
+  'service.created.low': 'task',
   'service.updated': 'task',
   'service.assigned': 'task',
   'service.resolved': 'task',
@@ -41,12 +51,17 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'change.approved': 'change',
   'change.rejected': 'change',
   'change.implemented': 'change',
+  'change.implemented.success': 'change',
+  'change.implemented.failure': 'change',
+  'change.implemented.partial': 'change',
   'change.rollback': 'change',
   'change.emergency.created': 'change',
   'change.emergency.approved': 'change',
   
   // Problem events
   'problem.created': 'incident',
+  'problem.created.critical': 'incident',
+  'problem.created.high': 'incident',
   'problem.updated': 'incident',
   'problem.resolved': 'incident',
   'problem.assigned': 'incident',
@@ -58,9 +73,13 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'sla.warning': 'incident',
   'sla.warning.response': 'incident',
   'sla.warning.resolution': 'incident',
+  'sla.warning.update': 'incident',
+  'sla.warning.approaching': 'incident',
+  'sla.warning.imminent': 'incident',
   'sla.breached': 'incident',
   'sla.breached.response': 'incident',
   'sla.breached.resolution': 'incident',
+  'sla.breached.update': 'incident',
   
   // Task events
   'task.created': 'task',
@@ -69,8 +88,12 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'task.dueDateApproaching': 'task',
   'task.overdue': 'task',
   'task.overdue.critical': 'task',
+  'task.overdue.high': 'task',
+  'task.overdue.medium': 'task',
   'task.statusChanged': 'task',
   'task.completed': 'task',
+  'task.completed.success': 'task',
+  'task.completed.partial': 'task',
   
   // Release events
   'release.created': 'release',
@@ -82,6 +105,9 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'release.scheduledDeployment': 'release',
   'release.deploymentStarted': 'release',
   'release.deploymentCompleted': 'release',
+  'release.deploymentCompleted.success': 'release',
+  'release.deploymentCompleted.failure': 'release',
+  'release.deploymentCompleted.partial': 'release',
   'release.rollback': 'release',
   
   // Asset events
@@ -89,6 +115,8 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'asset.updated': 'asset',
   'asset.retired': 'asset',
   'asset.expiring': 'asset',
+  'asset.expiring.approaching': 'asset',
+  'asset.expiring.imminent': 'asset',
   'asset.maintenance.scheduled': 'asset',
   
   // Test events
@@ -96,6 +124,8 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'test.executed': 'testCase',
   'test.passed': 'testCase',
   'test.failed': 'bug',
+  'test.failed.critical': 'bug',
+  'test.failed.high': 'bug',
   
   // Knowledge events
   'knowledge.created': 'knowledge',
@@ -117,9 +147,13 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'backlogItem.statusChanged': 'backlogItem',
   'backlogItem.readyForReview': 'backlogItem',
   'backlogItem.completed': 'backlogItem',
+  'backlogItem.completed.success': 'backlogItem',
+  'backlogItem.completed.partial': 'backlogItem',
   
   // Reminder events
   'reminder.upcoming': 'task',
+  'reminder.upcoming.approaching': 'task',
+  'reminder.upcoming.imminent': 'task',
   'reminder.due': 'task',
   'reminder.recurring': 'task',
   'reminder.snoozed': 'task',
@@ -133,6 +167,10 @@ export const EVENT_TO_NOTIFICATION_TYPE: Record<EventType, Notification['type']>
   'testExecution.scheduled': 'testCase',
   'testExecution.started': 'testCase',
   'testExecution.failed': 'bug',
+  'testExecution.failed.critical': 'bug',
+  'testExecution.failed.high': 'bug',
   'testExecution.completed': 'testCase',
+  'testExecution.completed.success': 'testCase',
+  'testExecution.completed.partial': 'testCase',
   'testExecution.blocked': 'bug'
 };

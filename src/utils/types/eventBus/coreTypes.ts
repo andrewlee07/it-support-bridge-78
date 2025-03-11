@@ -2,11 +2,11 @@
 /**
  * Core event bus types defining the standard event structure and interfaces
  */
-import { EventType, EventSource } from './eventTypes';
-import { EventOrigin } from './sourceTypes';
+import { EventType } from './eventTypes';
+import { EventSource } from './sourceTypes';
 
 /**
- * Standard event structure for all system events
+ * Standardized event data structure for all system events
  */
 export interface SystemEvent<T = any> {
   id: string;
@@ -15,6 +15,38 @@ export interface SystemEvent<T = any> {
   timestamp: string;
   data: T;
   metadata: EventMetadata;
+  actor?: EventActor;
+  entity?: EventEntity;
+  changes?: EventChanges;
+}
+
+/**
+ * Event actor information
+ */
+export interface EventActor {
+  id: string;
+  name?: string;
+  type: 'user' | 'system' | 'integration';
+  email?: string;
+}
+
+/**
+ * Primary entity associated with the event
+ */
+export interface EventEntity {
+  id: string;
+  type: string;
+  name?: string;
+  url?: string;
+}
+
+/**
+ * Changes made in update events
+ */
+export interface EventChanges {
+  fields: string[];
+  before?: Record<string, any>;
+  after?: Record<string, any>;
 }
 
 /**
@@ -22,8 +54,13 @@ export interface SystemEvent<T = any> {
  */
 export interface EventMetadata {
   correlationId?: string;
-  origin?: EventOrigin;
+  origin?: string;
   userId?: string;
+  tenantId?: string;
+  requestId?: string;
+  severity?: string;
+  priority?: string;
+  tags?: string[];
   [key: string]: any;
 }
 
