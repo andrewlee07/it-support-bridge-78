@@ -6,10 +6,12 @@ import {
   sprintColumnsConfig, 
   generateAssigneeColumns, 
   priorityColumnsConfig, 
-  generateLabelColumns 
+  generateLabelColumns,
+  generateReleaseColumns
 } from '@/utils/types/kanbanTypes';
 import { UseKanbanBoardProps } from './types';
 import { BacklogItem } from '@/utils/types/backlogTypes';
+import { ViewDimension } from '@/hooks/backlog/kanban/types';
 
 export function useKanbanBoardColumnConfig(
   props: UseKanbanBoardProps,
@@ -70,6 +72,24 @@ export function useKanbanBoardColumnConfig(
       
       newConfig.columns = generateLabelColumns(uniqueLabels.length > 0 ? uniqueLabels : ['No Label']);
     }
+    else if (viewDimension === 'release') {
+      // Generate columns based on releases
+      const uniqueReleases = Array.from(
+        new Set(
+          backlogItems
+            .filter(item => item.releaseId)
+            .map(item => item.releaseId || 'unassigned')
+        )
+      );
+      
+      // Add an unassigned column if not already included
+      if (!uniqueReleases.includes('unassigned')) {
+        uniqueReleases.push('unassigned');
+      }
+      
+      newConfig.columns = generateReleaseColumns ? generateReleaseColumns(uniqueReleases) : newConfig.columns;
+    }
+    // Handle additional dimensions like 'progress' and 'due-date' can be added here
     
     setBoardConfig(newConfig);
   }, [viewDimension, backlogItems, boardConfig.viewType]);
@@ -109,6 +129,16 @@ export function useKanbanBoardColumnConfig(
           : item.labels && item.labels.includes(label)
       );
     }
+    else if (viewDimension === 'release') {
+      const releaseId = columnId.replace('release-', '');
+      return backlogItems.filter(item => 
+        releaseId === 'unassigned' 
+          ? !item.releaseId 
+          : item.releaseId === releaseId
+      );
+    }
+    // Additional dimensions like 'progress' and 'due-date' can be handled here
+    
     return [];
   };
 

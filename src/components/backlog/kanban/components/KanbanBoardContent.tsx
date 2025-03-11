@@ -5,6 +5,7 @@ import { DropResult } from 'react-beautiful-dnd';
 import KanbanColumns from './KanbanColumns';
 import KanbanEmptyState from './KanbanEmptyState';
 import { KanbanBoardConfig } from '@/utils/types/kanbanTypes';
+import { ViewDimension } from '@/hooks/backlog/kanban/types';
 
 interface KanbanBoardContentProps {
   backlogItems: BacklogItem[];
@@ -17,7 +18,7 @@ interface KanbanBoardContentProps {
   columnSize: 'compact' | 'standard';
   onAddItem: (status: string) => void;
   getItemsForColumn: (columnStatusValue: string, columnId: string) => BacklogItem[];
-  viewDimension: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
+  viewDimension: ViewDimension;
   onCreateItem: () => void;
 }
 

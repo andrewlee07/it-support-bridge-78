@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { KanbanBoardConfig, KanbanColumnConfig } from '@/utils/types/kanbanTypes';
+import { ViewDimension } from '@/hooks/backlog/kanban/types';
 
 export function useKanbanConfig(initialConfig: KanbanBoardConfig) {
   const [localConfig, setLocalConfig] = useState<KanbanBoardConfig>(() => ({
@@ -87,7 +88,7 @@ export function useKanbanConfig(initialConfig: KanbanBoardConfig) {
     }));
   };
 
-  const handleViewTypeChange = (viewType: 'status' | 'sprint') => {
+  const handleViewTypeChange = (viewType: ViewDimension) => {
     setLocalConfig(prev => ({
       ...prev,
       viewType: viewType

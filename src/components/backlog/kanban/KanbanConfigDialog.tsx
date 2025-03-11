@@ -7,6 +7,7 @@ import { useKanbanConfig } from './config/useKanbanConfig';
 import BoardLayoutSection from './config/BoardLayoutSection';
 import ColumnsSection from './config/ColumnsSection';
 import { toast } from 'sonner';
+import { ViewDimension } from '@/hooks/backlog/kanban/types';
 
 interface KanbanConfigDialogProps {
   open: boolean;
@@ -38,7 +39,7 @@ const KanbanConfigDialog: React.FC<KanbanConfigDialogProps> = ({
     toast.success("Board configuration updated");
   };
 
-  const handleSwitchToSprints = (viewType: 'status' | 'sprint') => {
+  const handleSwitchToSprints = (viewType: ViewDimension) => {
     handleViewTypeChange(viewType);
     
     // If switching to sprints and there are no sprint columns yet, add them

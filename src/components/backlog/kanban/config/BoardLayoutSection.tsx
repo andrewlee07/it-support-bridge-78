@@ -4,12 +4,13 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ViewDimension } from '@/hooks/backlog/kanban/types';
 
 interface BoardLayoutSectionProps {
   layout: 'horizontal' | 'grid';
-  viewType: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
+  viewType: ViewDimension;
   onLayoutChange: (layout: 'horizontal' | 'grid') => void;
-  onViewTypeChange: (viewType: 'status' | 'sprint' | 'assignee' | 'priority' | 'label') => void;
+  onViewTypeChange: (viewType: ViewDimension) => void;
 }
 
 const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
@@ -27,7 +28,7 @@ const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
       <CardContent className="space-y-4">
         <div>
           <Label className="mb-2 block">View Dimension</Label>
-          <Select value={viewType} onValueChange={(value) => onViewTypeChange(value as 'status' | 'sprint' | 'assignee' | 'priority' | 'label')}>
+          <Select value={viewType} onValueChange={(value) => onViewTypeChange(value as ViewDimension)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select view type" />
             </SelectTrigger>
@@ -37,6 +38,9 @@ const BoardLayoutSection: React.FC<BoardLayoutSectionProps> = ({
               <SelectItem value="assignee">By Assignee</SelectItem>
               <SelectItem value="priority">By Priority</SelectItem>
               <SelectItem value="label">By Label</SelectItem>
+              <SelectItem value="release">By Release</SelectItem>
+              <SelectItem value="progress">By Progress</SelectItem>
+              <SelectItem value="due-date">By Due Date</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground mt-1">

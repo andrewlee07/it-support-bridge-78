@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
 import { KanbanBoardConfig, KanbanColumnConfig } from '@/utils/types/kanbanTypes';
 import KanbanColumn from '../KanbanColumn';
+import { ViewDimension } from '@/hooks/backlog/kanban/types';
 
 interface KanbanColumnsProps {
   boardConfig: KanbanBoardConfig;
@@ -18,7 +19,7 @@ interface KanbanColumnsProps {
   columnSize: 'compact' | 'standard';
   onAddItem: (status: string) => void;
   getItemsForColumn?: (columnStatusValue: string, columnId: string) => BacklogItem[];
-  viewDimension?: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
+  viewDimension?: ViewDimension;
 }
 
 const KanbanColumns: React.FC<KanbanColumnsProps> = ({
