@@ -130,8 +130,9 @@ export const EVENT_TO_PRIORITY: Record<EventType, Notification['priority']> = {
 
 /**
  * Maps problem event types to recipient groups
+ * Using Partial<Record> as we're only defining a subset of events
  */
-export const PROBLEM_EVENT_RECIPIENTS: Record<EventType, string[]> = {
+export const PROBLEM_EVENT_RECIPIENTS: Partial<Record<EventType, string[]>> = {
   'problem.created': ['problem-manager', 'service-owner', 'it-management'],
   'problem.assigned': ['assignee', 'previous-assignee', 'problem-manager'],
   'problem.rootCauseIdentified': ['problem-manager', 'service-owner', 'related-incident-owners'],
@@ -142,8 +143,9 @@ export const PROBLEM_EVENT_RECIPIENTS: Record<EventType, string[]> = {
 
 /**
  * Maps problem event types to recommended notification channels
+ * Using Partial<Record> as we're only defining a subset of events
  */
-export const PROBLEM_EVENT_CHANNELS: Record<EventType, ('email' | 'teams' | 'inApp' | 'sms')[]> = {
+export const PROBLEM_EVENT_CHANNELS: Partial<Record<EventType, ('email' | 'teams' | 'inApp' | 'sms')[]>> = {
   'problem.created': ['email', 'teams', 'inApp'],
   'problem.assigned': ['email', 'teams', 'inApp'],
   'problem.rootCauseIdentified': ['email', 'teams', 'inApp'],

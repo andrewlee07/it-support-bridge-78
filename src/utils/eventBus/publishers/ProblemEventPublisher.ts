@@ -1,7 +1,6 @@
 
 import EventBus from '../EventBus';
 import { EventSource, EventOrigin, ProblemEventData } from '@/utils/types/eventBus';
-import { v4 as uuidv4 } from 'uuid';
 import { Problem } from '@/utils/types/problem';
 
 /**
@@ -30,17 +29,15 @@ class ProblemEventPublisher {
       relatedIncidents: problem.relatedIncidents
     };
 
-    this.eventBus.publish({
-      id: uuidv4(),
-      type: 'problem.created',
-      source: this.source,
-      timestamp: new Date().toISOString(),
-      data: eventData,
-      metadata: {
+    this.eventBus.publish(
+      'problem.created',
+      this.source,
+      eventData,
+      {
         origin: this.origin,
         userId: problem.createdBy
       }
-    });
+    );
   }
 
   /**
@@ -56,17 +53,15 @@ class ProblemEventPublisher {
       previousAssignee: previousAssignee
     };
 
-    this.eventBus.publish({
-      id: uuidv4(),
-      type: 'problem.assigned',
-      source: this.source,
-      timestamp: new Date().toISOString(),
-      data: eventData,
-      metadata: {
+    this.eventBus.publish(
+      'problem.assigned',
+      this.source,
+      eventData,
+      {
         origin: this.origin,
         userId: problem.assignedTo
       }
-    });
+    );
   }
 
   /**
@@ -83,17 +78,15 @@ class ProblemEventPublisher {
       relatedIncidents: problem.relatedIncidents
     };
 
-    this.eventBus.publish({
-      id: uuidv4(),
-      type: 'problem.rootCauseIdentified',
-      source: this.source,
-      timestamp: new Date().toISOString(),
-      data: eventData,
-      metadata: {
+    this.eventBus.publish(
+      'problem.rootCauseIdentified',
+      this.source,
+      eventData,
+      {
         origin: this.origin,
         userId: problem.assignedTo || problem.createdBy
       }
-    });
+    );
   }
 
   /**
@@ -110,17 +103,15 @@ class ProblemEventPublisher {
       relatedIncidents: problem.relatedIncidents
     };
 
-    this.eventBus.publish({
-      id: uuidv4(),
-      type: 'problem.workaroundAvailable',
-      source: this.source,
-      timestamp: new Date().toISOString(),
-      data: eventData,
-      metadata: {
+    this.eventBus.publish(
+      'problem.workaroundAvailable',
+      this.source,
+      eventData,
+      {
         origin: this.origin,
         userId: problem.assignedTo || problem.createdBy
       }
-    });
+    );
   }
 
   /**
@@ -137,17 +128,15 @@ class ProblemEventPublisher {
       relatedIncidents: problem.relatedIncidents
     };
 
-    this.eventBus.publish({
-      id: uuidv4(),
-      type: 'problem.resolved',
-      source: this.source,
-      timestamp: new Date().toISOString(),
-      data: eventData,
-      metadata: {
+    this.eventBus.publish(
+      'problem.resolved',
+      this.source,
+      eventData,
+      {
         origin: this.origin,
         userId: problem.assignedTo || problem.createdBy
       }
-    });
+    );
   }
 
   /**
@@ -163,17 +152,15 @@ class ProblemEventPublisher {
       resolution: problem.resolutionDescription
     };
 
-    this.eventBus.publish({
-      id: uuidv4(),
-      type: 'problem.closed',
-      source: this.source,
-      timestamp: new Date().toISOString(),
-      data: eventData,
-      metadata: {
+    this.eventBus.publish(
+      'problem.closed',
+      this.source,
+      eventData,
+      {
         origin: this.origin,
         userId: problem.assignedTo || problem.createdBy
       }
-    });
+    );
   }
 
   /**
