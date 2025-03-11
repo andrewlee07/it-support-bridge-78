@@ -1,4 +1,5 @@
-import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData, KnowledgeArticleEventData, BacklogItemEventData } from '@/utils/types/eventBus';
+
+import { SystemEvent, EventType, ProblemEventData, KnownErrorEventData, ReleaseEventData, KnowledgeArticleEventData, BacklogItemEventData, TaskEventData } from '@/utils/types/eventBus';
 import { Notification } from '@/components/shared/notifications/types';
 import { v4 as uuidv4 } from 'uuid';
 import { EVENT_TITLE_MAP, EVENT_TO_NOTIFICATION_TYPE, EVENT_TO_PRIORITY } from '../constants/eventMappings';
@@ -21,10 +22,47 @@ export const createNotificationFromEvent = (event: SystemEvent): Notification =>
   switch (event.type) {
     case 'task.created':
     case 'task.updated':
+    case 'task.assigned':
+    case 'task.dueDateApproaching':
+    case 'task.overdue':
+    case 'task.statusChanged':
     case 'task.completed':
-      const taskData = event.data as any;
+      const taskData = event.data as TaskEventData;
       title = `${title}: ${taskData.title}`;
-      message = taskData.description || `Task ${event.type.split('.')[1]}`;
+      
+      // Create appropriate message based on event type
+      if (event.type === 'task.created') {
+        message = `New task created: ${taskData.description || taskData.title}`;
+        if (taskData.dueDate) {
+          message += `. Due: ${taskData.dueDate}`;
+        }
+      } else if (event.type === 'task.updated') {
+        const updatedFieldsList = taskData.updatedFields?.join(', ') || 'multiple fields';
+        message = `Task updated: ${updatedFieldsList}`;
+      } else if (event.type === 'task.assigned') {
+        message = `Task assigned to ${taskData.assignee}`;
+        if (taskData.previousAssignee) {
+          message += ` (previously: ${taskData.previousAssignee})`;
+        }
+      } else if (event.type === 'task.dueDateApproaching') {
+        message = `Task due date approaching: ${taskData.dueDate}`;
+        if (taskData.reminderDays) {
+          message += ` (${taskData.reminderDays} days remaining)`;
+        }
+      } else if (event.type === 'task.overdue') {
+        message = `Task is overdue. Due date was: ${taskData.dueDate}`;
+        if (taskData.escalation) {
+          message += `. ${taskData.escalation}`;
+        }
+      } else if (event.type === 'task.statusChanged') {
+        message = `Task status changed to ${taskData.status}`;
+        if (taskData.progress) {
+          message += `. ${taskData.progress}`;
+        }
+      } else if (event.type === 'task.completed') {
+        message = `Task completed: ${taskData.completionDetails || 'No details provided'}`;
+      }
+      
       actionUrl = `/tasks/${taskData.taskId}`;
       entityId = taskData.taskId;
       break;

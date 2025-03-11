@@ -14,6 +14,10 @@ import { BacklogItemEventData } from './backlogItemEventTypes';
 export interface EventDataMap {
   'task.created': TaskEventData;
   'task.updated': TaskEventData;
+  'task.assigned': TaskEventData;
+  'task.dueDateApproaching': TaskEventData;
+  'task.overdue': TaskEventData;
+  'task.statusChanged': TaskEventData;
   'task.completed': TaskEventData;
   'problem.created': ProblemEventData;
   'problem.updated': ProblemEventData;
