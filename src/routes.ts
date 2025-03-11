@@ -1,3 +1,4 @@
+
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import MainLayout from '@/layouts/MainLayout';
@@ -42,6 +43,8 @@ import BugConfiguration from '@/pages/admin/BugConfiguration';
 import ReleaseConfiguration from '@/pages/admin/ReleaseConfiguration';
 import TestConfiguration from '@/pages/admin/TestConfiguration';
 import StatusSynchronizationConfig from '@/pages/admin/StatusSynchronizationConfig';
+import Tasks from '@/pages/Tasks';
+import TaskDashboard from '@/pages/TaskDashboard';
 
 const router = createBrowserRouter([
   {
@@ -218,6 +221,15 @@ const router = createBrowserRouter([
       {
         path: '/assets',
         element: React.createElement(Assets)
+      },
+      // Task Management Routes
+      {
+        path: '/tasks',
+        element: React.createElement(Tasks)
+      },
+      {
+        path: '/tasks/dashboard',
+        element: React.createElement(TaskDashboard)
       }
     ]
   }
