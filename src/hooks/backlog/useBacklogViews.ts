@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { BacklogViewType } from '@/utils/types/backlogTypes';
 
 export interface BacklogFilters {
@@ -11,7 +11,12 @@ export interface BacklogFilters {
 }
 
 export function useBacklogViews() {
-  const [currentView, setCurrentView] = useState<BacklogViewType>('kanban');
+  // Load initial view from localStorage or default to 'kanban'
+  const [currentView, setCurrentView] = useState<BacklogViewType>(() => {
+    const savedView = localStorage.getItem('backlogCurrentView');
+    return (savedView as BacklogViewType) || 'kanban';
+  });
+
   const [filters, setFilters] = useState<BacklogFilters>({
     search: '',
     status: [],
@@ -22,6 +27,8 @@ export function useBacklogViews() {
 
   const handleViewChange = useCallback((view: BacklogViewType) => {
     setCurrentView(view);
+    // Save to localStorage
+    localStorage.setItem('backlogCurrentView', view);
     // Filters persist across view changes
   }, []);
 

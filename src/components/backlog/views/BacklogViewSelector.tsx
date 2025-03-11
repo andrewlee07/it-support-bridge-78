@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { ViewIcon, KanbanIcon, ListIcon, CalendarIcon, LineChartIcon, Clock } from 'lucide-react';
+import { KanbanIcon, ListIcon, Clock, CalendarIcon, LineChartIcon } from 'lucide-react';
 import { BacklogViewType } from '@/utils/types/backlogTypes';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useNavigate } from 'react-router-dom';
 
 interface BacklogViewSelectorProps {
   currentView: BacklogViewType;
@@ -11,16 +12,35 @@ interface BacklogViewSelectorProps {
 }
 
 const viewOptions = [
-  { value: 'kanban', label: 'Kanban', icon: KanbanIcon },
-  { value: 'list', label: 'List', icon: ListIcon },
-  { value: 'timeline', label: 'Timeline', icon: Clock },
-  { value: 'calendar', label: 'Calendar', icon: CalendarIcon },
-  { value: 'reporting', label: 'Reporting', icon: LineChartIcon },
+  { value: 'kanban', label: 'Kanban', icon: KanbanIcon, path: '/backlog/kanban' },
+  { value: 'list', label: 'List', icon: ListIcon, path: '/backlog/list' },
+  { value: 'timeline', label: 'Timeline', icon: Clock, path: '/backlog/timeline' },
+  { value: 'calendar', label: 'Calendar', icon: CalendarIcon, path: '/backlog/calendar' },
+  { value: 'reporting', label: 'Reporting', icon: LineChartIcon, path: '/backlog/reporting' },
 ] as const;
 
 export function BacklogViewSelector({ currentView, onViewChange }: BacklogViewSelectorProps) {
+  const navigate = useNavigate();
+
+  const handleViewChange = (value: string) => {
+    if (!value) return;
+
+    const viewType = value as BacklogViewType;
+    onViewChange(viewType);
+    
+    // Find the path for the selected view and navigate to it
+    const selectedView = viewOptions.find(option => option.value === viewType);
+    if (selectedView) {
+      navigate(selectedView.path);
+    }
+  };
+
   return (
-    <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as BacklogViewType)}>
+    <ToggleGroup 
+      type="single" 
+      value={currentView} 
+      onValueChange={handleViewChange}
+    >
       {viewOptions.map(({ value, label, icon: Icon }) => (
         <Tooltip key={value}>
           <TooltipTrigger asChild>
