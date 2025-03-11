@@ -24,16 +24,16 @@ import {
   EVENT_DOCUMENTATION,
   getEventDocumentation,
   getProcessEvents,
-  EventFieldDefinition
+  EventDocumentation
 } from '@/utils/eventBus/docs/EventDocumentation';
 
 const EventDocumentationTable: React.FC = () => {
-  const [selectedProcess, setSelectedProcess] = useState<string>('incident');
+  const [selectedProcess, setSelectedProcess] = useState<string>('Incident Management');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentEvent, setCurrentEvent] = useState<EventFieldDefinition | null>(null);
+  const [currentEvent, setCurrentEvent] = useState<EventDocumentation | null>(null);
   
   // Get events for the selected process
-  const eventsForProcess = getProcessEvents(selectedProcess as keyof typeof EVENT_GROUPS);
+  const eventsForProcess = getProcessEvents(selectedProcess);
   
   // Filter events based on search query
   const filteredEvents = searchQuery 
@@ -43,7 +43,9 @@ const EventDocumentationTable: React.FC = () => {
   // Handle event selection for detail view
   const handleEventSelect = (eventType: string) => {
     const eventDoc = getEventDocumentation(eventType as any);
-    setCurrentEvent(eventDoc);
+    if (eventDoc) {
+      setCurrentEvent(eventDoc);
+    }
   };
   
   return (
@@ -55,9 +57,9 @@ const EventDocumentationTable: React.FC = () => {
               <SelectValue placeholder="Select process" />
             </SelectTrigger>
             <SelectContent>
-              {Object.keys(EVENT_GROUPS).map(process => (
-                <SelectItem key={process} value={process}>
-                  {process.charAt(0).toUpperCase() + process.slice(1)}
+              {EVENT_GROUPS.map(group => (
+                <SelectItem key={group.name} value={group.name}>
+                  {group.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -87,7 +89,7 @@ const EventDocumentationTable: React.FC = () => {
                 {filteredEvents.map(event => (
                   <div 
                     key={event} 
-                    className={`p-2 rounded cursor-pointer ${currentEvent?.eventType === event ? 'bg-secondary' : 'hover:bg-secondary/30'}`}
+                    className={`p-2 rounded cursor-pointer ${currentEvent?.type === event ? 'bg-secondary' : 'hover:bg-secondary/30'}`}
                     onClick={() => handleEventSelect(event)}
                   >
                     <div className="font-medium truncate">{event}</div>
@@ -108,7 +110,7 @@ const EventDocumentationTable: React.FC = () => {
           {currentEvent ? (
             <Card>
               <CardHeader>
-                <CardTitle>{currentEvent.title}</CardTitle>
+                <CardTitle>{currentEvent.type}</CardTitle>
                 <CardDescription>
                   {currentEvent.description}
                 </CardDescription>
@@ -126,20 +128,40 @@ const EventDocumentationTable: React.FC = () => {
                       <div>
                         <h3 className="font-medium mb-2">Required Fields</h3>
                         <div className="flex flex-wrap gap-2">
-                          {currentEvent.requiredFields.map(field => (
-                            <Badge key={field} variant="default">{field}</Badge>
-                          ))}
+                          {currentEvent.dataFields
+                            .filter(field => field.required)
+                            .map(field => (
+                              <Badge key={field.name} variant="default">{field.name}</Badge>
+                            ))}
                         </div>
                       </div>
                       
                       <div>
                         <h3 className="font-medium mb-2">Optional Fields</h3>
                         <div className="flex flex-wrap gap-2">
-                          {currentEvent.optionalFields.map(field => (
-                            <Badge key={field} variant="outline">{field}</Badge>
-                          ))}
+                          {currentEvent.dataFields
+                            .filter(field => !field.required)
+                            .map(field => (
+                              <Badge key={field.name} variant="outline">{field.name}</Badge>
+                            ))}
                         </div>
                       </div>
+
+                      <div>
+                        <h3 className="font-medium mb-2">Source</h3>
+                        <Badge variant="secondary">{currentEvent.source}</Badge>
+                      </div>
+
+                      {currentEvent.notes && currentEvent.notes.length > 0 && (
+                        <div>
+                          <h3 className="font-medium mb-2">Notes</h3>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {currentEvent.notes.map((note, index) => (
+                              <li key={index} className="text-sm text-muted-foreground">{note}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
                   
@@ -148,22 +170,16 @@ const EventDocumentationTable: React.FC = () => {
                       <div>
                         <h3 className="font-medium mb-2">Default Recipients</h3>
                         <div className="flex flex-wrap gap-2">
-                          {currentEvent.defaultRecipients.length > 0 ? (
-                            currentEvent.defaultRecipients.map(recipient => (
-                              <Badge key={recipient} variant="secondary">{recipient}</Badge>
-                            ))
-                          ) : (
-                            <span className="text-muted-foreground">No default recipients specified</span>
-                          )}
+                          {/* This is a placeholder - we'll need to add recipient data to the EventDocumentation type */}
+                          <span className="text-muted-foreground">Recipients based on event context</span>
                         </div>
                       </div>
                       
                       <div>
                         <h3 className="font-medium mb-2">Default Channels</h3>
                         <div className="flex flex-wrap gap-2">
-                          {currentEvent.defaultChannels.map(channel => (
-                            <Badge key={channel} variant="outline">{channel}</Badge>
-                          ))}
+                          <Badge variant="outline">In-app</Badge>
+                          <Badge variant="outline">Email</Badge>
                         </div>
                       </div>
                     </div>
@@ -172,7 +188,7 @@ const EventDocumentationTable: React.FC = () => {
                   <TabsContent value="example">
                     <div className="rounded bg-muted p-4 overflow-auto max-h-[400px]">
                       <pre className="text-xs">
-                        {JSON.stringify(currentEvent.exampleData, null, 2)}
+                        {currentEvent.example ? JSON.stringify(currentEvent.example, null, 2) : 'No example data available'}
                       </pre>
                     </div>
                   </TabsContent>
