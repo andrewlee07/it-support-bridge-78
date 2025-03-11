@@ -24,8 +24,10 @@ interface DueDateSectionProps {
 
 const DueDateSection: React.FC<DueDateSectionProps> = ({ form }) => {
   return (
-    <>
-      <div>
+    <div className="space-y-6">
+      <h3 className="text-lg font-medium">Due Date Information</h3>
+      
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="dueDate"
@@ -65,34 +67,34 @@ const DueDateSection: React.FC<DueDateSectionProps> = ({ form }) => {
             </FormItem>
           )}
         />
-      </div>
 
-      <FormField
-        control={form.control}
-        name="dueTime"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Due Time (24-hour format)</FormLabel>
-            <div className="flex">
-              <FormControl>
-                <div className="flex items-center">
-                  <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    type="time" 
-                    placeholder="Select time"
-                    {...field}
-                  />
-                </div>
-              </FormControl>
-            </div>
-            <FormDescription>
-              Optional. Specify a time for the due date if needed.
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </>
+        <FormField
+          control={form.control}
+          name="dueTime"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Due Time (24-hour format)</FormLabel>
+              <div className="flex">
+                <FormControl>
+                  <div className="flex items-center">
+                    <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      type="time" 
+                      placeholder="Select time"
+                      {...field}
+                    />
+                  </div>
+                </FormControl>
+              </div>
+              <FormDescription>
+                Optional. Specify a time for the due date if needed.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+    </div>
   );
 };
 
