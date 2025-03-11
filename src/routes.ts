@@ -6,7 +6,7 @@ import Login from '@/pages/Login';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ErrorPage from '@/pages/ErrorPage';
 
-// Import domain-specific routes
+// Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
 import { ticketRoutes } from './routes/ticketRoutes';
 import { changeRoutes } from './routes/changeRoutes';
