@@ -1,10 +1,13 @@
 
-import { BacklogItem, BacklogItemStatus } from '@/utils/types/backlogTypes';
-import { KanbanBoardConfig } from '@/utils/types/kanbanTypes';
+import { BacklogItem } from "@/utils/types/backlogTypes";
+import { KanbanBoardConfig } from "@/utils/types/kanbanTypes";
+
+// Define ViewDimension directly here to avoid circular references
+export type ViewDimension = 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
 
 export interface UseKanbanBoardProps {
   backlogItems: BacklogItem[];
-  viewDimension: 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
+  viewDimension: ViewDimension;
   onCreateItem: (defaultStatus?: string) => void;
 }
 
@@ -29,4 +32,5 @@ export interface KanbanActions {
   handleAddBucket: () => void;
   handleAddItem: (status: string) => void;
   handleCreateItem: () => void;
+  handleAddColumn: () => void; // Add the missing method
 }

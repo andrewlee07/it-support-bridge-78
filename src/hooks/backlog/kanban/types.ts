@@ -1,6 +1,8 @@
 
-import { ViewDimension } from "../useBacklogKanban";
 import { BacklogItem } from "@/utils/types/backlogTypes";
+
+// Define ViewDimension directly here to avoid circular references
+export type ViewDimension = 'status' | 'sprint' | 'assignee' | 'priority' | 'label';
 
 export interface UseBacklogKanbanReturn {
   backlogItems: BacklogItem[];
@@ -12,5 +14,3 @@ export interface UseBacklogKanbanReturn {
   handleCreateItem: (defaultStatus?: string) => void;
   handleViewDimensionChange: (dimension: ViewDimension) => void;
 }
-
-export { ViewDimension };
