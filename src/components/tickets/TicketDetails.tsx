@@ -34,7 +34,8 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
       id,
       type: 'problem',
       title: problem?.title || `Problem ${id}`,
-      status: problem?.status || 'unknown'
+      status: problem?.status || 'unknown',
+      createdAt: new Date() // Add a default createdAt property
     };
   });
   

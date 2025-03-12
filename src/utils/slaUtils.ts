@@ -1,140 +1,122 @@
 
-// SLA utility functions
-import { SLA } from './types/sla';
+import { differenceInMinutes, isAfter } from 'date-fns';
 import { Ticket } from './types/ticket';
-import { formatDistance, differenceInHours, differenceInMinutes, isWithinInterval } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz'; // Fixed import from utcToZonedTime to toZonedTime
-import { mockSLAs } from './mockData/slas'; // Use mockSLAs instead of businessHours
+import { getTicketsSLA } from './mockData/slas';
 
-/**
- * Calculates whether an SLA has been breached
- * @param ticket The ticket to check
- * @param sla The SLA to apply
- * @returns boolean indicating if the SLA has been breached
- */
-export const isSLABreached = (ticket: Ticket, sla: SLA): boolean => {
-  if (!ticket.createdAt) return false;
-  
-  const creationTime = new Date(ticket.createdAt);
-  const currentTime = new Date();
-  
-  // For resolution time breach check
-  if (sla.resolutionTimeHours) {
-    const resolutionDeadline = new Date(creationTime);
-    resolutionDeadline.setHours(resolutionDeadline.getHours() + sla.resolutionTimeHours);
-    
-    // If we're past the deadline and ticket isn't resolved
-    if (currentTime > resolutionDeadline && ticket.status !== 'resolved' && ticket.status !== 'closed') {
-      return true;
-    }
+// Define SLA timeframes - in a real app these would come from a configuration or database
+export const SLA_TIMEFRAMES = {
+  responseTime: {
+    P1: 30, // minutes
+    P2: 60,
+    P3: 240,
+    P4: 480
+  },
+  resolutionTime: {
+    P1: 240, // minutes
+    P2: 480,
+    P3: 1440,
+    P4: 2880
   }
-  
-  // For response time breach check
-  if (sla.responseTimeHours) {
-    const responseDeadline = new Date(creationTime);
-    responseDeadline.setHours(responseDeadline.getHours() + sla.responseTimeHours);
-    
-    // If we're past the deadline and ticket hasn't been responded to
-    if (currentTime > responseDeadline && !ticket.firstResponseAt) {
-      return true;
-    }
-  }
-  
-  return false;
 };
 
 /**
- * Gets the SLA that applies to a specific ticket
- * @param ticket Ticket to get SLA for
- * @returns The matching SLA or null if none found
+ * Calculate SLA breach percentage (how close we are to breaching SLA)
+ * @param ticket The ticket to calculate SLA for
+ * @param slaType 'response' or 'resolution'
+ * @returns A number from 0-100 where 100 means SLA has been breached
  */
-export const getApplicableSLA = (ticket: Ticket): SLA | null => {
-  // Filter SLAs by ticket type and priority
-  const applicableSLAs = mockSLAs.filter(sla => {
-    const ticketTypeMatches = 
-      (ticket.type === 'incident' && sla.ticketType === 'incident') ||
-      (ticket.type === 'service' && sla.ticketType === 'service');
-    
-    const priorityMatches = sla.priorityLevel === ticket.priority;
-    
-    return ticketTypeMatches && priorityMatches && sla.isActive;
-  });
+export const calculateSLAPercentage = (ticket: Ticket, slaType: 'response' | 'resolution' = 'resolution'): number => {
+  // If ticket is resolved/closed/fulfilled, SLA is not relevant
+  if (['resolved', 'closed', 'fulfilled'].includes(ticket.status)) {
+    return 0;
+  }
+
+  // Get appropriate SLA timeframe based on priority and type
+  const timeframes = SLA_TIMEFRAMES[slaType === 'response' ? 'responseTime' : 'resolutionTime'];
+  const targetMinutes = timeframes[ticket.priority as keyof typeof timeframes] || timeframes.P3;
   
-  // Return the first matching SLA or null if none found
-  return applicableSLAs.length > 0 ? applicableSLAs[0] : null;
+  // Calculate elapsed time
+  const createdAt = new Date(ticket.createdAt);
+  const now = new Date();
+  
+  // For response time, if the ticket has been responded to, use that time instead of now
+  const endTime = slaType === 'response' && ticket.firstResponseAt ? new Date(ticket.firstResponseAt) : now;
+  
+  // Calculate minutes elapsed
+  const minutesElapsed = differenceInMinutes(endTime, createdAt);
+  
+  // Calculate percentage of SLA used
+  const percentage = Math.min(100, Math.round((minutesElapsed / targetMinutes) * 100));
+  
+  return percentage;
 };
 
 /**
- * Calculates the time remaining before SLA breach
+ * Check if SLA has been breached
  * @param ticket The ticket to check
- * @param sla The SLA to apply
- * @returns Formatted string showing time remaining or 'Breached' if already breached
+ * @param slaType 'response' or 'resolution'
+ * @returns Boolean indicating whether SLA has been breached
  */
-export const getTimeUntilSLABreach = (ticket: Ticket, sla: SLA): string => {
-  if (isSLABreached(ticket, sla)) {
-    return 'Breached';
+export const isSLABreached = (ticket: Ticket, slaType: 'response' | 'resolution' = 'resolution'): boolean => {
+  return calculateSLAPercentage(ticket, slaType) >= 100;
+};
+
+/**
+ * Calculate SLA status - returns one of: 'ok', 'warning', 'breached'
+ * @param ticket The ticket to calculate status for
+ * @param slaType 'response' or 'resolution'
+ * @returns SLA status string
+ */
+export const getSLAStatus = (ticket: Ticket, slaType: 'response' | 'resolution' = 'resolution'): 'ok' | 'warning' | 'breached' => {
+  // If ticket is resolved or closed, SLA is considered ok
+  if (['resolved', 'closed', 'fulfilled'].includes(ticket.status)) {
+    return 'ok';
   }
   
-  if (!ticket.createdAt) return 'Unknown';
+  // For response SLA, if ticket has been responded to, SLA is considered ok
+  if (slaType === 'response' && ticket.status !== 'new' && ticket.firstResponseAt) {
+    return 'ok';
+  }
   
-  const creationTime = new Date(ticket.createdAt);
-  const currentTime = new Date();
+  const percentage = calculateSLAPercentage(ticket, slaType);
   
-  // Calculate deadline based on ticket status
-  let deadline: Date;
-  
-  if (ticket.status === 'new' || !ticket.firstResponseAt) {
-    // For tickets awaiting first response, use response time SLA
-    deadline = new Date(creationTime);
-    deadline.setHours(deadline.getHours() + sla.responseTimeHours);
+  if (percentage >= 100) {
+    return 'breached';
+  } else if (percentage >= 80) {
+    return 'warning';
   } else {
-    // For tickets in progress, use resolution time SLA
-    deadline = new Date(creationTime);
-    deadline.setHours(deadline.getHours() + sla.resolutionTimeHours);
+    return 'ok';
   }
-  
-  // If we've already passed the deadline
-  if (currentTime > deadline) {
-    return 'Breached';
-  }
-  
-  // Return human-readable format of time remaining
-  return formatDistance(deadline, currentTime, { addSuffix: false });
 };
 
 /**
- * Adjusts the SLA calculation based on business hours if configured
- * This is a placeholder for the actual implementation
+ * Get formatted time remaining for SLA
+ * @param ticket The ticket to calculate time for
+ * @param slaType 'response' or 'resolution'
+ * @returns Formatted string of time remaining or breached by
  */
-export const adjustForBusinessHours = (startTime: Date, endTime: Date, sla: SLA): number => {
-  // Placeholder implementation
-  // In a real implementation, this would:
-  // 1. Check if SLA is configured to respect business hours
-  // 2. Calculate elapsed time only during business hours
-  // 3. Apply timezone adjustments
+export const getSLATimeRemaining = (ticket: Ticket, slaType: 'response' | 'resolution' = 'resolution'): string => {
+  // Get appropriate SLA timeframe
+  const timeframes = SLA_TIMEFRAMES[slaType === 'response' ? 'responseTime' : 'resolutionTime'];
+  const targetMinutes = timeframes[ticket.priority as keyof typeof timeframes] || timeframes.P3;
   
-  if (!sla.calculationOptions.pauseOutsideBusinessHours) {
-    // If not respecting business hours, just return the full difference
-    return differenceInHours(endTime, startTime);
+  // Calculate elapsed time
+  const createdAt = new Date(ticket.createdAt);
+  const now = new Date();
+  const minutesElapsed = differenceInMinutes(now, createdAt);
+  
+  // Calculate minutes remaining
+  const minutesRemaining = targetMinutes - minutesElapsed;
+  
+  // Format the time
+  if (minutesRemaining <= 0) {
+    const minutesBreached = Math.abs(minutesRemaining);
+    const hours = Math.floor(minutesBreached / 60);
+    const minutes = minutesBreached % 60;
+    return hours > 0 ? `Breached by ${hours}h ${minutes}m` : `Breached by ${minutes}m`;
+  } else {
+    const hours = Math.floor(minutesRemaining / 60);
+    const minutes = minutesRemaining % 60;
+    return hours > 0 ? `${hours}h ${minutes}m remaining` : `${minutes}m remaining`;
   }
-  
-  // Placeholder - in real implementation we would load business hours
-  // and perform complex calculation
-  return differenceInHours(endTime, startTime) / 2; // Just an example
-};
-
-/**
- * Checks if SLA calculation should be paused
- * @param ticket The ticket to check
- * @param sla The SLA configuration
- */
-export const shouldPauseSLACalculation = (ticket: Ticket, sla: SLA): boolean => {
-  // Pause if configured to pause during pending status and ticket is pending
-  if (sla.calculationOptions.pauseDuringPendingStatus && ticket.status === 'pending') {
-    return true;
-  }
-  
-  // Additional pause logic can be added here
-  
-  return false;
 };

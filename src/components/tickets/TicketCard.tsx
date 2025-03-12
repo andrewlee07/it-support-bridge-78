@@ -15,13 +15,15 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClick }) => {
   const getPriorityColor = (priority: TicketPriority) => {
     switch (priority) {
       case 'P1':
+      case 'high':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       case 'P2':
         return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
       case 'P3':
-      case 'medium': // Handling the 'medium' case
+      case 'medium':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
       case 'P4':
+      case 'low':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
@@ -31,6 +33,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClick }) => {
   const getStatusColor = (status: TicketStatus) => {
     switch (status) {
       case 'open':
+      case 'new':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
       case 'in-progress':
         return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
@@ -40,6 +43,8 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClick }) => {
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
       case 'approved':
       case 'fulfilled':
+      case 'on-hold':
+      case 'pending':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';

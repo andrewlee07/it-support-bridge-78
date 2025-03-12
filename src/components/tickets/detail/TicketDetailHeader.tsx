@@ -29,11 +29,11 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
   const typeLabel = isServiceRequest ? 'Service Request' : 'Incident';
   const parentPath = isServiceRequest ? '/service-requests' : '/incidents';
   
-  const badgeColor = ticket.priority === 'P1' 
+  const badgeColor = ticket.priority === 'P1' || ticket.priority === 'high'
     ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
     : ticket.priority === 'P2'
     ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
-    : ticket.priority === 'P3'
+    : ticket.priority === 'P3' || ticket.priority === 'medium'
     ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
     : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
   

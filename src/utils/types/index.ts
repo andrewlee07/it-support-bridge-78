@@ -24,6 +24,11 @@ export type {
   TicketType,
   TicketFilter,
   TestCoverageRelationship,
+  RelatedItem,
+  RelatedItemType,
+  PendingSubStatus,
+  TicketNote,
+  TicketWithNotes
 } from './ticket';
 
 // Re-export test-related types

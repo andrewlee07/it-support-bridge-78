@@ -1,5 +1,5 @@
 
-import { Ticket, TicketStatus, TicketPriority, TicketType } from '../types';
+import { Ticket, TicketStatus, TicketPriority, TicketType, RelatedItem } from '../types';
 import { createAuditEntries } from './auditHelpers';
 
 // Mock tickets
@@ -79,7 +79,8 @@ export const mockTickets: Ticket[] = [
         id: 'BUG001',
         title: 'VPN Client crashes on connection attempt',
         type: 'bug',
-        status: 'open'
+        status: 'open',
+        createdAt: new Date()
       }
     ]
   },
@@ -100,8 +101,9 @@ export const mockTickets: Ticket[] = [
       {
         id: 'BKL001',
         title: 'Create standard software installation package',
-        type: 'backlog',
-        status: 'in-progress'
+        type: 'backlogItem',
+        status: 'in-progress',
+        createdAt: new Date()
       }
     ]
   },
