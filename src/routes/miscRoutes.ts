@@ -5,6 +5,7 @@ import Dashboard from '@/pages/Dashboard';
 import ErrorPage from '@/pages/ErrorPage';
 import NotFound from '@/pages/NotFound';
 import EndUserPortal from '@/pages/EndUserPortal';
+import AnnouncementsPage from '@/pages/AnnouncementsPage';
 
 export const miscRoutes = [
   {
@@ -26,5 +27,9 @@ export const miscRoutes = [
   {
     path: '/portal',
     element: React.createElement(EndUserPortal)
+  },
+  {
+    path: '/announcements',
+    element: React.createElement(AnnouncementsPage)
   }
 ];
