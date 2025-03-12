@@ -13,7 +13,8 @@ import {
   Server,
   FileStack,
   Users,
-  Megaphone
+  Megaphone,
+  ExternalLink
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -127,5 +128,11 @@ export const navigationItems: NavigationItem[] = [
     href: "/admin",
     icon: Cog,
     description: "Configure system settings"
+  },
+  {
+    title: "End User Portal",
+    href: "/portal",
+    icon: ExternalLink,
+    description: "Preview and test the end user portal experience"
   }
 ];
