@@ -9,6 +9,7 @@ import { getUserById } from '@/utils/mockData/users';
 import { getTeamById } from '@/utils/mockData/services';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
+import { getUserNameById } from '@/utils/userUtils';
 
 interface TicketDetailsGridProps {
   ticket: Ticket;
@@ -62,11 +63,11 @@ const TicketDetailsGrid: React.FC<TicketDetailsGridProps> = ({ ticket, isService
         </div>
         <div>
           <h3 className="text-sm font-medium">Reported By</h3>
-          <p className="text-sm">{ticket.createdBy}</p>
+          <p className="text-sm">{getUserNameById(ticket.createdBy)}</p>
         </div>
         <div>
           <h3 className="text-sm font-medium">Assigned To</h3>
-          <p className="text-sm">{ticket.assignedTo || 'Unassigned'}</p>
+          <p className="text-sm">{getUserNameById(ticket.assignedTo)}</p>
         </div>
         
         {service && (

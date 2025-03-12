@@ -12,6 +12,7 @@ import { getProblemById } from '@/utils/mockData/problems';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getAssetById } from '@/utils/mockData/assets';
+import WatchButton from '@/components/shared/WatchButton';
 
 interface TicketDetailsProps {
   ticket: Ticket;
@@ -57,6 +58,16 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
     };
   });
   
+  // Create a watchable item
+  const watchableItem = {
+    id: ticket.id,
+    type: isServiceRequest ? 'service' : 'incident',
+    title: ticket.title,
+    status: ticket.status,
+    createdAt: ticket.createdAt,
+    updatedAt: ticket.updatedAt
+  };
+  
   return (
     <div className="space-y-6">
       <DetailBreadcrumb 
@@ -71,6 +82,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
           <h1 className="text-xl font-semibold text-foreground">{ticket.title}</h1>
           <StatusBadge status={ticket.status} isServiceRequest={isServiceRequest} />
           <PriorityBadge priority={ticket.priority} isServiceRequest={isServiceRequest} />
+          <WatchButton item={watchableItem} />
         </div>
         
         <p className="text-muted-foreground">{ticket.description}</p>
