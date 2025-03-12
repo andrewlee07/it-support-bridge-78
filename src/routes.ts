@@ -59,6 +59,14 @@ const router = createBrowserRouter([
     element: React.createElement(PortalMyApprovals)
   },
   {
+    path: '/portal/my-incidents',
+    element: React.createElement(PortalMyApprovals) // Reusing same component for now
+  },
+  {
+    path: '/portal/my-requests',
+    element: React.createElement(PortalMyApprovals) // Reusing same component for now
+  },
+  {
     path: '/knowledge/:id',
     element: React.createElement(KnowledgeArticleDetail)
   },

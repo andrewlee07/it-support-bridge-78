@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, CheckCircle, BookOpen, HelpCircle, ClipboardCheck, Bell } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { CheckCircle, BookOpen, HelpCircle, ClipboardCheck, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -11,21 +10,11 @@ import IncidentItem from '@/components/portal/IncidentItem';
 import ServiceRequestItem from '@/components/portal/ServiceRequestItem';
 import PortalHeader from '@/components/portal/PortalHeader';
 import KnowledgeArticlesList from '@/components/portal/KnowledgeArticlesList';
+import AISearch from '@/components/portal/AISearch';
 
 const EndUserPortal: React.FC = () => {
   const { user } = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      toast({
-        title: "Search initiated",
-        description: `Searching for "${searchQuery}"`,
-      });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
@@ -35,25 +24,9 @@ const EndUserPortal: React.FC = () => {
       {/* Hero Search Section */}
       <section className="bg-gradient-to-r from-purple-900/20 to-purple-600/20 p-8 md:p-16 flex flex-col items-center justify-center text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">How can we help?</h1>
-        <form onSubmit={handleSearch} className="w-full max-w-2xl">
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="How can we help?"
-              className="pr-10 h-12 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button 
-              type="submit" 
-              size="icon" 
-              variant="ghost" 
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-          </div>
-        </form>
+        <div className="w-full max-w-2xl">
+          <AISearch />
+        </div>
       </section>
 
       {/* Main Content */}
@@ -83,7 +56,7 @@ const EndUserPortal: React.FC = () => {
             to="/portal/incident"
           />
 
-          {/* My Approvals - replacing Community */}
+          {/* My Approvals */}
           <PortalCard 
             title="My Approvals" 
             icon={<ClipboardCheck className="h-10 w-10 text-primary" />}
