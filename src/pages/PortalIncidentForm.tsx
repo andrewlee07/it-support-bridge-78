@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { HelpCircle, ArrowLeft } from 'lucide-react';
@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 import { Ticket, TicketType, TicketPriority, TicketCategory } from '@/utils/types';
 import PortalHeader from '@/components/portal/PortalHeader';
 import PageTransition from '@/components/shared/PageTransition';
+import { getMandatoryFieldsConfig } from '@/api/statusSynchronization';
+import { ConfigurableEntityType } from '@/utils/types/configuration';
 
 type IncidentFormValues = {
   title: string;
@@ -23,6 +25,9 @@ type IncidentFormValues = {
 
 const PortalIncidentForm: React.FC = () => {
   const navigate = useNavigate();
+  const [mandatoryFields, setMandatoryFields] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const form = useForm<IncidentFormValues>({
     defaultValues: {
       title: '',
@@ -32,8 +37,49 @@ const PortalIncidentForm: React.FC = () => {
     }
   });
 
+  // Fetch mandatory fields for incidents
+  useEffect(() => {
+    const fetchMandatoryFields = async () => {
+      setIsLoading(true);
+      try {
+        const entityType: ConfigurableEntityType = 'incident';
+        const fields = await getMandatoryFieldsConfig(entityType);
+        
+        // Extract required field names
+        const requiredFields = fields
+          .filter(field => field.isRequired)
+          .map(field => field.fieldName);
+        
+        setMandatoryFields(requiredFields);
+      } catch (error) {
+        console.error('Failed to fetch mandatory fields:', error);
+        toast.error('Could not load configuration. Some fields may be missing.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchMandatoryFields();
+  }, []);
+
+  // Helper function to check if a field is required
+  const isFieldRequired = (fieldName: string) => mandatoryFields.includes(fieldName);
+
   const onSubmit = async (data: IncidentFormValues) => {
     try {
+      // Check for mandatory fields
+      const missingFields = mandatoryFields.filter(field => !data[field]);
+      
+      if (missingFields.length > 0) {
+        // Format field names for display
+        const formattedFields = missingFields
+          .map(field => field.charAt(0).toUpperCase() + field.slice(1))
+          .join(', ');
+        
+        toast.error(`Please complete all required fields: ${formattedFields}`);
+        return;
+      }
+      
       // Create the ticket with the necessary properties
       const ticket: Partial<Ticket> = {
         ...data,
@@ -74,70 +120,35 @@ const PortalIncidentForm: React.FC = () => {
             <h1 className="text-2xl font-bold">Report an Issue</h1>
           </div>
           
-          <Card className="p-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>What's the issue? <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Briefly describe the problem" 
-                          {...field} 
-                          required
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description <span className="text-red-500">*</span></FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Please provide more details about the issue" 
-                          className="min-h-32"
-                          {...field} 
-                          required
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {isLoading ? (
+            <Card className="p-6">
+              <div className="flex justify-center items-center h-64">
+                <div className="text-center">
+                  <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading form configuration...</p>
+                </div>
+              </div>
+            </Card>
+          ) : (
+            <Card className="p-6">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="hardware">Hardware</SelectItem>
-                            <SelectItem value="software">Software</SelectItem>
-                            <SelectItem value="network">Network</SelectItem>
-                            <SelectItem value="access">Access</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormLabel>
+                          What's the issue? 
+                          {isFieldRequired('title') && <span className="text-red-500 ml-1">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Briefly describe the problem" 
+                            {...field} 
+                            required={isFieldRequired('title')}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -145,46 +156,110 @@ const PortalIncidentForm: React.FC = () => {
                   
                   <FormField
                     control={form.control}
-                    name="priority"
+                    name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Impact</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select impact" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="P1">High - Work stopped</SelectItem>
-                            <SelectItem value="P2">Medium - Work hindered</SelectItem>
-                            <SelectItem value="P3">Low - Minor issue</SelectItem>
-                            <SelectItem value="P4">Very Low - Question</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormLabel>
+                          Description 
+                          {isFieldRequired('description') && <span className="text-red-500 ml-1">*</span>}
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Please provide more details about the issue" 
+                            className="min-h-32"
+                            {...field} 
+                            required={isFieldRequired('description')}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </div>
-                
-                <div className="pt-4 flex justify-end">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="mr-2"
-                    onClick={() => navigate('/portal')}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit">Submit Incident</Button>
-                </div>
-              </form>
-            </Form>
-          </Card>
+                  
+                  {(mandatoryFields.length === 0 || mandatoryFields.includes('category') || mandatoryFields.includes('priority')) && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {(mandatoryFields.length === 0 || mandatoryFields.includes('category')) && (
+                        <FormField
+                          control={form.control}
+                          name="category"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Category
+                                {isFieldRequired('category') && <span className="text-red-500 ml-1">*</span>}
+                              </FormLabel>
+                              <Select 
+                                onValueChange={field.onChange} 
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select category" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="hardware">Hardware</SelectItem>
+                                  <SelectItem value="software">Software</SelectItem>
+                                  <SelectItem value="network">Network</SelectItem>
+                                  <SelectItem value="access">Access</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                      
+                      {(mandatoryFields.length === 0 || mandatoryFields.includes('priority')) && (
+                        <FormField
+                          control={form.control}
+                          name="priority"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Impact
+                                {isFieldRequired('priority') && <span className="text-red-500 ml-1">*</span>}
+                              </FormLabel>
+                              <Select 
+                                onValueChange={field.onChange} 
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select impact" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="P1">High - Work stopped</SelectItem>
+                                  <SelectItem value="P2">Medium - Work hindered</SelectItem>
+                                  <SelectItem value="P3">Low - Minor issue</SelectItem>
+                                  <SelectItem value="P4">Very Low - Question</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                    </div>
+                  )}
+                  
+                  <div className="pt-4 flex justify-end">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="mr-2"
+                      onClick={() => navigate('/portal')}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit">Submit Incident</Button>
+                  </div>
+                </form>
+              </Form>
+            </Card>
+          )}
         </div>
       </div>
     </PageTransition>
