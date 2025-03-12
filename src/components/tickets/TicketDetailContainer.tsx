@@ -1,34 +1,19 @@
 
 import React, { useState } from 'react';
-import { Ticket } from '@/utils/types/ticket';
-import { UpdateTicketValues } from './TicketUpdateForm';
-import { CloseTicketValues } from './TicketCloseForm';
-import { Tabs } from '@/components/ui/tabs';
-import { useTicketDetailState } from './hooks/useTicketDetailState';
-import { useRelatedItemCreation } from './hooks/useRelatedItemCreation';
-import TicketDetailHeader from './detail/TicketDetailHeader';
-import TicketTabs from './detail/TicketTabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { 
+  TicketDetailViewProps 
+} from './TicketDetailView';
 import TicketTabContent from './detail/TicketTabContent';
 import ReopenDialog from './detail/ReopenDialog';
-import ReminderDialog from './detail/ReminderDialog';
-import { Button } from '@/components/ui/button';
-import { AlarmClock } from 'lucide-react';
-import { Task } from '@/utils/types/taskTypes';
-import { toast } from 'sonner';
+import TicketDetailHeader from './detail/TicketDetailHeader';
+import NoteTab from './detail/NoteTab';
+import CreateTaskTab from './detail/CreateTaskTab';
+import { Megaphone } from 'lucide-react';
+import CreateAnnouncementFromIncidentDialog from '@/components/announcements/CreateAnnouncementFromIncidentDialog';
 
-interface TicketDetailContainerProps {
-  ticket: Ticket;
-  type: 'incident' | 'service';
-  onUpdate?: (data: UpdateTicketValues) => void;
-  onClose?: (data: CloseTicketValues) => void;
-  onAddNote?: (note: string) => void;
-  onReopen?: (reason: string) => void;
-  onUpdateTicket?: (data: UpdateTicketValues) => void;
-  onCloseTicket?: (data: CloseTicketValues) => void;
-  onReopenTicket?: (reason: string) => void;
-}
-
-const TicketDetailContainer: React.FC<TicketDetailContainerProps> = ({
+const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
   ticket,
   type,
   onUpdate,
@@ -39,102 +24,95 @@ const TicketDetailContainer: React.FC<TicketDetailContainerProps> = ({
   onCloseTicket,
   onReopenTicket
 }) => {
-  const {
-    activeTab,
-    setActiveTab,
-    isReopenDialogOpen,
-    setIsReopenDialogOpen,
-    handleUpdateSubmit,
-    handleCloseSubmit,
-    handleReopenSubmit
-  } = useTicketDetailState();
-
-  const { 
-    handleCreateBug, 
-    handleCreateBacklogItem,
-    handleCreateTask 
-  } = useRelatedItemCreation({
-    ticket,
-    onAddNote,
-    onUpdate: onUpdate || onUpdateTicket
-  });
-
-  // State for reminder dialog
-  const [isReminderDialogOpen, setIsReminderDialogOpen] = useState(false);
-
-  // Derived state
-  const isServiceRequest = type === 'service';
-  const isResolved = ['resolved', 'closed', 'fulfilled'].includes(ticket.status);
-  const canReopen = ticket.status === (isServiceRequest ? 'fulfilled' : 'resolved') || ticket.status === 'closed';
-  const resolveTabLabel = isServiceRequest ? 'fulfill' : 'resolve';
-
-  const wrapAddNote = (note: string) => {
-    if (onAddNote && note.trim()) {
-      onAddNote(note);
+  // For backward compatibility
+  const handleUpdate = onUpdate || onUpdateTicket;
+  const handleClose = onClose || onCloseTicket;
+  const handleReopen = onReopen || onReopenTicket;
+  
+  const [reopenDialogOpen, setReopenDialogOpen] = useState(false);
+  const [createAnnouncementDialogOpen, setCreateAnnouncementDialogOpen] = useState(false);
+  
+  const handleReopenClick = () => {
+    setReopenDialogOpen(true);
+  };
+  
+  const handleReopenConfirm = (reason: string) => {
+    if (handleReopen) {
+      handleReopen(reason);
     }
+    setReopenDialogOpen(false);
   };
 
+  const isIncident = type === 'incident';
+  
   return (
-    <div className="space-y-6 h-full">
+    <div className="space-y-6">
       <TicketDetailHeader 
         ticket={ticket}
-        isServiceRequest={isServiceRequest}
-        canReopen={canReopen}
-        isResolved={isResolved}
-        onReopen={() => setIsReopenDialogOpen(true)}
-        onResolve={() => setActiveTab(resolveTabLabel)}
-      >
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="ml-auto" 
-          onClick={() => setIsReminderDialogOpen(true)}
-        >
-          <AlarmClock className="w-4 h-4 mr-2" />
-          Set Reminder
-        </Button>
-      </TicketDetailHeader>
+        type={type}
+        onReopenClick={handleReopenClick}
+      />
       
-      {/* Tabs Navigation */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="h-[calc(100%-150px)]">
-        <TicketTabs 
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          isResolved={isResolved}
-          isServiceRequest={isServiceRequest}
-        />
-        
-        {/* Tab Contents */}
-        <TicketTabContent 
-          activeTab={activeTab}
-          ticket={ticket}
-          type={type}
-          onUpdate={(data) => handleUpdateSubmit(onUpdate, onUpdateTicket, data)}
-          onClose={(data) => handleCloseSubmit(onClose, onCloseTicket, data)}
-          onAddNote={wrapAddNote}
-          onDetailsTabReopen={() => setIsReopenDialogOpen(true)}
-          onTabChange={setActiveTab}
-          onCreateBug={handleCreateBug}
-          onCreateBacklogItem={handleCreateBacklogItem}
-          onCreateTask={handleCreateTask}
-        />
+      {isIncident && (
+        <div className="flex justify-end">
+          <Button 
+            variant="outline" 
+            className="flex items-center"
+            onClick={() => setCreateAnnouncementDialogOpen(true)}
+          >
+            <Megaphone className="mr-2 h-4 w-4" />
+            Create Announcement
+          </Button>
+        </div>
+      )}
+      
+      <Tabs defaultValue="details">
+        <TabsList>
+          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="notes">Notes</TabsTrigger>
+          <TabsTrigger value="create-task">Create Task</TabsTrigger>
+        </TabsList>
+        <TabsContent value="details" className="space-y-4">
+          <TicketTabContent 
+            ticket={ticket}
+            type={type}
+            onUpdate={handleUpdate}
+            onClose={handleClose}
+          />
+        </TabsContent>
+        <TabsContent value="notes">
+          <NoteTab 
+            ticketId={ticket.id} 
+            notes={ticket.notes || []} 
+            onAddNote={onAddNote} 
+          />
+        </TabsContent>
+        <TabsContent value="create-task">
+          <CreateTaskTab ticket={ticket} />
+        </TabsContent>
       </Tabs>
-
+      
       {/* Reopen Dialog */}
-      <ReopenDialog 
-        isOpen={isReopenDialogOpen} 
-        onOpenChange={setIsReopenDialogOpen}
-        onReopen={(data) => handleReopenSubmit(onReopen, onReopenTicket, data)}
-        isServiceRequest={isServiceRequest}
+      <ReopenDialog
+        open={reopenDialogOpen}
+        onOpenChange={setReopenDialogOpen}
+        onConfirm={handleReopenConfirm}
       />
-
-      {/* Reminder Dialog */}
-      <ReminderDialog
-        isOpen={isReminderDialogOpen}
-        onOpenChange={setIsReminderDialogOpen}
-        ticket={ticket}
-        onReminderSet={wrapAddNote}
-      />
+      
+      {/* Create Announcement Dialog */}
+      {isIncident && (
+        <CreateAnnouncementFromIncidentDialog
+          open={createAnnouncementDialogOpen}
+          onOpenChange={setCreateAnnouncementDialogOpen}
+          incident={ticket}
+          onSuccess={() => {
+            // Optionally add a note to the ticket about the announcement
+            if (onAddNote) {
+              onAddNote("Created a public announcement based on this incident.");
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -1,13 +1,23 @@
 
+import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
-import Calendar from '@/pages/Calendar';
-import Approvals from '@/pages/Approvals';
-import Dashboard from '@/pages/Dashboard';
+
+// Import pages
+const Index = React.lazy(() => import('@/pages/Index'));
+const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
+const Calendar = React.lazy(() => import('@/pages/Calendar'));
+const Reports = React.lazy(() => import('@/pages/Reports'));
+const UserProfile = React.lazy(() => import('@/pages/UserProfile'));
+const UserSettings = React.lazy(() => import('@/pages/UserSettings'));
+const NotFound = React.lazy(() => import('@/pages/NotFound'));
+const AnnouncementsPage = React.lazy(() => import('@/pages/AnnouncementsPage'));
+const CreateAnnouncementPage = React.lazy(() => import('@/pages/CreateAnnouncementPage'));
+const EditAnnouncementPage = React.lazy(() => import('@/pages/EditAnnouncementPage'));
 
 export const miscRoutes = [
   {
     path: '/',
-    element: React.createElement(Dashboard)
+    element: React.createElement(Index)
   },
   {
     path: '/dashboard',
@@ -18,11 +28,31 @@ export const miscRoutes = [
     element: React.createElement(Calendar)
   },
   {
-    path: '/approvals',
-    element: React.createElement(Approvals)
+    path: '/reports',
+    element: React.createElement(Reports)
   },
   {
-    path: '/security',
-    element: React.createElement(() => React.createElement('div', null, 'Security Page'))
+    path: '/user/profile',
+    element: React.createElement(UserProfile)
+  },
+  {
+    path: '/user/settings',
+    element: React.createElement(UserSettings)
+  },
+  {
+    path: '/announcements',
+    element: React.createElement(AnnouncementsPage)
+  },
+  {
+    path: '/announcements/create',
+    element: React.createElement(CreateAnnouncementPage)
+  },
+  {
+    path: '/announcements/edit/:id',
+    element: React.createElement(EditAnnouncementPage)
+  },
+  {
+    path: '*',
+    element: React.createElement(NotFound)
   }
 ];

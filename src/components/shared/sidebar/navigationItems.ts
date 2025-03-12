@@ -1,159 +1,131 @@
 
 import {
-  LayoutDashboard,
-  AlarmClock,
-  HelpCircle,
-  Calendar,
-  Blocks,
-  NotebookTabs,
-  RefreshCw,
-  Package,
-  ShieldCheck,
-  Settings,
-  Network,
-  Database,
-  FileText,
-  CheckSquare,
+  AlertCircle,
+  BarChart3,
   Bug,
-  TestTube2,
+  Calendar,
+  ClipboardCheck,
+  Cog,
+  LayoutDashboard,
+  List,
+  PackageOpen,
+  ScrollText,
+  Server,
+  FileStack,
   Users,
-  SlidersHorizontal,
-  CheckCircle2,
-} from 'lucide-react';
-import { NavItem } from './types';
+  Megaphone
+} from "lucide-react";
 
-export const navigationItems: NavItem[] = [
+export type NavigationItem = {
+  title: string;
+  href: string;
+  icon: any;
+  items?: NavigationItem[];
+  description?: string;
+};
+
+export const navigationItems: NavigationItem[] = [
   {
-    name: 'Dashboard',
-    title: 'Dashboard',
-    href: '/dashboard',
-    path: '/dashboard',
+    title: "Dashboard",
+    href: "/dashboard",
     icon: LayoutDashboard,
+    description: "Overview of the system"
   },
   {
-    name: 'Incidents',
-    title: 'Incidents',
-    href: '/incidents',
-    path: '/incidents',
-    icon: AlarmClock,
+    title: "Ticket Management",
+    href: "#",
+    icon: ScrollText,
+    items: [
+      {
+        title: "Incidents",
+        href: "/incidents",
+        icon: AlertCircle,
+        description: "Manage system incidents"
+      },
+      {
+        title: "Service Requests",
+        href: "/service-requests",
+        icon: ClipboardCheck,
+        description: "Manage service requests"
+      }
+    ]
   },
   {
-    name: 'Service Requests',
-    title: 'Service Requests',
-    href: '/service-requests',
-    path: '/service-requests',
-    icon: HelpCircle,
-  },
-  {
-    name: 'Problems',
-    title: 'Problems',
-    href: '/problems',
-    path: '/problems',
-    icon: Blocks,
-  },
-  {
-    name: 'Changes',
-    title: 'Changes',
-    href: '/changes',
-    path: '/changes',
-    icon: RefreshCw,
-  },
-  {
-    name: 'Releases',
-    title: 'Releases',
-    href: '/releases',
-    path: '/releases',
-    icon: Package,
-  },
-  {
-    name: 'Tasks',
-    title: 'Tasks',
-    href: '/tasks',
-    path: '/tasks',
-    icon: CheckCircle2,
-  },
-  {
-    name: 'Backlog',
-    title: 'Backlog',
-    href: '/backlog',
-    path: '/backlog',
-    icon: NotebookTabs,
-  },
-  {
-    name: 'My Approvals',
-    title: 'My Approvals',
-    href: '/approvals',
-    path: '/approvals',
-    icon: CheckSquare,
-  },
-  {
-    name: 'Calendar',
-    title: 'Calendar',
-    href: '/calendar',
-    path: '/calendar',
-    icon: Calendar,
-  },
-  {
-    name: 'Assets',
-    title: 'Assets',
-    href: '/assets',
-    path: '/assets',
-    icon: Database,
-  },
-  {
-    name: 'Service Catalog',
-    title: 'Service Catalog',
-    href: '/services',
-    path: '/services',
-    icon: Network,
-  },
-  {
-    name: 'Knowledge',
-    title: 'Knowledge',
-    href: '/knowledge',
-    path: '/knowledge',
-    icon: FileText,
-  },
-  {
-    name: 'Security',
-    title: 'Security',
-    href: '/security',
-    path: '/security',
-    icon: ShieldCheck,
-  },
-  {
-    name: 'Settings',
-    title: 'Settings',
-    href: '/settings',
-    path: '/settings',
-    icon: Settings,
-  },
-  {
-    name: 'Test Management',
-    title: 'Test Management',
-    href: '/testing',
-    path: '/testing',
-    icon: TestTube2,
-  },
-  {
-    name: 'Bug Tracking',
-    title: 'Bug Tracking',
-    href: '/bugs',
-    path: '/bugs',
+    title: "Problem Management",
+    href: "/problems",
     icon: Bug,
+    description: "Manage system problems"
   },
   {
-    name: 'User Management',
-    title: 'User Management',
-    href: '/user-management',
-    path: '/user-management',
+    title: "Change Management",
+    href: "/changes",
+    icon: PackageOpen,
+    description: "Manage change requests"
+  },
+  {
+    title: "Backlog Management",
+    href: "/backlog",
+    icon: List,
+    description: "Manage work backlog"
+  },
+  {
+    title: "Release Management",
+    href: "/releases",
+    icon: PackageOpen,
+    description: "Manage system releases"
+  },
+  {
+    title: "Task Management",
+    href: "/tasks",
+    icon: ClipboardCheck,
+    description: "Manage tasks and assignments"
+  },
+  {
+    title: "Asset Management",
+    href: "/assets",
+    icon: Server,
+    description: "Manage system assets"
+  },
+  {
+    title: "Test Management",
+    href: "/test-tracking",
+    icon: Bug,
+    description: "Manage testing activities"
+  },
+  {
+    title: "Knowledge Base",
+    href: "/knowledge",
+    icon: FileStack,
+    description: "Access knowledge articles"
+  },
+  {
+    title: "Calendar",
+    href: "/calendar",
+    icon: Calendar,
+    description: "View scheduled events"
+  },
+  {
+    title: "Announcements",
+    href: "/announcements",
+    icon: Megaphone,
+    description: "Manage public announcements"
+  },
+  {
+    title: "Reports",
+    href: "/reports",
+    icon: BarChart3,
+    description: "View system reports"
+  },
+  {
+    title: "Users",
+    href: "/users",
     icon: Users,
+    description: "Manage system users"
   },
   {
-    name: 'Admin',
-    title: 'Admin Settings',
-    href: '/admin',
-    path: '/admin',
-    icon: SlidersHorizontal,
-  },
+    title: "Admin Settings",
+    href: "/admin",
+    icon: Cog,
+    description: "Configure system settings"
+  }
 ];
