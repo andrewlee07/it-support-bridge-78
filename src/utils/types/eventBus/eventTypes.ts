@@ -16,4 +16,6 @@ export * from './backlogItemEventTypes';
 export * from './reminderEventTypes';
 export * from './testEventTypes';
 export * from './eventDataMap';
+export * from './coreTypes';
+export * from './notificationTypes';
 

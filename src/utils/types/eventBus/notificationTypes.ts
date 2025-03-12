@@ -136,4 +136,3 @@ export interface ChannelTestResult {
   messagePreview?: string;
   timestamp: string;
 }
-
