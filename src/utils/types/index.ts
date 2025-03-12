@@ -3,7 +3,7 @@
 export { isTaskOverdue, isTaskDueSoon } from './taskTypes';
 
 // Re-export announcement types
-export { 
+export type { 
   Announcement, 
   AnnouncementStatus,
   AnnouncementPriority,
