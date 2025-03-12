@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AdminSettings from '@/pages/AdminSettings';
 import AIConfiguration from '@/pages/admin/AIConfiguration';
@@ -18,6 +17,7 @@ import SecuritySettings from '@/pages/admin/SecuritySettings';
 import StatusSynchronizationConfig from '@/pages/admin/StatusSynchronizationConfig';
 import EventDocumentation from '@/pages/admin/EventDocumentation';
 import GroupsQueueManagement from '@/pages/admin/GroupsQueueManagement';
+import QueueConfiguration from '@/pages/admin/QueueConfiguration';
 
 export const adminRoutes = [
   {
@@ -99,5 +99,9 @@ export const adminRoutes = [
   {
     path: 'admin/groups-queues',
     element: React.createElement(GroupsQueueManagement)
+  },
+  {
+    path: 'admin/queue-configuration',
+    element: React.createElement(QueueConfiguration)
   }
 ];

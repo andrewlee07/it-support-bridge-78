@@ -1,4 +1,3 @@
-
 import React from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +7,7 @@ import {
   BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert, 
   Sliders, ArrowUpDown, LibraryIcon, Bell, LayoutDashboard, ExternalLink,
   Brain, Users, // Added Users icon for Groups & Queues
+  InboxIcon, // Added InboxIcon for Queue Configuration
 } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -101,7 +101,13 @@ const AdminSettings = () => {
       description: 'Configure AI settings, models, and integration parameters',
       icon: <Brain className="h-8 w-8 text-primary/80" />,
       path: '/admin/ai-configuration'
-    }
+    },
+    {
+      title: 'Queue Configuration',
+      description: 'Configure queue settings, routing rules, and assignments',
+      icon: <InboxIcon className="h-8 w-8 text-primary/80" />,
+      path: '/admin/queue-configuration'
+    },
   ];
 
   return (
