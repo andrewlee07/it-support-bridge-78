@@ -23,14 +23,18 @@ export const tasks: Task[] = [
       {
         id: 'checklist-1',
         text: 'Notify users of downtime',
+        content: 'Notify users of downtime',
         completed: true,
+        status: 'completed',
         createdAt: pastDate(6),
         completedAt: pastDate(5)
       },
       {
         id: 'checklist-2',
         text: 'Create backup',
+        content: 'Create backup',
         completed: false,
+        status: 'pending',
         createdAt: pastDate(6)
       }
     ]
