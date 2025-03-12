@@ -1,14 +1,16 @@
 
-import { getUserById } from './mockData/users';
+import { getAllUsers } from '@/utils/mockData/users';
 
 /**
- * Get a user's name by their ID
- * @param userId The user ID
- * @returns The user's name or "Unassigned" if no user ID or user not found
+ * Gets a user's name by their ID
+ * @param userId The ID of the user to lookup
+ * @returns The user's name or "Unassigned" if not found
  */
 export const getUserNameById = (userId?: string): string => {
   if (!userId) return "Unassigned";
   
-  const user = getUserById(userId);
-  return user ? user.name : "Unassigned";
+  const users = getAllUsers();
+  const user = users.find(u => u.id === userId);
+  
+  return user ? user.name : "Unknown User";
 };

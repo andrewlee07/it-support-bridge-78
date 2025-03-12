@@ -23,6 +23,10 @@ interface TaskFormProps {
   onTaskCreated?: (task: Task) => void;
   onTaskUpdated?: (task: Task) => void;
   onCancel?: () => void;
+  // Add properties for backward compatibility
+  onSuccess?: (taskId: string) => void;
+  taskData?: Task;
+  isEditing?: boolean;
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ 
@@ -30,10 +34,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
   templateData,
   onTaskCreated, 
   onTaskUpdated, 
-  onCancel 
+  onCancel,
+  // Handle backward compatibility
+  onSuccess,
+  taskData,
+  isEditing
 }) => {
+  // Use either initialData or taskData (for backward compatibility)
+  const effectiveInitialData = initialData || taskData;
+  
   const [attachments, setAttachments] = useState<TaskAttachment[]>(
-    initialData?.attachments || templateData?.attachments || []
+    effectiveInitialData?.attachments || templateData?.attachments || []
   );
 
   const { 
@@ -44,10 +55,16 @@ const TaskForm: React.FC<TaskFormProps> = ({
     addChecklistItem,
     removeChecklistItem
   } = useTaskForm({
-    initialData,
+    initialData: effectiveInitialData,
     templateData,
-    onTaskCreated,
-    onTaskUpdated
+    onTaskCreated: (task) => {
+      if (onTaskCreated) onTaskCreated(task);
+      if (onSuccess) onSuccess(task.id);
+    },
+    onTaskUpdated: (task) => {
+      if (onTaskUpdated) onTaskUpdated(task);
+      if (onSuccess) onSuccess(task.id);
+    }
   });
 
   const handleAddAttachment = (attachment: TaskAttachment) => {
@@ -87,7 +104,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
           
           <TabsContent value="advanced" className="space-y-6">
             <TimeTrackingSection form={form} />
-            <DependenciesSection form={form} currentTaskId={initialData?.id} />
+            <DependenciesSection form={form} currentTaskId={effectiveInitialData?.id} />
             {!isFromTemplate && <TemplateOptionsSection form={form} />}
           </TabsContent>
           
@@ -106,7 +123,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
         </Tabs>
         
         <FormActions 
-          isEditMode={isEditMode} 
+          isEditMode={isEditMode || isEditing} 
           onCancel={onCancel} 
           isTemplate={form.watch('isTemplate')}
         />

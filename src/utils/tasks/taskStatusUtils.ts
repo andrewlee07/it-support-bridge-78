@@ -1,93 +1,104 @@
 
-import { Task, TaskStatus } from '../types/taskCore';
+import { Task, TaskStatus } from '../types/taskTypes';
+import { differenceInDays } from 'date-fns';
 
-// Helper functions for task status
+// Check if a task is overdue
 export const isTaskOverdue = (task: Task): boolean => {
-  if (!task.dueDate) return false;
-  if (task.status === 'completed' || task.status === 'cancelled') return false;
-  return new Date(task.dueDate) < new Date();
+  if (task.status === 'completed' || task.status === 'cancelled' || !task.dueDate) {
+    return false;
+  }
+  
+  const dueDate = new Date(task.dueDate);
+  return dueDate < new Date();
 };
 
-export const isTaskDueSoon = (task: Task, thresholdHours: number = 24): boolean => {
-  if (!task.dueDate) return false;
-  if (task.status === 'completed' || task.status === 'cancelled') return false;
+// Check if a task is due soon (within hours)
+export const isTaskDueSoon = (task: Task, hoursThreshold = 24): boolean => {
+  if (task.status === 'completed' || task.status === 'cancelled' || !task.dueDate) {
+    return false;
+  }
   
   const now = new Date();
-  const due = new Date(task.dueDate);
-  const diffMs = due.getTime() - now.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
+  const dueDate = new Date(task.dueDate);
   
-  return diffHours > 0 && diffHours <= thresholdHours;
+  // If already overdue, it's not "due soon" - it's overdue
+  if (dueDate < now) {
+    return false;
+  }
+  
+  // Calculate difference in hours
+  const diffHours = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+  return diffHours <= hoursThreshold;
 };
 
-// Return simple color classes for status
-export const getTaskStatusColor = (status: TaskStatus): string => {
+// Get color for task status
+export const getTaskStatusColor = (status: TaskStatus) => {
   switch (status) {
-    case 'new': return 'text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30';
-    case 'in-progress': return 'text-purple-700 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30';
-    case 'on-hold': return 'text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30';
-    case 'completed': return 'text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
-    case 'cancelled': return 'text-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/30';
-    default: return 'text-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/30';
+    case 'new':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    case 'in-progress':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+    case 'on-hold':
+      return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
+    case 'completed':
+      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+    case 'cancelled':
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
   }
 };
 
-// Return more specific classes for status visualization
+// Get status visual properties
 export const getTaskStatusVisuals = (status: TaskStatus) => {
   switch (status) {
     case 'new':
       return {
-        color: 'text-blue-700 dark:text-blue-400',
-        bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-        borderColor: 'border-blue-300 dark:border-blue-700',
-        hoverBg: 'hover:bg-blue-50 dark:hover:bg-blue-900/50',
-        iconClass: 'text-blue-500',
-        badge: 'text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30'
+        bg: 'bg-blue-50 dark:bg-blue-950/20',
+        text: 'text-blue-700 dark:text-blue-400',
+        badge: 'bg-blue-100 text-blue-800 dark:bg-blue-900/70 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900',
+        hoverBg: 'hover:bg-blue-50 dark:hover:bg-blue-950/10',
+        border: 'border-blue-200 dark:border-blue-800',
       };
     case 'in-progress':
       return {
-        color: 'text-purple-700 dark:text-purple-400',
-        bgColor: 'bg-purple-100 dark:bg-purple-900/30',
-        borderColor: 'border-purple-300 dark:border-purple-700',
-        hoverBg: 'hover:bg-purple-50 dark:hover:bg-purple-900/50',
-        iconClass: 'text-purple-500',
-        badge: 'text-purple-700 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30'
+        bg: 'bg-purple-50 dark:bg-purple-950/20',
+        text: 'text-purple-700 dark:text-purple-400',
+        badge: 'bg-purple-100 text-purple-800 dark:bg-purple-900/70 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900',
+        hoverBg: 'hover:bg-purple-50 dark:hover:bg-purple-950/10',
+        border: 'border-purple-200 dark:border-purple-800',
       };
     case 'on-hold':
       return {
-        color: 'text-yellow-700 dark:text-yellow-400',
-        bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
-        borderColor: 'border-yellow-300 dark:border-yellow-700',
-        hoverBg: 'hover:bg-yellow-50 dark:hover:bg-yellow-900/50',
-        iconClass: 'text-yellow-500',
-        badge: 'text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30'
+        bg: 'bg-amber-50 dark:bg-amber-950/20',
+        text: 'text-amber-700 dark:text-amber-400',
+        badge: 'bg-amber-100 text-amber-800 dark:bg-amber-900/70 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900',
+        hoverBg: 'hover:bg-amber-50 dark:hover:bg-amber-950/10',
+        border: 'border-amber-200 dark:border-amber-800',
       };
     case 'completed':
       return {
-        color: 'text-green-700 dark:text-green-400',
-        bgColor: 'bg-green-100 dark:bg-green-900/30',
-        borderColor: 'border-green-300 dark:border-green-700',
-        hoverBg: 'hover:bg-green-50 dark:hover:bg-green-900/50',
-        iconClass: 'text-green-500',
-        badge: 'text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30'
+        bg: 'bg-green-50 dark:bg-green-950/20',
+        text: 'text-green-700 dark:text-green-400',
+        badge: 'bg-green-100 text-green-800 dark:bg-green-900/70 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900',
+        hoverBg: 'hover:bg-green-50 dark:hover:bg-green-950/10',
+        border: 'border-green-200 dark:border-green-800',
       };
     case 'cancelled':
       return {
-        color: 'text-gray-700 dark:text-gray-400',
-        bgColor: 'bg-gray-100 dark:bg-gray-900/30',
-        borderColor: 'border-gray-300 dark:border-gray-700',
-        hoverBg: 'hover:bg-gray-50 dark:hover:bg-gray-900/50',
-        iconClass: 'text-gray-500',
-        badge: 'text-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/30'
+        bg: 'bg-gray-50 dark:bg-gray-800/20',
+        text: 'text-gray-700 dark:text-gray-400',
+        badge: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600',
+        hoverBg: 'hover:bg-gray-50 dark:hover:bg-gray-800/10',
+        border: 'border-gray-200 dark:border-gray-700',
       };
     default:
       return {
-        color: 'text-gray-700 dark:text-gray-400',
-        bgColor: 'bg-gray-100 dark:bg-gray-900/30',
-        borderColor: 'border-gray-300 dark:border-gray-700',
-        hoverBg: 'hover:bg-gray-50 dark:hover:bg-gray-900/50',
-        iconClass: 'text-gray-500',
-        badge: 'text-gray-700 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/30'
+        bg: 'bg-gray-50 dark:bg-gray-800/20',
+        text: 'text-gray-700 dark:text-gray-400',
+        badge: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600',
+        hoverBg: 'hover:bg-gray-50 dark:hover:bg-gray-800/10',
+        border: 'border-gray-200 dark:border-gray-700',
       };
   }
 };

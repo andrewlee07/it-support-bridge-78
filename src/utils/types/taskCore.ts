@@ -87,3 +87,20 @@ export interface ExportableTask extends Omit<Task, 'createdAt' | 'updatedAt' | '
   updatedAt: string;
   dueDate?: string;
 }
+
+// Form values for task creation/editing
+export interface TaskFormValues {
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignee?: string;
+  relatedItemId?: string;
+  relatedItemType?: 'incident' | 'service-request' | 'task';
+  dueDate?: Date;
+  estimatedHours?: number;
+  isTemplate?: boolean;
+  checklist?: ChecklistItem[];
+  dependsOn?: string[];
+  blockedBy?: string[];
+}

@@ -118,6 +118,10 @@ interface TaskSearchProps {
   onFinishDateOptionChange?: (option: string) => void;
   customFinishDate?: Date;
   onCustomFinishDateChange?: (date: Date) => void;
+  // Additional props for backward compatibility
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
 }
 
 const TaskSearch: React.FC<TaskSearchProps> = ({
@@ -138,7 +142,16 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
   onFinishDateOptionChange = () => {},
   customFinishDate,
   onCustomFinishDateChange = () => {},
+  // Handle backward compatibility
+  value,
+  onChange,
+  placeholder
 }) => {
+  // If using backward compatibility props, use them
+  const effectiveSearchQuery = value !== undefined ? value : searchQuery;
+  const effectiveOnSearchChange = onChange || onSearchChange;
+  const effectivePlaceholder = placeholder || "Search tasks...";
+
   // State for the preset save/load dialogs
   const [savedPresets, setSavedPresets] = useState<FilterPreset[]>(defaultPresets);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -293,9 +306,9 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <Input
-            placeholder="Search tasks..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder={effectivePlaceholder}
+            value={effectiveSearchQuery}
+            onChange={(e) => effectiveOnSearchChange(e.target.value)}
             className="w-full"
           />
         </div>
