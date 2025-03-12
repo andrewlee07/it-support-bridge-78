@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { 
   AlertCircle, Headphones, PanelRightIcon, OctagonAlert, 
   BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert, 
-  Sliders, ArrowUpDown, LibraryIcon, Bell
+  Sliders, ArrowUpDown, LibraryIcon, Bell, LayoutDashboard, ExternalLink
 } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -118,6 +118,30 @@ const AdminSettings = () => {
                 </Card>
               </Link>
             ))}
+          </div>
+          
+          {/* End User Portal Link */}
+          <div className="mt-8 border-t pt-6">
+            <h2 className="text-xl font-semibold mb-4">Testing Tools</h2>
+            <Link to="/portal" className="block">
+              <Card className="bg-primary/5 transition-all hover:shadow-md hover:border-primary/50">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <CardTitle className="flex items-center">
+                        End User Portal <ExternalLink className="ml-2 h-4 w-4" />
+                      </CardTitle>
+                      <CardDescription>
+                        Preview and test the end user portal experience
+                      </CardDescription>
+                    </div>
+                    <div>
+                      <LayoutDashboard className="h-8 w-8 text-primary/80" />
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
           </div>
         </div>
       </div>
