@@ -25,7 +25,7 @@ const PortalHeader: React.FC = () => {
         <div className="flex items-center space-x-6">
           <Link to="/" className="flex items-center">
             <img 
-              src="/lovable-uploads/9f8e5267-ab6c-409e-99f0-0517f48fc1b8.png" 
+              src="/lovable-uploads/21bb1d00-a388-4d8e-848e-bee077c2ab5a.png" 
               alt="We Are Group Logo" 
               className="h-8 mr-2" 
             />

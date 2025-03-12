@@ -74,7 +74,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
       <div className="flex h-16 items-center justify-between border-b border-border/40 px-4">
         {!collapsed && (
           <div className="font-semibold text-lg text-primary flex items-center">
-            IT Support Bridge
+            <img 
+              src="/lovable-uploads/21bb1d00-a388-4d8e-848e-bee077c2ab5a.png" 
+              alt="We Are Group" 
+              className="h-8 mr-2"
+            />
+            <span className="text-sm">IT Support Bridge</span>
           </div>
         )}
         <Button 

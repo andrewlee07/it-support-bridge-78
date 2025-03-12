@@ -15,7 +15,7 @@ const Index = () => {
         <div className="max-w-screen-xl mx-auto">
           <div className="flex items-center justify-between">
             <img 
-              src="/lovable-uploads/9f8e5267-ab6c-409e-99f0-0517f48fc1b8.png" 
+              src="/lovable-uploads/21bb1d00-a388-4d8e-848e-bee077c2ab5a.png" 
               alt="We Are Group" 
               className="h-10 md:h-12"
             />

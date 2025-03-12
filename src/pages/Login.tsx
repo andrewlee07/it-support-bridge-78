@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -75,7 +76,7 @@ const Login = () => {
         <div className="max-w-screen-xl mx-auto">
           <div className="flex items-center">
             <img 
-              src="/lovable-uploads/1d1d210b-925d-4f3b-a218-4bb7ea9297a7.png" 
+              src="/lovable-uploads/21bb1d00-a388-4d8e-848e-bee077c2ab5a.png" 
               alt="We Are Group" 
               className="h-10 md:h-12"
             />
