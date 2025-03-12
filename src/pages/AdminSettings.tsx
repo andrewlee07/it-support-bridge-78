@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import { 
   AlertCircle, Headphones, PanelRightIcon, OctagonAlert, 
   BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert, 
-  Sliders, ArrowUpDown, LibraryIcon, Bell, LayoutDashboard, ExternalLink
+  Sliders, ArrowUpDown, LibraryIcon, Bell, LayoutDashboard, ExternalLink,
+  Brain // Added Brain icon for AI Configuration
 } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -87,6 +88,12 @@ const AdminSettings = () => {
       description: 'Configure security policies, MFA, and audit logs',
       icon: <ShieldAlert className="h-8 w-8 text-primary/80" />,
       path: '/admin/security-settings'
+    },
+    {
+      title: 'AI Configuration',
+      description: 'Configure AI settings, models, and integration parameters',
+      icon: <Brain className="h-8 w-8 text-primary/80" />,
+      path: '/admin/ai-configuration'
     }
   ];
 
