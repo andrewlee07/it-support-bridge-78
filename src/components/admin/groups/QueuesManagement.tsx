@@ -18,7 +18,7 @@ const mockQueues: Queue[] = [
     name: 'IT Support Queue',
     description: 'General IT support tickets',
     filterCriteria: {
-      ticketTypes: ['incident', 'service-request'],
+      ticketTypes: ['incident', 'service'],
       priorities: ['medium', 'low']
     },
     groupId: 'group-1',
@@ -42,7 +42,7 @@ const mockQueues: Queue[] = [
     name: 'Change Requests',
     description: 'All change request tickets',
     filterCriteria: {
-      ticketTypes: ['change-request']
+      ticketTypes: ['change']
     },
     groupId: 'group-3',
     createdAt: new Date('2023-03-15'),
