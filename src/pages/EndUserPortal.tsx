@@ -104,9 +104,9 @@ const EndUserPortal: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          {/* My Open Incidents & My Open Requests Grid */}
+        {/* Bottom Sections - Rearranged to have all three next to each other */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+          {/* My Open Incidents */}
           <div className="card p-5 border rounded-lg shadow-sm">
             <h3 className="text-lg font-medium mb-4">My Open Incidents</h3>
             <div className="space-y-4">
@@ -137,7 +137,7 @@ const EndUserPortal: React.FC = () => {
             </div>
           </div>
 
-          {/* Knowledge Articles */}
+          {/* My Open Requests */}
           <div className="card p-5 border rounded-lg shadow-sm">
             <h3 className="text-lg font-medium mb-4">My Open Requests</h3>
             <div className="space-y-4">
@@ -171,11 +171,12 @@ const EndUserPortal: React.FC = () => {
               />
             </div>
           </div>
-        </div>
 
-        {/* Knowledge Articles List */}
-        <div className="mt-8">
-          <KnowledgeArticlesList />
+          {/* Knowledge Articles - Using KnowledgeArticlesList component */}
+          <div className="card p-5 border rounded-lg shadow-sm">
+            <h3 className="text-lg font-medium mb-4">Knowledge Articles</h3>
+            <KnowledgeArticlesList maxItems={4} showHeader={false} className="p-0" />
+          </div>
         </div>
       </section>
     </div>
@@ -183,4 +184,3 @@ const EndUserPortal: React.FC = () => {
 };
 
 export default EndUserPortal;
-
