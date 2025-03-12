@@ -10,6 +10,8 @@ import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFie
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
 import DropdownFieldsTab from '@/components/admin/change-configuration/DropdownFieldsTab';
 import BusinessHoursConfigurationTab from '@/components/admin/BusinessHoursConfigurationTab';
+import { Form } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
 
 const IncidentConfiguration = () => {
   const breadcrumbItems = [
@@ -18,6 +20,9 @@ const IncidentConfiguration = () => {
   ];
 
   const { mandatoryFields, updateMandatoryFields, isLoading } = useMandatoryFields('incident');
+  
+  // Add a form context for components that might need it
+  const form = useForm();
 
   return (
     <PageTransition>
@@ -54,15 +59,21 @@ const IncidentConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="sla">
-            <SLAConfigurationTab ticketType="incident" />
+            <Form {...form}>
+              <SLAConfigurationTab ticketType="incident" />
+            </Form>
           </TabsContent>
           
           <TabsContent value="business-hours">
-            <BusinessHoursConfigurationTab moduleType="incident" />
+            <Form {...form}>
+              <BusinessHoursConfigurationTab moduleType="incident" />
+            </Form>
           </TabsContent>
           
           <TabsContent value="autoclose">
-            <AutoCloseConfigurationTab moduleType="incident" />
+            <Form {...form}>
+              <AutoCloseConfigurationTab moduleType="incident" />
+            </Form>
           </TabsContent>
           
           <TabsContent value="dropdowns">
@@ -72,7 +83,9 @@ const IncidentConfiguration = () => {
                 <CardDescription>Configure dropdown fields for incident management</CardDescription>
               </CardHeader>
               <CardContent>
-                <DropdownFieldsTab />
+                <Form {...form}>
+                  <DropdownFieldsTab />
+                </Form>
               </CardContent>
             </Card>
           </TabsContent>
