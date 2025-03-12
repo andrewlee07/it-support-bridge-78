@@ -101,11 +101,12 @@ export interface Ticket {
   // Additional metadata
   tags?: string[];
   attachments?: any[];
-  
-  // Additional properties referenced in errors
   relatedProblems?: string[];
   associatedAssets?: string[];
   notes?: TicketNote[];
+  
+  // Watch list functionality
+  watchers?: string[];
 }
 
 // Extended ticket interface with notes

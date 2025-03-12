@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TicketPriority } from '@/utils/types/ticket';
 import { getDashboardStats } from '@/utils/mockData/dashboardStats';
 import { ServiceDashboardCard } from '@/components/services/ServiceDashboardCard';
+import WatchListCard from '@/components/dashboard/WatchListCard';
 
 // Helper function to determine if a ticket is high priority
 export const isHighPriority = (priority: TicketPriority): boolean => {
@@ -27,6 +28,9 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {/* Watch List Card */}
+        <WatchListCard />
+        
         <Tabs defaultValue="overview" className="animate-fade-in">
           <TabsList className="mb-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>

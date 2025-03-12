@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Ticket, TicketPriority, TicketStatus } from '@/utils/types/ticket';
 import { CalendarDays, Clock, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import WatchButton from '@/components/shared/WatchButton';
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -51,11 +52,23 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClick }) => {
     }
   };
 
+  const watchableItem = {
+    id: ticket.id,
+    type: ticket.type as any,
+    title: ticket.title,
+    status: ticket.status,
+    createdAt: new Date(ticket.createdAt),
+    updatedAt: new Date(ticket.updatedAt)
+  };
+
   return (
     <Card 
-      className="shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer" 
+      className="shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer relative" 
       onClick={onClick}
     >
+      <div className="absolute top-2 right-2 z-10">
+        <WatchButton item={watchableItem} />
+      </div>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start gap-2">
           <div>

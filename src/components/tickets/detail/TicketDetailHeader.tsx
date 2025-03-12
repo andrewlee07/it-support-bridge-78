@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { getUserNameById } from '@/utils/userUtils';
 import { format } from 'date-fns';
 import DetailBreadcrumb from './DetailBreadcrumb';
+import WatchButton from '@/components/shared/WatchButton';
 
 interface TicketDetailHeaderProps {
   ticket: Ticket;
@@ -50,6 +51,15 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
       ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
       : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
   
+  const watchableItem = {
+    id: ticket.id,
+    type: ticket.type as any,
+    title: ticket.title,
+    status: ticket.status,
+    createdAt: new Date(ticket.createdAt),
+    updatedAt: new Date(ticket.updatedAt)
+  };
+
   return (
     <div className="space-y-4">
       <DetailBreadcrumb
@@ -60,15 +70,10 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
       />
       
       <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-        <div>
+        <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{ticket.title}</h1>
-          <div className="flex items-center space-x-2 mt-1">
-            <Badge variant="outline">{ticket.id}</Badge>
-            <Badge className={badgeColor}>{ticket.priority}</Badge>
-            <Badge className={statusColor}>{ticket.status}</Badge>
-          </div>
+          <WatchButton item={watchableItem} />
         </div>
-        
         <div className="flex items-center space-x-2 mt-4 sm:mt-0">
           {!isResolved ? (
             <Button variant="default" size="sm" onClick={onResolve}>
@@ -82,6 +87,12 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
           
           {children}
         </div>
+      </div>
+      
+      <div className="flex items-center space-x-2 mt-1">
+        <Badge variant="outline">{ticket.id}</Badge>
+        <Badge className={badgeColor}>{ticket.priority}</Badge>
+        <Badge className={statusColor}>{ticket.status}</Badge>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
