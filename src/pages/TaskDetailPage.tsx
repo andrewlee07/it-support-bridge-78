@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { fetchTaskById } from '@/utils/api/taskApi';
 import { Task } from '@/utils/types/taskTypes';
 import PageTransition from '@/components/shared/PageTransition';
+import WatchButton from '@/components/shared/WatchButton';
 
 const TaskDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,11 +63,24 @@ const TaskDetailPage: React.FC = () => {
     );
   }
 
+  // Create watchable item for the task
+  const watchableItem = task ? {
+    id: task.id,
+    type: 'task' as const,
+    title: task.title,
+    status: task.status,
+    createdAt: new Date(task.createdAt),
+    updatedAt: task.updatedAt ? new Date(task.updatedAt) : undefined
+  } : null;
+
   return (
     <PageTransition>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">{task.title}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">{task.title}</h1>
+            {watchableItem && <WatchButton item={watchableItem} variant="outline" size="sm" />}
+          </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigate('/tasks')}>Back to Tasks</Button>
             <Button onClick={() => navigate(`/tasks/${id}/edit`)}>Edit Task</Button>
