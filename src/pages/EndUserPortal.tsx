@@ -106,10 +106,7 @@ const EndUserPortal: React.FC = () => {
 
         {/* Bottom Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          {/* Knowledge Articles - Using our new component */}
-          <KnowledgeArticlesList />
-
-          {/* My Open Incidents */}
+          {/* My Open Incidents & My Open Requests Grid */}
           <div className="card p-5 border rounded-lg shadow-sm">
             <h3 className="text-lg font-medium mb-4">My Open Incidents</h3>
             <div className="space-y-4">
@@ -139,12 +136,10 @@ const EndUserPortal: React.FC = () => {
               />
             </div>
           </div>
-        </div>
 
-        {/* My Service Requests Section */}
-        <div className="grid grid-cols-1 mt-8">
+          {/* Knowledge Articles */}
           <div className="card p-5 border rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">My Requests</h3>
+            <h3 className="text-lg font-medium mb-4">My Open Requests</h3>
             <div className="space-y-4">
               <ServiceRequestItem 
                 title="New laptop request"
@@ -177,9 +172,15 @@ const EndUserPortal: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Knowledge Articles List */}
+        <div className="mt-8">
+          <KnowledgeArticlesList />
+        </div>
       </section>
     </div>
   );
 };
 
 export default EndUserPortal;
+
