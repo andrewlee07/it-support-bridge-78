@@ -1,7 +1,6 @@
 
 import EventBus from '../EventBus';
-import { TaskEventData } from '@/utils/types/eventBus';
-import { EventType } from '@/utils/types/eventBus';
+import { TaskEventData, EventType, EventSource } from '@/utils/types/eventBus';
 
 /**
  * Utility class for publishing task-related events to the EventBus
@@ -25,7 +24,7 @@ export class TaskEventPublisher {
     // Get the instance of EventBus and publish the event
     EventBus.getInstance().publish(
       'task.created' as EventType,
-      'task-management',
+      'taskManager' as EventSource,
       eventData,
       {
         actor: {
@@ -56,7 +55,7 @@ export class TaskEventPublisher {
 
     EventBus.getInstance().publish(
       'task.updated' as EventType,
-      'task-management',
+      'taskManager' as EventSource,
       eventData,
       {
         actor: {
@@ -87,7 +86,7 @@ export class TaskEventPublisher {
 
     EventBus.getInstance().publish(
       'task.statusChanged' as EventType,
-      'task-management',
+      'taskManager' as EventSource,
       eventData,
       {
         actor: {
@@ -117,7 +116,7 @@ export class TaskEventPublisher {
 
     EventBus.getInstance().publish(
       'task.assigned' as EventType,
-      'task-management',
+      'taskManager' as EventSource,
       eventData,
       {
         actor: {
@@ -147,7 +146,7 @@ export class TaskEventPublisher {
 
     EventBus.getInstance().publish(
       'task.completed' as EventType,
-      'task-management',
+      'taskManager' as EventSource,
       eventData,
       {
         actor: {
@@ -178,7 +177,7 @@ export class TaskEventPublisher {
 
     EventBus.getInstance().publish(
       'task.overdue' as EventType,
-      'task-management',
+      'taskManager' as EventSource,
       eventData,
       {
         actor: {
@@ -207,7 +206,7 @@ export class TaskEventPublisher {
 
     EventBus.getInstance().publish(
       'task.deleted' as EventType,
-      'task-management',
+      'taskManager' as EventSource,
       eventData,
       {
         actor: {
