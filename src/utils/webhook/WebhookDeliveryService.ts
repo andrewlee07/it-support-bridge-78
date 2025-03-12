@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { SystemEvent, WebhookConfig, WebhookDeliveryLog, EventSource } from '../types/eventBus';
+import { SystemEvent, WebhookConfig, WebhookDeliveryLog, EventSource, EventType } from '../types/eventBus';
 import { EventOrigin } from '../types/eventBus/sourceTypes';
 
 /**
@@ -54,7 +54,7 @@ export class WebhookDeliveryService {
       };
       
       // Add authentication if needed
-      if (webhook.authentication.type !== 'none') {
+      if (webhook.authentication && webhook.authentication.type !== 'none') {
         this.applyAuthentication(headers, webhook.authentication);
       }
       
@@ -139,19 +139,40 @@ export class WebhookDeliveryService {
    * Create a test event for a webhook
    */
   public createTestEvent(webhook: WebhookConfig): SystemEvent {
+    // Use a valid EventType from the eventTypes array or default to 'ticket.created'
+    const eventType: EventType = webhook.eventTypes && webhook.eventTypes.length > 0 && 
+                               this.isValidEventType(webhook.eventTypes[0]) ? 
+                               webhook.eventTypes[0] as EventType : 
+                               'ticket.created';
+    
     return {
       id: `test-${uuidv4()}`,
-      type: webhook.eventTypes[0],
-      source: 'external-system',
+      type: eventType,
+      source: 'external-system' as EventSource,
       timestamp: new Date().toISOString(),
       data: {
         message: 'This is a test event',
         timestamp: new Date().toISOString()
       },
       metadata: {
-        origin: 'background-job',
+        origin: 'webhook-test',
         isTest: true
       }
     };
+  }
+  
+  /**
+   * Check if a string is a valid EventType
+   */
+  private isValidEventType(type: string): boolean {
+    // List of valid event types from eventTypeDefinitions.ts
+    const validEventTypes = [
+      'ticket.created', 'ticket.updated', 'ticket.assigned', 'ticket.resolved',
+      'ticket.closed', 'ticket.reopened', 'incident.created', 'incident.updated',
+      'incident.assigned', 'incident.resolved', 'incident.closed', 'incident.reopened'
+      // Add other valid event types as needed
+    ];
+    
+    return validEventTypes.includes(type);
   }
 }

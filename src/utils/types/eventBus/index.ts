@@ -51,4 +51,5 @@ export interface WebhookDeliveryLog {
   success?: boolean;
   error?: string;
   retries?: number;
+  retryCount?: number;
 }
