@@ -18,7 +18,7 @@ const ServiceRequestItem: React.FC<ServiceRequestItemProps> = ({
   id,
   status = 'open'
 }) => {
-  // Extract the service request number without the "SR" prefix
+  // Extract the service request number without the "SR" prefix for URL
   const requestId = id.replace('SR', '');
   
   return (

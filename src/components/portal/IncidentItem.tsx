@@ -10,7 +10,7 @@ interface IncidentItemProps {
 }
 
 const IncidentItem: React.FC<IncidentItemProps> = ({ title, date, time, id }) => {
-  // Extract the incident number without the "INC" prefix
+  // Extract the incident number without the "INC" prefix for URL
   const incidentId = id.replace('INC', '');
   
   return (
