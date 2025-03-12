@@ -1,45 +1,31 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Grid, 
-  List, 
-  Calendar as CalendarIcon 
-} from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { LayoutGrid, List, Calendar } from 'lucide-react';
 
-export type TaskViewMode = 'grid' | 'list' | 'calendar';
+export type TaskViewType = 'table' | 'grid' | 'calendar';
 
-interface TaskViewToggleProps {
-  activeView: TaskViewMode;
-  onViewChange: (view: TaskViewMode) => void;
+export interface TaskViewToggleProps {
+  currentView: TaskViewType;
+  onViewChange: (view: TaskViewType) => void;
 }
 
 const TaskViewToggle: React.FC<TaskViewToggleProps> = ({
-  activeView,
-  onViewChange,
+  currentView,
+  onViewChange
 }) => {
   return (
-    <Tabs
-      value={activeView}
-      onValueChange={(value) => onViewChange(value as TaskViewMode)}
-      className="w-fit"
-    >
-      <TabsList className="grid grid-cols-3 w-auto">
-        <TabsTrigger value="grid" aria-label="Grid View" className="flex items-center gap-2 px-3">
-          <Grid className="h-4 w-4" />
-          <span className="hidden sm:inline">Grid</span>
-        </TabsTrigger>
-        <TabsTrigger value="list" aria-label="List View" className="flex items-center gap-2 px-3">
-          <List className="h-4 w-4" />
-          <span className="hidden sm:inline">List</span>
-        </TabsTrigger>
-        <TabsTrigger value="calendar" aria-label="Calendar View" className="flex items-center gap-2 px-3">
-          <CalendarIcon className="h-4 w-4" />
-          <span className="hidden sm:inline">Calendar</span>
-        </TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <ToggleGroup type="single" value={currentView} onValueChange={(value) => value && onViewChange(value as TaskViewType)}>
+      <ToggleGroupItem value="table" aria-label="List view">
+        <List className="h-4 w-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="grid" aria-label="Grid view">
+        <LayoutGrid className="h-4 w-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="calendar" aria-label="Calendar view">
+        <Calendar className="h-4 w-4" />
+      </ToggleGroupItem>
+    </ToggleGroup>
   );
 };
 
