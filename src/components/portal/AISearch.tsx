@@ -1,13 +1,14 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, Loader2, MessageSquare, TicketIcon, BookOpen } from 'lucide-react';
+import { Search, X, Loader2, MessageSquare, TicketIcon, BookOpen, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { getKnowledgeArticles } from '@/utils/api/knowledgeApi';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AISearchProps {
   onClose?: () => void;
@@ -15,6 +16,10 @@ interface AISearchProps {
 
 type SearchState = 'idle' | 'searching' | 'results' | 'collecting' | 'submitting';
 type TicketType = 'incident' | 'service-request';
+
+const AI_REQUEST_KEY = 'ai_request_count';
+const AI_LIMIT_HOUR_KEY = 'ai_limit_hour';
+const AI_LIMIT_DAY_KEY = 'ai_limit_day';
 
 const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,9 +35,15 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
   });
   const [conversationMessages, setConversationMessages] = useState<{role: string, content: string}[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [limitExceeded, setLimitExceeded] = useState(false);
+  const [limitMessage, setLimitMessage] = useState('');
+  const [userMessage, setUserMessage] = useState('');
+  
   const { toast } = useToast();
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
   
   // Auto-scroll to bottom of messages
   useEffect(() => {
@@ -41,12 +52,113 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
     }
   }, [conversationMessages]);
 
+  // Handle chat expansion
+  useEffect(() => {
+    if (searchState !== 'idle' && searchState !== 'searching') {
+      setIsExpanded(true);
+    }
+  }, [searchState]);
+
+  // Check for AI limits (guardrails against abuse)
+  const checkLimits = (): boolean => {
+    // Load AI settings
+    const aiSettingsStr = localStorage.getItem('aiSettings');
+    if (!aiSettingsStr) return true; // No limits set yet
+    
+    const aiSettings = JSON.parse(aiSettingsStr);
+    const requestLimitPerHour = aiSettings.requestLimitPerHour || 10;
+    const requestLimitPerDay = aiSettings.requestLimitPerDay || 50;
+    
+    // User identification - use user ID from auth context if available, or anonymous ID
+    const userId = user?.id || 'anonymous';
+    
+    // Get or initialize counters from localStorage
+    const requestCounterKey = `${AI_REQUEST_KEY}_${userId}`;
+    const hourLimitKey = `${AI_LIMIT_HOUR_KEY}_${userId}`;
+    const dayLimitKey = `${AI_LIMIT_DAY_KEY}_${userId}`;
+    
+    const now = new Date().getTime();
+    const hourAgo = now - (60 * 60 * 1000);
+    const dayAgo = now - (24 * 60 * 60 * 1000);
+    
+    // Get or initialize hour counter
+    let hourCounter = JSON.parse(localStorage.getItem(hourLimitKey) || '[]');
+    hourCounter = hourCounter.filter((timestamp: number) => timestamp > hourAgo);
+    
+    // Get or initialize day counter
+    let dayCounter = JSON.parse(localStorage.getItem(dayLimitKey) || '[]');
+    dayCounter = dayCounter.filter((timestamp: number) => timestamp > dayAgo);
+    
+    // Check limits
+    if (hourCounter.length >= requestLimitPerHour) {
+      setLimitExceeded(true);
+      setLimitMessage(`You've reached the hourly limit (${requestLimitPerHour} requests). Please try again later.`);
+      return false;
+    }
+    
+    if (dayCounter.length >= requestLimitPerDay) {
+      setLimitExceeded(true);
+      setLimitMessage(`You've reached the daily limit (${requestLimitPerDay} requests). Please try again tomorrow.`);
+      return false;
+    }
+    
+    // Update counters
+    hourCounter.push(now);
+    dayCounter.push(now);
+    
+    // Save updated counters
+    localStorage.setItem(hourLimitKey, JSON.stringify(hourCounter));
+    localStorage.setItem(dayLimitKey, JSON.stringify(dayCounter));
+    
+    // Increment request count
+    const requestCount = parseInt(localStorage.getItem(requestCounterKey) || '0') + 1;
+    localStorage.setItem(requestCounterKey, requestCount.toString());
+    
+    return true;
+  };
+
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!searchQuery.trim()) return;
     
+    // Check if AI is enabled and API key is set
+    const aiSettings = localStorage.getItem('aiSettings');
+    if (!aiSettings) {
+      toast({
+        title: "AI not configured",
+        description: "Please ask an administrator to configure the AI assistant.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const parsedSettings = JSON.parse(aiSettings);
+    if (!parsedSettings.enableAI) {
+      toast({
+        title: "AI assistant is disabled",
+        description: "Please ask an administrator to enable the AI assistant.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!parsedSettings.apiKey) {
+      toast({
+        title: "API key missing",
+        description: "Please ask an administrator to set up the OpenAI API key.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Check rate limits
+    if (!checkLimits()) {
+      return;
+    }
+    
     setSearchState('searching');
     setIsProcessing(true);
+    setLimitExceeded(false);
 
     try {
       // First, search for knowledge articles
@@ -106,7 +218,7 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
     setConversationMessages([
       { role: 'system', content: 'I need to collect information about your issue to create an incident.' },
       { role: 'user', content: query },
-      { role: 'assistant', content: 'I understand you\'re having an issue. Could you tell me which service is affected?' }
+      { role: 'assistant', content: "I understand you're having an issue. Could you tell me which service is affected?" }
     ]);
   };
 
@@ -123,15 +235,15 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
     setConversationMessages([
       { role: 'system', content: 'I need to collect information about your request.' },
       { role: 'user', content: query },
-      { role: 'assistant', content: 'I\'d be happy to help with your request. Which service are you requesting?' }
+      { role: 'assistant', content: "I'd be happy to help with your request. Which service are you requesting?" }
     ]);
   };
 
-  const handleUserMessage = (message: string) => {
-    if (!message.trim()) return;
+  const handleUserMessage = () => {
+    if (!userMessage.trim()) return;
     
     // Add user message to conversation
-    setConversationMessages(prev => [...prev, { role: 'user', content: message }]);
+    setConversationMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsProcessing(true);
     
     // Process the message
@@ -143,21 +255,21 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
       
       if (messagesCount === 1) {
         // This is responding to the service question
-        setTicketData(prev => ({ ...prev, service: message }));
+        setTicketData(prev => ({ ...prev, service: userMessage }));
         setConversationMessages(prev => [...prev, { 
           role: 'assistant', 
           content: `Thank you. How would you rate the ${currentTicketType === 'incident' ? 'impact' : 'urgency'} of this ${currentTicketType}? (Low, Medium, High)` 
         }]);
       } else if (messagesCount === 2) {
         // This is responding to the impact/urgency question
-        setTicketData(prev => ({ ...prev, priority: message.toLowerCase() }));
+        setTicketData(prev => ({ ...prev, priority: userMessage.toLowerCase() }));
         setConversationMessages(prev => [...prev, { 
           role: 'assistant', 
           content: `Thank you for providing that information. Is there anything else you'd like to add before I submit this ${currentTicketType}?` 
         }]);
       } else {
         // Any additional information is added to description
-        setTicketData(prev => ({ ...prev, description: prev.description + "\n\nAdditional information: " + message }));
+        setTicketData(prev => ({ ...prev, description: prev.description + "\n\nAdditional information: " + userMessage }));
         setConversationMessages(prev => [...prev, { 
           role: 'assistant', 
           content: 'Thank you for the additional information. I have all the details I need. Would you like me to submit this now?' 
@@ -165,6 +277,7 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
       }
       
       setIsProcessing(false);
+      setUserMessage('');
     }, 1000);
   };
 
@@ -198,6 +311,7 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
         impact: 'moderate'
       });
       setConversationMessages([]);
+      setIsExpanded(false);
       
       if (onClose) onClose();
     }, 2000);
@@ -221,35 +335,94 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
       impact: 'moderate'
     });
     setConversationMessages([]);
+    setIsExpanded(false);
+  };
+
+  const toggleExpanded = () => {
+    if (searchState === 'idle') {
+      setIsExpanded(!isExpanded);
+    }
   };
 
   return (
     <div className="w-full">
       {searchState === 'idle' && (
-        <form onSubmit={handleSearch} className="w-full">
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="How can we help?"
-              className="pr-10 h-12 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button 
-              type="submit" 
-              size="icon" 
-              variant="ghost" 
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-10 w-10"
-              disabled={!searchQuery.trim() || isProcessing}
-            >
-              {isProcessing ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <Search className="h-5 w-5" />
-              )}
-            </Button>
-          </div>
-        </form>
+        <div>
+          <form onSubmit={handleSearch} className="w-full">
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="How can we help?"
+                className="pr-24 h-12 rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex">
+                <Button 
+                  type="button" 
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-10 w-10"
+                  onClick={toggleExpanded}
+                >
+                  {isExpanded ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                </Button>
+                <Button 
+                  type="submit" 
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-10 w-10"
+                  disabled={!searchQuery.trim() || isProcessing}
+                >
+                  {isProcessing ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Search className="h-5 w-5" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </form>
+          
+          {isExpanded && (
+            <Card className="p-4 mt-2">
+              <div className="space-y-3">
+                <p className="text-sm">I can help with:</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="justify-start" 
+                    onClick={() => {
+                      setSearchQuery("My computer isn't working");
+                      handleSearch();
+                    }}
+                  >
+                    <TicketIcon className="mr-2 h-4 w-4" />
+                    Report an issue
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="justify-start"
+                    onClick={() => {
+                      setSearchQuery("I need access to");
+                      handleSearch();
+                    }}
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Request something
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Type your question or select an option above.
+                </p>
+              </div>
+            </Card>
+          )}
+        </div>
       )}
 
       {(searchState === 'searching' || searchState === 'submitting') && (
@@ -264,6 +437,21 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
                 ? 'Looking for information that might help you.' 
                 : 'Creating your ticket and notifying the support team.'}
             </p>
+          </div>
+        </Card>
+      )}
+
+      {limitExceeded && (
+        <Card className="p-6">
+          <div className="flex items-start">
+            <AlertTriangle className="h-5 w-5 text-amber-500 mr-3 mt-1" />
+            <div>
+              <h3 className="font-medium">Usage Limit Reached</h3>
+              <p className="text-sm text-muted-foreground mt-1">{limitMessage}</p>
+              <Button variant="outline" className="mt-3" onClick={reset}>
+                Close
+              </Button>
+            </div>
           </div>
         </Card>
       )}
@@ -374,17 +562,28 @@ const AISearch: React.FC<AISearchProps> = ({ onClose }) => {
           </div>
           
           <div className="relative mt-4">
-            <Input 
-              placeholder="Type your response..." 
-              disabled={isProcessing}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  const target = e.target as HTMLInputElement;
-                  handleUserMessage(target.value);
-                  target.value = '';
-                }
-              }}
-            />
+            <div className="flex gap-2">
+              <Textarea 
+                placeholder="Type your response..." 
+                className="resize-none"
+                disabled={isProcessing}
+                value={userMessage}
+                onChange={(e) => setUserMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleUserMessage();
+                  }
+                }}
+              />
+              <Button 
+                onClick={handleUserMessage} 
+                disabled={isProcessing || !userMessage.trim()}
+              >
+                Send
+              </Button>
+            </div>
+            
             {conversationMessages.length >= 6 && (
               <div className="mt-4 flex justify-between">
                 <Button variant="outline" onClick={reset}>

@@ -1,26 +1,23 @@
+
 import React from 'react';
-import { Dashboard } from '@/pages/admin/Dashboard';
-import { Users } from '@/pages/admin/Users';
-import { Configuration } from '@/pages/admin/Configuration';
-import { Security } from '@/pages/admin/Security';
 import AIConfiguration from '@/pages/admin/AIConfiguration';
 
 export const adminRoutes = [
   {
     path: 'admin/dashboard',
-    element: React.createElement(Dashboard)
+    element: React.createElement(() => <div>Dashboard</div>)
   },
   {
     path: 'admin/users',
-    element: React.createElement(Users)
+    element: React.createElement(() => <div>Users</div>)
   },
   {
     path: 'admin/configuration',
-    element: React.createElement(Configuration)
+    element: React.createElement(() => <div>Configuration</div>)
   },
   {
     path: 'admin/security',
-    element: React.createElement(Security)
+    element: React.createElement(() => <div>Security</div>)
   },
   {
     path: 'admin/ai-configuration',
