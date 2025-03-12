@@ -34,13 +34,13 @@ export const navigationItems: NavigationItem[] = [
     description: "Overview of the system"
   },
   {
-    title: "Incidents",
+    title: "Incident Management",
     href: "/incidents",
     icon: AlertCircle,
     description: "Manage system incidents"
   },
   {
-    title: "Service Requests",
+    title: "Service Request Management",
     href: "/service-requests",
     icon: ClipboardCheck,
     description: "Manage service requests"
@@ -136,3 +136,4 @@ export const navigationItems: NavigationItem[] = [
     description: "Preview and test the end user portal experience"
   }
 ];
+
