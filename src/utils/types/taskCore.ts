@@ -8,7 +8,7 @@ export interface ChecklistItem {
   id: string;
   text: string;
   completed: boolean;
-  createdAt?: string; // Make this optional to prevent errors
+  createdAt?: string; // Make this a string to prevent type errors
   completedAt?: string;
 }
 

@@ -42,7 +42,7 @@ const AttachmentsSection: React.FC<AttachmentsSectionProps> = ({
         type: file.type, // Use the correct property name
         fileType: file.type, // Also set fileType for backward compatibility
         size: file.size,
-        uploadedAt: new Date().toISOString(), // Convert Date to string
+        uploadedAt: new Date().toISOString(), // Convert Date to string to match Task interface
         uploadedBy: user.id
       };
       

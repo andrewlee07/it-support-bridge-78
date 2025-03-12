@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -23,8 +24,8 @@ const Tasks: React.FC = () => {
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<TaskStatus[]>([]); // Changed from string to TaskStatus[]
-  const [priorityFilter, setPriorityFilter] = useState<TaskPriority[]>([]); // Changed from string to TaskPriority[]
+  const [statusFilter, setStatusFilter] = useState<TaskStatus[]>([]); 
+  const [priorityFilter, setPriorityFilter] = useState<TaskPriority[]>([]);
   const [onlyOverdue, setOnlyOverdue] = useState<boolean>(false);
   const [onlyAssignedToMe, setOnlyAssignedToMe] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<TaskViewType>('grid');
@@ -244,7 +245,6 @@ const Tasks: React.FC = () => {
                 onOverdueChange={setOnlyOverdue}
                 onlyAssignedToMe={onlyAssignedToMe}
                 onAssignedToMeChange={setOnlyAssignedToMe}
-                // New advanced filtering props
                 selectedGoals={selectedGoals}
                 onGoalsChange={setSelectedGoals}
                 finishDateOption={finishDateOption}

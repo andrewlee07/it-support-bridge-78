@@ -1,19 +1,13 @@
 
 import React from 'react';
+import { Search, Filter, Calendar } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { 
-  DropdownMenu, 
-  DropdownMenuTrigger, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuCheckboxItem,
-  DropdownMenuSeparator,
-  DropdownMenuLabel
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Filter, Search, X } from 'lucide-react';
-import { TaskStatus, TaskPriority } from '@/utils/types/taskTypes';
 import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { TaskStatus, TaskPriority } from '@/utils/types/taskTypes';
 
 export interface TaskSearchProps {
   searchQuery: string;
@@ -22,10 +16,17 @@ export interface TaskSearchProps {
   onStatusFilterChange: (statuses: TaskStatus[]) => void;
   priorityFilter: TaskPriority[];
   onPriorityFilterChange: (priorities: TaskPriority[]) => void;
-  placeholder?: string;
-  // For backward compatibility with Tasks.tsx
-  value?: string;
-  onChange?: (value: string) => void;
+  onlyOverdue: boolean;
+  onOverdueChange: (value: boolean) => void;
+  onlyAssignedToMe: boolean;
+  onAssignedToMeChange: (value: boolean) => void;
+  // Advanced filtering props
+  selectedGoals?: string[];
+  onGoalsChange?: (goals: string[]) => void;
+  finishDateOption?: string;
+  onFinishDateOptionChange?: (option: string) => void;
+  customFinishDate?: Date;
+  onCustomFinishDateChange?: (date: Date) => void;
 }
 
 const TaskSearch: React.FC<TaskSearchProps> = ({
@@ -35,19 +36,42 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
   onStatusFilterChange,
   priorityFilter,
   onPriorityFilterChange,
-  placeholder = 'Search tasks...',
-  // Handle backward compatibility
-  value,
-  onChange
+  onlyOverdue,
+  onOverdueChange,
+  onlyAssignedToMe,
+  onAssignedToMeChange,
+  // Advanced filtering props
+  selectedGoals = [],
+  onGoalsChange = () => {},
+  finishDateOption = 'any',
+  onFinishDateOptionChange = () => {},
+  customFinishDate,
+  onCustomFinishDateChange = () => {}
 }) => {
-  // Use the backward compatibility props if provided
-  const effectiveSearchQuery = value !== undefined ? value : searchQuery;
-  const effectiveOnSearchChange = onChange || onSearchChange;
-
   const statusOptions: TaskStatus[] = ['new', 'in-progress', 'on-hold', 'completed', 'cancelled'];
   const priorityOptions: TaskPriority[] = ['critical', 'high', 'medium', 'low'];
+  
+  // Mock goals for the demo
+  const goalOptions = [
+    { id: 'goal-1', name: 'Improve System Reliability' },
+    { id: 'goal-2', name: 'Reduce Support Tickets' },
+    { id: 'goal-3', name: 'Enhance User Experience' },
+    { id: 'goal-4', name: 'Optimize Performance' }
+  ];
+  
+  // Date filter options
+  const dateOptions = [
+    { value: 'any', label: 'Any date' },
+    { value: 'today', label: 'Due today' },
+    { value: 'tomorrow', label: 'Due tomorrow' },
+    { value: 'this-week', label: 'Due this week' },
+    { value: 'this-month', label: 'Due this month' },
+    { value: 'overdue', label: 'Overdue' },
+    { value: 'no-date', label: 'No due date' },
+    { value: 'custom', label: 'Custom date' }
+  ];
 
-  const handleToggleStatus = (status: TaskStatus) => {
+  const handleStatusChange = (status: TaskStatus) => {
     if (statusFilter.includes(status)) {
       onStatusFilterChange(statusFilter.filter(s => s !== status));
     } else {
@@ -55,125 +79,202 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
     }
   };
 
-  const handleTogglePriority = (priority: TaskPriority) => {
+  const handlePriorityChange = (priority: TaskPriority) => {
     if (priorityFilter.includes(priority)) {
       onPriorityFilterChange(priorityFilter.filter(p => p !== priority));
     } else {
       onPriorityFilterChange([...priorityFilter, priority]);
     }
   };
-
-  const handleClearFilters = () => {
-    effectiveOnSearchChange('');
-    onStatusFilterChange([]);
-    onPriorityFilterChange([]);
+  
+  const handleGoalChange = (goalId: string) => {
+    if (selectedGoals.includes(goalId)) {
+      onGoalsChange(selectedGoals.filter(g => g !== goalId));
+    } else {
+      onGoalsChange([...selectedGoals, goalId]);
+    }
+  };
+  
+  const handleDateOptionChange = (option: string) => {
+    onFinishDateOptionChange(option);
+  };
+  
+  const handleCustomDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value ? new Date(e.target.value) : undefined;
+    if (date) {
+      onCustomFinishDateChange(date);
+    }
   };
 
-  const hasFilters = effectiveSearchQuery || statusFilter.length > 0 || priorityFilter.length > 0;
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (statusFilter.length > 0) count++;
+    if (priorityFilter.length > 0) count++;
+    if (onlyOverdue) count++;
+    if (onlyAssignedToMe) count++;
+    if (selectedGoals.length > 0) count++;
+    if (finishDateOption !== 'any') count++;
+    return count;
+  };
 
   return (
-    <div className="w-full max-w-3xl">
+    <div className="space-y-4">
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            type="text"
-            placeholder={placeholder}
-            value={effectiveSearchQuery}
-            onChange={(e) => effectiveOnSearchChange(e.target.value)}
+            type="search"
+            placeholder="Search tasks..."
             className="pl-8"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
           />
-          {effectiveSearchQuery && (
-            <button 
-              onClick={() => effectiveOnSearchChange('')}
-              className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-1">
+        
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="flex gap-2">
               <Filter className="h-4 w-4" />
-              <span className="hidden sm:inline">Filter</span>
-              {(statusFilter.length > 0 || priorityFilter.length > 0) && (
-                <Badge variant="secondary" className="ml-1 h-5 px-1">
-                  {statusFilter.length + priorityFilter.length}
+              Filters
+              {getActiveFilterCount() > 0 && (
+                <Badge variant="secondary" className="ml-1 rounded-full px-2">
+                  {getActiveFilterCount()}
                 </Badge>
               )}
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Status</DropdownMenuLabel>
-            {statusOptions.map(status => (
-              <DropdownMenuCheckboxItem
-                key={status}
-                checked={statusFilter.includes(status)}
-                onCheckedChange={() => handleToggleStatus(status)}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </DropdownMenuCheckboxItem>
-            ))}
-            
-            <DropdownMenuSeparator />
-            
-            <DropdownMenuLabel>Priority</DropdownMenuLabel>
-            {priorityOptions.map(priority => (
-              <DropdownMenuCheckboxItem
-                key={priority}
-                checked={priorityFilter.includes(priority)}
-                onCheckedChange={() => handleTogglePriority(priority)}
-              >
-                {priority.charAt(0).toUpperCase() + priority.slice(1)}
-              </DropdownMenuCheckboxItem>
-            ))}
-            
-            {hasFilters && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleClearFilters} className="text-destructive focus:text-destructive">
-                  Clear filters
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-4" align="end">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Status</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {statusOptions.map((status) => (
+                    <div key={status} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`status-${status}`} 
+                        checked={statusFilter.includes(status)} 
+                        onCheckedChange={() => handleStatusChange(status)}
+                      />
+                      <Label 
+                        htmlFor={`status-${status}`}
+                        className="text-sm capitalize cursor-pointer"
+                      >
+                        {status.replace(/-/g, ' ')}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Priority</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {priorityOptions.map((priority) => (
+                    <div key={priority} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`priority-${priority}`} 
+                        checked={priorityFilter.includes(priority)} 
+                        onCheckedChange={() => handlePriorityChange(priority)}
+                      />
+                      <Label 
+                        htmlFor={`priority-${priority}`}
+                        className="text-sm capitalize cursor-pointer"
+                      >
+                        {priority}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Assigned to</h4>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="assigned-to-me" 
+                    checked={onlyAssignedToMe} 
+                    onCheckedChange={(checked) => onAssignedToMeChange(checked === true)}
+                  />
+                  <Label 
+                    htmlFor="assigned-to-me"
+                    className="text-sm cursor-pointer"
+                  >
+                    Only assigned to me
+                  </Label>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Task status</h4>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="overdue" 
+                    checked={onlyOverdue} 
+                    onCheckedChange={(checked) => onOverdueChange(checked === true)}
+                  />
+                  <Label 
+                    htmlFor="overdue"
+                    className="text-sm cursor-pointer"
+                  >
+                    Show only overdue tasks
+                  </Label>
+                </div>
+              </div>
+              
+              {/* Advanced Filters */}
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Goals</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {goalOptions.map((goal) => (
+                    <div key={goal.id} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`goal-${goal.id}`} 
+                        checked={selectedGoals.includes(goal.id)} 
+                        onCheckedChange={() => handleGoalChange(goal.id)}
+                      />
+                      <Label 
+                        htmlFor={`goal-${goal.id}`}
+                        className="text-sm cursor-pointer"
+                      >
+                        {goal.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Due date</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  <select 
+                    className="w-full p-2 text-sm border rounded-md"
+                    value={finishDateOption}
+                    onChange={(e) => handleDateOptionChange(e.target.value)}
+                  >
+                    {dateOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  {finishDateOption === 'custom' && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <input 
+                        type="date" 
+                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                        value={customFinishDate ? customFinishDate.toISOString().split('T')[0] : ''}
+                        onChange={handleCustomDateChange}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
-
-      {hasFilters && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {statusFilter.map(status => (
-            <Badge key={status} variant="secondary" className="gap-1">
-              {status}
-              <button onClick={() => handleToggleStatus(status)} className="ml-1">
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-          
-          {priorityFilter.map(priority => (
-            <Badge key={priority} variant="secondary" className="gap-1">
-              {priority}
-              <button onClick={() => handleTogglePriority(priority)} className="ml-1">
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
-          
-          {hasFilters && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleClearFilters} 
-              className="h-6 px-2 text-xs"
-            >
-              Clear all
-            </Button>
-          )}
-        </div>
-      )}
     </div>
   );
 };

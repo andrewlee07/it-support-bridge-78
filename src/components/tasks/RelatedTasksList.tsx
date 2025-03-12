@@ -1,190 +1,140 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { fetchTasks } from '@/utils/api/taskApi';
+import { Empty, Link, Plus } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Task } from '@/utils/types/taskTypes';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle, Calendar, Clock, Link, Plus } from 'lucide-react';
-import { format } from 'date-fns';
-import LinkTaskDialog from './LinkTaskDialog';
+import { LinkTaskDialog } from './LinkTaskDialog';
+import { useAuth } from '@/contexts/AuthContext';
+import { createTask } from '@/utils/api/taskApi';
+import { v4 as uuidv4 } from 'uuid';
 
 interface RelatedTasksListProps {
-  relatedItemType: 'incident' | 'service-request' | 'problem';
-  relatedItemId: string;
+  tasks: Task[];
+  itemId?: string;
+  itemType?: 'incident' | 'service-request' | 'task';
+  onTaskAdded?: (task: Task) => void;
+  title?: string;
 }
 
-const RelatedTasksList: React.FC<RelatedTasksListProps> = ({
-  relatedItemType,
-  relatedItemId
+export const RelatedTasksList: React.FC<RelatedTasksListProps> = ({
+  tasks,
+  itemId,
+  itemType,
+  onTaskAdded,
+  title = 'Related Tasks'
 }) => {
-  const navigate = useNavigate();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const [relatedTasks, setRelatedTasks] = useState<Task[]>(tasks || []);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
 
   useEffect(() => {
-    const loadRelatedTasks = async () => {
-      try {
-        setLoading(true);
-        // This would ideally filter by relatedItemId and relatedItemType in a real API
-        const response = await fetchTasks();
-        const relatedTasks = response.data.filter(task => 
-          task.relatedItemId === relatedItemId && 
-          task.relatedItemType === relatedItemType
-        );
-        setTasks(relatedTasks);
-      } catch (error) {
-        console.error('Error loading related tasks:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadRelatedTasks();
-  }, [relatedItemId, relatedItemType]);
+    setRelatedTasks(tasks || []);
+  }, [tasks]);
 
-  const handleTaskCreated = (taskId: string) => {
-    // Refresh the task list
-    setTasks(prevTasks => [...prevTasks, {
-      id: taskId,
-      title: 'New Task', // This is a placeholder - in real world, you'd fetch the task details
-      description: '',
-      status: 'new',
-      priority: 'medium',
-      creator: '',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      relatedItemId,
-      relatedItemType: relatedItemType as 'incident' | 'service-request' | 'task'
-    }]);
+  const handleAddTask = async () => {
+    if (!itemId || !itemType || !user) return;
+
+    // Create a new task with this item as the related item
+    try {
+      const now = new Date().toISOString(); // Convert to string to match Task interface
+      const result = await createTask({
+        title: `New task for ${itemType} ${itemId}`,
+        description: `Task created from ${itemType} ${itemId}`,
+        status: 'new',
+        priority: 'medium',
+        creator: user.id,
+        createdAt: now, // Send as string
+        updatedAt: now, // Send as string
+        relatedItemId: itemId,
+        relatedItemType: itemType
+      });
+
+      if (result.success) {
+        // Use type assertion to ensure the new task conforms to Task type
+        setRelatedTasks(prevTasks => [...prevTasks, result.data as Task]);
+        
+        if (onTaskAdded) {
+          onTaskAdded(result.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error creating related task:', error);
+    }
   };
-  
-  if (loading) {
-    return (
-      <div className="space-y-3">
-        <div className="flex justify-between">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-9 w-24" />
-        </div>
-        {[1, 2].map((_, i) => (
-          <Card key={i} className="p-4">
-            <Skeleton className="h-5 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/2 mb-3" />
-            <div className="flex justify-between items-center">
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-  
+
+  const handleLinkTask = (selectedTask: Task) => {
+    setRelatedTasks(prev => [...prev, selectedTask]);
+    if (onTaskAdded) {
+      onTaskAdded(selectedTask);
+    }
+    setIsLinkDialogOpen(false);
+  };
+
   return (
-    <div className="space-y-3">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Related Tasks</h3>
-        <div className="flex gap-2">
+    <Card className="w-full">
+      <CardHeader className="flex flex-row items-center justify-between py-4">
+        <CardTitle className="text-lg font-medium">{title}</CardTitle>
+        <div className="flex space-x-2">
           <Button 
-            size="sm"
+            size="sm" 
             variant="outline" 
             onClick={() => setIsLinkDialogOpen(true)}
           >
-            <Link className="mr-2 h-4 w-4" />
-            Link Task
+            <Link className="h-4 w-4 mr-2" />
+            Link Existing
           </Button>
           <Button 
-            size="sm"
-            onClick={() => navigate('/tasks/create', { 
-              state: { 
-                relatedItemType,
-                relatedItemId
-              } 
-            })}
+            size="sm" 
+            variant="default" 
+            onClick={handleAddTask}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="h-4 w-4 mr-2" />
             New Task
           </Button>
         </div>
-      </div>
-      
-      {tasks.length === 0 ? (
-        <Card className="p-4 text-center">
-          <p className="text-muted-foreground">No tasks are linked to this {relatedItemType.replace('-', ' ')} yet.</p>
-          <Button 
-            size="sm" 
-            className="mt-2"
-            onClick={() => navigate('/tasks/create', { 
-              state: { 
-                relatedItemType,
-                relatedItemId
-              } 
-            })}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Create a Task
-          </Button>
-        </Card>
-      ) : (
-        <div className="space-y-2">
-          {tasks.map(task => (
-            <Card 
-              key={task.id} 
-              className="p-4 hover:bg-muted/50 cursor-pointer transition-colors"
-              onClick={() => navigate(`/tasks/${task.id}`)}
-            >
-              <div className="flex justify-between items-start">
+      </CardHeader>
+      <CardContent>
+        {relatedTasks.length > 0 ? (
+          <div className="space-y-2">
+            {relatedTasks.map((task) => (
+              <div 
+                key={task.id} 
+                className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors"
+              >
                 <div>
                   <h4 className="font-medium">{task.title}</h4>
-                  {task.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-1 mt-1 mb-2">
-                      {task.description}
-                    </p>
-                  )}
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                    <span className="capitalize">{task.status}</span>
+                    <span>•</span>
+                    <span className="capitalize">{task.priority}</span>
+                  </div>
                 </div>
-                <Badge variant="outline" className="capitalize">
-                  {task.status.replace('-', ' ')}
-                </Badge>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  asChild
+                >
+                  <a href={`/tasks/${task.id}`}>View</a>
+                </Button>
               </div>
-              
-              <div className="flex justify-between items-center mt-2">
-                <Badge className={`
-                  ${task.priority === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : ''}
-                  ${task.priority === 'high' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' : ''}
-                  ${task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : ''}
-                  ${task.priority === 'low' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : ''}
-                `}>
-                  {task.priority}
-                </Badge>
-                {task.dueDate && (
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <Calendar className="h-3.5 w-3.5 mr-1" />
-                    {format(new Date(task.dueDate), 'MMM d, yyyy')}
-                  </div>
-                )}
-                {task.assignee && (
-                  <div className="text-xs bg-muted px-2 py-0.5 rounded">
-                    Assigned to: {task.assignee}
-                  </div>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+            <Empty className="h-12 w-12 mb-2 text-muted-foreground/50" />
+            <h3 className="font-medium">No related tasks</h3>
+            <p className="text-sm mt-1">Create or link tasks to this {itemType}</p>
+          </div>
+        )}
+      </CardContent>
       
-      <LinkTaskDialog
-        open={isLinkDialogOpen}
+      <LinkTaskDialog 
+        open={isLinkDialogOpen} 
         onOpenChange={setIsLinkDialogOpen}
-        sourceType={relatedItemType}
-        sourceId={relatedItemId}
-        onTaskLinked={handleTaskCreated}
+        onTaskSelect={handleLinkTask}
+        excludeTaskIds={relatedTasks.map(t => t.id)}
       />
-    </div>
+    </Card>
   );
 };
-
-export default RelatedTasksList;

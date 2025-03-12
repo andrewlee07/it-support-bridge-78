@@ -1,51 +1,63 @@
 
 import { TaskPriority } from '../types/taskCore';
 
+// Priority helpers
+export function getPriorityName(priority: TaskPriority): string {
+  switch (priority) {
+    case 'critical':
+      return 'Critical';
+    case 'high':
+      return 'High';
+    case 'medium':
+      return 'Medium';
+    case 'low':
+      return 'Low';
+    default:
+      return 'Unknown';
+  }
+}
+
 export function getPriorityColor(priority: TaskPriority): string {
   switch (priority) {
     case 'critical':
-      return 'bg-red-500';
+      return 'red';
     case 'high':
-      return 'bg-orange-500';
+      return 'orange';
     case 'medium':
-      return 'bg-blue-500';
+      return 'blue';
     case 'low':
-      return 'bg-green-500';
+      return 'green';
     default:
-      return 'bg-gray-500';
+      return 'gray';
   }
 }
 
-export function getPriorityTextColor(priority: TaskPriority): string {
+export function getPriorityIcon(priority: TaskPriority): string {
   switch (priority) {
     case 'critical':
-      return 'text-red-700';
+      return 'alert-triangle';
     case 'high':
-      return 'text-orange-700';
+      return 'arrow-up';
     case 'medium':
-      return 'text-blue-700';
+      return 'minus';
     case 'low':
-      return 'text-green-700';
+      return 'arrow-down';
     default:
-      return 'text-gray-700';
+      return 'help-circle';
   }
 }
 
-export function getPriorityBgLightColor(priority: TaskPriority): string {
+export function getPriorityValue(priority: TaskPriority): number {
   switch (priority) {
     case 'critical':
-      return 'bg-red-100';
+      return 4;
     case 'high':
-      return 'bg-orange-100';
+      return 3;
     case 'medium':
-      return 'bg-blue-100';
+      return 2;
     case 'low':
-      return 'bg-green-100';
+      return 1;
     default:
-      return 'bg-gray-100';
+      return 0;
   }
-}
-
-export function getPriorityDisplayName(priority: TaskPriority): string {
-  return priority.charAt(0).toUpperCase() + priority.slice(1);
 }
