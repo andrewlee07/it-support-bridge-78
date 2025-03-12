@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Dialog, 
@@ -17,7 +16,7 @@ import * as XLSX from 'xlsx';
 import { useToast } from '@/hooks/use-toast';
 import { Group } from '@/utils/types/group';
 import { UserRole } from '@/utils/types/user';
-import { createAuditEntry } from '@/utils/auditUtils';
+import { logBulkRoleAssignments, addPermissionAuditEntry } from '@/utils/permissionAuditUtils';
 
 // Sample data structure for the Excel template
 const SAMPLE_DATA = [
@@ -164,18 +163,17 @@ const BulkRoleAssignmentDialog: React.FC<BulkRoleAssignmentDialogProps> = ({
     // Process the valid assignments
     onAssignRoles(validAssignments);
     
-    // Log the audit entries for each assignment
-    validAssignments.forEach(({ groupId, roleId }) => {
-      const groupName = groups.find(g => g.id === groupId)?.name || 'Unknown Group';
-      const roleName = availableRoles.find(r => r.id === roleId)?.name || 'Unknown Role';
-      
-      // Create audit entry
-      createAuditEntry(
-        groupId, 
-        'group', 
-        `Bulk assigned role: ${roleName} to group: ${groupName}`, 
-        'system' // This would typically be the current user's ID
-      );
+    // Create audit logs for all assignments using the dedicated function
+    const auditEntries = logBulkRoleAssignments(
+      validAssignments,
+      groups,
+      availableRoles,
+      'system' // This would typically be the current user's ID
+    );
+    
+    // Add all audit entries to the log
+    auditEntries.forEach(entry => {
+      addPermissionAuditEntry(entry);
     });
     
     toast({
