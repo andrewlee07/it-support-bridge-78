@@ -33,7 +33,7 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive, collapsed }) => {
       )}
     >
       {IconComponent && <IconComponent className={cn("h-5 w-5 flex-shrink-0", collapsed && "h-5 w-5")} />}
-      {!collapsed && <span>{item.name}</span>}
+      {!collapsed && <span>{item.name || item.title}</span>}
     </Link>
   );
 };

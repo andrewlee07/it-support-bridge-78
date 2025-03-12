@@ -46,6 +46,9 @@ const ChecklistSection: React.FC<ChecklistSectionProps> = ({
                 onCheckedChange={(checked) => {
                   const newChecklist = [...checklist];
                   newChecklist[index].completed = checked as boolean;
+                  // Also update content and status for compatibility with task types
+                  newChecklist[index].content = newChecklist[index].text;
+                  newChecklist[index].status = checked ? 'completed' : 'pending';
                   form.setValue('checklist', newChecklist);
                 }}
               />
@@ -54,6 +57,8 @@ const ChecklistSection: React.FC<ChecklistSectionProps> = ({
                 onChange={(e) => {
                   const newChecklist = [...checklist];
                   newChecklist[index].text = e.target.value;
+                  // Also update content for compatibility with task types
+                  newChecklist[index].content = e.target.value;
                   form.setValue('checklist', newChecklist);
                 }}
                 className="flex-1"

@@ -1,4 +1,3 @@
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -27,6 +26,9 @@ export const taskFormSchema = z.object({
     id: z.string(),
     text: z.string(),
     completed: z.boolean(),
+    // Add these for compatibility
+    content: z.string().optional(),
+    status: z.string().optional(),
   })).optional(),
   isTemplate: z.boolean().optional(),
   templateId: z.string().optional(),
@@ -55,14 +57,18 @@ export const useTaskForm = ({
     if (initialData?.checklist) {
       return initialData.checklist.map(item => ({
         id: item.id,
-        text: item.text,
-        completed: item.completed
+        text: item.text || item.content || '',
+        completed: item.completed || (item.status === 'completed'),
+        content: item.content || item.text || '',
+        status: item.status || (item.completed ? 'completed' : 'pending')
       }));
     } else if (templateData?.checklist) {
       return templateData.checklist.map(item => ({
         id: uuidv4(),
-        text: item.text,
-        completed: false
+        text: item.text || item.content || '',
+        completed: false,
+        content: item.content || item.text || '',
+        status: 'pending'
       }));
     }
     return [];
@@ -126,7 +132,13 @@ export const useTaskForm = ({
     const currentChecklist = form.getValues('checklist') || [];
     form.setValue('checklist', [
       ...currentChecklist,
-      { id: uuidv4(), text: '', completed: false }
+      { 
+        id: uuidv4(), 
+        text: '', 
+        completed: false,
+        content: '',
+        status: 'pending'
+      }
     ]);
   };
 
@@ -154,7 +166,9 @@ export const useTaskForm = ({
       const checklist: ChecklistItem[] = values.checklist?.map(item => ({
         id: item.id,
         text: item.text,
+        content: item.text, // Ensure content is always set
         completed: item.completed,
+        status: item.completed ? 'completed' : 'pending', // Ensure status is always set
         createdAt: new Date().toISOString(), // Convert Date to string
         completedAt: item.completed ? new Date().toISOString() : undefined, // Convert Date to string if available
       })) || [];
@@ -218,7 +232,7 @@ export const useTaskForm = ({
       const currentChecklist = form.getValues('checklist') || [];
       form.setValue('checklist', [
         ...currentChecklist,
-        { id: uuidv4(), text: '', completed: false }
+        { id: uuidv4(), text: '', completed: false, content: '', status: 'pending' }
       ]);
     },
     removeChecklistItem: (id: string) => {

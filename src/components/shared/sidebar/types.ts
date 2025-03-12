@@ -2,13 +2,15 @@
 import { ReactNode } from 'react';
 
 export interface NavigationItem {
-  name: string;
-  href?: string;
-  path?: string;
+  title: string;
+  href: string;
   icon: React.ElementType;
+  items?: NavigationItem[];
+  description?: string;
+  path?: string;
+  name?: string;
   collapsed?: boolean;
   allowedRoles?: string[];
-  items?: NavigationItem[];
 }
 
 export interface NavItem {

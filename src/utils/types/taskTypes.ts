@@ -70,6 +70,9 @@ export interface Task {
   labels?: TaskLabel[];
   checklist?: ChecklistItem[];
   dependencies?: TaskDependency[];
+  // For compatibility with taskCore
+  dependsOn?: string[];
+  blockedBy?: string[];
   parentTaskId?: string;
   sprint?: string;
   estimate?: number;
@@ -89,8 +92,6 @@ export interface Task {
   estimatedHours?: number;
   isTemplate?: boolean;
   templateName?: string;
-  dependsOn?: string[];
-  blockedBy?: string[];
   notes?: any[];
 }
 

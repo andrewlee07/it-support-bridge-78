@@ -58,10 +58,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
   };
   
   // Function to check if user has permission for the menu item
-  const hasPermission = (allowedRoles: string[] = []): boolean => {
+  const hasPermission = (item: any): boolean => {
     if (!user) return false;
-    if (allowedRoles.length === 0) return true; // If no roles specified, allow access
-    return allowedRoles.includes(user.role);
+    if (!item.allowedRoles || item.allowedRoles.length === 0) return true; // If no roles specified, allow access
+    return item.allowedRoles.includes(user.role);
   };
 
   return (
@@ -97,11 +97,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
         <div className="space-y-1 px-3 overflow-y-auto flex-grow">
           {navigationItems.map((item) => (
             // Only render if user has permission
-            hasPermission(item.allowedRoles || []) && (
+            hasPermission(item) && (
               <NavLink 
-                key={item.path || item.name} 
-                item={item} 
-                isActive={isActiveRoute(item.path)}
+                key={item.href || item.title} 
+                item={{
+                  ...item,
+                  // Ensure the item has the name property required by NavLink
+                  name: item.title,
+                  path: item.href
+                }}
+                isActive={isActiveRoute(item.href)}
                 collapsed={collapsed} 
               />
             )

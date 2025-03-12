@@ -10,6 +10,9 @@ export interface ChecklistItem {
   completed: boolean;
   createdAt?: string; // Make this a string to prevent type errors
   completedAt?: string;
+  // Add these fields for compatibility with taskTypes.ts
+  content?: string;
+  status?: string;
 }
 
 export interface TaskAttachment {
@@ -50,7 +53,7 @@ export interface Task {
   checklist?: ChecklistItem[];
   attachments?: TaskAttachment[];
   parentTaskId?: string;
-  dependencies?: string[];
+  dependencies?: string[] | any[]; // Allow both string[] and TaskDependency[]
   dependsOn?: string[]; // Added for backward compatibility
   blockedBy?: string[]; // Added for backward compatibility
   estimatedHours?: number;
