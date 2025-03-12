@@ -5,6 +5,8 @@ import Dashboard from '@/pages/Dashboard';
 import ErrorPage from '@/pages/ErrorPage';
 import NotFound from '@/pages/NotFound';
 import EndUserPortal from '@/pages/EndUserPortal';
+import PortalIncidentForm from '@/pages/PortalIncidentForm';
+import PortalServiceRequestForm from '@/pages/PortalServiceRequestForm';
 import AnnouncementsPage from '@/pages/AnnouncementsPage';
 import Reports from '@/pages/Reports';
 import Calendar from '@/pages/Calendar';
@@ -30,6 +32,14 @@ export const miscRoutes = [
   {
     path: '/portal',
     element: React.createElement(EndUserPortal)
+  },
+  {
+    path: '/portal/incident',
+    element: React.createElement(PortalIncidentForm)
+  },
+  {
+    path: '/portal/service-request',
+    element: React.createElement(PortalServiceRequestForm)
   },
   {
     path: '/announcements',

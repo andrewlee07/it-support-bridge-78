@@ -7,11 +7,12 @@ interface PortalCardProps {
   description: string;
   icon: React.ReactNode;
   to: string;
+  onClick?: () => void;
 }
 
-const PortalCard: React.FC<PortalCardProps> = ({ title, description, icon, to }) => {
+const PortalCard: React.FC<PortalCardProps> = ({ title, description, icon, to, onClick }) => {
   return (
-    <Link to={to} className="block">
+    <Link to={to} className="block" onClick={onClick}>
       <div className="rounded-lg border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md hover:border-primary/30 p-6">
         <div className="flex flex-col items-center text-center">
           <div className="mb-4">

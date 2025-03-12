@@ -9,6 +9,7 @@ import PortalCard from '@/components/portal/PortalCard';
 import StatusWidget from '@/components/portal/StatusWidget';
 import ArticleItem from '@/components/portal/ArticleItem';
 import IncidentItem from '@/components/portal/IncidentItem';
+import ServiceRequestItem from '@/components/portal/ServiceRequestItem';
 import PortalHeader from '@/components/portal/PortalHeader';
 
 const EndUserPortal: React.FC = () => {
@@ -63,7 +64,7 @@ const EndUserPortal: React.FC = () => {
             title="Request Something" 
             icon={<CheckCircle className="h-10 w-10 text-primary" />}
             description="Browse the catalog for services and items you need"
-            to="/service-catalog"
+            to="/portal/service-request"
           />
 
           {/* Knowledge Base */}
@@ -79,7 +80,7 @@ const EndUserPortal: React.FC = () => {
             title="Get Help" 
             icon={<HelpCircle className="h-10 w-10 text-primary" />}
             description="Contact support to make a request, or report a problem"
-            to="/tickets/new"
+            to="/portal/incident"
           />
 
           {/* Community */}
@@ -176,6 +177,43 @@ const EndUserPortal: React.FC = () => {
                 date="11/24/2023"
                 time="4 hours ago"
                 id="INC0000126"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* My Service Requests Section */}
+        <div className="grid grid-cols-1 mt-8">
+          <div className="card p-5 border rounded-lg shadow-sm">
+            <h3 className="text-lg font-medium mb-4">My Requests</h3>
+            <div className="space-y-4">
+              <ServiceRequestItem 
+                title="New laptop request"
+                date="11/20/2023"
+                time="5 days ago"
+                id="SR0000100"
+                status="in-progress"
+              />
+              <ServiceRequestItem 
+                title="Access to financial system"
+                date="11/15/2023"
+                time="1 week ago"
+                id="SR0000095"
+                status="fulfilled"
+              />
+              <ServiceRequestItem 
+                title="Microsoft Office installation"
+                date="11/24/2023"
+                time="3 hours ago"
+                id="SR0000127"
+                status="open"
+              />
+              <ServiceRequestItem 
+                title="New mobile phone request"
+                date="11/23/2023"
+                time="1 day ago"
+                id="SR0000126"
+                status="pending"
               />
             </div>
           </div>
