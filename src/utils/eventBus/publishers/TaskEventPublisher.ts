@@ -1,6 +1,7 @@
 
-import { TaskEventData } from '../types/eventBus/taskEventTypes';
 import EventBus from '../EventBus';
+import { TaskEventData } from '@/utils/types/eventBus';
+import { EventType } from '@/utils/types/eventBus';
 
 /**
  * Utility class for publishing task-related events to the EventBus
@@ -23,7 +24,7 @@ export class TaskEventPublisher {
 
     // Get the instance of EventBus and publish the event
     EventBus.getInstance().publish(
-      'task-created',
+      'task.created' as EventType,
       'task-management',
       eventData,
       {
@@ -54,7 +55,7 @@ export class TaskEventPublisher {
     };
 
     EventBus.getInstance().publish(
-      'task-updated',
+      'task.updated' as EventType,
       'task-management',
       eventData,
       {
@@ -85,7 +86,7 @@ export class TaskEventPublisher {
     };
 
     EventBus.getInstance().publish(
-      'task-status-changed',
+      'task.statusChanged' as EventType,
       'task-management',
       eventData,
       {
@@ -115,7 +116,7 @@ export class TaskEventPublisher {
     };
 
     EventBus.getInstance().publish(
-      'task-assigned',
+      'task.assigned' as EventType,
       'task-management',
       eventData,
       {
@@ -145,7 +146,7 @@ export class TaskEventPublisher {
     };
 
     EventBus.getInstance().publish(
-      'task-completed',
+      'task.completed' as EventType,
       'task-management',
       eventData,
       {
@@ -176,7 +177,7 @@ export class TaskEventPublisher {
     };
 
     EventBus.getInstance().publish(
-      'task-overdue',
+      'task.overdue' as EventType,
       'task-management',
       eventData,
       {
@@ -199,13 +200,13 @@ export class TaskEventPublisher {
     const eventData: TaskEventData = {
       taskId,
       title,
-      status: 'deleted',
-      priority: 'n/a',
+      status: 'deleted' as any,
+      priority: 'n/a' as any,
       createdBy: deletedBy
     };
 
     EventBus.getInstance().publish(
-      'task-deleted',
+      'task.deleted' as EventType,
       'task-management',
       eventData,
       {
