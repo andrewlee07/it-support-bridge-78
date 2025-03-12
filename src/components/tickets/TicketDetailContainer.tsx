@@ -13,6 +13,8 @@ import ReopenDialog from './detail/ReopenDialog';
 import ReminderDialog from './detail/ReminderDialog';
 import { Button } from '@/components/ui/button';
 import { AlarmClock } from 'lucide-react';
+import { Task } from '@/utils/types/taskTypes';
+import { toast } from 'sonner';
 
 interface TicketDetailContainerProps {
   ticket: Ticket;
@@ -47,7 +49,11 @@ const TicketDetailContainer: React.FC<TicketDetailContainerProps> = ({
     handleReopenSubmit
   } = useTicketDetailState();
 
-  const { handleCreateBug, handleCreateBacklogItem } = useRelatedItemCreation({
+  const { 
+    handleCreateBug, 
+    handleCreateBacklogItem,
+    handleCreateTask 
+  } = useRelatedItemCreation({
     ticket,
     onAddNote,
     onUpdate: onUpdate || onUpdateTicket
@@ -110,6 +116,7 @@ const TicketDetailContainer: React.FC<TicketDetailContainerProps> = ({
           onTabChange={setActiveTab}
           onCreateBug={handleCreateBug}
           onCreateBacklogItem={handleCreateBacklogItem}
+          onCreateTask={handleCreateTask}
         />
       </Tabs>
 

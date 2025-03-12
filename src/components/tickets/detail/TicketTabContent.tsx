@@ -9,8 +9,10 @@ import TicketCloseForm, { CloseTicketValues } from '../TicketCloseForm';
 import NoteTab from './NoteTab';
 import BugCreationForm from '@/components/test-management/forms/BugCreationForm';
 import BacklogItemForm from '@/components/backlog/BacklogItemForm';
+import CreateTaskTab from './CreateTaskTab';
 import { Bug } from '@/utils/types/test';
 import { BacklogItem } from '@/utils/types/backlogTypes';
+import { Task } from '@/utils/types/taskTypes';
 
 interface TicketTabContentProps {
   activeTab: string;
@@ -23,6 +25,7 @@ interface TicketTabContentProps {
   onTabChange: (value: string) => void;
   onCreateBug?: (data: any) => void;
   onCreateBacklogItem?: (data: BacklogItem) => void;
+  onCreateTask?: (task: Task) => void;
 }
 
 const TicketTabContent: React.FC<TicketTabContentProps> = ({
@@ -35,7 +38,8 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
   onDetailsTabReopen,
   onTabChange,
   onCreateBug,
-  onCreateBacklogItem
+  onCreateBacklogItem,
+  onCreateTask
 }) => {
   const isServiceRequest = type === 'service';
   const resolveTabLabel = isServiceRequest ? 'fulfill' : 'resolve';
@@ -52,6 +56,17 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
   const handleBacklogItemSubmit = (item: BacklogItem) => {
     if (onCreateBacklogItem) {
       onCreateBacklogItem(item);
+      onTabChange('details');
+    }
+  };
+
+  // Function to handle task creation
+  const handleTaskCreated = (task: Task) => {
+    if (onCreateTask) {
+      onCreateTask(task);
+      onTabChange('details');
+    } else {
+      // If no handler provided, still return to details tab
       onTabChange('details');
     }
   };
@@ -109,6 +124,15 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
       {/* Add Note Tab */}
       <TabsContent value="notes" className="h-full">
         <NoteTab onAddNote={onAddNote} />
+      </TabsContent>
+
+      {/* Create Task Tab */}
+      <TabsContent value="create-task" className="h-full">
+        <CreateTaskTab 
+          ticket={ticket}
+          onTaskCreated={handleTaskCreated}
+          onCancel={() => onTabChange('details')}
+        />
       </TabsContent>
 
       {/* Create Bug Tab (for Incidents) */}

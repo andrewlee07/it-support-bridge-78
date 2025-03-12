@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Bug, ListTodo } from 'lucide-react';
+import { PlusCircle, Bug, ListTodo, ClipboardList } from 'lucide-react';
 
 interface TicketTabsProps {
   activeTab: string;
@@ -27,6 +27,10 @@ const TicketTabs: React.FC<TicketTabsProps> = ({
           <TabsTrigger value="update">Update</TabsTrigger>
           <TabsTrigger value={resolveTabLabel}>{isServiceRequest ? 'Fulfill' : 'Resolve'}</TabsTrigger>
           <TabsTrigger value="notes">Add Note</TabsTrigger>
+          <TabsTrigger value="create-task" className="flex items-center">
+            <ClipboardList className="w-4 h-4 mr-1" />
+            Create Task
+          </TabsTrigger>
           {isServiceRequest ? (
             <TabsTrigger value="create-backlog" className="flex items-center">
               <ListTodo className="w-4 h-4 mr-1" />

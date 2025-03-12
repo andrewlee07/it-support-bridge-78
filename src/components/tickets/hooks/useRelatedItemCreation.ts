@@ -1,7 +1,10 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Ticket, RelatedItem } from '@/utils/types/ticket';
 import { BacklogItem } from '@/utils/types/backlogTypes';
+import { Task } from '@/utils/types/taskTypes';
+import { createTask } from '@/utils/api/taskApi';
 import { createBugFromTestExecution } from '@/utils/api/testBacklogIntegrationApi';
 
 interface UseRelatedItemCreationProps {
@@ -99,8 +102,53 @@ export const useRelatedItemCreation = ({
     }
   };
 
+  // Handle task creation from ticket
+  const handleCreateTask = async (task: Task) => {
+    try {
+      // Create task with prefilled data
+      const response = await createTask({
+        ...task,
+        creator: 'user-1', // In a real app, this would be the current user
+      });
+      
+      if (response && response.data) {
+        toast.success('Task created successfully');
+        
+        // Add a note to the ticket about the task creation
+        if (onAddNote) {
+          onAddNote(`Created task: ${response.data.title} (${response.data.id}) from this ${ticket.type}`);
+        }
+        
+        // Add the task to related items
+        if (onUpdate) {
+          const relatedItem: RelatedItem = {
+            id: response.data.id,
+            type: 'task',
+            status: response.data.status,
+            title: response.data.title,
+            createdAt: new Date()
+          };
+          
+          // Update the ticket's related items
+          const updatedRelatedItems = [...(ticket.relatedItems || []), relatedItem];
+          
+          onUpdate({
+            status: ticket.status as any,
+            assignedTo: ticket.assignedTo || '',
+            notes: `Added task ${response.data.id} to related items`,
+            _relatedItems: updatedRelatedItems
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error creating task:', error);
+      toast.error('Failed to create task');
+    }
+  };
+
   return {
     handleCreateBug,
-    handleCreateBacklogItem
+    handleCreateBacklogItem,
+    handleCreateTask
   };
 };
