@@ -17,6 +17,7 @@ import { getReleases } from '@/utils/api/release';
 import { Paperclip, MessageSquare, History, Users, Clock } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Import refactored components
 import AttachmentList from './attachments/AttachmentList';
@@ -40,6 +41,7 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   onDelete,
   onUpdate
 }) => {
+  const { user } = useAuth();
   const [releaseName, setReleaseName] = useState<string>('None');
   const [activeTab, setActiveTab] = useState<string>('details');
   
@@ -167,14 +169,13 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   
   // Handlers for comments
   const handleAddComment = (content: string, parentId?: string) => {
-    if (!item.creator) return;
+    if (!user) return;
     
-    const { user } = require('@/contexts/AuthContext');
     const newComment: Comment = {
       id: uuidv4(),
       content: content,
       text: content, // Set both for compatibility
-      author: user?.id,
+      author: user.id,
       createdAt: new Date(),
       parentId
     };
@@ -218,7 +219,6 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   
   // Handlers for watchers
   const handleToggleWatch = (isWatching: boolean) => {
-    const { user } = require('@/contexts/AuthContext');
     if (!user) return;
     
     let updatedWatchers;
@@ -271,7 +271,6 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   };
   
   const updateItemWithHistory = (field: string, previousValue: any, newValue: any) => {
-    const { user } = require('@/contexts/AuthContext');
     if (!user || !onUpdate) return;
     
     const historyEntry = {
@@ -302,8 +301,6 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   };
   
   // Check if current user is watching
-  const { useAuth } = require('@/contexts/AuthContext');
-  const { user } = useAuth();
   const isCurrentUserWatching = user ? watchers.includes(user.id) : false;
   
   // Counters for badges

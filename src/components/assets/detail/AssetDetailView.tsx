@@ -97,7 +97,7 @@ const AssetDetailView: React.FC<AssetDetailViewProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-medium">Assigned To</h3>
-            <p className="mt-1 text-sm">{getUserNameById(asset.assignedTo)}</p>
+            <p className="mt-1 text-sm">{asset.assignedTo ? getUserNameById(asset.assignedTo) : 'Unassigned'}</p>
           </div>
           <div>
             <h3 className="text-sm font-medium">Purchase Date</h3>
