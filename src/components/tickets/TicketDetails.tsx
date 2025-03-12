@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getAssetById } from '@/utils/mockData/assets';
 import WatchButton from '@/components/shared/WatchButton';
+import { WatchableItemType } from '@/hooks/useWatchList';
 
 interface TicketDetailsProps {
   ticket: Ticket;
@@ -58,10 +59,11 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
     };
   });
   
-  // Create a watchable item
+  // Create a watchable item - ensure type is correctly cast to WatchableItemType
+  const itemType: WatchableItemType = isServiceRequest ? 'service' : 'incident';
   const watchableItem = {
     id: ticket.id,
-    type: isServiceRequest ? 'service' : 'incident',
+    type: itemType,
     title: ticket.title,
     status: ticket.status,
     createdAt: ticket.createdAt,

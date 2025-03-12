@@ -6,6 +6,7 @@ import StatusBadge from './StatusBadge';
 import PriorityBadge from './PriorityBadge';
 import { getUserNameById } from '@/utils/userUtils';
 import WatchButton from '@/components/shared/WatchButton';
+import { WatchableItemType } from '@/hooks/useWatchList';
 
 interface TicketDetailHeaderProps {
   ticket: Ticket;
@@ -20,10 +21,11 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
 }) => {
   const isResolved = ['closed', 'resolved', 'fulfilled'].includes(ticket.status);
   
-  // Create a watchable item
+  // Create a watchable item - ensure type is correctly cast to WatchableItemType
+  const itemType: WatchableItemType = isServiceRequest ? 'service' : 'incident';
   const watchableItem = {
     id: ticket.id,
-    type: isServiceRequest ? 'service' : 'incident',
+    type: itemType,
     title: ticket.title,
     status: ticket.status,
     createdAt: ticket.createdAt,
