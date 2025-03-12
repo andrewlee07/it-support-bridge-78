@@ -18,6 +18,7 @@ import {
   TestTube2,
   Users,
   SlidersHorizontal,
+  CheckCircle2,
 } from 'lucide-react';
 import { NavItem } from './types';
 
@@ -63,6 +64,13 @@ export const navigationItems: NavItem[] = [
     href: '/releases',
     path: '/releases',
     icon: Package,
+  },
+  {
+    name: 'Tasks',
+    title: 'Tasks',
+    href: '/tasks',
+    path: '/tasks',
+    icon: CheckCircle2,
   },
   {
     name: 'Backlog',
