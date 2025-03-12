@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { Queue } from '@/utils/types/group';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { TicketType } from '@/utils/types/ticket';
 
 interface QueueFormValues {
   name: string;
   description?: string;
   groupId: string;
-  ticketTypes: string[];
+  ticketTypes: TicketType[];
 }
 
 export function useQueueManagement() {
@@ -56,7 +57,7 @@ export function useQueueManagement() {
               description: values.description || '',
               filterCriteria: {
                 ...queue.filterCriteria,
-                ticketTypes: values.ticketTypes
+                ticketTypes: values.ticketTypes as TicketType[]
               },
               groupId: values.groupId,
               updatedAt: new Date()
@@ -73,7 +74,7 @@ export function useQueueManagement() {
         name: values.name,
         description: values.description || '',
         filterCriteria: {
-          ticketTypes: values.ticketTypes,
+          ticketTypes: values.ticketTypes as TicketType[],
           priorities: []
         },
         groupId: values.groupId,

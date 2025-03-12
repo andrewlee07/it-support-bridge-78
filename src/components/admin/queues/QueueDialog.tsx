@@ -24,13 +24,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Queue } from '@/utils/types/group';
 import { MultiSelect } from '@/components/ui/multi-select';
+import { TicketType } from '@/utils/types/ticket';
 
 // Form schema for queue validation
 const queueFormSchema = z.object({
   name: z.string().min(2, { message: 'Queue name must be at least 2 characters' }),
   description: z.string().optional(),
   groupId: z.string(),
-  ticketTypes: z.array(z.string()).min(1, { message: 'Select at least one ticket type' })
+  ticketTypes: z.array(
+    z.enum(['incident', 'service', 'change'] as const)
+  ).min(1, { message: 'Select at least one ticket type' })
 });
 
 type QueueFormValues = z.infer<typeof queueFormSchema>;
@@ -65,7 +68,6 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
   const ticketTypeOptions = [
     { value: 'incident', label: 'Incident' },
     { value: 'service', label: 'Service Request' },
-    { value: 'problem', label: 'Problem' },
     { value: 'change', label: 'Change Request' }
   ];
 
@@ -159,7 +161,7 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
                         const option = ticketTypeOptions.find(opt => opt.value === value);
                         return { value, label: option?.label || value };
                       })}
-                      onChange={options => field.onChange(options.map(opt => opt.value))}
+                      onChange={options => field.onChange(options.map(opt => opt.value as TicketType))}
                       placeholder="Select ticket types"
                     />
                   </FormControl>

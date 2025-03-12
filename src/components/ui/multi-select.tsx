@@ -12,8 +12,8 @@ export type Option = {
 
 export interface MultiSelectProps {
   options: Option[];
-  selected: string[];
-  onChange: (selected: string[]) => void;
+  selected: Option[];
+  onChange: (selected: Option[]) => void;
   placeholder?: string;
   className?: string;
 }
@@ -30,8 +30,8 @@ export function MultiSelect({
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
 
-  const handleUnselect = (item: string) => {
-    onChange(selected.filter((i) => i !== item));
+  const handleUnselect = (item: Option) => {
+    onChange(selected.filter((i) => i.value !== item.value));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -54,10 +54,9 @@ export function MultiSelect({
       <div className="group border border-input px-3 py-2 text-sm ring-offset-background rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
         <div className="flex gap-1 flex-wrap">
           {selected.map((item) => {
-            const option = options.find((o) => o.value === item);
             return (
-              <Badge key={item} variant="secondary">
-                {option?.label || item}
+              <Badge key={item.value} variant="secondary">
+                {item.label}
                 <button
                   className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   onKeyDown={(e) => {
@@ -92,15 +91,15 @@ export function MultiSelect({
           <div className="absolute w-full z-10 top-0 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
             <CommandGroup className="h-full overflow-auto max-h-[300px]">
               {options.map((option) => {
-                const isSelected = selected.includes(option.value);
+                const isSelected = selected.some(item => item.value === option.value);
                 return (
                   <CommandItem
                     key={option.value}
                     onSelect={() => {
                       if (isSelected) {
-                        onChange(selected.filter((value) => value !== option.value));
+                        onChange(selected.filter((item) => item.value !== option.value));
                       } else {
-                        onChange([...selected, option.value]);
+                        onChange([...selected, option]);
                       }
                       setInputValue("");
                     }}
