@@ -1,6 +1,6 @@
 
-import { EventBus } from '../EventBus';
 import { Task } from '@/utils/types/taskTypes';
+import EventBus from '../EventBus';
 
 export enum TaskEvent {
   CREATED = 'task.created',
@@ -28,7 +28,7 @@ export class TaskEventPublisher {
       title: task.title,
       updatedBy: userId,
       updatedFields,
-      // Use toString instead of toISOString since task.updatedAt is a string
+      // Since task.updatedAt is a string, we don't need toISOString
       timestamp: task.updatedAt || new Date().toISOString(),
     });
   }
@@ -49,7 +49,7 @@ export class TaskEventPublisher {
       assignedBy: userId,
       previousAssignee,
       newAssignee: task.assignee,
-      // Use toString instead of toISOString since task.updatedAt is a string
+      // Since task.updatedAt is a string, we don't need toISOString
       timestamp: task.updatedAt || new Date().toISOString(),
     });
   }

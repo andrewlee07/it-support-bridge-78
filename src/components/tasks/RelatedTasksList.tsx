@@ -1,140 +1,155 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Empty, Link, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, Trash, FileBox } from 'lucide-react';
 import { Task } from '@/utils/types/taskTypes';
-import { LinkTaskDialog } from './LinkTaskDialog';
-import { useAuth } from '@/contexts/AuthContext';
 import { createTask } from '@/utils/api/taskApi';
-import { v4 as uuidv4 } from 'uuid';
+import LinkTaskDialog from './LinkTaskDialog';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface RelatedTasksListProps {
-  tasks: Task[];
-  itemId?: string;
-  itemType?: 'incident' | 'service-request' | 'task';
-  onTaskAdded?: (task: Task) => void;
-  title?: string;
+  relatedItemId: string;
+  relatedItemType: 'incident' | 'service-request' | 'task';
+  onTaskClick?: (taskId: string) => void;
 }
 
-export const RelatedTasksList: React.FC<RelatedTasksListProps> = ({
-  tasks,
-  itemId,
-  itemType,
-  onTaskAdded,
-  title = 'Related Tasks'
+const RelatedTasksList: React.FC<RelatedTasksListProps> = ({
+  relatedItemId,
+  relatedItemType,
+  onTaskClick
 }) => {
-  const { user } = useAuth();
-  const [relatedTasks, setRelatedTasks] = useState<Task[]>(tasks || []);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
-    setRelatedTasks(tasks || []);
-  }, [tasks]);
+    // In a real app, we would fetch related tasks based on relatedItemId and relatedItemType
+    // For now, we'll just simulate a loading state
+    const timer = setTimeout(() => {
+      setTasks([]);
+      setLoading(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [relatedItemId, relatedItemType]);
 
-  const handleAddTask = async () => {
-    if (!itemId || !itemType || !user) return;
-
-    // Create a new task with this item as the related item
+  const handleQuickCreateTask = async () => {
+    if (!user) return;
+    
     try {
-      const now = new Date().toISOString(); // Convert to string to match Task interface
-      const result = await createTask({
-        title: `New task for ${itemType} ${itemId}`,
-        description: `Task created from ${itemType} ${itemId}`,
+      const response = await createTask({
+        title: `Task related to ${relatedItemType} #${relatedItemId}`,
+        description: `This task was automatically created from ${relatedItemType} #${relatedItemId}`,
         status: 'new',
         priority: 'medium',
         creator: user.id,
-        createdAt: now, // Send as string
-        updatedAt: now, // Send as string
-        relatedItemId: itemId,
-        relatedItemType: itemType
+        relatedItemId,
+        relatedItemType,
       });
-
-      if (result.success) {
-        // Use type assertion to ensure the new task conforms to Task type
-        setRelatedTasks(prevTasks => [...prevTasks, result.data as Task]);
-        
-        if (onTaskAdded) {
-          onTaskAdded(result.data);
-        }
+      
+      if (response.success) {
+        setTasks(prevTasks => [...prevTasks, response.data]);
+        toast.success('Task created successfully');
       }
     } catch (error) {
-      console.error('Error creating related task:', error);
+      toast.error('Failed to create task');
+      console.error('Error creating task:', error);
     }
   };
 
-  const handleLinkTask = (selectedTask: Task) => {
-    setRelatedTasks(prev => [...prev, selectedTask]);
-    if (onTaskAdded) {
-      onTaskAdded(selectedTask);
-    }
+  const handleTaskLink = (selectedTasks: Task[]) => {
+    setTasks(prevTasks => [...prevTasks, ...selectedTasks]);
     setIsLinkDialogOpen(false);
   };
 
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Related Tasks</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center items-center h-24">
+            <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between py-4">
-        <CardTitle className="text-lg font-medium">{title}</CardTitle>
-        <div className="flex space-x-2">
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle>Related Tasks</CardTitle>
+        <div className="flex gap-2">
           <Button 
-            size="sm" 
             variant="outline" 
+            size="sm"
             onClick={() => setIsLinkDialogOpen(true)}
           >
-            <Link className="h-4 w-4 mr-2" />
-            Link Existing
+            <Plus className="h-4 w-4 mr-1" />
+            Link Task
           </Button>
           <Button 
-            size="sm" 
             variant="default" 
-            onClick={handleAddTask}
+            size="sm"
+            onClick={handleQuickCreateTask}
           >
-            <Plus className="h-4 w-4 mr-2" />
-            New Task
+            <Plus className="h-4 w-4 mr-1" />
+            Create Task
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        {relatedTasks.length > 0 ? (
-          <div className="space-y-2">
-            {relatedTasks.map((task) => (
-              <div 
-                key={task.id} 
-                className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors"
+        {tasks.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
+            <FileBox className="h-10 w-10 mb-2 opacity-20" />
+            <p>No related tasks found</p>
+            <p className="text-sm">Create or link tasks to track work related to this item</p>
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {tasks.map(task => (
+              <li 
+                key={task.id}
+                className="p-3 border rounded-md flex justify-between items-center hover:bg-accent cursor-pointer"
+                onClick={() => onTaskClick && onTaskClick(task.id)}
               >
                 <div>
                   <h4 className="font-medium">{task.title}</h4>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                    <span className="capitalize">{task.status}</span>
+                  <div className="flex gap-2 text-xs text-muted-foreground">
+                    <span>ID: {task.id}</span>
                     <span>•</span>
-                    <span className="capitalize">{task.priority}</span>
+                    <span className="capitalize">Status: {task.status}</span>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  asChild
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // In a real app, we would have an API to remove the relationship
+                    setTasks(tasks.filter(t => t.id !== task.id));
+                  }}
                 >
-                  <a href={`/tasks/${task.id}`}>View</a>
+                  <Trash className="h-4 w-4" />
                 </Button>
-              </div>
+              </li>
             ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
-            <Empty className="h-12 w-12 mb-2 text-muted-foreground/50" />
-            <h3 className="font-medium">No related tasks</h3>
-            <p className="text-sm mt-1">Create or link tasks to this {itemType}</p>
-          </div>
+          </ul>
         )}
       </CardContent>
       
       <LinkTaskDialog 
-        open={isLinkDialogOpen} 
+        open={isLinkDialogOpen}
         onOpenChange={setIsLinkDialogOpen}
-        onTaskSelect={handleLinkTask}
-        excludeTaskIds={relatedTasks.map(t => t.id)}
+        onTasksSelected={handleTaskLink}
       />
     </Card>
   );
 };
+
+export default RelatedTasksList;

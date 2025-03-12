@@ -25,13 +25,15 @@ const TasksPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<TaskStatus[]>([]);
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority[]>([]);
+  const [onlyOverdue, setOnlyOverdue] = useState<boolean>(false);
+  const [onlyAssignedToMe, setOnlyAssignedToMe] = useState<boolean>(false);
 
   useEffect(() => {
     const loadTasks = async () => {
       setLoading(true);
       try {
         const response = await fetchTasks(
-          undefined, // assignee
+          onlyAssignedToMe ? 'user-1' : undefined, // Replace with actual user ID if available
           statusFilter.length > 0 ? statusFilter : undefined,
           priorityFilter.length > 0 ? priorityFilter : undefined,
           searchQuery.trim() || undefined
@@ -48,7 +50,7 @@ const TasksPage: React.FC = () => {
     };
 
     loadTasks();
-  }, [searchQuery, statusFilter, priorityFilter]);
+  }, [searchQuery, statusFilter, priorityFilter, onlyAssignedToMe, onlyOverdue]);
 
   const handleTaskCreated = (task: Task) => {
     setTasks(prev => [task, ...prev]);
@@ -129,6 +131,10 @@ const TasksPage: React.FC = () => {
             onStatusFilterChange={handleStatusFilterChange}
             priorityFilter={priorityFilter}
             onPriorityFilterChange={handlePriorityFilterChange}
+            onlyOverdue={onlyOverdue}
+            onOverdueChange={setOnlyOverdue}
+            onlyAssignedToMe={onlyAssignedToMe}
+            onAssignedToMeChange={setOnlyAssignedToMe}
           />
           
           <TaskViewToggle 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, Filter, Calendar } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +20,7 @@ export interface TaskSearchProps {
   onOverdueChange: (value: boolean) => void;
   onlyAssignedToMe: boolean;
   onAssignedToMeChange: (value: boolean) => void;
-  // Advanced filtering props
+  // Optional advanced props with defaults
   selectedGoals?: string[];
   onGoalsChange?: (goals: string[]) => void;
   finishDateOption?: string;
@@ -40,7 +40,7 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
   onOverdueChange,
   onlyAssignedToMe,
   onAssignedToMeChange,
-  // Advanced filtering props
+  // Advanced filtering props with defaults
   selectedGoals = [],
   onGoalsChange = () => {},
   finishDateOption = 'any',
@@ -50,26 +50,6 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
 }) => {
   const statusOptions: TaskStatus[] = ['new', 'in-progress', 'on-hold', 'completed', 'cancelled'];
   const priorityOptions: TaskPriority[] = ['critical', 'high', 'medium', 'low'];
-  
-  // Mock goals for the demo
-  const goalOptions = [
-    { id: 'goal-1', name: 'Improve System Reliability' },
-    { id: 'goal-2', name: 'Reduce Support Tickets' },
-    { id: 'goal-3', name: 'Enhance User Experience' },
-    { id: 'goal-4', name: 'Optimize Performance' }
-  ];
-  
-  // Date filter options
-  const dateOptions = [
-    { value: 'any', label: 'Any date' },
-    { value: 'today', label: 'Due today' },
-    { value: 'tomorrow', label: 'Due tomorrow' },
-    { value: 'this-week', label: 'Due this week' },
-    { value: 'this-month', label: 'Due this month' },
-    { value: 'overdue', label: 'Overdue' },
-    { value: 'no-date', label: 'No due date' },
-    { value: 'custom', label: 'Custom date' }
-  ];
 
   const handleStatusChange = (status: TaskStatus) => {
     if (statusFilter.includes(status)) {
@@ -86,25 +66,6 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
       onPriorityFilterChange([...priorityFilter, priority]);
     }
   };
-  
-  const handleGoalChange = (goalId: string) => {
-    if (selectedGoals.includes(goalId)) {
-      onGoalsChange(selectedGoals.filter(g => g !== goalId));
-    } else {
-      onGoalsChange([...selectedGoals, goalId]);
-    }
-  };
-  
-  const handleDateOptionChange = (option: string) => {
-    onFinishDateOptionChange(option);
-  };
-  
-  const handleCustomDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const date = e.target.value ? new Date(e.target.value) : undefined;
-    if (date) {
-      onCustomFinishDateChange(date);
-    }
-  };
 
   const getActiveFilterCount = () => {
     let count = 0;
@@ -112,8 +73,6 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
     if (priorityFilter.length > 0) count++;
     if (onlyOverdue) count++;
     if (onlyAssignedToMe) count++;
-    if (selectedGoals.length > 0) count++;
-    if (finishDateOption !== 'any') count++;
     return count;
   };
 
@@ -188,7 +147,7 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
               </div>
               
               <div className="space-y-2">
-                <h4 className="font-medium text-sm">Assigned to</h4>
+                <h4 className="font-medium text-sm">Assignment</h4>
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="assigned-to-me" 
@@ -205,7 +164,7 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
               </div>
               
               <div className="space-y-2">
-                <h4 className="font-medium text-sm">Task status</h4>
+                <h4 className="font-medium text-sm">Due Date</h4>
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="overdue" 
@@ -218,57 +177,6 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
                   >
                     Show only overdue tasks
                   </Label>
-                </div>
-              </div>
-              
-              {/* Advanced Filters */}
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm">Goals</h4>
-                <div className="grid grid-cols-1 gap-2">
-                  {goalOptions.map((goal) => (
-                    <div key={goal.id} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`goal-${goal.id}`} 
-                        checked={selectedGoals.includes(goal.id)} 
-                        onCheckedChange={() => handleGoalChange(goal.id)}
-                      />
-                      <Label 
-                        htmlFor={`goal-${goal.id}`}
-                        className="text-sm cursor-pointer"
-                      >
-                        {goal.name}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm">Due date</h4>
-                <div className="grid grid-cols-1 gap-2">
-                  <select 
-                    className="w-full p-2 text-sm border rounded-md"
-                    value={finishDateOption}
-                    onChange={(e) => handleDateOptionChange(e.target.value)}
-                  >
-                    {dateOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  
-                  {finishDateOption === 'custom' && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <input 
-                        type="date" 
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
-                        value={customFinishDate ? customFinishDate.toISOString().split('T')[0] : ''}
-                        onChange={handleCustomDateChange}
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
