@@ -14,6 +14,7 @@ import {
   getTaskPriorityVisuals
 } from '@/utils/types/taskTypes';
 import { getStatusIconForTask, getPriorityIcon } from '@/components/shared/notifications/iconHelpers';
+import { getUserNameById } from '@/utils/userUtils';
 
 interface TaskCardProps {
   task: Task;
@@ -83,6 +84,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, highlight = false })
   const todayHighlightClass = isDueToday ? 'ring-2 ring-amber-400' : '';
   const highlightBorder = highlight ? 'border-blue-400 border-2' : '';
 
+  // Get user name for assignee
+  const assigneeName = getUserNameById(task.assignee);
+
   // Generate accessible label for the task card
   const taskStatusLabel = task.status.replace('-', ' ');
   const priorityLabel = task.priority;
@@ -144,11 +148,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, highlight = false })
           </Badge>
         </div>
         <div className="grid grid-cols-2 gap-2 w-full mt-3">
-          <div className="flex items-center text-xs text-muted-foreground" aria-label={task.assignee ? 'Assigned' : 'Unassigned'}>
+          <div className="flex items-center text-xs text-muted-foreground" aria-label={task.assignee ? `Assigned to ${assigneeName}` : 'Unassigned'}>
             <span aria-hidden="true">
               <User className="h-3 w-3 mr-1" />
             </span>
-            {task.assignee ? `Assigned` : 'Unassigned'}
+            {task.assignee ? assigneeName : 'Unassigned'}
           </div>
           <div className={`flex items-center text-xs justify-end ${getDueDateColor()}`} aria-live={isTaskOverdue(task) ? 'polite' : 'off'}>
             <span aria-hidden="true">

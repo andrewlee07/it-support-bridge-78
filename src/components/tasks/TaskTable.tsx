@@ -14,6 +14,7 @@ import { format, isToday, isPast } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Check, Clock, AlertTriangle, User, Calendar } from 'lucide-react';
 import { getStatusIconForTask, getPriorityIcon } from '@/components/shared/notifications/iconHelpers';
+import { getUserNameById } from '@/utils/userUtils';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -78,6 +79,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
             const statusVisuals = getTaskStatusVisuals(task.status);
             const priorityVisuals = getTaskPriorityVisuals(task.priority);
             const shouldHighlight = task.priority === 'critical' || isTaskOverdue(task);
+            const assigneeName = getUserNameById(task.assignee);
             
             return (
               <TableRow 
@@ -108,7 +110,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
                 <TableCell>
                   <div className="flex items-center">
                     <User className="h-4 w-4 mr-2 text-gray-500" />
-                    {task.assignee || 'Unassigned'}
+                    {assigneeName}
                   </div>
                 </TableCell>
               </TableRow>
