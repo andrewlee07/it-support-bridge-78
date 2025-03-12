@@ -53,7 +53,7 @@ const PortalHeader: React.FC = () => {
                   <Link to="/knowledge">Knowledge Base</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/community">Community</Link>
+                  <Link to="/portal/my-approvals">My Approvals</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

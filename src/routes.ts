@@ -8,6 +8,7 @@ import ErrorPage from '@/pages/ErrorPage';
 import NotFound from '@/pages/NotFound';
 import EndUserPortal from '@/pages/EndUserPortal';
 import KnowledgeArticleDetail from '@/pages/KnowledgeArticleDetail';
+import PortalMyApprovals from '@/pages/PortalMyApprovals';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
   {
     path: '/portal',
     element: React.createElement(EndUserPortal)
+  },
+  {
+    path: '/portal/my-approvals',
+    element: React.createElement(PortalMyApprovals)
   },
   {
     path: '/knowledge/:id',

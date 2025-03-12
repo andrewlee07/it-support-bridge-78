@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, CheckCircle, BookOpen, HelpCircle, Users, Bell } from 'lucide-react';
+import { Search, CheckCircle, BookOpen, HelpCircle, ClipboardCheck, Bell } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -83,12 +83,12 @@ const EndUserPortal: React.FC = () => {
             to="/portal/incident"
           />
 
-          {/* Community */}
+          {/* My Approvals - replacing Community */}
           <PortalCard 
-            title="Community" 
-            icon={<Users className="h-10 w-10 text-primary" />}
-            description="Community-sourced answers to your questions"
-            to="/community"
+            title="My Approvals" 
+            icon={<ClipboardCheck className="h-10 w-10 text-primary" />}
+            description="View and manage your pending approval requests"
+            to="/portal/my-approvals"
           />
         </div>
 
