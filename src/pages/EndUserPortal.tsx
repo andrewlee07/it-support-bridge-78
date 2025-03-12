@@ -7,10 +7,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import PortalCard from '@/components/portal/PortalCard';
 import StatusWidget from '@/components/portal/StatusWidget';
-import ArticleItem from '@/components/portal/ArticleItem';
 import IncidentItem from '@/components/portal/IncidentItem';
 import ServiceRequestItem from '@/components/portal/ServiceRequestItem';
 import PortalHeader from '@/components/portal/PortalHeader';
+import KnowledgeArticlesList from '@/components/portal/KnowledgeArticlesList';
 
 const EndUserPortal: React.FC = () => {
   const { user } = useAuth();
@@ -133,22 +133,8 @@ const EndUserPortal: React.FC = () => {
 
         {/* Bottom Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          {/* Top Rated Articles */}
-          <div className="card p-5 border rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">Top Rated Articles</h3>
-            <div className="space-y-4">
-              <ArticleItem 
-                title="Getting Around in Windows" 
-                rating={5} 
-                url="/knowledge/windows-navigation" 
-              />
-              <ArticleItem 
-                title="How to configure VPN for Apple Devices" 
-                rating={4} 
-                url="/knowledge/apple-vpn-setup" 
-              />
-            </div>
-          </div>
+          {/* Knowledge Articles - Using our new component */}
+          <KnowledgeArticlesList />
 
           {/* My Open Incidents */}
           <div className="card p-5 border rounded-lg shadow-sm">

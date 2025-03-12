@@ -10,8 +10,11 @@ interface IncidentItemProps {
 }
 
 const IncidentItem: React.FC<IncidentItemProps> = ({ title, date, time, id }) => {
+  // Extract the incident number without the "INC" prefix
+  const incidentId = id.replace('INC', '');
+  
   return (
-    <Link to={`/tickets/${id}`} className="block p-3 rounded-md hover:bg-accent transition-colors">
+    <Link to={`/incidents/${incidentId}`} className="block p-3 rounded-md hover:bg-accent transition-colors">
       <div className="space-y-1">
         <h4 className="text-sm font-medium">{title}</h4>
         <div className="text-xs text-muted-foreground">

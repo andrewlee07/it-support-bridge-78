@@ -15,27 +15,49 @@ import PortalHeader from '@/components/portal/PortalHeader';
 import PageTransition from '@/components/shared/PageTransition';
 import { getMandatoryFieldsConfig } from '@/api/statusSynchronization';
 import { ConfigurableEntityType } from '@/utils/types/configuration';
+import { useAuth } from '@/contexts/AuthContext';
 
 type ServiceRequestFormValues = {
   title: string;
   description: string;
   serviceId: string;
   requestType: string;
+  customerId?: string;
+  customerName?: string;
 };
+
+// Mock user data for demonstration - in a real app this would come from an API
+const mockUsers = [
+  { id: 'user-1', name: 'John Doe' },
+  { id: 'user-2', name: 'Jane Smith' },
+  { id: 'user-3', name: 'Bob Johnson' },
+  { id: 'user-4', name: 'Alice Williams' },
+];
 
 const PortalServiceRequestForm: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [mandatoryFields, setMandatoryFields] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdminMode, setIsAdminMode] = useState(false);
   
   const form = useForm<ServiceRequestFormValues>({
     defaultValues: {
       title: '',
       description: '',
       serviceId: '',
-      requestType: ''
+      requestType: '',
+      customerId: user?.id,
+      customerName: user?.name
     }
   });
+
+  // Check if user has admin role
+  useEffect(() => {
+    if (user?.role === 'admin' || user?.role === 'agent') {
+      setIsAdminMode(true);
+    }
+  }, [user]);
 
   // Mock service options for demo purposes
   const serviceOptions = [
@@ -77,7 +99,7 @@ const PortalServiceRequestForm: React.FC = () => {
   const onSubmit = async (data: ServiceRequestFormValues) => {
     try {
       // Check for mandatory fields
-      const missingFields = mandatoryFields.filter(field => !data[field]);
+      const missingFields = mandatoryFields.filter(field => !data[field as keyof ServiceRequestFormValues]);
       
       if (missingFields.length > 0) {
         // Format field names for display
@@ -97,7 +119,11 @@ const PortalServiceRequestForm: React.FC = () => {
         requestType: data.requestType,
         type: 'service',
         priority: 'P3',
-        category: 'other'
+        category: 'other',
+        // If in admin mode, use the selected user, otherwise use the current user
+        customerId: data.customerId || user?.id,
+        customerName: data.customerName || user?.name,
+        createdBy: user?.id || 'anonymous'
       };
       
       // Simulate API call - in a real app this would be an actual API call
@@ -147,6 +173,47 @@ const PortalServiceRequestForm: React.FC = () => {
             <Card className="p-6">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  {/* Admin-only user selection field */}
+                  {isAdminMode && (
+                    <FormField
+                      control={form.control}
+                      name="customerId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            On Behalf of User
+                            {isFieldRequired('customerId') && <span className="text-red-500 ml-1">*</span>}
+                          </FormLabel>
+                          <Select 
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // Find the selected user and update the customer name
+                              const selectedUser = mockUsers.find(u => u.id === value);
+                              if (selectedUser) {
+                                form.setValue('customerName', selectedUser.name);
+                              }
+                            }} 
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a user" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {mockUsers.map(user => (
+                                <SelectItem key={user.id} value={user.id}>
+                                  {user.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  
                   {(mandatoryFields.length === 0 || mandatoryFields.includes('serviceId')) && (
                     <FormField
                       control={form.control}

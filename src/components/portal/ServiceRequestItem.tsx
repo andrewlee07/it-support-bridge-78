@@ -18,8 +18,11 @@ const ServiceRequestItem: React.FC<ServiceRequestItemProps> = ({
   id,
   status = 'open'
 }) => {
+  // Extract the service request number without the "SR" prefix
+  const requestId = id.replace('SR', '');
+  
   return (
-    <Link to={`/service-requests/${id.replace('SR', '')}`} className="block">
+    <Link to={`/service-requests/${requestId}`} className="block">
       <div className="flex justify-between items-start border-b pb-3 hover:bg-muted/20 -mx-2 px-2 pt-2 rounded">
         <div className="space-y-1">
           <div className="font-medium text-sm">{title}</div>
