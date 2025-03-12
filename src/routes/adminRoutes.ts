@@ -17,6 +17,7 @@ import ErrorLogs from '@/pages/admin/ErrorLogs';
 import SecuritySettings from '@/pages/admin/SecuritySettings';
 import StatusSynchronizationConfig from '@/pages/admin/StatusSynchronizationConfig';
 import EventDocumentation from '@/pages/admin/EventDocumentation';
+import GroupsQueueManagement from '@/pages/admin/GroupsQueueManagement';
 
 export const adminRoutes = [
   {
@@ -56,6 +57,10 @@ export const adminRoutes = [
     element: React.createElement(ServiceCatalogueConfiguration)
   },
   {
+    path: 'admin/service-catalogue-configuration',
+    element: React.createElement(ServiceCatalogueConfiguration)
+  },
+  {
     path: 'admin/test-configuration',
     element: React.createElement(TestConfiguration)
   },
@@ -76,6 +81,10 @@ export const adminRoutes = [
     element: React.createElement(SecuritySettings)
   },
   {
+    path: 'admin/security-settings',
+    element: React.createElement(SecuritySettings)
+  },
+  {
     path: 'admin/status-synchronization',
     element: React.createElement(StatusSynchronizationConfig)
   },
@@ -86,5 +95,9 @@ export const adminRoutes = [
   {
     path: 'admin/ai-configuration',
     element: React.createElement(AIConfiguration)
+  },
+  {
+    path: 'admin/groups-queues',
+    element: React.createElement(GroupsQueueManagement)
   }
 ];

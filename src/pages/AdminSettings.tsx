@@ -1,3 +1,4 @@
+
 import React from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +7,7 @@ import {
   AlertCircle, Headphones, PanelRightIcon, OctagonAlert, 
   BoxesIcon, Bug, GitPullRequest, FlaskConical, ShieldAlert, 
   Sliders, ArrowUpDown, LibraryIcon, Bell, LayoutDashboard, ExternalLink,
-  Brain // Added Brain icon for AI Configuration
+  Brain, Users, // Added Users icon for Groups & Queues
 } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -64,6 +65,12 @@ const AdminSettings = () => {
       description: 'Configure test management settings, workflows, and mandatory fields',
       icon: <FlaskConical className="h-8 w-8 text-primary/80" />,
       path: '/admin/test-configuration'
+    },
+    {
+      title: 'Groups & Queues',
+      description: 'Configure groups, associate roles, and manage work queues',
+      icon: <Users className="h-8 w-8 text-primary/80" />,
+      path: '/admin/groups-queues'
     },
     {
       title: 'Status Synchronization',
