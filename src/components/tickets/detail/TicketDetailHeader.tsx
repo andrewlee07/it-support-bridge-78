@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Ticket } from '@/utils/types/ticket';
-import { CheckCircle2, RefreshCcw } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { getUserNameById } from '@/utils/userUtils';
+import { format } from 'date-fns';
+import DetailBreadcrumb from './DetailBreadcrumb';
 
 interface TicketDetailHeaderProps {
   ticket: Ticket;
@@ -11,6 +14,7 @@ interface TicketDetailHeaderProps {
   isResolved: boolean;
   onReopen: () => void;
   onResolve: () => void;
+  children?: React.ReactNode;
 }
 
 const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
@@ -19,39 +23,79 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
   canReopen,
   isResolved,
   onReopen,
-  onResolve
+  onResolve,
+  children
 }) => {
-  const resolveButtonLabel = isServiceRequest ? 'Fulfill Request' : 'Resolve';
+  const typeLabel = isServiceRequest ? 'Service Request' : 'Incident';
+  const parentPath = isServiceRequest ? '/service-requests' : '/incidents';
+  
+  const badgeColor = ticket.priority === 'P1' 
+    ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+    : ticket.priority === 'P2'
+    ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+    : ticket.priority === 'P3'
+    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+    : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+  
+  const statusColor = 
+    ticket.status === 'open' || ticket.status === 'new'
+      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+      : ticket.status === 'in-progress'
+      ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+      : ticket.status === 'pending' || ticket.status === 'on-hold'
+      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+      : ticket.status === 'resolved' || ticket.status === 'fulfilled'
+      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      : ticket.status === 'closed'
+      ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+      : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
   
   return (
     <div className="space-y-4">
-      {/* Ticket Header */}
-      <div className="border-b pb-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-2xl font-bold">{ticket.title}</h2>
-            <p className="text-sm text-muted-foreground">{ticket.id}</p>
+      <DetailBreadcrumb
+        entityName={typeLabel}
+        entityId={ticket.id}
+        parentRoute={parentPath}
+        parentName={isServiceRequest ? 'Service Requests' : 'Incidents'}
+      />
+      
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">{ticket.title}</h1>
+          <div className="flex items-center space-x-2 mt-1">
+            <Badge variant="outline">{ticket.id}</Badge>
+            <Badge className={badgeColor}>{ticket.priority}</Badge>
+            <Badge className={statusColor}>{ticket.status}</Badge>
           </div>
-          <div className="flex gap-2">
-            {canReopen && (
-              <Button 
-                variant="outline" 
-                onClick={onReopen}
-              >
-                <RefreshCcw className="h-4 w-4 mr-2" />
-                Reopen
-              </Button>
-            )}
-            {!isResolved && (
-              <Button 
-                variant="destructive" 
-                onClick={onResolve}
-              >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                {resolveButtonLabel}
-              </Button>
-            )}
-          </div>
+        </div>
+        
+        <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+          {!isResolved ? (
+            <Button variant="default" size="sm" onClick={onResolve}>
+              {isServiceRequest ? 'Fulfill Request' : 'Resolve Incident'}
+            </Button>
+          ) : canReopen ? (
+            <Button variant="outline" size="sm" onClick={onReopen}>
+              Reopen
+            </Button>
+          ) : null}
+          
+          {children}
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div>
+          <p className="text-muted-foreground">Assigned To</p>
+          <p>{ticket.assignedTo ? getUserNameById(ticket.assignedTo) : 'Unassigned'}</p>
+        </div>
+        <div>
+          <p className="text-muted-foreground">Created By</p>
+          <p>{getUserNameById(ticket.createdBy)}</p>
+        </div>
+        <div>
+          <p className="text-muted-foreground">Created At</p>
+          <p>{format(new Date(ticket.createdAt), 'PPP')}</p>
         </div>
       </div>
     </div>

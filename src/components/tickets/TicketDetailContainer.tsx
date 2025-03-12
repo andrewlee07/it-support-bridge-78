@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Ticket } from '@/utils/types/ticket';
 import { UpdateTicketValues } from './TicketUpdateForm';
 import { CloseTicketValues } from './TicketCloseForm';
@@ -10,6 +10,9 @@ import TicketDetailHeader from './detail/TicketDetailHeader';
 import TicketTabs from './detail/TicketTabs';
 import TicketTabContent from './detail/TicketTabContent';
 import ReopenDialog from './detail/ReopenDialog';
+import ReminderDialog from './detail/ReminderDialog';
+import { Button } from '@/components/ui/button';
+import { AlarmClock } from 'lucide-react';
 
 interface TicketDetailContainerProps {
   ticket: Ticket;
@@ -50,6 +53,9 @@ const TicketDetailContainer: React.FC<TicketDetailContainerProps> = ({
     onUpdate: onUpdate || onUpdateTicket
   });
 
+  // State for reminder dialog
+  const [isReminderDialogOpen, setIsReminderDialogOpen] = useState(false);
+
   // Derived state
   const isServiceRequest = type === 'service';
   const isResolved = ['resolved', 'closed', 'fulfilled'].includes(ticket.status);
@@ -71,7 +77,17 @@ const TicketDetailContainer: React.FC<TicketDetailContainerProps> = ({
         isResolved={isResolved}
         onReopen={() => setIsReopenDialogOpen(true)}
         onResolve={() => setActiveTab(resolveTabLabel)}
-      />
+      >
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="ml-auto" 
+          onClick={() => setIsReminderDialogOpen(true)}
+        >
+          <AlarmClock className="w-4 h-4 mr-2" />
+          Set Reminder
+        </Button>
+      </TicketDetailHeader>
       
       {/* Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-[calc(100%-150px)]">
@@ -103,6 +119,14 @@ const TicketDetailContainer: React.FC<TicketDetailContainerProps> = ({
         onOpenChange={setIsReopenDialogOpen}
         onReopen={(data) => handleReopenSubmit(onReopen, onReopenTicket, data)}
         isServiceRequest={isServiceRequest}
+      />
+
+      {/* Reminder Dialog */}
+      <ReminderDialog
+        isOpen={isReminderDialogOpen}
+        onOpenChange={setIsReminderDialogOpen}
+        ticket={ticket}
+        onReminderSet={wrapAddNote}
       />
     </div>
   );
