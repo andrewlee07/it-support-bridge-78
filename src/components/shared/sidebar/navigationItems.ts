@@ -14,7 +14,8 @@ import {
   FileStack,
   Users,
   Megaphone,
-  ExternalLink
+  ExternalLink,
+  ShoppingCart
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -33,23 +34,22 @@ export const navigationItems: NavigationItem[] = [
     description: "Overview of the system"
   },
   {
-    title: "Ticket Management",
-    href: "#",
-    icon: ScrollText,
-    items: [
-      {
-        title: "Incidents",
-        href: "/incidents",
-        icon: AlertCircle,
-        description: "Manage system incidents"
-      },
-      {
-        title: "Service Requests",
-        href: "/service-requests",
-        icon: ClipboardCheck,
-        description: "Manage service requests"
-      }
-    ]
+    title: "Incidents",
+    href: "/incidents",
+    icon: AlertCircle,
+    description: "Manage system incidents"
+  },
+  {
+    title: "Service Requests",
+    href: "/service-requests",
+    icon: ClipboardCheck,
+    description: "Manage service requests"
+  },
+  {
+    title: "Service Catalog",
+    href: "/services",
+    icon: ShoppingCart,
+    description: "Browse available services"
   },
   {
     title: "Problem Management",
