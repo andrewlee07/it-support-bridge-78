@@ -21,4 +21,5 @@ export interface AuditEntry {
   assignedTo?: string;
 }
 
-export type AuditEntityType = 'change' | 'ticket' | 'user' | 'asset' | 'release' | 'problem';
+export type AuditEntityType = 'change' | 'ticket' | 'user' | 'asset' | 'release' | 'problem' | 'group' | 'role' | 'permission';
+

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,8 +8,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Group, ResourcePermission, ResourceType, ActionType } from '@/utils/types/group';
 import { UserRole } from '@/utils/types/user';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import BulkRoleAssignmentDialog from './BulkRoleAssignmentDialog';
+import { 
+  logRoleAssignment, 
+  logRoleRemoval, 
+  logPermissionChange, 
+  addPermissionAuditEntry,
+  getPermissionAuditLogs
+} from '@/utils/permissionAuditUtils';
 
 // Mock groups data
 const mockGroups: Group[] = [
@@ -99,8 +106,18 @@ const GroupRoleManagement: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
   const [selectedPermissions, setSelectedPermissions] = useState<Map<ResourceType, Set<ActionType>>>(new Map());
+
+  const [auditDialogOpen, setAuditDialogOpen] = useState(false);
+  const [auditLogs, setAuditLogs] = useState<ReturnType<typeof getPermissionAuditLogs>>([]);
   
   const { toast } = useToast();
+  
+  // Fetch audit logs when the audit dialog opens
+  useEffect(() => {
+    if (auditDialogOpen) {
+      setAuditLogs(getPermissionAuditLogs());
+    }
+  }, [auditDialogOpen]);
   
   const handleGroupChange = (value: string) => {
     setSelectedGroupId(value);
@@ -135,6 +152,16 @@ const GroupRoleManagement: React.FC = () => {
       
       setGroups(updatedGroups);
       
+      // Create and add audit entry
+      const auditEntry = logRoleAssignment(
+        selectedGroupId,
+        selectedGroup.name,
+        selectedRole,
+        getRoleName(selectedRole),
+        'user-1' // In a real app, this would be the current user's ID
+      );
+      addPermissionAuditEntry(auditEntry);
+      
       toast({
         title: "Success",
         description: `Role ${getRoleName(selectedRole)} added to ${selectedGroup.name}`,
@@ -151,6 +178,9 @@ const GroupRoleManagement: React.FC = () => {
   };
   
   const handleRemoveRoleFromGroup = (groupId: string, role: UserRole) => {
+    const groupToUpdate = groups.find(g => g.id === groupId);
+    if (!groupToUpdate) return;
+    
     const updatedGroups = groups.map(group => 
       group.id === groupId 
         ? { 
@@ -162,6 +192,16 @@ const GroupRoleManagement: React.FC = () => {
     );
     
     setGroups(updatedGroups);
+    
+    // Create and add audit entry
+    const auditEntry = logRoleRemoval(
+      groupId,
+      groupToUpdate.name,
+      role,
+      getRoleName(role),
+      'user-1' // In a real app, this would be the current user's ID
+    );
+    addPermissionAuditEntry(auditEntry);
     
     const groupName = groups.find(g => g.id === groupId)?.name || "the group";
     
@@ -208,11 +248,38 @@ const GroupRoleManagement: React.FC = () => {
     }
     
     const resourcePermissions = updatedPermissions.get(resource)!;
+    const previouslyHadPermission = resourcePermissions.has(action);
     
     if (checked) {
       resourcePermissions.add(action);
+      
+      // Only log if this is a new permission
+      if (!previouslyHadPermission) {
+        const auditEntry = logPermissionChange(
+          selectedRole as UserRole,
+          getRoleName(selectedRole as UserRole),
+          resource,
+          action,
+          true,
+          'user-1' // In a real app, this would be the current user's ID
+        );
+        addPermissionAuditEntry(auditEntry);
+      }
     } else {
       resourcePermissions.delete(action);
+      
+      // Only log if we're removing an existing permission
+      if (previouslyHadPermission) {
+        const auditEntry = logPermissionChange(
+          selectedRole as UserRole,
+          getRoleName(selectedRole as UserRole),
+          resource,
+          action,
+          false,
+          'user-1' // In a real app, this would be the current user's ID
+        );
+        addPermissionAuditEntry(auditEntry);
+      }
     }
     
     // If no permissions are left for this resource, remove the resource entry
@@ -237,12 +304,55 @@ const GroupRoleManagement: React.FC = () => {
     if (!selectedPermissions.has(resource)) return false;
     return selectedPermissions.get(resource)!.has(action);
   };
+  
+  const handleBulkAssignRoles = (assignments: {groupId: string, roleId: UserRole}[]) => {
+    // Apply the assignments to the groups
+    const updatedGroups = [...groups];
+    
+    assignments.forEach(({ groupId, roleId }) => {
+      const groupIndex = updatedGroups.findIndex(g => g.id === groupId);
+      if (groupIndex >= 0) {
+        const group = updatedGroups[groupIndex];
+        if (!group.assignedRoles.includes(roleId)) {
+          updatedGroups[groupIndex] = {
+            ...group,
+            assignedRoles: [...group.assignedRoles, roleId],
+            updatedAt: new Date()
+          };
+        }
+      }
+    });
+    
+    setGroups(updatedGroups);
+    
+    // Refresh the audit logs
+    setAuditLogs(getPermissionAuditLogs());
+  };
+  
+  const formatDate = (date: Date): string => {
+    return new Date(date).toLocaleString();
+  };
 
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle>Role to Group Assignment</CardTitle>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setAuditDialogOpen(true)}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              View Audit Log
+            </Button>
+            <BulkRoleAssignmentDialog 
+              groups={groups}
+              availableRoles={availableRoles}
+              onAssignRoles={handleBulkAssignRoles}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center space-x-4 mb-6">
@@ -376,6 +486,60 @@ const GroupRoleManagement: React.FC = () => {
             </Button>
             <Button onClick={savePermissions}>
               Save Permissions
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Audit Log Dialog */}
+      <Dialog open={auditDialogOpen} onOpenChange={setAuditDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Permission Changes Audit Log</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto mt-4">
+            {auditLogs.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No permission changes have been logged yet.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Timestamp</TableHead>
+                    <TableHead>Action</TableHead>
+                    <TableHead>Details</TableHead>
+                    <TableHead>Performed By</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {auditLogs.map(log => (
+                    <TableRow key={log.id}>
+                      <TableCell className="font-mono text-xs">
+                        {formatDate(log.timestamp)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          log.action?.includes('Granted') || log.action?.includes('Assignment') 
+                            ? 'default' 
+                            : 'destructive'
+                        }>
+                          {log.action}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{log.message}</TableCell>
+                      <TableCell>
+                        {log.performedBy === 'system' ? 'System (Bulk Operation)' : 'Administrator'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+          <div className="flex justify-end mt-4">
+            <Button onClick={() => setAuditDialogOpen(false)}>
+              Close
             </Button>
           </div>
         </DialogContent>
