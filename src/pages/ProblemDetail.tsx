@@ -33,12 +33,14 @@ const ProblemDetail = () => {
         />
       )}
       
-      <ProblemDetailError
-        loading={loading}
-        error={error}
-        returnPath="/problems"
-        entityType="Problem"
-      />
+      {(loading || error || !problem) && (
+        <ProblemDetailError
+          loading={loading}
+          error={error}
+          returnPath="/problems"
+          entityType="Problem"
+        />
+      )}
       
       {!loading && !error && problem && (
         <ProblemDetailView

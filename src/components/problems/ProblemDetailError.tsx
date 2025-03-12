@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 
 interface ProblemDetailErrorProps {
   loading: boolean;
@@ -17,27 +18,29 @@ const ProblemDetailError: React.FC<ProblemDetailErrorProps> = ({
   entityType
 }) => {
   const navigate = useNavigate();
-  
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="container mx-auto py-10 flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <h2 className="text-xl font-semibold mb-2">{entityType} Not Found</h2>
-        <p className="text-muted-foreground mb-4">
-          The {entityType.toLowerCase()} you're looking for doesn't exist or you don't have permission to view it.
+      <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+        <div className="rounded-full bg-amber-100 p-3 mb-4">
+          <AlertTriangle className="h-6 w-6 text-amber-600" />
+        </div>
+        <h2 className="text-xl font-bold mb-2">
+          {entityType} Not Found
+        </h2>
+        <p className="text-muted-foreground mb-6">
+          The {entityType.toLowerCase()} you're looking for could not be found or may have been deleted.
         </p>
-        <Button 
-          className="btn-primary"
-          onClick={() => navigate(returnPath)}
-        >
-          Return to {entityType}s
+        <Button onClick={() => navigate(returnPath)}>
+          Return to {entityType} List
         </Button>
       </div>
     );
