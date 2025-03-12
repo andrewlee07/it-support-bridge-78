@@ -1,122 +1,136 @@
 
-import { differenceInMinutes, isAfter } from 'date-fns';
 import { Ticket } from './types/ticket';
-import { getTicketsSLA } from './mockData/slas';
+import { SLA } from './types/sla';
+import { mockSLAs } from './mockData/slas';
 
-// Define SLA timeframes - in a real app these would come from a configuration or database
-export const SLA_TIMEFRAMES = {
-  responseTime: {
-    P1: 30, // minutes
-    P2: 60,
-    P3: 240,
-    P4: 480
-  },
-  resolutionTime: {
-    P1: 240, // minutes
-    P2: 480,
-    P3: 1440,
-    P4: 2880
+// Replace the missing import with a direct reference to mockSLAs
+export const getTicketSLA = (ticket: Ticket): SLA | undefined => {
+  // Find a matching SLA for the ticket based on priority and type
+  return mockSLAs.find(
+    sla => 
+      sla.priorityLevel === ticket.priority && 
+      sla.ticketType === ticket.type &&
+      sla.isActive
+  );
+};
+
+export type SLAType = 'response' | 'resolution';
+
+export interface SLAStatus {
+  slaType: SLAType;
+  timeLeft: string;
+  percentLeft: number;
+  isBreached: boolean;
+}
+
+export const calculateSLAStatus = (ticket: Ticket, type: SLAType = 'resolution'): SLAStatus => {
+  const sla = getTicketSLA(ticket);
+  
+  if (!sla) {
+    return {
+      slaType: type,
+      timeLeft: 'No SLA',
+      percentLeft: 100,
+      isBreached: false
+    };
+  }
+  
+  // Calculate based on SLA type
+  if (type === 'response') {
+    return calculateResponseSLA(ticket, sla);
+  } else {
+    return calculateResolutionSLA(ticket, sla);
   }
 };
 
-/**
- * Calculate SLA breach percentage (how close we are to breaching SLA)
- * @param ticket The ticket to calculate SLA for
- * @param slaType 'response' or 'resolution'
- * @returns A number from 0-100 where 100 means SLA has been breached
- */
-export const calculateSLAPercentage = (ticket: Ticket, slaType: 'response' | 'resolution' = 'resolution'): number => {
-  // If ticket is resolved/closed/fulfilled, SLA is not relevant
-  if (['resolved', 'closed', 'fulfilled'].includes(ticket.status)) {
-    return 0;
+// Calculate response SLA status
+const calculateResponseSLA = (ticket: Ticket, sla: SLA): SLAStatus => {
+  // If ticket has a first response, SLA is met
+  if (ticket.firstResponseAt) {
+    return {
+      slaType: 'response',
+      timeLeft: 'Responded',
+      percentLeft: 100,
+      isBreached: false
+    };
   }
-
-  // Get appropriate SLA timeframe based on priority and type
-  const timeframes = SLA_TIMEFRAMES[slaType === 'response' ? 'responseTime' : 'resolutionTime'];
-  const targetMinutes = timeframes[ticket.priority as keyof typeof timeframes] || timeframes.P3;
   
-  // Calculate elapsed time
+  // Calculate time left for response
   const createdAt = new Date(ticket.createdAt);
+  const responseTarget = new Date(createdAt.getTime() + sla.responseTimeHours * 60 * 60 * 1000);
   const now = new Date();
   
-  // For response time, if the ticket has been responded to, use that time instead of now
-  const endTime = slaType === 'response' && ticket.firstResponseAt ? new Date(ticket.firstResponseAt) : now;
+  const timeLeftMs = responseTarget.getTime() - now.getTime();
+  const isBreached = timeLeftMs <= 0;
   
-  // Calculate minutes elapsed
-  const minutesElapsed = differenceInMinutes(endTime, createdAt);
+  // Format the time left
+  const timeLeft = formatTimeLeft(timeLeftMs);
   
-  // Calculate percentage of SLA used
-  const percentage = Math.min(100, Math.round((minutesElapsed / targetMinutes) * 100));
+  // Calculate percent left (0-100)
+  const totalTimeMs = sla.responseTimeHours * 60 * 60 * 1000;
+  const percentLeft = Math.max(0, Math.min(100, (timeLeftMs / totalTimeMs) * 100));
   
-  return percentage;
+  return {
+    slaType: 'response',
+    timeLeft: isBreached ? 'Breached' : timeLeft,
+    percentLeft,
+    isBreached
+  };
 };
 
-/**
- * Check if SLA has been breached
- * @param ticket The ticket to check
- * @param slaType 'response' or 'resolution'
- * @returns Boolean indicating whether SLA has been breached
- */
-export const isSLABreached = (ticket: Ticket, slaType: 'response' | 'resolution' = 'resolution'): boolean => {
-  return calculateSLAPercentage(ticket, slaType) >= 100;
-};
-
-/**
- * Calculate SLA status - returns one of: 'ok', 'warning', 'breached'
- * @param ticket The ticket to calculate status for
- * @param slaType 'response' or 'resolution'
- * @returns SLA status string
- */
-export const getSLAStatus = (ticket: Ticket, slaType: 'response' | 'resolution' = 'resolution'): 'ok' | 'warning' | 'breached' => {
-  // If ticket is resolved or closed, SLA is considered ok
-  if (['resolved', 'closed', 'fulfilled'].includes(ticket.status)) {
-    return 'ok';
+// Calculate resolution SLA status
+const calculateResolutionSLA = (ticket: Ticket, sla: SLA): SLAStatus => {
+  // If ticket is resolved or closed, SLA is met
+  if (ticket.status === 'resolved' || ticket.status === 'closed' || ticket.status === 'fulfilled') {
+    return {
+      slaType: 'resolution',
+      timeLeft: 'Resolved',
+      percentLeft: 100,
+      isBreached: false
+    };
   }
   
-  // For response SLA, if ticket has been responded to, SLA is considered ok
-  if (slaType === 'response' && ticket.status !== 'new' && ticket.firstResponseAt) {
-    return 'ok';
+  // For new tickets that haven't been responded to yet, use the same logic as response SLA
+  if (ticket.status === 'new' && !ticket.firstResponseAt) {
+    return calculateResponseSLA(ticket, sla);
   }
   
-  const percentage = calculateSLAPercentage(ticket, slaType);
-  
-  if (percentage >= 100) {
-    return 'breached';
-  } else if (percentage >= 80) {
-    return 'warning';
-  } else {
-    return 'ok';
-  }
-};
-
-/**
- * Get formatted time remaining for SLA
- * @param ticket The ticket to calculate time for
- * @param slaType 'response' or 'resolution'
- * @returns Formatted string of time remaining or breached by
- */
-export const getSLATimeRemaining = (ticket: Ticket, slaType: 'response' | 'resolution' = 'resolution'): string => {
-  // Get appropriate SLA timeframe
-  const timeframes = SLA_TIMEFRAMES[slaType === 'response' ? 'responseTime' : 'resolutionTime'];
-  const targetMinutes = timeframes[ticket.priority as keyof typeof timeframes] || timeframes.P3;
-  
-  // Calculate elapsed time
+  // Calculate time left for resolution
   const createdAt = new Date(ticket.createdAt);
+  const resolutionTarget = new Date(createdAt.getTime() + sla.resolutionTimeHours * 60 * 60 * 1000);
   const now = new Date();
-  const minutesElapsed = differenceInMinutes(now, createdAt);
   
-  // Calculate minutes remaining
-  const minutesRemaining = targetMinutes - minutesElapsed;
+  const timeLeftMs = resolutionTarget.getTime() - now.getTime();
+  const isBreached = timeLeftMs <= 0;
   
-  // Format the time
-  if (minutesRemaining <= 0) {
-    const minutesBreached = Math.abs(minutesRemaining);
-    const hours = Math.floor(minutesBreached / 60);
-    const minutes = minutesBreached % 60;
-    return hours > 0 ? `Breached by ${hours}h ${minutes}m` : `Breached by ${minutes}m`;
-  } else {
-    const hours = Math.floor(minutesRemaining / 60);
-    const minutes = minutesRemaining % 60;
-    return hours > 0 ? `${hours}h ${minutes}m remaining` : `${minutes}m remaining`;
+  // Format the time left
+  const timeLeft = formatTimeLeft(timeLeftMs);
+  
+  // Calculate percent left (0-100)
+  const totalTimeMs = sla.resolutionTimeHours * 60 * 60 * 1000;
+  const percentLeft = Math.max(0, Math.min(100, (timeLeftMs / totalTimeMs) * 100));
+  
+  return {
+    slaType: 'resolution',
+    timeLeft: isBreached ? 'Breached' : timeLeft,
+    percentLeft,
+    isBreached
+  };
+};
+
+// Helper to format time left in a human-readable format
+const formatTimeLeft = (timeLeftMs: number): string => {
+  if (timeLeftMs <= 0) {
+    return 'Breached';
   }
+  
+  const hours = Math.floor(timeLeftMs / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  if (hours > 24) {
+    const days = Math.floor(hours / 24);
+    return `${days}d ${hours % 24}h`;
+  }
+  
+  return `${hours}h ${minutes}m`;
 };

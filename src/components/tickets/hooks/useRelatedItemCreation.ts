@@ -108,6 +108,7 @@ export const useRelatedItemCreation = ({
       // Create task with prefilled data
       const response = await createTask({
         ...task,
+        description: task.description || '', // Ensure description is always provided
         creator: 'user-1', // In a real app, this would be the current user
       });
       
