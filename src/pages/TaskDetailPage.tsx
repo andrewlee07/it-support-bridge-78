@@ -1,20 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchTaskById } from '@/utils/api/taskApi';
-import { Task } from '@/utils/types/taskTypes';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { getUserNameById } from '@/utils/userUtils';
-import { getTaskStatusVisuals, getTaskPriorityVisuals } from '@/utils/types/taskTypes';
-import { format } from 'date-fns';
-import TaskForm from '@/components/tasks/TaskForm';
-import TicketLoadingError from '@/components/tickets/TicketLoadingError';
-import { AlertTriangle, Calendar, CheckSquare, Clock } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import PageTransition from '@/components/shared/PageTransition';
-import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
+import { getTaskById, deleteTask } from '@/utils/api/taskApi';
+import { Task } from '@/utils/types/taskTypes';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { format } from 'date-fns';
+import { getUserNameById } from '@/utils/userUtils';
+import { toast } from 'sonner';
 
 const TaskDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,254 +20,226 @@ const TaskDetailPage: React.FC = () => {
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   useEffect(() => {
     const loadTask = async () => {
+      if (!id) return;
+      
       setLoading(true);
+      setError(null);
+      
       try {
-        if (id) {
-          const response = await fetchTaskById(id);
-          if (response.success && response.data) {
-            setTask(response.data);
-          } else {
-            setError('Task not found');
-          }
+        const response = await getTaskById(id);
+        
+        if (response.success) {
+          setTask(response.data);
         } else {
-          setError('Invalid task ID');
+          setError('Failed to load task details');
         }
       } catch (err) {
         console.error('Error loading task:', err);
-        setError('Failed to load task');
+        setError('An error occurred while loading the task');
       } finally {
         setLoading(false);
       }
     };
-
+    
     loadTask();
   }, [id]);
-
-  const handleTaskUpdated = (updatedTask: Task) => {
-    setTask(updatedTask);
-    setIsEditing(false);
+  
+  const handleEdit = () => {
+    navigate(`/tasks/${id}/edit`);
   };
-
-  const handleCancel = () => {
-    setIsEditing(false);
+  
+  const handleDelete = async () => {
+    if (!id || !window.confirm('Are you sure you want to delete this task?')) return;
+    
+    try {
+      const response = await deleteTask(id);
+      if (response.success) {
+        toast.success('Task deleted successfully');
+        navigate('/tasks');
+      } else {
+        toast.error('Failed to delete task');
+      }
+    } catch (err) {
+      console.error('Error deleting task:', err);
+      toast.error('An error occurred while deleting the task');
+    }
   };
-
+  
+  const renderStatusBadge = (status: string) => {
+    let color = 'bg-gray-200 text-gray-800';
+    switch (status) {
+      case 'new':
+        color = 'bg-blue-100 text-blue-800';
+        break;
+      case 'in-progress':
+        color = 'bg-yellow-100 text-yellow-800';
+        break;
+      case 'on-hold':
+        color = 'bg-purple-100 text-purple-800';
+        break;
+      case 'completed':
+        color = 'bg-green-100 text-green-800';
+        break;
+      case 'cancelled':
+        color = 'bg-red-100 text-red-800';
+        break;
+    }
+    
+    return (
+      <Badge variant="outline" className={`${color} border-0`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </Badge>
+    );
+  };
+  
+  const renderPriorityBadge = (priority: string) => {
+    let color = 'bg-gray-200 text-gray-800';
+    switch (priority) {
+      case 'critical':
+        color = 'bg-red-100 text-red-800';
+        break;
+      case 'high':
+        color = 'bg-orange-100 text-orange-800';
+        break;
+      case 'medium':
+        color = 'bg-blue-100 text-blue-800';
+        break;
+      case 'low':
+        color = 'bg-green-100 text-green-800';
+        break;
+    }
+    
+    return (
+      <Badge variant="outline" className={`${color} border-0`}>
+        {priority.charAt(0).toUpperCase() + priority.slice(1)}
+      </Badge>
+    );
+  };
+  
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <PageTransition>
+        <div className="container mx-auto p-4">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </PageTransition>
     );
   }
-
+  
   if (error || !task) {
     return (
-      <TicketLoadingError
-        returnPath="/tasks"
-        entityName="Task"
-      />
-    );
-  }
-
-  if (isEditing) {
-    return (
-      <div className="container mx-auto p-4 max-w-5xl">
-        <DetailBreadcrumb 
-          entityName="Task"
-          entityId={task.id}
-          parentRoute="/tasks"
-          parentName="Tasks"
-        />
-        <div className="mt-4">
-          <TaskForm
-            initialData={task}
-            onTaskUpdated={handleTaskUpdated}
-            onCancel={handleCancel}
-          />
+      <PageTransition>
+        <div className="container mx-auto p-4">
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>
+              {error || 'Task not found'}
+            </AlertDescription>
+          </Alert>
+          
+          <Button onClick={() => navigate('/tasks')}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Tasks
+          </Button>
         </div>
-      </div>
+      </PageTransition>
     );
   }
-
-  const statusVisuals = getTaskStatusVisuals(task.status);
-  const priorityVisuals = getTaskPriorityVisuals(task.priority);
 
   return (
     <PageTransition>
-      <div className="container mx-auto p-4 max-w-5xl">
-        <DetailBreadcrumb 
-          entityName="Task"
-          entityId={task.id}
-          parentRoute="/tasks"
-          parentName="Tasks"
-        />
-        
-        <div className="flex justify-between items-center mt-4 mb-6">
-          <h1 className="text-2xl font-bold">{task.title}</h1>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setIsEditing(true)}>
-              Edit Task
+      <div className="container mx-auto p-4">
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between">
+            <Button variant="outline" onClick={() => navigate('/tasks')} className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Tasks
             </Button>
-            <Button onClick={() => navigate('/tasks')}>
-              Back to Tasks
-            </Button>
+            
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleEdit}>
+                <Edit className="mr-2 h-4 w-4" /> Edit
+              </Button>
+              <Button variant="destructive" onClick={handleDelete}>
+                <Trash2 className="mr-2 h-4 w-4" /> Delete
+              </Button>
+            </div>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Description</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap">{task.description}</p>
-              </CardContent>
-            </Card>
-
-            {task.checklist && task.checklist.length > 0 && (
-              <Card>
-                <CardHeader className="flex flex-row items-center">
-                  <CheckSquare className="mr-2 h-5 w-5" />
-                  <CardTitle>Checklist</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {task.checklist.map(item => (
-                      <li key={item.id} className="flex items-start">
-                        <div className={`w-5 h-5 mr-2 rounded-full flex items-center justify-center ${item.completed ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
-                          {item.completed ? '✓' : '○'}
-                        </div>
-                        <div className="flex-1">
-                          <p className={item.completed ? 'line-through text-gray-500' : ''}>
-                            {item.text}
-                          </p>
-                          {item.completedAt && (
-                            <p className="text-xs text-gray-500">
-                              Completed on {format(new Date(item.completedAt), 'MMM d, yyyy')}
-                            </p>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
-
-            {(task.dependsOn && task.dependsOn.length > 0) || (task.blockedBy && task.blockedBy.length > 0) ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Dependencies</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {task.dependsOn && task.dependsOn.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="font-medium mb-2">Depends On:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {task.dependsOn.map(depId => (
-                          <Badge key={depId} variant="outline" className="cursor-pointer" onClick={() => navigate(`/tasks/${depId}`)}>
-                            {depId}
-                          </Badge>
-                        ))}
-                      </div>
+          
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-2xl">{task.title}</CardTitle>
+                  <div className="flex gap-2 mt-2">
+                    {renderStatusBadge(task.status)}
+                    {renderPriorityBadge(task.priority)}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-muted-foreground">ID: {task.id}</div>
+                  {task.dueDate && (
+                    <div className="text-sm mt-1">
+                      Due: {format(new Date(task.dueDate), 'MMM d, yyyy')}
                     </div>
                   )}
-                  
-                  {task.blockedBy && task.blockedBy.length > 0 && (
-                    <div>
-                      <h4 className="font-medium mb-2">Blocked By:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {task.blockedBy.map(blockerId => (
-                          <Badge key={blockerId} variant="outline" className="cursor-pointer" onClick={() => navigate(`/tasks/${blockerId}`)}>
-                            {blockerId}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ) : null}
-          </div>
-
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Task Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent>
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Status</p>
-                  <Badge className={statusVisuals.badge}>{task.status}</Badge>
+                  <h3 className="text-lg font-medium mb-2">Description</h3>
+                  <p className="text-muted-foreground whitespace-pre-wrap">
+                    {task.description || 'No description provided.'}
+                  </p>
                 </div>
                 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Priority</p>
-                  <Badge className={priorityVisuals.badge}>{task.priority}</Badge>
-                </div>
+                <Separator />
                 
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Assignee</p>
-                  <p>{getUserNameById(task.assignee)}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Created By</p>
-                  <p>{getUserNameById(task.creator)}</p>
-                </div>
-                
-                {task.dueDate && (
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Due Date</p>
-                      <p>{format(new Date(task.dueDate), 'PPP')}</p>
-                    </div>
-                  </div>
-                )}
-
-                {task.estimatedHours && (
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Estimated Hours</p>
-                      <p>{task.estimatedHours} hours</p>
-                    </div>
-                  </div>
-                )}
-
-                {task.relatedItemId && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Related {task.relatedItemType}</p>
-                    <Badge variant="outline" className="cursor-pointer" onClick={() => navigate(`/${task.relatedItemType}s/${task.relatedItemId}`)}>
-                      {task.relatedItemId}
-                    </Badge>
+                    <h3 className="text-lg font-medium mb-2">Details</h3>
+                    <dl className="space-y-2">
+                      <div className="flex justify-between">
+                        <dt className="text-muted-foreground">Assignee:</dt>
+                        <dd className="font-medium">{task.assignee ? getUserNameById(task.assignee) : 'Unassigned'}</dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-muted-foreground">Created:</dt>
+                        <dd className="font-medium">{format(new Date(task.createdAt), 'MMM d, yyyy')}</dd>
+                      </div>
+                      {task.updatedAt && (
+                        <div className="flex justify-between">
+                          <dt className="text-muted-foreground">Last updated:</dt>
+                          <dd className="font-medium">{format(new Date(task.updatedAt), 'MMM d, yyyy')}</dd>
+                        </div>
+                      )}
+                    </dl>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Dates</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Created</p>
-                  <p>{format(new Date(task.createdAt), 'PPP')}</p>
+                  
+                  {task.checklist && task.checklist.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">Checklist</h3>
+                      <ul className="space-y-2">
+                        {task.checklist.map((item) => (
+                          <li key={item.id} className="flex items-center">
+                            <span className={`mr-2 ${item.completed ? 'line-through text-muted-foreground' : ''}`}>
+                              {item.text}
+                            </span>
+                            {item.completed && <Badge>Completed</Badge>}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Last Updated</p>
-                  <p>{format(new Date(task.updatedAt), 'PPP')}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </PageTransition>

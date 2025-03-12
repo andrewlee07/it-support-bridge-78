@@ -8,20 +8,18 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import TaskTable from '@/components/tasks/TaskTable';
 import TaskGrid from '@/components/tasks/TaskGrid';
 import TaskCalendarView from '@/components/tasks/TaskCalendarView';
-import TaskViewToggle from '@/components/tasks/TaskViewToggle';
+import TaskViewToggle, { TaskViewType } from '@/components/tasks/TaskViewToggle';
 import TaskSearch from '@/components/tasks/TaskSearch';
 import TaskForm from '@/components/tasks/TaskForm';
 import { fetchTasks } from '@/utils/api/taskApi';
 import { Task, TaskStatus, TaskPriority } from '@/utils/types/taskTypes';
-
-type ViewType = 'table' | 'grid' | 'calendar';
 
 const TasksPage: React.FC = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState<boolean>(false);
-  const [view, setView] = useState<ViewType>('table');
+  const [view, setView] = useState<TaskViewType>('table');
   
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -73,7 +71,7 @@ const TasksPage: React.FC = () => {
     setPriorityFilter(priorities);
   };
 
-  const handleViewChange = (newView: ViewType) => {
+  const handleViewChange = (newView: TaskViewType) => {
     setView(newView);
   };
 

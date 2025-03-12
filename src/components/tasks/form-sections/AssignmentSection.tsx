@@ -44,7 +44,7 @@ const AssignmentSection: React.FC<AssignmentSectionProps> = ({ form }) => {
           <FormLabel>Assignee</FormLabel>
           <Select
             onValueChange={field.onChange}
-            value={field.value || ""}
+            value={field.value || "unassigned"}
           >
             <FormControl>
               <SelectTrigger>
@@ -52,7 +52,7 @@ const AssignmentSection: React.FC<AssignmentSectionProps> = ({ form }) => {
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              <SelectItem value="">Unassigned</SelectItem>
+              <SelectItem value="unassigned">Unassigned</SelectItem>
               {users.map(user => (
                 <SelectItem key={user.id} value={user.id}>
                   {user.name}

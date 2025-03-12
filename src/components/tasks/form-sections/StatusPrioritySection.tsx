@@ -30,7 +30,7 @@ const StatusPrioritySection: React.FC<StatusPrioritySectionProps> = ({ form }) =
         render={({ field }) => (
           <FormItem>
             <FormLabel>Status</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} defaultValue={field.value || "new"}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
@@ -55,7 +55,7 @@ const StatusPrioritySection: React.FC<StatusPrioritySectionProps> = ({ form }) =
         render={({ field }) => (
           <FormItem>
             <FormLabel>Priority</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} defaultValue={field.value || "medium"}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select priority" />

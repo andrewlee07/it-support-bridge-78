@@ -23,6 +23,9 @@ export interface TaskSearchProps {
   priorityFilter: TaskPriority[];
   onPriorityFilterChange: (priorities: TaskPriority[]) => void;
   placeholder?: string;
+  // For backward compatibility with Tasks.tsx
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 const TaskSearch: React.FC<TaskSearchProps> = ({
@@ -32,8 +35,15 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
   onStatusFilterChange,
   priorityFilter,
   onPriorityFilterChange,
-  placeholder = 'Search tasks...'
+  placeholder = 'Search tasks...',
+  // Handle backward compatibility
+  value,
+  onChange
 }) => {
+  // Use the backward compatibility props if provided
+  const effectiveSearchQuery = value !== undefined ? value : searchQuery;
+  const effectiveOnSearchChange = onChange || onSearchChange;
+
   const statusOptions: TaskStatus[] = ['new', 'in-progress', 'on-hold', 'completed', 'cancelled'];
   const priorityOptions: TaskPriority[] = ['critical', 'high', 'medium', 'low'];
 
@@ -54,12 +64,12 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
   };
 
   const handleClearFilters = () => {
-    onSearchChange('');
+    effectiveOnSearchChange('');
     onStatusFilterChange([]);
     onPriorityFilterChange([]);
   };
 
-  const hasFilters = searchQuery || statusFilter.length > 0 || priorityFilter.length > 0;
+  const hasFilters = effectiveSearchQuery || statusFilter.length > 0 || priorityFilter.length > 0;
 
   return (
     <div className="w-full max-w-3xl">
@@ -69,13 +79,13 @@ const TaskSearch: React.FC<TaskSearchProps> = ({
           <Input
             type="text"
             placeholder={placeholder}
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={effectiveSearchQuery}
+            onChange={(e) => effectiveOnSearchChange(e.target.value)}
             className="pl-8"
           />
-          {searchQuery && (
+          {effectiveSearchQuery && (
             <button 
-              onClick={() => onSearchChange('')}
+              onClick={() => effectiveOnSearchChange('')}
               className="absolute right-2.5 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
