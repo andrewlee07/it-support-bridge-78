@@ -44,32 +44,42 @@ const router = createBrowserRouter([
   // End user portal routes
   {
     path: '/portal',
-    element: React.createElement(ProtectedRoute, { allowEndUser: true }, 
+    element: React.createElement(
+      ProtectedRoute, 
+      { allowEndUser: true }, 
       React.createElement(EndUserPortal)
     )
   },
   {
     path: '/portal/my-approvals',
-    element: React.createElement(ProtectedRoute, { allowEndUser: true },
+    element: React.createElement(
+      ProtectedRoute, 
+      { allowEndUser: true },
       React.createElement(PortalMyApprovals)
     )
   },
   {
     path: '/portal/my-incidents',
-    element: React.createElement(ProtectedRoute, { allowEndUser: true },
+    element: React.createElement(
+      ProtectedRoute, 
+      { allowEndUser: true },
       React.createElement(PortalMyApprovals) // Reusing same component for now
     )
   },
   {
     path: '/portal/my-requests',
-    element: React.createElement(ProtectedRoute, { allowEndUser: true },
+    element: React.createElement(
+      ProtectedRoute, 
+      { allowEndUser: true },
       React.createElement(PortalMyApprovals) // Reusing same component for now
     )
   },
   // Staff routes with additional protection
   {
     path: '/',
-    element: React.createElement(ProtectedRoute, { allowEndUser: false }, 
+    element: React.createElement(
+      ProtectedRoute, 
+      { allowEndUser: false }, 
       React.createElement(MainLayout)
     ),
     errorElement: React.createElement(ErrorPage),
