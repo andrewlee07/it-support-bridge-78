@@ -5,7 +5,6 @@ import MainLayout from '@/layouts/MainLayout';
 import Login from '@/pages/Login';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ErrorPage from '@/pages/ErrorPage';
-import { AuthProvider } from '@/contexts/AuthContext';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
@@ -19,10 +18,6 @@ import { testBugRoutes } from './routes/testBugRoutes';
 import { releaseRoutes } from './routes/releaseRoutes';
 import { taskRoutes } from './routes/taskRoutes';
 import { miscRoutes } from './routes/miscRoutes';
-
-const wrapWithAuthProvider = (element: React.ReactElement) => {
-  return React.createElement(AuthProvider, null, element);
-};
 
 const router = createBrowserRouter([
   {
