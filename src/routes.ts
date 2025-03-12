@@ -12,6 +12,7 @@ import Knowledge from '@/pages/Knowledge';
 import TestTracking from '@/pages/TestTracking';
 import PortalMyApprovals from '@/pages/PortalMyApprovals';
 import Assets from '@/pages/Assets';
+import Index from '@/pages/Index';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
@@ -27,13 +28,48 @@ import { taskRoutes } from './routes/taskRoutes';
 import { miscRoutes } from './routes/miscRoutes';
 
 const router = createBrowserRouter([
+  // Public routes that don't require authentication
+  {
+    path: '/',
+    element: React.createElement(Index)
+  },
   {
     path: '/login',
     element: React.createElement(Login)
   },
   {
+    path: '/knowledge/:id',
+    element: React.createElement(KnowledgeArticleDetail)
+  },
+  // End user portal routes
+  {
+    path: '/portal',
+    element: React.createElement(ProtectedRoute, { allowEndUser: true }, 
+      React.createElement(EndUserPortal)
+    )
+  },
+  {
+    path: '/portal/my-approvals',
+    element: React.createElement(ProtectedRoute, { allowEndUser: true },
+      React.createElement(PortalMyApprovals)
+    )
+  },
+  {
+    path: '/portal/my-incidents',
+    element: React.createElement(ProtectedRoute, { allowEndUser: true },
+      React.createElement(PortalMyApprovals) // Reusing same component for now
+    )
+  },
+  {
+    path: '/portal/my-requests',
+    element: React.createElement(ProtectedRoute, { allowEndUser: true },
+      React.createElement(PortalMyApprovals) // Reusing same component for now
+    )
+  },
+  // Staff routes with additional protection
+  {
     path: '/',
-    element: React.createElement(ProtectedRoute, null, 
+    element: React.createElement(ProtectedRoute, { allowEndUser: false }, 
       React.createElement(MainLayout)
     ),
     errorElement: React.createElement(ErrorPage),
@@ -75,27 +111,6 @@ const router = createBrowserRouter([
         element: React.createElement(Assets)
       }
     ]
-  },
-  // Add the End User Portal routes
-  {
-    path: '/portal',
-    element: React.createElement(EndUserPortal)
-  },
-  {
-    path: '/portal/my-approvals',
-    element: React.createElement(PortalMyApprovals)
-  },
-  {
-    path: '/portal/my-incidents',
-    element: React.createElement(PortalMyApprovals) // Reusing same component for now
-  },
-  {
-    path: '/portal/my-requests',
-    element: React.createElement(PortalMyApprovals) // Reusing same component for now
-  },
-  {
-    path: '/knowledge/:id',
-    element: React.createElement(KnowledgeArticleDetail)
   },
   {
     path: '*',

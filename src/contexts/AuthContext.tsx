@@ -9,6 +9,7 @@ import { useSessionManagement } from '@/hooks/useSessionManagement';
 import { isSessionValid } from '@/utils/securityUtils';
 import { useToast } from '@/hooks/use-toast';
 import { logError } from '@/utils/logging/errorLogger';
+import { useNavigate } from 'react-router-dom';
 
 // Session checker interval in milliseconds (5 minutes)
 const SESSION_CHECK_INTERVAL = 5 * 60 * 1000;
@@ -30,12 +31,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Logout function that uses our hook
   const logout = () => logoutUser(user);
 
-  // Redirect users based on their role
+  // Handle user role-based redirects after login
   useEffect(() => {
     if (user && !loading) {
-      // If user role is 'user', redirect to portal
-      if (user.role === 'user' && window.location.pathname === '/') {
-        window.location.href = '/portal';
+      // Redirect end users to portal, staff to dashboard
+      console.log(`User role is ${user.role}, redirecting accordingly`);
+      
+      // If user role is 'user', they should only access the portal
+      if (user.role === 'user') {
+        // Only redirect if not already on a portal page
+        if (!window.location.pathname.startsWith('/portal')) {
+          console.log('End user detected, redirecting to portal');
+          window.location.href = '/portal';
+        }
       }
     }
   }, [user, loading]);
@@ -87,6 +95,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (isSessionValid(parsedUser)) {
             console.log("Saved user session is valid, setting user state");
             setUser(parsedUser);
+            
+            // For end users, ensure they're redirected to portal
+            if (parsedUser.role === 'user' && !window.location.pathname.startsWith('/portal')) {
+              console.log('End user detected from saved session, redirecting to portal');
+              window.location.href = '/portal';
+            }
           } else {
             // Invalid session, clear it
             console.log("Saved user session is invalid, clearing localStorage");

@@ -19,8 +19,13 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      console.log("User already logged in, redirecting to dashboard");
-      navigate('/dashboard', { replace: true });
+      console.log("User already logged in, redirecting based on role");
+      // Redirect based on user role
+      if (user.role === 'user') {
+        navigate('/portal', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     }
   }, [user, navigate]);
 
@@ -60,9 +65,9 @@ const Login = () => {
       const success = await login(email, password);
       if (success && pendingUser) {
         navigate('/mfa-verification');
-      } else if (success) {
-        navigate('/dashboard');
       }
+      // No need to navigate here as the useEffect will handle it
+      // based on the user role
     } finally {
       setIsLoading(false);
     }

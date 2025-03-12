@@ -1,12 +1,20 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogIn } from 'lucide-react';
 
 const Index = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect end users to portal
+  useEffect(() => {
+    if (user && user.role === 'user') {
+      navigate('/portal', { replace: true });
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#b047c9]/10 to-[#05b2e6]/5 flex flex-col">
@@ -22,7 +30,9 @@ const Index = () => {
             
             {user ? (
               <Button variant="default" asChild>
-                <Link to="/dashboard">Go to Dashboard</Link>
+                <Link to={user.role === 'user' ? '/portal' : '/dashboard'}>
+                  {user.role === 'user' ? 'Go to Portal' : 'Go to Dashboard'}
+                </Link>
               </Button>
             ) : (
               <Button asChild>
@@ -44,7 +54,9 @@ const Index = () => {
           
           {user ? (
             <Button size="lg" asChild>
-              <Link to="/dashboard">Access Dashboard</Link>
+              <Link to={user.role === 'user' ? '/portal' : '/dashboard'}>
+                {user.role === 'user' ? 'Access Portal' : 'Access Dashboard'}
+              </Link>
             </Button>
           ) : (
             <Button size="lg" asChild>
