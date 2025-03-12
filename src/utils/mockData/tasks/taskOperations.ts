@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 // Mock data storage
 let tasks: Task[] = [
   {
-    id: 'task-1',
+    id: 'TSK00001',
     title: 'Server Maintenance',
     description: 'Schedule downtime and perform server updates',
     status: 'new',
@@ -34,7 +34,7 @@ let tasks: Task[] = [
     ]
   },
   {
-    id: 'task-2',
+    id: 'TSK00002',
     title: 'Update Security Certificates',
     description: 'Renew SSL certificates before they expire',
     status: 'in-progress',
@@ -44,11 +44,11 @@ let tasks: Task[] = [
     dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago (overdue)
     createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    dependsOn: ['task-3'],
+    dependsOn: ['TSK00003'],
     estimatedHours: 2
   },
   {
-    id: 'task-3',
+    id: 'TSK00003',
     title: 'Review Incident Reports',
     description: 'Analyze recent incident reports and summarize findings',
     status: 'completed',
@@ -60,7 +60,7 @@ let tasks: Task[] = [
     updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)
   },
   {
-    id: 'task-4',
+    id: 'TSK00004',
     title: 'Upgrade Database',
     description: 'Implement database migration to newer version',
     status: 'on-hold',
@@ -70,10 +70,10 @@ let tasks: Task[] = [
     dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    blockedBy: ['task-5']
+    blockedBy: ['TSK00005']
   },
   {
-    id: 'task-5',
+    id: 'TSK00005',
     title: 'Implement New Feature',
     description: 'Add requested feature to improve user experience',
     status: 'new',
@@ -85,7 +85,7 @@ let tasks: Task[] = [
   },
   // Task template example
   {
-    id: 'template-1',
+    id: 'TEMP00001',
     title: 'New Server Setup Template',
     description: 'Standard steps for setting up a new server',
     status: 'new',
@@ -123,6 +123,43 @@ let tasks: Task[] = [
     ]
   }
 ];
+
+// Function to get the next task ID
+const getNextTaskIdNumber = (): number => {
+  const taskIds = tasks
+    .filter(t => !t.isTemplate && t.id.startsWith('TSK'))
+    .map(t => {
+      const numericPart = t.id.replace('TSK', '');
+      return parseInt(numericPart, 10);
+    });
+  
+  const maxId = taskIds.length > 0 ? Math.max(...taskIds) : 0;
+  return maxId + 1;
+};
+
+// Function to get the next template ID
+const getNextTemplateIdNumber = (): number => {
+  const templateIds = tasks
+    .filter(t => t.isTemplate && t.id.startsWith('TEMP'))
+    .map(t => {
+      const numericPart = t.id.replace('TEMP', '');
+      return parseInt(numericPart, 10);
+    });
+  
+  const maxId = templateIds.length > 0 ? Math.max(...templateIds) : 0;
+  return maxId + 1;
+};
+
+// Generate a formatted task ID
+const generateTaskId = (isTemplate: boolean): string => {
+  if (isTemplate) {
+    const nextNumber = getNextTemplateIdNumber();
+    return `TEMP${nextNumber.toString().padStart(5, '0')}`;
+  } else {
+    const nextNumber = getNextTaskIdNumber();
+    return `TSK${nextNumber.toString().padStart(5, '0')}`;
+  }
+};
 
 // API functions
 export const fetchTasks = async (
@@ -214,7 +251,7 @@ type CreateTaskInput = {
 
 export const createTask = async (taskData: CreateTaskInput): Promise<{ success: boolean; data: Task }> => {
   const newTask: Task = {
-    id: taskData.isTemplate ? `template-${uuidv4().slice(0, 8)}` : `task-${uuidv4().slice(0, 8)}`,
+    id: generateTaskId(taskData.isTemplate || false),
     ...taskData,
     timeTracking: taskData.timeTracking ? {
       totalTimeSpent: taskData.timeTracking.totalTimeSpent || 0,
