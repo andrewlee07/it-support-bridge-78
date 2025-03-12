@@ -9,6 +9,7 @@ import NotFound from '@/pages/NotFound';
 import EndUserPortal from '@/pages/EndUserPortal';
 import KnowledgeArticleDetail from '@/pages/KnowledgeArticleDetail';
 import PortalMyApprovals from '@/pages/PortalMyApprovals';
+import Assets from '@/pages/Assets';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
@@ -35,6 +36,15 @@ const router = createBrowserRouter([
     ),
     errorElement: React.createElement(ErrorPage),
     children: [
+      // Add asset routes directly
+      {
+        path: 'assets',
+        element: React.createElement(Assets)
+      },
+      {
+        path: 'assets/:id',
+        element: React.createElement(Assets)
+      },
       // Add all routes from domain-specific files
       ...miscRoutes,
       ...ticketRoutes,
