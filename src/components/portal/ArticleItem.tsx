@@ -16,8 +16,11 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
   url,
   description
 }) => {
+  // Get the ID from the URL
+  const articleId = url.split('/').pop();
+  
   return (
-    <Link to={url} className="block">
+    <Link to={`/knowledge/${articleId}`} className="block">
       <div className="p-3 rounded-md hover:bg-accent transition-colors">
         <h4 className="text-sm font-medium mb-1">{title}</h4>
         {description && (

@@ -5,6 +5,9 @@ import MainLayout from '@/layouts/MainLayout';
 import Login from '@/pages/Login';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ErrorPage from '@/pages/ErrorPage';
+import NotFound from '@/pages/NotFound';
+import EndUserPortal from '@/pages/EndUserPortal';
+import KnowledgeArticleDetail from '@/pages/KnowledgeArticleDetail';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
@@ -44,6 +47,19 @@ const router = createBrowserRouter([
       ...adminRoutes,
       ...taskRoutes
     ]
+  },
+  // Add the End User Portal routes
+  {
+    path: '/portal',
+    element: React.createElement(EndUserPortal)
+  },
+  {
+    path: '/knowledge/:id',
+    element: React.createElement(KnowledgeArticleDetail)
+  },
+  {
+    path: '*',
+    element: React.createElement(NotFound)
   }
 ]);
 
