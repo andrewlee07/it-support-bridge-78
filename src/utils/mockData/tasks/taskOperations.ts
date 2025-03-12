@@ -1,6 +1,9 @@
-
-import { Task, TaskPriority, TaskStatus, TimeEntry, ChecklistItem } from '@/utils/types/taskTypes';
+import { Task, TaskPriority, TaskStatus, ChecklistItem } from '@/utils/types/taskTypes';
 import { v4 as uuidv4 } from 'uuid';
+
+// Helper function to format dates as ISO strings
+const toISOString = (date: Date): string => date.toISOString();
+const now = (): string => new Date().toISOString();
 
 // Mock data storage
 let tasks: Task[] = [
@@ -12,9 +15,9 @@ let tasks: Task[] = [
     priority: 'high',
     assignee: 'user-1',
     creator: 'user-1',
-    dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    dueDate: toISOString(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)), // 2 days from now
+    createdAt: toISOString(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
+    updatedAt: toISOString(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
     // New fields
     estimatedHours: 4,
     checklist: [
@@ -22,14 +25,14 @@ let tasks: Task[] = [
         id: 'checklist-1',
         text: 'Notify users of downtime',
         completed: true,
-        createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
-        completedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+        createdAt: toISOString(new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)),
+        completedAt: toISOString(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000))
       },
       {
         id: 'checklist-2',
         text: 'Create backup',
         completed: false,
-        createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)
+        createdAt: toISOString(new Date(Date.now() - 6 * 24 * 60 * 60 * 1000))
       }
     ]
   },
@@ -41,9 +44,9 @@ let tasks: Task[] = [
     priority: 'critical',
     assignee: 'user-2',
     creator: 'user-1',
-    dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago (overdue)
-    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    dueDate: toISOString(new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)), // 1 day ago (overdue)
+    createdAt: toISOString(new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)),
+    updatedAt: toISOString(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
     dependsOn: ['TSK00003'],
     estimatedHours: 2
   },
@@ -55,9 +58,9 @@ let tasks: Task[] = [
     priority: 'medium',
     assignee: 'user-3',
     creator: 'user-2',
-    dueDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    createdAt: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)
+    dueDate: toISOString(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)), // 3 days ago
+    createdAt: toISOString(new Date(Date.now() - 21 * 24 * 60 * 60 * 1000)),
+    updatedAt: toISOString(new Date(Date.now() - 4 * 24 * 60 * 60 * 1000))
   },
   {
     id: 'TSK00004',
@@ -67,9 +70,9 @@ let tasks: Task[] = [
     priority: 'medium',
     assignee: 'user-1',
     creator: 'user-3',
-    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    dueDate: toISOString(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)), // 5 days from now
+    createdAt: toISOString(new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)),
+    updatedAt: toISOString(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)),
     blockedBy: ['TSK00005']
   },
   {
@@ -79,9 +82,9 @@ let tasks: Task[] = [
     status: 'new',
     priority: 'low',
     creator: 'user-2',
-    dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+    dueDate: toISOString(new Date(Date.now() + 10 * 24 * 60 * 60 * 1000)), // 10 days from now
+    createdAt: toISOString(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)),
+    updatedAt: toISOString(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000))
   },
   // Task template example
   {
@@ -91,8 +94,8 @@ let tasks: Task[] = [
     status: 'new',
     priority: 'medium',
     creator: 'user-1',
-    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
+    updatedAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
     isTemplate: true,
     estimatedHours: 8,
     checklist: [
@@ -100,25 +103,25 @@ let tasks: Task[] = [
         id: 'checklist-t1',
         text: 'Install OS',
         completed: false,
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
       },
       {
         id: 'checklist-t2',
         text: 'Configure firewall',
         completed: false,
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
       },
       {
         id: 'checklist-t3',
         text: 'Install required software',
         completed: false,
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
       },
       {
         id: 'checklist-t4',
         text: 'Configure backup',
         completed: false,
-        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
       }
     ]
   }
@@ -187,7 +190,7 @@ export const fetchTasks = async (
     const query = searchQuery.toLowerCase();
     filteredTasks = filteredTasks.filter(t => 
       t.title.toLowerCase().includes(query) || 
-      t.description.toLowerCase().includes(query)
+      t.description?.toLowerCase().includes(query)
     );
   }
   
@@ -235,15 +238,15 @@ type CreateTaskInput = {
   priority: TaskPriority;
   assignee?: string;
   creator: string;
-  dueDate?: Date;
+  dueDate?: string;
   relatedItemId?: string;
-  relatedItemType?: 'incident' | 'service-request' | 'task';
+  relatedItemType?: string;
   // New fields
   dependsOn?: string[];
   blockedBy?: string[];
   checklist?: ChecklistItem[];
   estimatedHours?: number;
-  timeTracking?: { entries: TimeEntry[]; totalTimeSpent?: number };
+  timeTracking?: { entries: any[]; totalTimeSpent?: number };
   attachments?: any[];
   isTemplate?: boolean;
   templateId?: string;
@@ -257,8 +260,8 @@ export const createTask = async (taskData: CreateTaskInput): Promise<{ success: 
       totalTimeSpent: taskData.timeTracking.totalTimeSpent || 0,
       entries: taskData.timeTracking.entries || []
     } : undefined,
-    createdAt: new Date(),
-    updatedAt: new Date()
+    createdAt: now(),
+    updatedAt: now()
   };
   
   tasks.push(newTask);
@@ -274,7 +277,7 @@ export const updateTask = async (id: string, taskData: Partial<Task>): Promise<{
   const updatedTask = {
     ...tasks[index],
     ...taskData,
-    updatedAt: new Date()
+    updatedAt: now()
   };
   
   tasks[index] = updatedTask;
@@ -298,13 +301,13 @@ export const addTaskNote = async (taskId: string, noteContent: string, authorId:
     id: `note-${uuidv4().slice(0, 8)}`,
     content: noteContent,
     author: authorId,
-    createdAt: new Date()
+    createdAt: now()
   };
   
   const updatedTask = {
     ...task,
     notes: task.notes ? [...task.notes, newNote] : [newNote],
-    updatedAt: new Date()
+    updatedAt: now()
   };
   
   tasks[index] = updatedTask;

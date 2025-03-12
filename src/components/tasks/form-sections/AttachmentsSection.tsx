@@ -35,11 +35,15 @@ const AttachmentsSection: React.FC<AttachmentsSectionProps> = ({
       // and get back a URL. For now, we'll just use a blob URL.
       const newAttachment: TaskAttachment = {
         id: uuidv4(),
-        fileName: file.name,
-        fileUrl: URL.createObjectURL(file),
-        fileType: file.type,
-        uploadedBy: user.id,
-        uploadedAt: new Date()
+        name: file.name, // Use the correct property name
+        fileName: file.name, // Also set fileName for backward compatibility
+        url: URL.createObjectURL(file), // Use the correct property name
+        fileUrl: URL.createObjectURL(file), // Also set fileUrl for backward compatibility
+        type: file.type, // Use the correct property name
+        fileType: file.type, // Also set fileType for backward compatibility
+        size: file.size,
+        uploadedAt: new Date().toISOString(), // Convert Date to string
+        uploadedBy: user.id
       };
       
       onAddAttachment(newAttachment);
@@ -93,12 +97,12 @@ const AttachmentsSection: React.FC<AttachmentsSectionProps> = ({
           {attachments.map(attachment => (
             <li key={attachment.id} className="flex items-center gap-3 p-2 border rounded-md">
               <div className="p-1 bg-muted rounded">
-                {getFileIcon(attachment.fileType)}
+                {getFileIcon(attachment.type || attachment.fileType || '')}
               </div>
-              <span className="flex-1 truncate">{attachment.fileName}</span>
+              <span className="flex-1 truncate">{attachment.name || attachment.fileName}</span>
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" asChild>
-                  <a href={attachment.fileUrl} download={attachment.fileName}>
+                  <a href={attachment.url || attachment.fileUrl} download={attachment.name || attachment.fileName}>
                     <Download className="h-4 w-4" />
                   </a>
                 </Button>

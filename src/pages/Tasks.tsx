@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ import TaskTable from '@/components/tasks/TaskTable';
 import TaskCalendarView from '@/components/tasks/TaskCalendarView';
 import TaskForm from '@/components/tasks/TaskForm';
 import TaskSearch from '@/components/tasks/TaskSearch';
-import TaskViewToggle, { TaskViewMode } from '@/components/tasks/TaskViewToggle';
+import TaskViewToggle, { TaskViewType } from '@/components/tasks/TaskViewToggle';
 import { fetchTasks } from '@/utils/api/taskApi';
 import { Task, TaskStatus, TaskPriority, isTaskOverdue } from '@/utils/types/taskTypes';
 import { toast } from 'sonner';
@@ -24,11 +23,11 @@ const Tasks: React.FC = () => {
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<TaskStatus[]>([]); // Changed from string to TaskStatus[]
+  const [priorityFilter, setPriorityFilter] = useState<TaskPriority[]>([]); // Changed from string to TaskPriority[]
   const [onlyOverdue, setOnlyOverdue] = useState<boolean>(false);
   const [onlyAssignedToMe, setOnlyAssignedToMe] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<TaskViewMode>('grid');
+  const [viewMode, setViewMode] = useState<TaskViewType>('grid');
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState<boolean>(false);
   
   // Advanced filtering state
@@ -41,16 +40,11 @@ const Tasks: React.FC = () => {
     const loadTasks = async () => {
       try {
         setLoading(true);
-        const statusFilters = statusFilter === 'all' ? undefined 
-          : [statusFilter as TaskStatus];
-        
-        const priorityFilters = priorityFilter === 'all' ? undefined 
-          : [priorityFilter as TaskPriority];
         
         const tasksResponse = await fetchTasks(
           onlyAssignedToMe ? user?.id : undefined,
-          statusFilters,
-          priorityFilters,
+          statusFilter.length > 0 ? statusFilter : undefined,
+          priorityFilter.length > 0 ? priorityFilter : undefined,
           searchQuery.trim() ? searchQuery : undefined
         );
         
@@ -167,8 +161,16 @@ const Tasks: React.FC = () => {
     setTasks(prev => [task, ...prev]);
   };
 
-  const handleViewChange = (newView: TaskViewMode) => {
+  const handleViewChange = (newView: TaskViewType) => {
     setViewMode(newView);
+  };
+
+  const handleStatusFilterChange = (statuses: TaskStatus[]) => {
+    setStatusFilter(statuses);
+  };
+  
+  const handlePriorityFilterChange = (priorities: TaskPriority[]) => {
+    setPriorityFilter(priorities);
   };
 
   const renderTaskView = () => {
@@ -185,7 +187,7 @@ const Tasks: React.FC = () => {
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <h3 className="text-xl font-medium mb-2">No tasks found</h3>
           <p className="text-muted-foreground mb-4">
-            {searchQuery || statusFilter !== 'all' || priorityFilter !== 'all' || onlyOverdue || onlyAssignedToMe
+            {searchQuery || statusFilter.length > 0 || priorityFilter.length > 0 || onlyOverdue || onlyAssignedToMe
               || selectedGoals.length > 0 || finishDateOption !== 'any'
               ? "Try adjusting your filters"
               : "Get started by creating your first task"}
@@ -199,7 +201,7 @@ const Tasks: React.FC = () => {
     }
 
     switch (viewMode) {
-      case 'list':
+      case 'table':
         return <TaskTable tasks={filteredTasks} onTaskClick={handleTaskClick} />;
       case 'calendar':
         return <TaskCalendarView tasks={filteredTasks} onTaskClick={handleTaskClick} />;
@@ -235,9 +237,9 @@ const Tasks: React.FC = () => {
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 statusFilter={statusFilter}
-                onStatusFilterChange={setStatusFilter}
+                onStatusFilterChange={handleStatusFilterChange}
                 priorityFilter={priorityFilter}
-                onPriorityFilterChange={setPriorityFilter}
+                onPriorityFilterChange={handlePriorityFilterChange}
                 onlyOverdue={onlyOverdue}
                 onOverdueChange={setOnlyOverdue}
                 onlyAssignedToMe={onlyAssignedToMe}
@@ -252,7 +254,10 @@ const Tasks: React.FC = () => {
               />
               
               <div className="flex justify-end">
-                <TaskViewToggle activeView={viewMode} onViewChange={handleViewChange} />
+                <TaskViewToggle
+                  currentView={viewMode}
+                  onViewChange={handleViewChange}
+                />
               </div>
             </div>
           </CardContent>

@@ -2,13 +2,13 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Task, ChecklistItem } from '@/utils/types/taskTypes';
+import { Task, ChecklistItem, TaskStatus, TaskPriority } from '@/utils/types/taskTypes';
 import { useAuth } from '@/contexts/AuthContext';
 import { createTask, updateTask } from '@/utils/api/taskApi';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
-// Form schema
+// Form schema with fixed relatedItemType type
 export const taskFormSchema = z.object({
   title: z.string().min(3, { message: 'Title must be at least 3 characters.' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
@@ -73,13 +73,13 @@ export const useTaskForm = ({
     defaultValues: initialData ? {
       title: initialData.title,
       description: initialData.description,
-      status: initialData.status,
-      priority: initialData.priority,
+      status: initialData.status as TaskStatus,
+      priority: initialData.priority as TaskPriority,
       assignee: initialData.assignee || '',
       dueDate: initialData.dueDate ? new Date(initialData.dueDate) : undefined,
       dueTime: initialData.dueDate ? new Date(initialData.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : undefined,
       relatedItemId: initialData.relatedItemId || '',
-      relatedItemType: initialData.relatedItemType,
+      relatedItemType: initialData.relatedItemType as "incident" | "service-request" | "task" | undefined,
       // New enhanced fields
       estimatedHours: initialData.estimatedHours,
       dependsOn: initialData.dependsOn || [],
@@ -89,8 +89,8 @@ export const useTaskForm = ({
     } : templateData ? {
       title: templateData.isTemplate ? `Copy of ${templateData.title}` : templateData.title,
       description: templateData.description,
-      status: 'new',
-      priority: templateData.priority,
+      status: 'new' as TaskStatus,
+      priority: templateData.priority as TaskPriority,
       assignee: user?.id || '',
       dueDate: undefined,
       dueTime: undefined,
@@ -106,8 +106,8 @@ export const useTaskForm = ({
     } : {
       title: '',
       description: '',
-      status: 'new',
-      priority: 'medium',
+      status: 'new' as TaskStatus,
+      priority: 'medium' as TaskPriority,
       assignee: user?.id || '',
       dueDate: undefined,
       dueTime: undefined,
@@ -143,28 +143,28 @@ export const useTaskForm = ({
       }
 
       // Combine date and time if both are provided
-      let dueDateTime = values.dueDate;
+      let dueDateTime: Date | undefined = values.dueDate;
       if (dueDateTime && values.dueTime) {
         const [hours, minutes] = values.dueTime.split(':').map(Number);
         dueDateTime = new Date(dueDateTime);
         dueDateTime.setHours(hours, minutes);
       }
 
-      // Format checklist items properly
+      // Format checklist items properly and convert dates to ISO strings
       const checklist: ChecklistItem[] = values.checklist?.map(item => ({
         id: item.id,
         text: item.text,
         completed: item.completed,
-        createdAt: new Date(),
-        completedAt: item.completed ? new Date() : undefined,
+        createdAt: new Date().toISOString(), // Convert Date to string
+        completedAt: item.completed ? new Date().toISOString() : undefined, // Convert Date to string if available
       })) || [];
 
       if (isEditMode && initialData) {
         // Update existing task
         const result = await updateTask(initialData.id, {
           ...values,
-          dueDate: dueDateTime,
-          updatedAt: new Date(),
+          dueDate: dueDateTime ? dueDateTime.toISOString() : undefined, // Convert Date to string
+          updatedAt: new Date().toISOString(), // Convert Date to string
           checklist
         });
 
@@ -183,7 +183,7 @@ export const useTaskForm = ({
           priority: values.priority,
           creator: user.id,
           assignee: values.assignee,
-          dueDate: dueDateTime,
+          dueDate: dueDateTime ? dueDateTime.toISOString() : undefined, // Convert Date to string
           relatedItemId: values.relatedItemId,
           relatedItemType: values.relatedItemType,
           // New enhanced fields
@@ -214,7 +214,16 @@ export const useTaskForm = ({
     isEditMode,
     isFromTemplate,
     onSubmit,
-    addChecklistItem,
-    removeChecklistItem
+    addChecklistItem: () => {
+      const currentChecklist = form.getValues('checklist') || [];
+      form.setValue('checklist', [
+        ...currentChecklist,
+        { id: uuidv4(), text: '', completed: false }
+      ]);
+    },
+    removeChecklistItem: (id: string) => {
+      const currentChecklist = form.getValues('checklist') || [];
+      form.setValue('checklist', currentChecklist.filter(item => item.id !== id));
+    }
   };
 };

@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import PageTransition from '@/components/shared/PageTransition';
-import { getTaskById, deleteTask } from '@/utils/api/taskApi';
+import { fetchTaskById, deleteTask } from '@/utils/api/taskApi'; // Changed from getTaskById to fetchTaskById
 import { Task } from '@/utils/types/taskTypes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -29,7 +28,7 @@ const TaskDetailPage: React.FC = () => {
       setError(null);
       
       try {
-        const response = await getTaskById(id);
+        const response = await fetchTaskById(id); // Changed from getTaskById to fetchTaskById
         
         if (response.success) {
           setTask(response.data);
