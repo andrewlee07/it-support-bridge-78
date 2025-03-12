@@ -1,89 +1,223 @@
 
-import { Task } from '@/utils/types/taskTypes';
+import { TaskEventData } from '../types/eventBus/taskEventTypes';
 import EventBus from '../EventBus';
 
-export enum TaskEvent {
-  CREATED = 'task.created',
-  UPDATED = 'task.updated',
-  COMPLETED = 'task.completed',
-  REASSIGNED = 'task.reassigned',
-  DELETED = 'task.deleted',
-  DUE_DATE_APPROACHING = 'task.dueDateApproaching',
-  CHECKLIST_ITEM_COMPLETED = 'task.checklistItemCompleted',
-}
-
+/**
+ * Utility class for publishing task-related events to the EventBus
+ */
 export class TaskEventPublisher {
-  static publishTaskCreated(task: Task, userId: string) {
-    EventBus.publish(TaskEvent.CREATED, {
+  /**
+   * Publish a task created event
+   */
+  static publishTaskCreated(task: any) {
+    const eventData: TaskEventData = {
       taskId: task.id,
       title: task.title,
-      creatorId: userId,
-      timestamp: new Date().toISOString(),
-    });
-  }
-
-  static publishTaskUpdated(task: Task, userId: string, updatedFields: string[]) {
-    EventBus.publish(TaskEvent.UPDATED, {
-      taskId: task.id,
-      title: task.title,
-      updatedBy: userId,
-      updatedFields,
-      // Since task.updatedAt is a string, we don't need toISOString
-      timestamp: task.updatedAt || new Date().toISOString(),
-    });
-  }
-
-  static publishTaskCompleted(task: Task, userId: string) {
-    EventBus.publish(TaskEvent.COMPLETED, {
-      taskId: task.id,
-      title: task.title,
-      completedBy: userId,
-      timestamp: new Date().toISOString(),
-    });
-  }
-
-  static publishTaskReassigned(task: Task, userId: string, previousAssignee: string | null) {
-    EventBus.publish(TaskEvent.REASSIGNED, {
-      taskId: task.id,
-      title: task.title,
-      assignedBy: userId,
-      previousAssignee,
-      newAssignee: task.assignee,
-      // Since task.updatedAt is a string, we don't need toISOString
-      timestamp: task.updatedAt || new Date().toISOString(),
-    });
-  }
-
-  static publishTaskDeleted(taskId: string, taskTitle: string, userId: string) {
-    EventBus.publish(TaskEvent.DELETED, {
-      taskId,
-      title: taskTitle,
-      deletedBy: userId,
-      timestamp: new Date().toISOString(),
-    });
-  }
-
-  static publishTaskDueDateApproaching(task: Task) {
-    EventBus.publish(TaskEvent.DUE_DATE_APPROACHING, {
-      taskId: task.id,
-      title: task.title,
-      dueDate: task.dueDate,
+      description: task.description,
+      priority: task.priority,
+      status: task.status,
       assignee: task.assignee,
-      timestamp: new Date().toISOString(),
-    });
+      dueDate: task.dueDate,
+      createdBy: task.creator
+    };
+
+    // Get the instance of EventBus and publish the event
+    EventBus.getInstance().publish(
+      'task-created',
+      'task-management',
+      eventData,
+      {
+        actor: {
+          id: task.creator || 'system',
+          type: 'user'
+        },
+        entity: {
+          id: task.id,
+          type: 'task'
+        }
+      }
+    );
   }
 
-  static publishChecklistItemCompleted(task: Task, itemId: string, userId: string) {
-    const item = task.checklist?.find(item => item.id === itemId);
-    if (!item) return;
-
-    EventBus.publish(TaskEvent.CHECKLIST_ITEM_COMPLETED, {
+  /**
+   * Publish a task updated event
+   */
+  static publishTaskUpdated(task: any, updatedFields: string[]) {
+    const eventData: TaskEventData = {
       taskId: task.id,
-      taskTitle: task.title,
-      itemId,
-      itemText: item.text,
-      completedBy: userId,
-      timestamp: new Date().toISOString(),
-    });
+      title: task.title,
+      status: task.status,
+      priority: task.priority,
+      assignee: task.assignee,
+      dueDate: task.dueDate,
+      updatedFields
+    };
+
+    EventBus.getInstance().publish(
+      'task-updated',
+      'task-management',
+      eventData,
+      {
+        actor: {
+          id: 'current-user',
+          type: 'user'
+        },
+        entity: {
+          id: task.id,
+          type: 'task'
+        }
+      }
+    );
+  }
+
+  /**
+   * Publish a task status changed event
+   */
+  static publishTaskStatusChanged(task: any, previousStatus: string) {
+    const eventData: TaskEventData = {
+      taskId: task.id,
+      title: task.title,
+      status: task.status,
+      priority: task.priority,
+      assignee: task.assignee,
+      dueDate: task.dueDate,
+      progress: `Status changed from ${previousStatus} to ${task.status}`
+    };
+
+    EventBus.getInstance().publish(
+      'task-status-changed',
+      'task-management',
+      eventData,
+      {
+        actor: {
+          id: 'current-user',
+          type: 'user'
+        },
+        entity: {
+          id: task.id,
+          type: 'task'
+        }
+      }
+    );
+  }
+
+  /**
+   * Publish a task assigned event
+   */
+  static publishTaskAssigned(task: any, previousAssignee?: string) {
+    const eventData: TaskEventData = {
+      taskId: task.id,
+      title: task.title,
+      status: task.status,
+      priority: task.priority,
+      assignee: task.assignee,
+      previousAssignee
+    };
+
+    EventBus.getInstance().publish(
+      'task-assigned',
+      'task-management',
+      eventData,
+      {
+        actor: {
+          id: 'current-user',
+          type: 'user'
+        },
+        entity: {
+          id: task.id,
+          type: 'task'
+        }
+      }
+    );
+  }
+
+  /**
+   * Publish a task completed event
+   */
+  static publishTaskCompleted(task: any) {
+    const eventData: TaskEventData = {
+      taskId: task.id,
+      title: task.title,
+      status: task.status,
+      priority: task.priority,
+      assignee: task.assignee,
+      completionDetails: `Task completed by ${task.assignee || 'unassigned'}`
+    };
+
+    EventBus.getInstance().publish(
+      'task-completed',
+      'task-management',
+      eventData,
+      {
+        actor: {
+          id: task.assignee || 'current-user',
+          type: 'user'
+        },
+        entity: {
+          id: task.id,
+          type: 'task'
+        }
+      }
+    );
+  }
+
+  /**
+   * Publish a task overdue event
+   */
+  static publishTaskOverdue(task: any) {
+    const eventData: TaskEventData = {
+      taskId: task.id,
+      title: task.title,
+      status: task.status,
+      priority: task.priority,
+      assignee: task.assignee,
+      dueDate: task.dueDate,
+      escalation: 'Task is now overdue'
+    };
+
+    EventBus.getInstance().publish(
+      'task-overdue',
+      'task-management',
+      eventData,
+      {
+        actor: {
+          id: 'system',
+          type: 'system'
+        },
+        entity: {
+          id: task.id,
+          type: 'task'
+        }
+      }
+    );
+  }
+
+  /**
+   * Publish a task deleted event
+   */
+  static publishTaskDeleted(taskId: string, title: string, deletedBy: string) {
+    const eventData: TaskEventData = {
+      taskId,
+      title,
+      status: 'deleted',
+      priority: 'n/a',
+      createdBy: deletedBy
+    };
+
+    EventBus.getInstance().publish(
+      'task-deleted',
+      'task-management',
+      eventData,
+      {
+        actor: {
+          id: deletedBy || 'current-user',
+          type: 'user'
+        },
+        entity: {
+          id: taskId,
+          type: 'task'
+        }
+      }
+    );
   }
 }
