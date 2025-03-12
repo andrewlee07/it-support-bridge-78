@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -79,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapsedChange }) => {
               alt="We Are Group" 
               className="h-8 mr-2"
             />
-            <span className="text-sm">IT Support Bridge</span>
+            <span className="text-sm">IT Support</span>
           </div>
         )}
         <Button 

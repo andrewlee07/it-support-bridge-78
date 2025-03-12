@@ -93,7 +93,7 @@ const Login = () => {
         >
           <Card className="border-none shadow-lg">
             <CardHeader className="space-y-1 text-center bg-[#42284e] text-white rounded-t-lg">
-              <CardTitle className="text-2xl font-bold">IT Support Bridge</CardTitle>
+              <CardTitle className="text-2xl font-bold">IT Support</CardTitle>
               <CardDescription className="text-white/80">Enter your credentials to access the platform</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>

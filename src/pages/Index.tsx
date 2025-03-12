@@ -37,7 +37,7 @@ const Index = () => {
       
       <main className="flex-1 container mx-auto px-6 py-12 flex items-center justify-center">
         <div className="max-w-md mx-auto text-center">
-          <h1 className="text-4xl font-bold mb-4">IT Support Bridge</h1>
+          <h1 className="text-4xl font-bold mb-4">IT Support</h1>
           <p className="text-xl text-muted-foreground mb-8">
             Secure enterprise platform for IT support and service management
           </p>
