@@ -33,7 +33,10 @@ const queueFormSchema = z.object({
   groupId: z.string(),
   ticketTypes: z.array(
     z.enum(['incident', 'service', 'change'] as const)
-  ).min(1, { message: 'Select at least one ticket type' })
+  ).min(1, { message: 'Select at least one ticket type' }),
+  defaultAssignee: z.string().optional(),
+  isDefault: z.boolean().optional(),
+  capacity: z.number().optional()
 });
 
 type QueueFormValues = z.infer<typeof queueFormSchema>;
@@ -60,7 +63,10 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
       name: initialData?.name || '',
       description: initialData?.description || '',
       groupId: initialData?.groupId || '',
-      ticketTypes: initialData?.filterCriteria.ticketTypes || []
+      ticketTypes: initialData?.filterCriteria.ticketTypes || [],
+      defaultAssignee: initialData?.defaultAssignee || '',
+      isDefault: initialData?.isDefault || false,
+      capacity: initialData?.capacity || undefined
     }
   });
 
@@ -166,6 +172,48 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="capacity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Queue Capacity</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number" 
+                      placeholder="Maximum number of tickets" 
+                      {...field}
+                      onChange={e => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="isDefault"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Default Queue</FormLabel>
+                    <p className="text-sm text-muted-foreground">
+                      Make this the default queue for the selected group
+                    </p>
+                  </div>
                 </FormItem>
               )}
             />

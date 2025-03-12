@@ -33,6 +33,11 @@ export interface User {
   jwtToken?: string;
   refreshToken?: string;
   tokenExpiry?: Date;
+  
+  // New fields for group relationships
+  groupIds?: string[]; // IDs of groups the user belongs to
+  primaryGroupId?: string; // Primary group for the user
+  managedGroupIds?: string[]; // Groups managed by this user (for managers/admins)
 }
 
 // Password strength requirements
@@ -77,4 +82,25 @@ export interface PasswordHistory {
   userId: string;
   passwordHash: string; // In a real app, this would be a hash
   changedAt: Date;
+}
+
+// User-Group relationship
+export interface UserGroupMembership {
+  userId: string;
+  groupId: string;
+  role: 'member' | 'manager' | 'owner'; // Role within the group
+  joinedAt: Date;
+  invitedBy?: string; // User ID who invited this user
+}
+
+// User-Queue relationship 
+export interface UserQueueAssignment {
+  userId: string;
+  queueId: string;
+  assignedAt: Date;
+  assignedBy: string; // User ID who made the assignment
+  primary: boolean; // Whether this is the user's primary queue
+  canViewAll: boolean; // Whether the user can view all tickets in this queue
+  canAssignTickets: boolean; // Whether the user can assign tickets in this queue
+  canModifyTickets: boolean; // Whether the user can modify tickets in this queue
 }

@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Queue } from '@/utils/types/group';
+import { Queue, AutoAssignRule, QueueNotificationSettings, BusinessHours } from '@/utils/types/group';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { TicketType } from '@/utils/types/ticket';
@@ -10,6 +10,12 @@ interface QueueFormValues {
   description?: string;
   groupId: string;
   ticketTypes: TicketType[];
+  defaultAssignee?: string;
+  isDefault?: boolean;
+  capacity?: number;
+  autoAssignRules?: AutoAssignRule[];
+  notificationSettings?: QueueNotificationSettings;
+  businessHours?: BusinessHours;
 }
 
 export function useQueueManagement() {
@@ -20,10 +26,12 @@ export function useQueueManagement() {
       name: 'General Support',
       description: 'General IT support requests',
       filterCriteria: {
-        ticketTypes: ['incident', 'service'],
+        ticketTypes: ['incident', 'service'] as TicketType[],
         priorities: ['low', 'medium']
       },
       groupId: 'g1',
+      isDefault: true,
+      capacity: 100,
       createdAt: new Date(),
       updatedAt: new Date()
     }
@@ -57,9 +65,15 @@ export function useQueueManagement() {
               description: values.description || '',
               filterCriteria: {
                 ...queue.filterCriteria,
-                ticketTypes: values.ticketTypes as TicketType[]
+                ticketTypes: values.ticketTypes
               },
               groupId: values.groupId,
+              defaultAssignee: values.defaultAssignee,
+              isDefault: values.isDefault,
+              capacity: values.capacity,
+              autoAssignRules: values.autoAssignRules,
+              notificationSettings: values.notificationSettings,
+              businessHours: values.businessHours,
               updatedAt: new Date()
             }
           : queue
@@ -74,10 +88,16 @@ export function useQueueManagement() {
         name: values.name,
         description: values.description || '',
         filterCriteria: {
-          ticketTypes: values.ticketTypes as TicketType[],
+          ticketTypes: values.ticketTypes,
           priorities: []
         },
         groupId: values.groupId,
+        defaultAssignee: values.defaultAssignee,
+        isDefault: values.isDefault,
+        capacity: values.capacity,
+        autoAssignRules: values.autoAssignRules,
+        notificationSettings: values.notificationSettings,
+        businessHours: values.businessHours,
         createdAt: new Date(),
         updatedAt: new Date()
       };
