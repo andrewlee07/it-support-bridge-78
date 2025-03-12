@@ -8,6 +8,8 @@ import ErrorPage from '@/pages/ErrorPage';
 import NotFound from '@/pages/NotFound';
 import EndUserPortal from '@/pages/EndUserPortal';
 import KnowledgeArticleDetail from '@/pages/KnowledgeArticleDetail';
+import Knowledge from '@/pages/Knowledge';
+import TestTracking from '@/pages/TestTracking';
 import PortalMyApprovals from '@/pages/PortalMyApprovals';
 import Assets from '@/pages/Assets';
 
@@ -36,16 +38,22 @@ const router = createBrowserRouter([
     ),
     errorElement: React.createElement(ErrorPage),
     children: [
-      // Add asset routes directly
+      // Test Management route
       {
-        path: 'assets',
-        element: React.createElement(Assets)
+        path: 'test-tracking',
+        element: React.createElement(TestTracking)
       },
+      // Knowledge route
       {
-        path: 'assets/:id',
-        element: React.createElement(Assets)
+        path: 'knowledge',
+        element: React.createElement(Knowledge)
       },
-      // Add all routes from domain-specific files
+      // Knowledge article detail route
+      {
+        path: 'knowledge/:id',
+        element: React.createElement(KnowledgeArticleDetail)
+      },
+      // Add all other existing routes
       ...miscRoutes,
       ...ticketRoutes,
       ...problemRoutes,
@@ -56,7 +64,16 @@ const router = createBrowserRouter([
       ...testBugRoutes,
       ...userRoutes,
       ...adminRoutes,
-      ...taskRoutes
+      ...taskRoutes,
+      // Asset routes
+      {
+        path: 'assets',
+        element: React.createElement(Assets)
+      },
+      {
+        path: 'assets/:id',
+        element: React.createElement(Assets)
+      }
     ]
   },
   // Add the End User Portal routes

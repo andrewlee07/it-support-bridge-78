@@ -1,4 +1,3 @@
-
 import {
   AlertCircle,
   BarChart3,
@@ -136,4 +135,3 @@ export const navigationItems: NavigationItem[] = [
     description: "Preview and test the end user portal experience"
   }
 ];
-
