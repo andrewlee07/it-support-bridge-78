@@ -1,5 +1,6 @@
 
 import React from 'react';
+import AdminSettings from '@/pages/AdminSettings';
 import AIConfiguration from '@/pages/admin/AIConfiguration';
 import ProcessConfiguration from '@/pages/admin/ProcessConfiguration';
 import IncidentConfiguration from '@/pages/admin/IncidentConfiguration';
@@ -19,8 +20,8 @@ import EventDocumentation from '@/pages/admin/EventDocumentation';
 
 export const adminRoutes = [
   {
-    path: 'admin/dashboard',
-    element: React.createElement('div', null, 'Admin Dashboard')
+    path: 'admin',
+    element: React.createElement(AdminSettings)
   },
   {
     path: 'admin/process-configuration',

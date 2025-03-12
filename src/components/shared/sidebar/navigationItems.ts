@@ -125,7 +125,7 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     title: "Admin Settings",
-    href: "/admin/process-configuration",
+    href: "/admin",  // Updated from /admin/process-configuration to /admin
     icon: Cog,
     description: "Configure system settings"
   },
