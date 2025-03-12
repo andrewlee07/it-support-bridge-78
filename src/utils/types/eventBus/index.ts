@@ -19,23 +19,36 @@ export interface WebhookConfig {
   id: string;
   name: string;
   url: string;
-  events: string[];
-  active: boolean;
+  events?: string[];
+  eventTypes?: string[];
+  enabled?: boolean;
+  active?: boolean;
   secret?: string;
   headers?: Record<string, string>;
   createdAt: string;
   updatedAt: string;
+  authentication?: {
+    type: 'none' | 'basic' | 'bearer' | 'custom';
+    token?: string;
+    username?: string;
+    password?: string;
+    customHeader?: string;
+  };
 }
 
 export interface WebhookDeliveryLog {
   id: string;
   webhookId: string;
   eventId: string;
-  timestamp: string;
-  requestBody: string;
-  responseStatus: number;
+  timestamp?: string;
+  requestTimestamp?: string;
+  responseTimestamp?: string;
+  requestBody?: string;
+  responseStatus?: number;
+  statusCode?: number;
   responseBody?: string;
-  success: boolean;
+  status?: 'success' | 'failed';
+  success?: boolean;
   error?: string;
-  retries: number;
+  retries?: number;
 }
