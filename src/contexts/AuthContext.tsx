@@ -30,6 +30,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Logout function that uses our hook
   const logout = () => logoutUser(user);
 
+  // Redirect users based on their role
+  useEffect(() => {
+    if (user && !loading) {
+      // If user role is 'user', redirect to portal
+      if (user.role === 'user' && window.location.pathname === '/') {
+        window.location.href = '/portal';
+      }
+    }
+  }, [user, loading]);
+
   // Session checking
   useEffect(() => {
     let sessionCheckInterval: number;

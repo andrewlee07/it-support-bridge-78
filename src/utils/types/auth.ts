@@ -16,4 +16,5 @@ export interface AuthContextType {
   refreshSession: () => boolean;
   userHasPermission: (permissionName: string) => boolean;
   userCanPerformAction: (resource: string, action: string) => boolean;
+  // New properties for our portal actions would go here
 }
