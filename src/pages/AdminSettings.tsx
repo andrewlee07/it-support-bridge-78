@@ -102,6 +102,25 @@ const AdminSettings = () => {
             </p>
           </div>
           
+          {/* Add End User Portal Link at the top for better visibility */}
+          <div className="mb-4 border rounded-lg overflow-hidden bg-primary/5">
+            <Link to="/portal" className="block">
+              <div className="p-4 flex items-center justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-xl font-semibold flex items-center">
+                    End User Portal <ExternalLink className="ml-2 h-4 w-4" />
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Preview and test the end user portal experience
+                  </p>
+                </div>
+                <div>
+                  <LayoutDashboard className="h-10 w-10 text-primary/80" />
+                </div>
+              </div>
+            </Link>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {configurationTiles.map((tile, index) => (
               <Link key={index} to={tile.path} className="block">
@@ -120,28 +139,30 @@ const AdminSettings = () => {
             ))}
           </div>
           
-          {/* End User Portal Link */}
+          {/* Testing Tools Section */}
           <div className="mt-8 border-t pt-6">
             <h2 className="text-xl font-semibold mb-4">Testing Tools</h2>
-            <Link to="/portal" className="block">
-              <Card className="bg-primary/5 transition-all hover:shadow-md hover:border-primary/50">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <CardTitle className="flex items-center">
-                        End User Portal <ExternalLink className="ml-2 h-4 w-4" />
-                      </CardTitle>
-                      <CardDescription>
-                        Preview and test the end user portal experience
-                      </CardDescription>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Link to="/portal" className="block">
+                <Card className="bg-primary/5 transition-all hover:shadow-md hover:border-primary/50">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <CardTitle className="flex items-center">
+                          End User Portal <ExternalLink className="ml-2 h-4 w-4" />
+                        </CardTitle>
+                        <CardDescription>
+                          Preview and test the end user portal experience
+                        </CardDescription>
+                      </div>
+                      <div>
+                        <LayoutDashboard className="h-8 w-8 text-primary/80" />
+                      </div>
                     </div>
-                    <div>
-                      <LayoutDashboard className="h-8 w-8 text-primary/80" />
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            </Link>
+                  </CardHeader>
+                </Card>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

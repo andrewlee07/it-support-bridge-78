@@ -2,7 +2,7 @@
 // Re-export functions from taskVisualUtils
 export { isTaskOverdue, isTaskDueSoon } from './taskTypes';
 
-// Re-export announcement types
+// Re-export announcement types using 'export type'
 export type { 
   Announcement, 
   AnnouncementStatus,
@@ -11,7 +11,7 @@ export type {
   AnnouncementFormValues 
 } from './announcementTypes';
 
-// Re-export missing types that were causing TypeScript errors
+// Re-export missing types using 'export type'
 export type { ConfigurableEntityType } from './configuration';
 export type { SLA } from './sla';
 export type { TicketType, TicketPriority, TicketCategory, Ticket, TicketStatus, RelatedItem } from './ticket';
