@@ -9,6 +9,7 @@ import { AnnouncementFormValues } from '@/components/announcements/announcementS
 import { useAnnouncements } from '@/hooks/useAnnouncements';
 import { useAuth } from '@/contexts/AuthContext';
 import PageTransition from '@/components/shared/PageTransition';
+import { AnnouncementStatus, AnnouncementPriority, AnnouncementType } from '@/utils/types/announcementTypes';
 
 const CreateAnnouncementPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,8 +24,13 @@ const CreateAnnouncementPage: React.FC = () => {
     try {
       const result = await createNewAnnouncement({
         ...data,
+        title: data.title,
+        content: data.content,
+        status: data.status as AnnouncementStatus,
+        priority: data.priority as AnnouncementPriority,
+        type: data.type as AnnouncementType,
         createdBy: user.id,
-        creatorName: `${user.firstName} ${user.lastName}`,
+        creatorName: user.name || 'System User',
       });
       
       if (result) {

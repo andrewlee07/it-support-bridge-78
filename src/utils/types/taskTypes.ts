@@ -29,8 +29,8 @@ export interface ChecklistItem {
   completedAt?: string;
   
   // For backward compatibility with code that uses text/completed properties
-  text?: string;
-  completed?: boolean;
+  text: string;
+  completed: boolean;
 }
 
 export interface TaskDependency {
@@ -48,6 +48,11 @@ export interface TaskAttachment {
   size: number;
   uploadedAt: string;
   uploadedBy?: string;
+  
+  // For backward compatibility
+  fileName?: string;
+  fileUrl?: string;
+  fileType?: string;
 }
 
 export interface Task {

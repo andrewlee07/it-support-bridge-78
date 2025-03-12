@@ -1,5 +1,5 @@
 
-import { User } from './userTypes';
+import { User } from './user';
 
 export type AnnouncementStatus = 'active' | 'draft' | 'expired';
 export type AnnouncementPriority = 'low' | 'medium' | 'high' | 'critical';

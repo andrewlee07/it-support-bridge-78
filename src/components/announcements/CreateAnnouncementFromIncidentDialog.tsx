@@ -14,7 +14,7 @@ import { AnnouncementFormValues } from './announcementSchema';
 import { createAnnouncementFromIncident } from '@/utils/mockData/announcements';
 import { useToast } from '@/hooks/use-toast';
 import { Megaphone } from 'lucide-react';
-import { Ticket } from '@/utils/types';
+import { Ticket, AnnouncementStatus, AnnouncementPriority, AnnouncementType } from '@/utils/types';
 
 interface CreateAnnouncementFromIncidentDialogProps {
   open: boolean;
@@ -38,9 +38,9 @@ const CreateAnnouncementFromIncidentDialog: React.FC<CreateAnnouncementFromIncid
       const response = await createAnnouncementFromIncident(incident.id, {
         title: data.title || `Service Disruption: ${incident.title}`,
         content: data.content,
-        status: data.status,
-        priority: data.priority,
-        type: data.type,
+        status: data.status as AnnouncementStatus,
+        priority: data.priority as AnnouncementPriority,
+        type: data.type as AnnouncementType,
         expiresAt: data.expiresAt,
         audienceGroups: data.audienceGroups,
         createdBy: 'user-1', // In a real app, use the current user ID
@@ -85,9 +85,9 @@ const CreateAnnouncementFromIncidentDialog: React.FC<CreateAnnouncementFromIncid
 <p><strong>Affected Service:</strong> ${incident.serviceId || 'Multiple Services'}</p>
 <p><strong>Impact:</strong> ${incident.description || 'Service disruption'}</p>
 <p>We apologize for any inconvenience this may cause. We will provide updates as more information becomes available.</p>`,
-    status: 'active',
-    priority: 'high',
-    type: 'outage',
+    status: 'active' as AnnouncementStatus,
+    priority: 'high' as AnnouncementPriority,
+    type: 'outage' as AnnouncementType,
     relatedIncidentId: incident.id,
   };
   

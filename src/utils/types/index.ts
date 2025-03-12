@@ -21,7 +21,6 @@ export type { ChangeRequest, ChangeCategory, ClosureReason, ApproverRole, Change
 export type { User, UserRole } from './user';
 export type { Release, ReleaseStatus, ReleaseType, ReleaseItem, ReleaseMetrics } from './release';
 export type { ConfigurableDropdown, DropdownOption, DropdownConfigFormProps } from './configuration';
-export type { BacklogTestCoverage } from './test/testCoverage';
 export type { PaginatedResponse, ApiResponse } from './api';
 export type { Asset } from './asset';
 export type { EmailTemplate } from './email';
