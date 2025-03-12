@@ -10,23 +10,28 @@ import WatchButton from '@/components/shared/WatchButton';
 
 interface TicketDetailHeaderProps {
   ticket: Ticket;
-  isServiceRequest: boolean;
-  canReopen: boolean;
-  isResolved: boolean;
-  onReopen: () => void;
-  onResolve: () => void;
+  isServiceRequest?: boolean;
+  canReopen?: boolean;
+  isResolved?: boolean;
+  onReopen?: () => void;
+  onResolve?: () => void;
+  onReopenClick?: () => void; // Add this prop to support both naming conventions
   children?: React.ReactNode;
 }
 
 const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
   ticket,
-  isServiceRequest,
-  canReopen,
-  isResolved,
+  isServiceRequest = false,
+  canReopen = false,
+  isResolved = false,
   onReopen,
   onResolve,
+  onReopenClick,
   children
 }) => {
+  // Use onReopenClick if provided, otherwise use onReopen
+  const handleReopen = onReopenClick || onReopen;
+  
   const typeLabel = isServiceRequest ? 'Service Request' : 'Incident';
   const parentPath = isServiceRequest ? '/service-requests' : '/incidents';
   
@@ -80,7 +85,7 @@ const TicketDetailHeader: React.FC<TicketDetailHeaderProps> = ({
               {isServiceRequest ? 'Fulfill Request' : 'Resolve Incident'}
             </Button>
           ) : canReopen ? (
-            <Button variant="outline" size="sm" onClick={onReopen}>
+            <Button variant="outline" size="sm" onClick={handleReopen}>
               Reopen
             </Button>
           ) : null}

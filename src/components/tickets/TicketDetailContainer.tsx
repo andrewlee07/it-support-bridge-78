@@ -55,6 +55,7 @@ const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
     <div className="space-y-6">
       <TicketDetailHeader 
         ticket={ticket}
+        isServiceRequest={type === 'service'}
         onReopenClick={handleReopenClick}
       />
       
@@ -81,6 +82,7 @@ const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
           <TicketTabContent 
             ticket={ticket}
             activeTab={activeTab}
+            type={type}
             onUpdate={handleUpdate}
             onClose={handleClose}
             onAddNote={onAddNote || (() => {})}
@@ -90,7 +92,6 @@ const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
         </TabsContent>
         <TabsContent value="notes">
           <NoteTab 
-            notes={ticket.notes || []} 
             onAddNote={onAddNote || (() => {})} 
           />
         </TabsContent>
@@ -106,8 +107,9 @@ const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
       {/* Reopen Dialog */}
       <ReopenDialog
         isOpen={reopenDialogOpen}
-        setIsOpen={setReopenDialogOpen}
+        onOpenChange={setReopenDialogOpen}
         onConfirm={handleReopenConfirm}
+        isServiceRequest={type === 'service'}
       />
       
       {/* Create Announcement Dialog */}

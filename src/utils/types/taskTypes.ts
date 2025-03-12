@@ -69,7 +69,7 @@ export interface Task {
   creator: string;
   labels?: TaskLabel[];
   checklist?: ChecklistItem[];
-  dependencies?: TaskDependency[];
+  dependencies?: TaskDependency[] | string[];
   // For compatibility with taskCore
   dependsOn?: string[];
   blockedBy?: string[];

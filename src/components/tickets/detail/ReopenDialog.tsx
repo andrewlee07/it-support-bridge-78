@@ -17,14 +17,14 @@ export type ReopenFormValues = z.infer<typeof reopenFormSchema>;
 interface ReopenDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onReopen: (data: ReopenFormValues) => void;
+  onConfirm: (reason: string) => void;
   isServiceRequest: boolean;
 }
 
 const ReopenDialog: React.FC<ReopenDialogProps> = ({
   isOpen,
   onOpenChange,
-  onReopen,
+  onConfirm,
   isServiceRequest
 }) => {
   const reopenForm = useForm<ReopenFormValues>({
@@ -35,7 +35,7 @@ const ReopenDialog: React.FC<ReopenDialogProps> = ({
   });
 
   const handleSubmit = (data: ReopenFormValues) => {
-    onReopen(data);
+    onConfirm(data.reason);
     reopenForm.reset();
   };
 

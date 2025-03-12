@@ -6,9 +6,10 @@ import { MessageSquare } from 'lucide-react';
 
 interface NoteTabProps {
   onAddNote: (note: string) => void;
+  notes?: any[]; // Make notes optional since it's not used in some places
 }
 
-const NoteTab: React.FC<NoteTabProps> = ({ onAddNote }) => {
+const NoteTab: React.FC<NoteTabProps> = ({ onAddNote, notes = [] }) => {
   const [note, setNote] = useState('');
 
   const handleAddNote = () => {

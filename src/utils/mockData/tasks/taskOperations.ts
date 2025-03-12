@@ -1,3 +1,4 @@
+
 import { Task, TaskPriority, TaskStatus, ChecklistItem } from '@/utils/types/taskTypes';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -24,6 +25,8 @@ let tasks: Task[] = [
       {
         id: 'checklist-1',
         text: 'Notify users of downtime',
+        content: 'Notify users of downtime',
+        status: 'completed',
         completed: true,
         createdAt: toISOString(new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)),
         completedAt: toISOString(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000))
@@ -31,6 +34,8 @@ let tasks: Task[] = [
       {
         id: 'checklist-2',
         text: 'Create backup',
+        content: 'Create backup',
+        status: 'pending',
         completed: false,
         createdAt: toISOString(new Date(Date.now() - 6 * 24 * 60 * 60 * 1000))
       }
@@ -102,24 +107,32 @@ let tasks: Task[] = [
       {
         id: 'checklist-t1',
         text: 'Install OS',
+        content: 'Install OS',
+        status: 'pending',
         completed: false,
         createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
       },
       {
         id: 'checklist-t2',
         text: 'Configure firewall',
+        content: 'Configure firewall',
+        status: 'pending',
         completed: false,
         createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
       },
       {
         id: 'checklist-t3',
         text: 'Install required software',
+        content: 'Install required software',
+        status: 'pending',
         completed: false,
         createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
       },
       {
         id: 'checklist-t4',
         text: 'Configure backup',
+        content: 'Configure backup',
+        status: 'pending',
         completed: false,
         createdAt: toISOString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
       }
@@ -253,9 +266,17 @@ type CreateTaskInput = {
 };
 
 export const createTask = async (taskData: CreateTaskInput): Promise<{ success: boolean; data: Task }> => {
+  // Ensure checklist items have content and status fields
+  const checklist = taskData.checklist?.map(item => ({
+    ...item,
+    content: item.content || item.text,
+    status: item.status || (item.completed ? 'completed' : 'pending')
+  })) || [];
+  
   const newTask: Task = {
     id: generateTaskId(taskData.isTemplate || false),
     ...taskData,
+    checklist,
     timeTracking: taskData.timeTracking ? {
       totalTimeSpent: taskData.timeTracking.totalTimeSpent || 0,
       entries: taskData.timeTracking.entries || []

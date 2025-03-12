@@ -24,3 +24,4 @@ export type { ConfigurableDropdown, DropdownOption, DropdownConfigFormProps } fr
 export type { PaginatedResponse, ApiResponse } from './api';
 export type { Asset } from './asset';
 export type { EmailTemplate } from './email';
+export type { BacklogTestCoverage } from './backlogTypes';
