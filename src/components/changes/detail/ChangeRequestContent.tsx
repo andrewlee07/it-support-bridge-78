@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChangeRequest } from '@/utils/types/change';
 import { useAuth } from '@/contexts/AuthContext';
 import RiskAssessmentDetails from '../RiskAssessmentDetails';
@@ -34,6 +35,7 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
 }) => {
   const { user, hasPermission } = useAuth();
   const [showRiskDetails, setShowRiskDetails] = useState(false);
+  const [activeTab, setActiveTab] = useState('details');
   
   const canApprove = hasPermission(['admin', 'change-manager']) && 
                      changeRequest.status === 'submitted' &&
@@ -87,48 +89,66 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
       </CardHeader>
       
       <CardContent className="space-y-6">
-        <ChangeRequestMetadata 
-          startDate={changeRequest.startDate}
-          endDate={changeRequest.endDate}
-          riskScore={changeRequest.riskScore}
-          riskLevel={changeRequest.riskLevel}
-          createdBy={changeRequest.createdBy}
-          implementor={changeRequest.implementor}
-          onRiskDetailsToggle={() => setShowRiskDetails(!showRiskDetails)}
-          showRiskDetails={showRiskDetails}
-          onAddImplementor={onAddImplementor}
-        />
-        
-        {changeRequest.status === 'completed' && (
-          <ChangeRequestClosureDetails 
-            closureReason={changeRequest.closureReason}
-            closedAt={changeRequest.updatedAt}
-          />
-        )}
-        
-        {showRiskAssessment && (
-          <div className="border rounded-md p-4 bg-muted/20">
-            <h3 className="text-lg font-medium mb-3">Risk Assessment Details</h3>
-            <RiskAssessmentDetails 
-              answers={changeRequest.assessmentAnswers || []}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="risk">Risk Assessment</TabsTrigger>
+            <TabsTrigger value="approvals">Approvals</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="details" className="space-y-6">
+            <ChangeRequestMetadata 
+              startDate={changeRequest.startDate}
+              endDate={changeRequest.endDate}
               riskScore={changeRequest.riskScore}
               riskLevel={changeRequest.riskLevel}
+              createdBy={changeRequest.createdBy}
+              implementor={changeRequest.implementor}
+              onRiskDetailsToggle={() => setShowRiskDetails(!showRiskDetails)}
+              showRiskDetails={showRiskDetails}
+              onAddImplementor={onAddImplementor}
             />
-          </div>
-        )}
-        
-        <ChangeRequestDescription 
-          description={changeRequest.description}
-          implementationPlan={changeRequest.implementationPlan}
-          rollbackPlan={changeRequest.rollbackPlan}
-        />
-        
-        <ChangeRequestApprovals 
-          approvedBy={changeRequest.approvedBy}
-          approvedAt={changeRequest.approvedAt}
-          approverRoles={changeRequest.approverRoles}
-          onAddApprover={onAddApprover}
-        />
+            
+            {changeRequest.status === 'completed' && (
+              <ChangeRequestClosureDetails 
+                closureReason={changeRequest.closureReason}
+                closedAt={changeRequest.updatedAt}
+              />
+            )}
+            
+            <ChangeRequestDescription 
+              description={changeRequest.description}
+              implementationPlan={changeRequest.implementationPlan}
+              rollbackPlan={changeRequest.rollbackPlan}
+            />
+          </TabsContent>
+          
+          <TabsContent value="risk" className="space-y-6">
+            {showRiskAssessment ? (
+              <div className="border rounded-md p-4 bg-muted/20">
+                <h3 className="text-lg font-medium mb-3">Risk Assessment Details</h3>
+                <RiskAssessmentDetails 
+                  answers={changeRequest.assessmentAnswers || []}
+                  riskScore={changeRequest.riskScore}
+                  riskLevel={changeRequest.riskLevel}
+                />
+              </div>
+            ) : (
+              <div className="border rounded-md p-4 text-center">
+                <p className="text-muted-foreground">No risk assessment data available for this change request.</p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="approvals" className="space-y-6">
+            <ChangeRequestApprovals 
+              approvedBy={changeRequest.approvedBy}
+              approvedAt={changeRequest.approvedAt}
+              approverRoles={changeRequest.approverRoles}
+              onAddApprover={onAddApprover}
+            />
+          </TabsContent>
+        </Tabs>
       </CardContent>
       
       <CardFooter>
