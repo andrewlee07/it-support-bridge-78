@@ -16,7 +16,6 @@ import Index from '@/pages/Index';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
-import { ticketRoutes } from './routes/ticketRoutes';
 import { changeRoutes } from './routes/changeRoutes';
 import { adminRoutes } from './routes/adminRoutes';
 import { problemRoutes } from './routes/problemRoutes';
@@ -26,6 +25,7 @@ import { testBugRoutes } from './routes/testBugRoutes';
 import { releaseRoutes } from './routes/releaseRoutes';
 import { taskRoutes } from './routes/taskRoutes';
 import { miscRoutes } from './routes/miscRoutes';
+import { ticketRoutes } from './routes/ticketRoutes';
 
 const router = createBrowserRouter([
   // Public routes that don't require authentication

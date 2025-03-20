@@ -9,27 +9,27 @@ import CloseChange from '@/pages/CloseChange';
 
 export const changeRoutes = [
   {
-    path: '/changes',
+    path: 'changes',
     element: React.createElement(Changes)
   },
   {
-    path: '/changes/:id',
+    path: 'changes/:id',
     element: React.createElement(ChangeDetail)
   },
   {
-    path: '/changes/new',
+    path: 'changes/new',
     element: React.createElement(NewChangeRequest)
   },
   {
-    path: '/changes/:id/edit',
+    path: 'changes/:id/edit',
     element: React.createElement(EditChangeRequest)
   },
   {
-    path: '/changes/:id/reject',
+    path: 'changes/:id/reject',
     element: React.createElement(RejectChange)
   },
   {
-    path: '/changes/:id/close',
+    path: 'changes/:id/close',
     element: React.createElement(CloseChange)
   }
 ];

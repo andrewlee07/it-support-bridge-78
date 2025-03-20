@@ -75,7 +75,9 @@ const Changes = () => {
   };
 
   const handleViewChange = (changeId: string) => {
+    // Updated to ensure consistent navigation
     navigate(`/changes/${changeId}`);
+    console.log(`Navigating to change: /changes/${changeId}`);
   };
 
   const handleViewModeChange = (mode: 'grid' | 'table') => {

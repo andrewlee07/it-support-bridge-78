@@ -48,13 +48,18 @@ const ChangesList: React.FC<ChangesListProps> = ({
     );
   }
 
+  // Ensure we always pass a function for onViewChange
+  const handleViewChange = onViewChange || (() => {
+    console.warn('No view change handler provided');
+  });
+
   return (
     <ChangesTable 
       changes={changes} 
       activeTab={activeTab}
       onApprove={onApprove}
       onReject={onReject}
-      onViewChange={onViewChange || (() => {})}
+      onViewChange={handleViewChange}
       userRole={userRole}
     />
   );

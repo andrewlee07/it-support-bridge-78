@@ -10,6 +10,9 @@ import { useChangeRequestDetail } from '@/hooks/useChangeRequestDetail';
 const ChangeDetail = () => {
   const { id } = useParams<{ id: string }>();
   
+  // Added console log to help with debugging
+  console.log('ChangeDetail: Rendering with ID:', id);
+  
   const {
     changeRequest,
     loading,
@@ -34,6 +37,9 @@ const ChangeDetail = () => {
       />
     );
   }
+
+  // Added console log to confirm we have data
+  console.log('ChangeDetail: Loaded change request:', changeRequest.id);
 
   return (
     <PageTransition>
