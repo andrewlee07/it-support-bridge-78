@@ -1,215 +1,148 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import LoginPage from '@/pages/LoginPage';
-import Dashboard from '@/pages/Dashboard';
-import IncidentsPage from '@/pages/IncidentsPage';
-import IncidentDetail from '@/pages/IncidentDetail';
-import CreateIncidentPage from '@/pages/CreateIncidentPage';
-import EditIncidentPage from '@/pages/EditIncidentPage';
-import ServiceRequestsPage from '@/pages/ServiceRequestsPage';
-import ServiceRequestDetail from '@/pages/ServiceRequestDetail';
-import CreateServiceRequestPage from '@/pages/CreateServiceRequestPage';
-import EditServiceRequestPage from '@/pages/EditServiceRequestPage';
-import ProblemsPage from '@/pages/ProblemsPage';
-import ProblemDetailPage from '@/pages/ProblemDetailPage';
-import CreateProblemPage from '@/pages/CreateProblemPage';
-import EditProblemPage from '@/pages/EditProblemPage';
-import KnownErrorsPage from '@/pages/KnownErrorsPage';
-import KnowledgePage from '@/pages/KnowledgePage';
-import KnowledgeArticlePage from '@/pages/KnowledgeArticlePage';
-import CreateKnowledgeArticlePage from '@/pages/CreateKnowledgeArticlePage';
-import ServiceCatalogPage from '@/pages/ServiceCatalogPage';
-import ServiceDetailPage from '@/pages/ServiceDetailPage';
-import ServiceManagementPage from '@/pages/ServiceManagementPage';
-import AssetsPage from '@/pages/AssetsPage';
-import AssetDetailPage from '@/pages/AssetDetailPage';
-import CreateAssetPage from '@/pages/CreateAssetPage';
-import EditAssetPage from '@/pages/EditAssetPage';
-import ReportsPage from '@/pages/ReportsPage';
-import NotFoundPage from '@/pages/NotFoundPage';
-import ChangesPage from '@/pages/ChangesPage';
-import ChangeRequestDetail from '@/pages/ChangeRequestDetail';
-import CreateChangeRequestPage from '@/pages/CreateChangeRequestPage';
-import EditChangeRequestPage from '@/pages/EditChangeRequestPage';
-import CalendarPage from '@/pages/CalendarPage';
-import ApprovalDashboardPage from '@/pages/ApprovalDashboardPage';
-import SettingsPage from '@/pages/SettingsPage';
-import AdminDashboardPage from '@/pages/AdminDashboardPage';
-import AdminSLASettings from '@/pages/AdminSLASettings';
-import AdminStatusSynchronization from '@/pages/AdminStatusSynchronization';
-import AdminAutoCloseSettings from '@/pages/AdminAutoCloseSettings';
-import AdminBusinessHoursSettings from '@/pages/AdminBusinessHoursSettings';
-import AdminNotificationSettings from '@/pages/AdminNotificationSettings';
-import AdminNotificationTemplates from '@/pages/AdminNotificationTemplates';
-import AdminDropdownConfig from '@/pages/AdminDropdownConfig';
-import AdminErrorLogsPage from '@/pages/AdminErrorLogsPage';
-import AdminApiKeysPage from '@/pages/AdminApiKeysPage';
-import AdminSecuritySettingsPage from '@/pages/AdminSecuritySettingsPage';
-import NotificationsPage from '@/pages/NotificationsPage';
-import NotificationConsole from '@/pages/NotificationConsole';
-import ProfilePage from '@/pages/ProfilePage';
-import ReleasesPage from '@/pages/ReleasesPage';
-import ReleaseDetailPage from '@/pages/ReleaseDetailPage';
-import CreateReleasePage from '@/pages/CreateReleasePage';
-import EditReleasePage from '@/pages/EditReleasePage';
-import BacklogPage from '@/pages/BacklogPage';
-import BacklogItemDetailPage from '@/pages/BacklogItemDetailPage';
-import CreateBacklogItemPage from '@/pages/CreateBacklogItemPage';
-import EditBacklogItemPage from '@/pages/EditBacklogItemPage';
-import TestManagementPage from '@/pages/TestManagementPage';
-import TestCasesPage from '@/pages/TestCasesPage';
-import TestCaseDetailPage from '@/pages/TestCaseDetailPage';
-import CreateTestCasePage from '@/pages/CreateTestCasePage';
-import EditTestCasePage from '@/pages/EditTestCasePage';
-import TestExecutionPage from '@/pages/TestExecutionPage';
-import BugsPage from '@/pages/BugsPage';
-import BugDetailPage from '@/pages/BugDetailPage';
-import CreateBugPage from '@/pages/CreateBugPage';
-import EditBugPage from '@/pages/EditBugPage';
-import ChangeRiskSettings from '@/pages/ChangeRiskSettings';
-import UserManagementPage from '@/pages/UserManagementPage';
-import TasksPage from '@/pages/TasksPage';
-import TaskDashboard from '@/pages/TaskDashboard';
-import TaskDetailPage from '@/pages/TaskDetailPage';
-import CreateTaskPage from '@/pages/CreateTaskPage';
-import EditTaskPage from '@/pages/EditTaskPage';
-import AdminMFASettingsPage from '@/pages/AdminMFASettingsPage';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import MainLayout from './layouts/MainLayout';
+import AuthLayout from './layouts/AuthLayout';
+import Index from './pages/Index';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Changes from './pages/Changes';
+import ChangeDetail from './pages/ChangeDetail';
+import NewChange from './pages/NewChange';
+import EditChange from './pages/EditChange';
+import RejectChange from './pages/RejectChange';
+import CloseChange from './pages/CloseChange';
+import Incidents from './pages/Incidents';
+import IncidentDetail from './pages/IncidentDetail';
+import NewIncident from './pages/NewIncident';
+import EditIncident from './pages/EditIncident';
+import ServiceRequests from './pages/ServiceRequests';
+import ServiceRequestDetail from './pages/ServiceRequestDetail';
+import NewServiceRequest from './pages/NewServiceRequest';
+import EditServiceRequest from './pages/EditServiceRequest';
+import Problems from './pages/Problems';
+import ProblemDetail from './pages/ProblemDetail';
+import NewProblem from './pages/NewProblem';
+import EditProblem from './pages/EditProblem';
+import KnownErrors from './pages/KnownErrors';
+import Tasks from './pages/Tasks';
+import TaskDashboard from './pages/TaskDashboard';
+import TaskDetail from './pages/TaskDetail';
+import NewTask from './pages/NewTask';
+import EditTask from './pages/EditTask';
+import Assets from './pages/Assets';
+import AssetDetail from './pages/AssetDetail';
+import NewAsset from './pages/NewAsset';
+import EditAsset from './pages/EditAsset';
+import Knowledge from './pages/Knowledge';
+import KnowledgeArticle from './pages/KnowledgeArticle';
+import NewKnowledgeArticle from './pages/NewKnowledgeArticle';
+import Testing from './pages/Testing';
+import TestCases from './pages/TestCases';
+import TestCaseDetail from './pages/TestCaseDetail';
+import NewTestCase from './pages/NewTestCase';
+import EditTestCase from './pages/EditTestCase';
+import TestExecution from './pages/TestExecution';
+import Calendar from './pages/Calendar';
+import Reports from './pages/Reports';
+import ReportCategory from './pages/ReportCategory';
+import Portal from './pages/Portal';
+import PortalApprovals from './pages/PortalApprovals';
+import PortalIncidents from './pages/PortalIncidents';
+import PortalRequests from './pages/PortalRequests';
+import Settings from './pages/Settings';
+import Profile from './pages/Profile';
+import Admin from './pages/Admin';
+import AdminSLA from './pages/AdminSLA';
+import AdminStatusSync from './pages/AdminStatusSync';
+import AdminChangeRisk from './pages/AdminChangeRisk';
 
-// Initialize QueryClient once
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-  },
-});
-
-const AppRoutes = () => {
+export const AppRoutes = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        
-        {/* Incidents */}
-        <Route path="/incidents" element={<IncidentsPage />} />
-        <Route path="/incidents/:incidentId" element={<IncidentDetail />} />
-        <Route path="/incidents/create" element={<CreateIncidentPage />} />
-        <Route path="/incidents/edit/:incidentId" element={<EditIncidentPage />} />
-        
-        {/* Service Requests */}
-        <Route path="/service-requests" element={<ServiceRequestsPage />} />
-        <Route path="/service-requests/:requestId" element={<ServiceRequestDetail />} />
-        <Route path="/service-requests/create" element={<CreateServiceRequestPage />} />
-        <Route path="/service-requests/edit/:requestId" element={<EditServiceRequestPage />} />
-        
-        {/* Problems */}
-        <Route path="/problems" element={<ProblemsPage />} />
-        <Route path="/problems/:problemId" element={<ProblemDetailPage />} />
-        <Route path="/problems/create" element={<CreateProblemPage />} />
-        <Route path="/problems/edit/:problemId" element={<EditProblemPage />} />
-        <Route path="/problems/known-errors" element={<KnownErrorsPage />} />
-        
-        {/* Changes */}
-        <Route path="/changes" element={<ChangesPage />} />
-        <Route path="/changes/:changeId" element={<ChangeRequestDetail />} />
-        <Route path="/changes/create" element={<CreateChangeRequestPage />} />
-        <Route path="/changes/edit/:changeId" element={<EditChangeRequestPage />} />
-        
-        {/* Tasks */}
-        <Route path="/tasks" element={<TasksPage />} />
-        <Route path="/tasks/dashboard" element={<TaskDashboard />} />
-        <Route path="/tasks/:taskId" element={<TaskDetailPage />} />
-        <Route path="/tasks/create" element={<CreateTaskPage />} />
-        <Route path="/tasks/edit/:taskId" element={<EditTaskPage />} />
-        
-        {/* Knowledge */}
-        <Route path="/knowledge" element={<KnowledgePage />} />
-        <Route path="/knowledge/article/:articleId" element={<KnowledgeArticlePage />} />
-        <Route path="/knowledge/create" element={<CreateKnowledgeArticlePage />} />
-        
-        {/* Asset Management */}
-        <Route path="/assets" element={<AssetsPage />} />
-        <Route path="/assets/:assetId" element={<AssetDetailPage />} />
-        <Route path="/assets/create" element={<CreateAssetPage />} />
-        <Route path="/assets/edit/:assetId" element={<EditAssetPage />} />
-        
-        {/* Service Catalog */}
-        <Route path="/services" element={<ServiceCatalogPage />} />
-        <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
-        <Route path="/services/management" element={<ServiceManagementPage />} />
-        
-        {/* Calendar */}
-        <Route path="/calendar" element={<CalendarPage />} />
-        
-        {/* My Approvals */}
-        <Route path="/approvals" element={<ApprovalDashboardPage />} />
-        
-        {/* Releases */}
-        <Route path="/releases" element={<ReleasesPage />} />
-        <Route path="/releases/:releaseId" element={<ReleaseDetailPage />} />
-        <Route path="/releases/create" element={<CreateReleasePage />} />
-        <Route path="/releases/edit/:releaseId" element={<EditReleasePage />} />
-        
-        {/* Backlog */}
-        <Route path="/backlog" element={<BacklogPage />} />
-        <Route path="/backlog/:itemId" element={<BacklogItemDetailPage />} />
-        <Route path="/backlog/create" element={<CreateBacklogItemPage />} />
-        <Route path="/backlog/edit/:itemId" element={<EditBacklogItemPage />} />
-        
-        {/* Test Management */}
-        <Route path="/testing" element={<TestManagementPage />} />
-        <Route path="/testing/cases" element={<TestCasesPage />} />
-        <Route path="/testing/cases/:caseId" element={<TestCaseDetailPage />} />
-        <Route path="/testing/cases/create" element={<CreateTestCasePage />} />
-        <Route path="/testing/cases/edit/:caseId" element={<EditTestCasePage />} />
-        <Route path="/testing/execution/:cycleId" element={<TestExecutionPage />} />
-        
-        {/* Bug Tracking */}
-        <Route path="/bugs" element={<BugsPage />} />
-        <Route path="/bugs/:bugId" element={<BugDetailPage />} />
-        <Route path="/bugs/create" element={<CreateBugPage />} />
-        <Route path="/bugs/edit/:bugId" element={<EditBugPage />} />
-        
-        {/* Settings */}
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        
-        {/* Reports */}
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/reports/:category" element={<ReportsPage />} />
-        
-        {/* Admin */}
-        <Route path="/admin" element={<AdminDashboardPage />} />
-        <Route path="/admin/sla" element={<AdminSLASettings />} />
-        <Route path="/admin/status-sync" element={<AdminStatusSynchronization />} />
-        <Route path="/admin/auto-close" element={<AdminAutoCloseSettings />} />
-        <Route path="/admin/business-hours" element={<AdminBusinessHoursSettings />} />
-        <Route path="/admin/notifications" element={<AdminNotificationSettings />} />
-        <Route path="/admin/notification-templates" element={<AdminNotificationTemplates />} />
-        <Route path="/admin/dropdown-config" element={<AdminDropdownConfig />} />
-        <Route path="/admin/error-logs" element={<AdminErrorLogsPage />} />
-        <Route path="/admin/api-keys" element={<AdminApiKeysPage />} />
-        <Route path="/admin/security" element={<AdminSecuritySettingsPage />} />
-        <Route path="/admin/mfa" element={<AdminMFASettingsPage />} />
-        <Route path="/admin/change-risk" element={<ChangeRiskSettings />} />
-        
-        {/* Notifications */}
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/notification-console" element={<NotificationConsole />} />
-        
-        {/* User Management */}
-        <Route path="/user-management" element={<UserManagementPage />} />
-        
-        {/* 404 - Keep this at the end */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </QueryClientProvider>
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<Index />} />
+      <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
+      
+      {/* Protected routes */}
+      <Route path="/dashboard" element={<MainLayout><Dashboard /></MainLayout>} />
+      
+      {/* Change Management */}
+      <Route path="/changes" element={<MainLayout><Changes /></MainLayout>} />
+      <Route path="/changes/:id" element={<MainLayout><ChangeDetail /></MainLayout>} />
+      <Route path="/changes/:id/edit" element={<MainLayout><EditChange /></MainLayout>} />
+      <Route path="/changes/:id/reject" element={<MainLayout><RejectChange /></MainLayout>} />
+      <Route path="/changes/:id/close" element={<MainLayout><CloseChange /></MainLayout>} />
+      <Route path="/changes/new" element={<MainLayout><NewChange /></MainLayout>} />
+      
+      {/* Ticket routes */}
+      <Route path="/incidents" element={<MainLayout><Incidents /></MainLayout>} />
+      <Route path="/incidents/:id" element={<MainLayout><IncidentDetail /></MainLayout>} />
+      <Route path="/incidents/create" element={<MainLayout><NewIncident /></MainLayout>} />
+      <Route path="/incidents/edit/:id" element={<MainLayout><EditIncident /></MainLayout>} />
+
+      <Route path="/service-requests" element={<MainLayout><ServiceRequests /></MainLayout>} />
+      <Route path="/service-requests/:id" element={<MainLayout><ServiceRequestDetail /></MainLayout>} />
+      <Route path="/service-requests/create" element={<MainLayout><NewServiceRequest /></MainLayout>} />
+      <Route path="/service-requests/edit/:id" element={<MainLayout><EditServiceRequest /></MainLayout>} />
+
+      {/* Problem Management routes */}
+      <Route path="/problems" element={<MainLayout><Problems /></MainLayout>} />
+      <Route path="/problems/:id" element={<MainLayout><ProblemDetail /></MainLayout>} />
+      <Route path="/problems/create" element={<MainLayout><NewProblem /></MainLayout>} />
+      <Route path="/problems/edit/:id" element={<MainLayout><EditProblem /></MainLayout>} />
+      <Route path="/problems/known-errors" element={<MainLayout><KnownErrors /></MainLayout>} />
+
+      {/* Task Management routes */}
+      <Route path="/tasks" element={<MainLayout><Tasks /></MainLayout>} />
+      <Route path="/tasks/dashboard" element={<MainLayout><TaskDashboard /></MainLayout>} />
+      <Route path="/tasks/:id" element={<MainLayout><TaskDetail /></MainLayout>} />
+      <Route path="/tasks/create" element={<MainLayout><NewTask /></MainLayout>} />
+      <Route path="/tasks/edit/:id" element={<MainLayout><EditTask /></MainLayout>} />
+
+      {/* Assets routes */}
+      <Route path="/assets" element={<MainLayout><Assets /></MainLayout>} />
+      <Route path="/assets/:id" element={<MainLayout><AssetDetail /></MainLayout>} />
+      <Route path="/assets/create" element={<MainLayout><NewAsset /></MainLayout>} />
+      <Route path="/assets/edit/:id" element={<MainLayout><EditAsset /></MainLayout>} />
+
+      {/* Knowledge routes */}
+      <Route path="/knowledge" element={<MainLayout><Knowledge /></MainLayout>} />
+      <Route path="/knowledge/article/:id" element={<MainLayout><KnowledgeArticle /></MainLayout>} />
+      <Route path="/knowledge/create" element={<MainLayout><NewKnowledgeArticle /></MainLayout>} />
+
+      {/* Test Management routes */}
+      <Route path="/testing" element={<MainLayout><Testing /></MainLayout>} />
+      <Route path="/testing/cases" element={<MainLayout><TestCases /></MainLayout>} />
+      <Route path="/testing/cases/:id" element={<MainLayout><TestCaseDetail /></MainLayout>} />
+      <Route path="/testing/cases/create" element={<MainLayout><NewTestCase /></MainLayout>} />
+      <Route path="/testing/cases/edit/:id" element={<MainLayout><EditTestCase /></MainLayout>} />
+      <Route path="/testing/execution/:id" element={<MainLayout><TestExecution /></MainLayout>} />
+
+      {/* Calendar */}
+      <Route path="/calendar" element={<MainLayout><Calendar /></MainLayout>} />
+
+      {/* Reports */}
+      <Route path="/reports" element={<MainLayout><Reports /></MainLayout>} />
+      <Route path="/reports/:category" element={<MainLayout><ReportCategory /></MainLayout>} />
+
+      {/* Portal routes */}
+      <Route path="/portal" element={<MainLayout><Portal /></MainLayout>} />
+      <Route path="/portal/my-approvals" element={<MainLayout><PortalApprovals /></MainLayout>} />
+      <Route path="/portal/my-incidents" element={<MainLayout><PortalIncidents /></MainLayout>} />
+      <Route path="/portal/my-requests" element={<MainLayout><PortalRequests /></MainLayout>} />
+
+      {/* User Settings */}
+      <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
+      <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
+
+      {/* Admin routes */}
+      <Route path="/admin" element={<MainLayout><Admin /></MainLayout>} />
+      <Route path="/admin/sla" element={<MainLayout><AdminSLA /></MainLayout>} />
+      <Route path="/admin/status-sync" element={<MainLayout><AdminStatusSync /></MainLayout>} />
+      <Route path="/admin/change-risk" element={<MainLayout><AdminChangeRisk /></MainLayout>} />
+      
+      {/* Catch-all route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 };
-
-export default AppRoutes;

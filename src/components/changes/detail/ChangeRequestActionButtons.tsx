@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import ActionButton from '@/components/shared/ActionButton';
 import { Edit, X, Check, CheckSquare } from 'lucide-react';
 
 interface ChangeRequestActionButtonsProps {
@@ -12,6 +12,7 @@ interface ChangeRequestActionButtonsProps {
   onReject?: () => void;
   onApprove?: () => void;
   onClose?: () => void;
+  changeId: string;
 }
 
 const ChangeRequestActionButtons: React.FC<ChangeRequestActionButtonsProps> = ({
@@ -22,36 +23,66 @@ const ChangeRequestActionButtons: React.FC<ChangeRequestActionButtonsProps> = ({
   onEdit,
   onReject,
   onApprove,
-  onClose
+  onClose,
+  changeId
 }) => {
   return (
     <div className="flex flex-wrap justify-end gap-2">
       {canEdit && onEdit && (
-        <Button variant="outline" onClick={onEdit}>
-          <Edit className="h-4 w-4 mr-2" />
+        <ActionButton 
+          action={{ 
+            type: 'function',
+            handler: onEdit,
+            errorMessage: 'Failed to enter edit mode'
+          }}
+          variant="outline"
+          icon={Edit}
+        >
           Edit
-        </Button>
+        </ActionButton>
       )}
       
       {canReject && onReject && (
-        <Button variant="outline" onClick={onReject}>
-          <X className="h-4 w-4 mr-2" />
+        <ActionButton 
+          action={{ 
+            type: 'function',
+            handler: onReject,
+            errorMessage: 'Failed to reject the change request'
+          }}
+          variant="outline"
+          icon={X}
+        >
           Reject
-        </Button>
+        </ActionButton>
       )}
       
       {canApprove && onApprove && (
-        <Button onClick={onApprove}>
-          <Check className="h-4 w-4 mr-2" />
+        <ActionButton 
+          action={{ 
+            type: 'function',
+            handler: onApprove,
+            successMessage: 'Change request approved successfully',
+            errorMessage: 'Failed to approve the change request'
+          }}
+          icon={Check}
+        >
           Approve
-        </Button>
+        </ActionButton>
       )}
 
       {canClose && onClose && (
-        <Button variant="secondary" onClick={onClose}>
-          <CheckSquare className="h-4 w-4 mr-2" />
+        <ActionButton 
+          action={{ 
+            type: 'function',
+            handler: onClose,
+            successMessage: 'Change request closed successfully',
+            errorMessage: 'Failed to close the change request'
+          }}
+          variant="secondary"
+          icon={CheckSquare}
+        >
           Close Change
-        </Button>
+        </ActionButton>
       )}
     </div>
   );

@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import './App.css';
-import AppRoutes from './routes';
+import { AppRoutes } from './routes';  // Changed from default import to named import
 import { Toaster } from './components/ui/toaster';
 import { ThemeProvider } from './components/ui/theme-provider';
 import RouteValidator from './components/dev/RouteValidator';

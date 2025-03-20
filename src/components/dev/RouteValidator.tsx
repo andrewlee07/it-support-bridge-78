@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { RouteStatus, testAllDefinedRoutes } from '@/utils/testing/linkTesting';
 import { AlertTriangle, CheckCircle, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import ActionButton from '@/components/shared/ActionButton';
 
 /**
  * Route validator component for development mode
@@ -45,9 +45,17 @@ const RouteValidator = () => {
           )}
           <h3 className="font-medium">Route Validation</h3>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => setIsVisible(false)}>
-          <X className="h-4 w-4" />
-        </Button>
+        <ActionButton 
+          variant="ghost" 
+          size="sm" 
+          action={{ 
+            type: 'function', 
+            handler: () => setIsVisible(false) 
+          }}
+          icon={X}
+        >
+          <span className="sr-only">Close</span>
+        </ActionButton>
       </div>
       
       <div className="p-4">
@@ -57,17 +65,20 @@ const RouteValidator = () => {
             <p>Valid routes: <span className="font-medium text-green-500">{validRoutes.length}</span></p>
             <p>Invalid routes: <span className="font-medium text-red-500">{invalidRoutes.length}</span></p>
           </div>
-          <Button 
+          <ActionButton 
             size="sm" 
             variant="outline" 
-            onClick={() => {
-              const results = testAllDefinedRoutes();
-              setValidationResults(results);
-              setHasInvalidRoutes(results.some(r => !r.isValid));
+            action={{
+              type: 'function',
+              handler: () => {
+                const results = testAllDefinedRoutes();
+                setValidationResults(results);
+                setHasInvalidRoutes(results.some(r => !r.isValid));
+              }
             }}
           >
             Re-validate
-          </Button>
+          </ActionButton>
         </div>
         
         {invalidRoutes.length > 0 && (
