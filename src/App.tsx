@@ -7,16 +7,22 @@ import { Toaster } from './components/ui/toaster';
 import { ThemeProvider } from './components/ui/theme-provider';
 import RouteValidator from './components/dev/RouteValidator';
 import { AuthProvider } from './contexts/AuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Create a client
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="ui-theme">
-      <AuthProvider>
-        <RouterProvider router={router} />
-        <Toaster />
-        {/* RouteValidator will only render in development mode */}
-        <RouteValidator />
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+          {/* RouteValidator will only render in development mode */}
+          <RouteValidator />
+        </AuthProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }
