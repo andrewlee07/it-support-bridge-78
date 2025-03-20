@@ -72,9 +72,9 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
   };
 
   return (
-    <div className="mt-4 h-full overflow-y-auto">
+    <>
       {/* Details Tab */}
-      <TabsContent value="details" className="h-full">
+      <TabsContent value="details" className="mt-4">
         <TicketDetails 
           ticket={ticket} 
           type={type} 
@@ -83,12 +83,12 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
       </TabsContent>
       
       {/* Activity Tab */}
-      <TabsContent value="activity" className="h-full">
+      <TabsContent value="activity" className="mt-4">
         <ActivityHistory auditEntries={ticket.audit} />
       </TabsContent>
       
       {/* Update Tab */}
-      <TabsContent value="update" className="h-full pb-6">
+      <TabsContent value="update" className="mt-4">
         <div className="border p-4 rounded-md bg-muted/30">
           <TicketUpdateForm
             defaultValues={{
@@ -105,40 +105,46 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
       </TabsContent>
       
       {/* Resolve/Fulfill Tab */}
-      <TabsContent value={resolveTabLabel} className="h-full">
-        <TicketCloseForm
-          defaultValues={{
-            status: isServiceRequest ? 'fulfilled' : 'resolved',
-            notes: '',
-            rootCause: '',
-            closureReason: '',
-            resolution: '' // Adding the missing resolution field
-          }}
-          onSubmit={onClose}
-          onCancel={() => onTabChange('details')}
-          type={type}
-          relatedItems={ticket.relatedItems}
-        />
+      <TabsContent value={resolveTabLabel} className="mt-4">
+        <div className="border p-4 rounded-md bg-muted/30">
+          <TicketCloseForm
+            defaultValues={{
+              status: isServiceRequest ? 'fulfilled' : 'resolved',
+              notes: '',
+              rootCause: '',
+              closureReason: '',
+              resolution: '' 
+            }}
+            onSubmit={onClose}
+            onCancel={() => onTabChange('details')}
+            type={type}
+            relatedItems={ticket.relatedItems}
+          />
+        </div>
       </TabsContent>
       
       {/* Add Note Tab */}
-      <TabsContent value="notes" className="h-full">
-        <NoteTab onAddNote={onAddNote} />
+      <TabsContent value="notes" className="mt-4">
+        <div className="border p-4 rounded-md bg-muted/30">
+          <NoteTab onAddNote={onAddNote} />
+        </div>
       </TabsContent>
 
       {/* Create Task Tab */}
-      <TabsContent value="create-task" className="h-full">
-        <CreateTaskTab 
-          ticket={ticket}
-          onTaskCreated={handleTaskCreated}
-          onCancel={() => onTabChange('details')}
-        />
+      <TabsContent value="create-task" className="mt-4">
+        <div className="border p-4 rounded-md bg-muted/30">
+          <CreateTaskTab 
+            ticket={ticket}
+            onTaskCreated={handleTaskCreated}
+            onCancel={() => onTabChange('details')}
+          />
+        </div>
       </TabsContent>
 
       {/* Create Bug Tab (for Incidents) */}
       {!isServiceRequest && (
-        <TabsContent value="create-bug" className="h-full">
-          <div className="space-y-4">
+        <TabsContent value="create-bug" className="mt-4">
+          <div className="border p-4 rounded-md bg-muted/30 space-y-4">
             <h2 className="text-xl font-semibold">Create Bug from Incident</h2>
             <p className="text-muted-foreground">
               Create a new bug based on this incident. The incident details will be used to pre-populate the bug form.
@@ -158,8 +164,8 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
 
       {/* Create Backlog Item Tab (for Service Requests) */}
       {isServiceRequest && (
-        <TabsContent value="create-backlog" className="h-full">
-          <div className="space-y-4">
+        <TabsContent value="create-backlog" className="mt-4">
+          <div className="border p-4 rounded-md bg-muted/30 space-y-4">
             <h2 className="text-xl font-semibold">Create Backlog Item from Service Request</h2>
             <p className="text-muted-foreground">
               Create a new backlog item based on this service request. The request details will be used to pre-populate the form.
@@ -178,7 +184,7 @@ const TicketTabContent: React.FC<TicketTabContentProps> = ({
           </div>
         </TabsContent>
       )}
-    </div>
+    </>
   );
 };
 

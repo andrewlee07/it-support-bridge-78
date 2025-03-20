@@ -12,6 +12,7 @@ import NoteTab from './detail/NoteTab';
 import CreateTaskTab from './detail/CreateTaskTab';
 import { Megaphone } from 'lucide-react';
 import CreateAnnouncementFromIncidentDialog from '@/components/announcements/CreateAnnouncementFromIncidentDialog';
+import TicketTabs from './detail/TicketTabs';
 
 // We need to make the TicketDetailContainer compatible with the interfaces used by the imported components
 const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
@@ -46,6 +47,8 @@ const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
   };
 
   const isIncident = type === 'incident';
+  const isResolved = ['closed', 'resolved', 'fulfilled'].includes(ticket.status);
+  const isServiceRequest = type === 'service';
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -55,7 +58,7 @@ const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
     <div className="space-y-6">
       <TicketDetailHeader 
         ticket={ticket}
-        isServiceRequest={type === 'service'}
+        isServiceRequest={isServiceRequest}
         onReopenClick={handleReopenClick}
       />
       
@@ -72,36 +75,24 @@ const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
         </div>
       )}
       
-      <Tabs defaultValue="details" onValueChange={handleTabChange}>
-        <TabsList>
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-          <TabsTrigger value="create-task">Create Task</TabsTrigger>
-        </TabsList>
-        <TabsContent value="details" className="space-y-4">
-          <TicketTabContent 
-            ticket={ticket}
-            activeTab={activeTab}
-            type={type}
-            onUpdate={handleUpdate}
-            onClose={handleClose}
-            onAddNote={onAddNote || (() => {})}
-            onDetailsTabReopen={handleReopenClick}
-            onTabChange={handleTabChange}
-          />
-        </TabsContent>
-        <TabsContent value="notes">
-          <NoteTab 
-            onAddNote={onAddNote || (() => {})} 
-          />
-        </TabsContent>
-        <TabsContent value="create-task">
-          <CreateTaskTab 
-            ticket={ticket} 
-            onTaskCreated={() => {}} 
-            onCancel={() => setActiveTab('details')} 
-          />
-        </TabsContent>
+      <Tabs defaultValue="details" onValueChange={handleTabChange} className="w-full">
+        <TicketTabs 
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          isResolved={isResolved}
+          isServiceRequest={isServiceRequest}
+        />
+        
+        <TicketTabContent 
+          ticket={ticket}
+          activeTab={activeTab}
+          type={type}
+          onUpdate={handleUpdate}
+          onClose={handleClose}
+          onAddNote={onAddNote || (() => {})}
+          onDetailsTabReopen={handleReopenClick}
+          onTabChange={handleTabChange}
+        />
       </Tabs>
       
       {/* Reopen Dialog */}
@@ -109,7 +100,7 @@ const TicketDetailContainer: React.FC<TicketDetailViewProps> = ({
         isOpen={reopenDialogOpen}
         onOpenChange={setReopenDialogOpen}
         onConfirm={handleReopenConfirm}
-        isServiceRequest={type === 'service'}
+        isServiceRequest={isServiceRequest}
       />
       
       {/* Create Announcement Dialog */}
