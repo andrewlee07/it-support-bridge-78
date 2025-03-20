@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
 import { useAuth } from '@/contexts/AuthContext';
 import ChangesHeader from '@/components/changes/ChangesHeader';
@@ -9,10 +8,20 @@ import ChangeTabs from '@/components/changes/ChangeTabs';
 import RejectChangeDialog from '@/components/changes/RejectChangeDialog';
 import { useChangeRequests } from '@/hooks/useChangeRequests';
 import { useChangeRequestMutations } from '@/hooks/useChangeRequestMutations';
+import { useAppNavigation } from '@/utils/routes/navigationUtils';
+import { logRouteValidationResults, testAllDefinedRoutes } from '@/utils/testing/linkTesting';
 
 const Changes = () => {
-  const navigate = useNavigate();
+  // In development mode, validate all routes on component mount
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const results = testAllDefinedRoutes();
+      logRouteValidationResults(results);
+    }
+  }, []);
+  
   const { user } = useAuth();
+  const navigation = useAppNavigation();
   
   // Change request states
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
@@ -71,13 +80,12 @@ const Changes = () => {
   };
 
   const handleCreateNewRequest = () => {
-    navigate('/changes/new');
+    navigation.goToNewChange();
   };
 
   const handleViewChange = (changeId: string) => {
-    // Updated to ensure consistent navigation
-    navigate(`/changes/${changeId}`);
-    console.log(`Navigating to change: /changes/${changeId}`);
+    navigation.goToChangeDetail(changeId);
+    console.log(`Navigating to change: ${changeId} using consistent navigation utility`);
   };
 
   const handleViewModeChange = (mode: 'grid' | 'table') => {

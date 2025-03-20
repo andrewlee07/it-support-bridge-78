@@ -6,9 +6,12 @@ import ChangeRequestDetailView from '@/components/changes/detail/ChangeRequestDe
 import ChangeRequestLoading from '@/components/changes/detail/ChangeRequestLoading';
 import ChangeRequestError from '@/components/changes/detail/ChangeRequestError';
 import { useChangeRequestDetail } from '@/hooks/useChangeRequestDetail';
+import { useAppNavigation } from '@/utils/routes/navigationUtils';
+import * as ROUTES from '@/utils/routes/routeConstants';
 
 const ChangeDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const navigation = useAppNavigation();
   
   // Added console log to help with debugging
   console.log('ChangeDetail: Rendering with ID:', id);
@@ -32,7 +35,7 @@ const ChangeDetail = () => {
   if (error || !changeRequest) {
     return (
       <ChangeRequestError
-        returnPath="/changes"
+        returnPath={ROUTES.CHANGES}
         entityName="Change Request"
       />
     );
@@ -46,12 +49,12 @@ const ChangeDetail = () => {
       <ChangeRequestDetailView
         changeRequest={changeRequest}
         onApprove={handleApprove}
-        onReject={() => window.location.href = `/changes/${changeRequest.id}/reject`}
-        onEdit={() => window.location.href = `/changes/${changeRequest.id}/edit`}
+        onReject={() => navigation.goToRejectChange(changeRequest.id)}
+        onEdit={() => navigation.goToEditChange(changeRequest.id)}
         onUpdateStatus={handleUpdateStatus}
         onAddImplementor={handleAddImplementor}
         onAddApprover={handleAddApprover}
-        onClose={() => window.location.href = `/changes/${changeRequest.id}/close`}
+        onClose={() => navigation.goToCloseChange(changeRequest.id)}
       />
     </PageTransition>
   );

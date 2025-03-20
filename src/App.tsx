@@ -1,32 +1,23 @@
 
 import React from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { AuthProvider } from '@/contexts/AuthContext';
-import router from '@/routes';
-import { Toaster } from "@/components/ui/toaster";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import './App.css';
+import AppRoutes from './routes';
+import { Toaster } from './components/ui/toaster';
+import { ThemeProvider } from './components/ui/theme-provider';
+import RouteValidator from './components/dev/RouteValidator';
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    },
-  },
-});
-
-const App: React.FC = () => {
+function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RouterProvider router={router} />
+    <ThemeProvider defaultTheme="light" storageKey="ui-theme">
+      <BrowserRouter>
+        <AppRoutes />
         <Toaster />
-      </AuthProvider>
-    </QueryClientProvider>
+        {/* RouteValidator will only render in development mode */}
+        <RouteValidator />
+      </BrowserRouter>
+    </ThemeProvider>
   );
-};
+}
 
 export default App;
