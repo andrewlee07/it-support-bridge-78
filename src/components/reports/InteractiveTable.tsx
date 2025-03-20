@@ -80,6 +80,17 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
     );
   };
 
+  // Helper function to check if an object conforms to SLAInfo interface
+  const isSLAInfo = (obj: any): obj is SLAInfo => {
+    return obj && 
+           typeof obj === 'object' && 
+           'percentLeft' in obj && 
+           'timeLeft' in obj &&
+           'isBreached' in obj &&
+           'slaTarget' in obj &&
+           'slaType' in obj;
+  };
+
   // Check if any column is an SLA column
   const hasSLAColumn = columns.some(col => col.isSLAColumn || col.formatSLA);
 
@@ -151,14 +162,9 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
                                 return formatSLAStatus(record[column.key] || {});
                               }
                               
-                              // Check if rendered is SLAInfo object and format it if needed
-                              if (
-                                rendered && 
-                                typeof rendered === 'object' && 
-                                'percentLeft' in rendered && 
-                                'timeLeft' in rendered
-                              ) {
-                                return formatSLAStatus(rendered as SLAInfo);
+                              // Check if rendered is an SLAInfo object and format it if needed
+                              if (rendered && isSLAInfo(rendered)) {
+                                return formatSLAStatus(rendered);
                               }
                               
                               // If it's already a ReactNode, just return it
