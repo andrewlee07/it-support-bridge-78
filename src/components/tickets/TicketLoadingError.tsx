@@ -1,33 +1,30 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 
-export interface TicketLoadingErrorProps {
+interface TicketLoadingErrorProps {
   returnPath: string;
   entityName: string;
 }
 
-const TicketLoadingError: React.FC<TicketLoadingErrorProps> = ({
-  returnPath,
-  entityName
+const TicketLoadingError: React.FC<TicketLoadingErrorProps> = ({ 
+  returnPath, 
+  entityName 
 }) => {
-  const navigate = useNavigate();
-
   return (
-    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-      <div className="rounded-full bg-amber-100 p-3 mb-4">
-        <AlertTriangle className="h-6 w-6 text-amber-600" />
-      </div>
-      <h2 className="text-xl font-bold mb-2">
-        {entityName} Not Found
-      </h2>
+    <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+      <AlertCircle className="h-16 w-16 text-destructive mb-4" />
+      <h1 className="text-2xl font-bold mb-2">Unable to load {entityName}</h1>
       <p className="text-muted-foreground mb-6">
-        The {entityName.toLowerCase()} you're looking for could not be found or may have been deleted.
+        The {entityName.toLowerCase()} you are looking for could not be found or an error occurred.
       </p>
-      <Button onClick={() => navigate(returnPath)}>
-        Return to {entityName} List
+      <Button asChild>
+        <Link to={returnPath}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Return to {entityName} List
+        </Link>
       </Button>
     </div>
   );
