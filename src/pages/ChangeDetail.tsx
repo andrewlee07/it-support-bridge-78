@@ -1,16 +1,14 @@
 
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
-import ChangeRequestDetail from '@/components/changes/ChangeRequestDetail';
+import ChangeRequestDetailView from '@/components/changes/detail/ChangeRequestDetailView';
 import ChangeRequestLoading from '@/components/changes/detail/ChangeRequestLoading';
 import ChangeRequestError from '@/components/changes/detail/ChangeRequestError';
-import ChangeRequestHeader from '@/components/changes/detail/ChangeRequestHeader';
 import { useChangeRequestDetail } from '@/hooks/useChangeRequestDetail';
 
 const ChangeDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   
   const {
     changeRequest,
@@ -22,49 +20,33 @@ const ChangeDetail = () => {
     handleAddApprover
   } = useChangeRequestDetail(id);
 
-  const handleReject = () => {
-    if (!changeRequest) return;
-    navigate(`/changes/${changeRequest.id}/reject`);
-  };
-
-  const handleEdit = () => {
-    if (!changeRequest) return;
-    navigate(`/changes/${changeRequest.id}/edit`);
-  };
-
-  const handleClose = () => {
-    if (!changeRequest) return;
-    navigate(`/changes/${changeRequest.id}/close`);
-  };
-
-  const handleStatusUpdate = (status: string, closureReason?: string) => {
-    handleUpdateStatus(status, closureReason);
-  };
-
+  // If loading, show loading state
   if (loading) {
     return <ChangeRequestLoading />;
   }
 
+  // If error or no change request, show error state
   if (error || !changeRequest) {
-    return <ChangeRequestError />;
+    return (
+      <ChangeRequestError
+        returnPath="/changes"
+        entityName="Change Request"
+      />
+    );
   }
 
   return (
     <PageTransition>
-      <div className="space-y-6">
-        <ChangeRequestHeader changeRequest={changeRequest} />
-        
-        <ChangeRequestDetail 
-          changeRequest={changeRequest} 
-          onApprove={handleApprove}
-          onReject={handleReject}
-          onEdit={handleEdit}
-          onUpdateStatus={handleStatusUpdate}
-          onAddImplementor={handleAddImplementor}
-          onAddApprover={handleAddApprover}
-          onClose={handleClose}
-        />
-      </div>
+      <ChangeRequestDetailView
+        changeRequest={changeRequest}
+        onApprove={handleApprove}
+        onReject={() => window.location.href = `/changes/${changeRequest.id}/reject`}
+        onEdit={() => window.location.href = `/changes/${changeRequest.id}/edit`}
+        onUpdateStatus={handleUpdateStatus}
+        onAddImplementor={handleAddImplementor}
+        onAddApprover={handleAddApprover}
+        onClose={() => window.location.href = `/changes/${changeRequest.id}/close`}
+      />
     </PageTransition>
   );
 };
