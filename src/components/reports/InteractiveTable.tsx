@@ -46,7 +46,7 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
 
   // Formatter for SLA status display with gradient color
   const formatSLAStatus = (slaInfo: SLAInfo): React.ReactNode => {
-    if (!slaInfo || slaInfo.status === undefined) {
+    if (!slaInfo) {
       return <div>N/A</div>;
     }
 
@@ -152,7 +152,12 @@ const InteractiveTable: React.FC<InteractiveTableProps> = ({
                               }
                               
                               // Check if rendered is SLAInfo object and format it if needed
-                              if (rendered && typeof rendered === 'object' && 'status' in rendered) {
+                              if (
+                                rendered && 
+                                typeof rendered === 'object' && 
+                                'percentLeft' in rendered && 
+                                'timeLeft' in rendered
+                              ) {
                                 return formatSLAStatus(rendered as SLAInfo);
                               }
                               

@@ -46,32 +46,28 @@ const router = createBrowserRouter([
     path: '/portal',
     element: React.createElement(
       ProtectedRoute, 
-      { allowEndUser: true }, 
-      React.createElement(EndUserPortal)
+      { allowEndUser: true, children: React.createElement(EndUserPortal) }
     )
   },
   {
     path: '/portal/my-approvals',
     element: React.createElement(
       ProtectedRoute, 
-      { allowEndUser: true },
-      React.createElement(PortalMyApprovals)
+      { allowEndUser: true, children: React.createElement(PortalMyApprovals) }
     )
   },
   {
     path: '/portal/my-incidents',
     element: React.createElement(
       ProtectedRoute, 
-      { allowEndUser: true },
-      React.createElement(PortalMyApprovals) // Reusing same component for now
+      { allowEndUser: true, children: React.createElement(PortalMyApprovals) } // Reusing same component for now
     )
   },
   {
     path: '/portal/my-requests',
     element: React.createElement(
       ProtectedRoute, 
-      { allowEndUser: true },
-      React.createElement(PortalMyApprovals) // Reusing same component for now
+      { allowEndUser: true, children: React.createElement(PortalMyApprovals) } // Reusing same component for now
     )
   },
   // Staff routes with additional protection
@@ -79,8 +75,7 @@ const router = createBrowserRouter([
     path: '/',
     element: React.createElement(
       ProtectedRoute, 
-      { allowEndUser: false }, 
-      React.createElement(MainLayout)
+      { allowEndUser: false, children: React.createElement(MainLayout) }
     ),
     errorElement: React.createElement(ErrorPage),
     children: [

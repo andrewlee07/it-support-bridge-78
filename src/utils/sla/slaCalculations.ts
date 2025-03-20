@@ -10,6 +10,8 @@ export interface SLAInfo {
   isBreached: boolean;
   slaTarget: Date;
   slaType: string;
+  status?: string;
+  completed?: boolean;
 }
 
 // Default SLA targets in hours
@@ -36,7 +38,9 @@ export const calculateSLAStatus = (ticket: Ticket, slaType: SLAType = 'resolutio
       timeLeft: 'Completed',
       isBreached: false,
       slaTarget: new Date(),
-      slaType: slaType === 'response' ? 'Response' : 'Resolution'
+      slaType: slaType === 'response' ? 'Response' : 'Resolution',
+      status: 'completed',
+      completed: true
     };
   }
   
@@ -74,6 +78,8 @@ export const calculateSLAStatus = (ticket: Ticket, slaType: SLAType = 'resolutio
     timeLeft,
     isBreached,
     slaTarget,
-    slaType: slaType === 'response' ? 'Response' : 'Resolution'
+    slaType: slaType === 'response' ? 'Response' : 'Resolution',
+    status: isBreached ? 'breached' : 'active',
+    completed: false
   };
 };
