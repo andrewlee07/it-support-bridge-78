@@ -2,10 +2,9 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
-import { getProblemById } from '@/utils/mockData/problems';
+import { useProblemDetail } from '@/hooks/useProblemDetail';
 import ProblemDetailView from '@/components/problems/ProblemDetailView';
 import ProblemDetailError from '@/components/problems/ProblemDetailError';
-import { useProblemDetail } from '@/hooks/useProblemDetail';
 import DetailBreadcrumb from '@/components/tickets/detail/DetailBreadcrumb';
 
 const ProblemDetail = () => {
@@ -22,37 +21,45 @@ const ProblemDetail = () => {
     handleReopenProblem
   } = useProblemDetail(id);
   
-  return (
-    <PageTransition>
-      {!loading && !error && problem && (
+  // If loading or error, show error/loading state
+  if (loading || error || !problem) {
+    return (
+      <PageTransition>
         <DetailBreadcrumb 
           entityName="Problem"
-          entityId={problem.id}
+          entityId={id || ''}
           parentRoute="/problems"
           parentName="Problems"
         />
-      )}
-      
-      {(loading || error || !problem) && (
+        
         <ProblemDetailError
           loading={loading}
           error={error}
           returnPath="/problems"
           entityType="Problem"
         />
-      )}
+      </PageTransition>
+    );
+  }
+
+  return (
+    <PageTransition>
+      <DetailBreadcrumb 
+        entityName="Problem"
+        entityId={problem.id}
+        parentRoute="/problems"
+        parentName="Problems"
+      />
       
-      {!loading && !error && problem && (
-        <ProblemDetailView
-          problem={problem}
-          onUpdateProblem={handleUpdateProblem}
-          onResolveProblem={handleResolveProblem}
-          onAddNote={handleAddNote}
-          onCreateKnownError={handleCreateKnownError}
-          onCloseProblem={handleCloseProblem}
-          onReopenProblem={handleReopenProblem}
-        />
-      )}
+      <ProblemDetailView
+        problem={problem}
+        onUpdateProblem={handleUpdateProblem}
+        onResolveProblem={handleResolveProblem}
+        onAddNote={handleAddNote}
+        onCreateKnownError={handleCreateKnownError}
+        onCloseProblem={handleCloseProblem}
+        onReopenProblem={handleReopenProblem}
+      />
     </PageTransition>
   );
 };

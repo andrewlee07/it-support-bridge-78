@@ -32,18 +32,18 @@ const ProblemTabContent = ({
 }: ProblemTabContentProps) => {
   return (
     <>
-      <TabsContent value="details" className="pt-6">
+      <TabsContent value="details" className="pt-2">
         <ProblemDetails problem={problem} />
       </TabsContent>
       
-      <TabsContent value="activity" className="pt-6">
+      <TabsContent value="activity" className="pt-2">
         <ProblemActivity auditEntries={problem.audit} />
       </TabsContent>
       
       {!isClosed && (
         <>
-          <TabsContent value="update" className="pt-6">
-            <div className="border p-4 rounded-md bg-muted/30">
+          <TabsContent value="update" className="pt-2">
+            <div className="border p-6 rounded-md bg-muted/10">
               <ProblemUpdateForm 
                 problem={problem} 
                 onSubmit={onUpdateProblem} 
@@ -52,8 +52,8 @@ const ProblemTabContent = ({
             </div>
           </TabsContent>
           
-          <TabsContent value="resolve" className="pt-6">
-            <div className="border p-4 rounded-md bg-muted/30">
+          <TabsContent value="resolve" className="pt-2">
+            <div className="border p-6 rounded-md bg-muted/10">
               <ProblemResolveForm 
                 problem={problem} 
                 onSubmit={onResolveProblem} 
@@ -62,8 +62,8 @@ const ProblemTabContent = ({
             </div>
           </TabsContent>
           
-          <TabsContent value="note" className="pt-6">
-            <div className="border p-4 rounded-md bg-muted/30">
+          <TabsContent value="note" className="pt-2">
+            <div className="border p-6 rounded-md bg-muted/10">
               <ProblemNoteForm 
                 onSubmit={(note) => {
                   onAddNote(note);
@@ -74,14 +74,14 @@ const ProblemTabContent = ({
             </div>
           </TabsContent>
           
-          <TabsContent value="kedb" className="pt-6">
-            <div className="border p-4 rounded-md bg-muted/30">
+          <TabsContent value="kedb" className="pt-2">
+            <div className="border p-6 rounded-md bg-muted/10">
               <KnownErrorForm 
                 problem={problem} 
                 onSubmit={(data) => {
                   onCreateKnownError(data);
-                  setActiveTab('details');
-                }} 
+                  setActiveTab('details')}
+                } 
                 onCancel={() => setActiveTab('details')}
               />
             </div>

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import ProblemList from '@/components/problems/ProblemList';
 import ProblemForm from '@/components/problems/ProblemForm';
 import KnownErrorDatabase from '@/components/problems/KnownErrorDatabase';
+import { Card } from '@/components/ui/card';
 
 const ProblemManagement = () => {
   const [activeTab, setActiveTab] = useState('problems');
@@ -32,7 +33,7 @@ const ProblemManagement = () => {
           </div>
           
           {activeTab === 'problems' && (
-            <Button className="shrink-0" onClick={() => setShowForm(!showForm)}>
+            <Button className="shrink-0 flex items-center" onClick={() => setShowForm(!showForm)}>
               {showForm ? (
                 <>
                   <X className="mr-2 h-4 w-4" />
@@ -49,28 +50,30 @@ const ProblemManagement = () => {
         </div>
         
         {showForm ? (
-          <div className="glass-panel p-6 rounded-lg animate-fade-in">
+          <Card className="p-6 rounded-lg animate-fade-in">
             <h2 className="text-xl font-semibold mb-4">Create New Problem</h2>
             <ProblemForm onSubmit={handleSubmit} />
-          </div>
+          </Card>
         ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="animate-fade-in">
-            <TabsList className="mb-4">
-              <TabsTrigger value="problems">Problems</TabsTrigger>
-              <TabsTrigger value="kedb" className="flex items-center">
-                <Database className="h-4 w-4 mr-2" />
-                Known Error DB
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="problems" className="mt-0">
-              <ProblemList />
-            </TabsContent>
-            
-            <TabsContent value="kedb" className="mt-0">
-              <KnownErrorDatabase />
-            </TabsContent>
-          </Tabs>
+          <Card className="p-6 rounded-lg animate-fade-in">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="mb-4">
+                <TabsTrigger value="problems">Problems</TabsTrigger>
+                <TabsTrigger value="kedb" className="flex items-center">
+                  <Database className="h-4 w-4 mr-2" />
+                  Known Error DB
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="problems" className="mt-0">
+                <ProblemList />
+              </TabsContent>
+              
+              <TabsContent value="kedb" className="mt-0">
+                <KnownErrorDatabase />
+              </TabsContent>
+            </Tabs>
+          </Card>
         )}
       </div>
     </PageTransition>

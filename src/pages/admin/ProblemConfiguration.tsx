@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
@@ -26,46 +27,55 @@ const ProblemConfiguration = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="general">
-          <TabsList className="mb-4">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="workflow">Workflow</TabsTrigger>
-            <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
-          </TabsList>
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle>Problem Management Settings</CardTitle>
+            <CardDescription>Configure problem management workflow and fields</CardDescription>
+          </CardHeader>
           
-          <TabsContent value="general">
-            <Card>
-              <CardHeader>
-                <CardTitle>General Settings</CardTitle>
-                <CardDescription>Configure general problem management settings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* General settings content */}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="workflow">
-            <Card>
-              <CardHeader>
-                <CardTitle>Workflow Settings</CardTitle>
-                <CardDescription>Configure problem workflow settings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Workflow settings content */}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="mandatoryfields">
-            <MandatoryFieldsConfig
-              entityType="problem"
-              fields={mandatoryFields}
-              onSave={updateMandatoryFields}
-              isLoading={isLoading}
-            />
-          </TabsContent>
-        </Tabs>
+          <CardContent className="pt-6">
+            <Tabs defaultValue="general">
+              <TabsList className="mb-4">
+                <TabsTrigger value="general">General</TabsTrigger>
+                <TabsTrigger value="workflow">Workflow</TabsTrigger>
+                <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="general">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>General Settings</CardTitle>
+                    <CardDescription>Configure general problem management settings</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {/* General settings content */}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="workflow">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Workflow Settings</CardTitle>
+                    <CardDescription>Configure problem workflow settings</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Workflow settings content */}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="mandatoryfields">
+                <MandatoryFieldsConfig
+                  entityType="problem"
+                  fields={mandatoryFields}
+                  onSave={updateMandatoryFields}
+                  isLoading={isLoading}
+                />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </PageTransition>
   );

@@ -14,6 +14,7 @@ import ProblemCard from './ProblemCard';
 import ProblemTable from './ProblemTable';
 import TicketViewToggle, { ViewType } from '@/components/tickets/TicketViewToggle';
 import { Problem } from '@/utils/types/problem';
+import { Card } from '@/components/ui/card';
 
 const ProblemList = () => {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const ProblemList = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-4 justify-between">
         <div className="flex flex-col md:flex-row gap-4 flex-1">
           <Input
@@ -61,12 +62,12 @@ const ProblemList = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="md:w-1/2"
           />
-          <div className="flex gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
             <Select
               value={statusFilter}
               onValueChange={setStatusFilter}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full md:w-[180px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -85,7 +86,7 @@ const ProblemList = () => {
               value={priorityFilter}
               onValueChange={setPriorityFilter}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full md:w-[180px]">
                 <SelectValue placeholder="Filter by priority" />
               </SelectTrigger>
               <SelectContent>
@@ -104,12 +105,12 @@ const ProblemList = () => {
       </div>
 
       {filteredProblems.length === 0 ? (
-        <div className="bg-muted/50 rounded-lg p-6 text-center">
+        <Card className="bg-muted/30 p-6 text-center">
           <h3 className="text-lg font-medium">No problems found</h3>
           <p className="text-muted-foreground mt-1">
             Try adjusting your search or filters
           </p>
-        </div>
+        </Card>
       ) : viewType === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProblems.map((problem) => (

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { CheckCircle, RefreshCcw } from 'lucide-react';
 
 interface ProblemActionButtonsProps {
   canClose: boolean;
@@ -37,11 +38,14 @@ const ProblemActionButtons = ({
   };
 
   return (
-    <div className="space-x-2">
+    <div className="flex space-x-2">
       {canClose && !isClosed && (
         <Dialog open={isClosingDialogOpen} onOpenChange={setIsClosingDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline">Close Problem</Button>
+            <Button variant="outline" className="flex items-center">
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Close Problem
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -71,7 +75,10 @@ const ProblemActionButtons = ({
       {canReopen && (
         <Dialog open={isReopenDialogOpen} onOpenChange={setIsReopenDialogOpen}>
           <DialogTrigger asChild>
-            <Button>Reopen Problem</Button>
+            <Button className="flex items-center">
+              <RefreshCcw className="mr-2 h-4 w-4" />
+              Reopen Problem
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
