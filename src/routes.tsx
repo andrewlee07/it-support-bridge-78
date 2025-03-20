@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
@@ -56,7 +57,7 @@ import AdminSLA from './pages/AdminSLA';
 import AdminStatusSync from './pages/AdminStatusSync';
 import AdminChangeRisk from './pages/AdminChangeRisk';
 
-export const AppRoutes = () => {
+const AppRoutes = () => {
   return (
     <Routes>
       {/* Public routes */}
@@ -146,3 +147,5 @@ export const AppRoutes = () => {
     </Routes>
   );
 };
+
+export default AppRoutes;

@@ -81,3 +81,23 @@ export const testAllDefinedRoutes = (): RouteStatus[] => {
   
   return results;
 };
+
+/**
+ * Logs route validation results to the console
+ */
+export const logRouteValidationResults = (results: RouteStatus[]): void => {
+  console.group('Route Validation Results:');
+  console.log(`Total Routes: ${results.length}`);
+  console.log(`Valid Routes: ${results.filter(r => r.isValid).length}`);
+  console.log(`Invalid Routes: ${results.filter(r => !r.isValid).length}`);
+  
+  if (results.some(r => !r.isValid)) {
+    console.group('Invalid Routes:');
+    results.filter(r => !r.isValid).forEach(r => {
+      console.error(`${r.path} - ${r.errorMessage}`);
+    });
+    console.groupEnd();
+  }
+  
+  console.groupEnd();
+};

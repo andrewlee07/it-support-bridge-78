@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { ChangeRequest } from '@/utils/types/change';
@@ -140,6 +141,7 @@ const ChangeRequestContent: React.FC<ChangeRequestContentProps> = ({
           onReject={onReject}
           onApprove={onApprove}
           onClose={onClose}
+          changeId={changeRequest.id}
         />
       </CardFooter>
     </Card>
