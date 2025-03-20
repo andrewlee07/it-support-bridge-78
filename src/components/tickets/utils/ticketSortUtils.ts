@@ -1,7 +1,7 @@
 
 import { Ticket } from '@/utils/types/ticket';
 import { SortKey, SortDirection } from '../types/ticketTableTypes';
-import { calculateSLAStatus } from '@/utils/sla/slaCalculations';
+import { calculateSLAStatus, SLAType } from '@/utils/sla/slaCalculations';
 
 // Sort tickets based on sort key and direction
 export const getSortedTickets = (
@@ -26,11 +26,10 @@ export const getSortedTickets = (
         const bAssigned = b.assignedTo || '';
         return sortFactor * aAssigned.localeCompare(bAssigned);
       case 'sla':
-        const aStatus = calculateSLAStatus(a);
-        const bStatus = calculateSLAStatus(b);
-        // Order: breached > warning > ok
-        const statusRank = { 'breached': 0, 'warning': 1, 'ok': 2 };
-        return sortFactor * (statusRank[aStatus.status] - statusRank[bStatus.status]);
+        const aStatus = calculateSLAStatus(a, 'resolution');
+        const bStatus = calculateSLAStatus(b, 'resolution');
+        // Order: breached > non-breached
+        return sortFactor * (aStatus.isBreached === bStatus.isBreached ? 0 : aStatus.isBreached ? -1 : 1);
       case 'createdAt':
       default:
         return sortFactor * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());

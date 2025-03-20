@@ -4,7 +4,7 @@ import { format, differenceInHours, differenceInMinutes, addHours } from 'date-f
 
 export type SLAType = 'response' | 'resolution';
 
-interface SLAInfo {
+export interface SLAInfo {
   percentLeft: number;
   timeLeft: string;
   isBreached: boolean;
@@ -28,7 +28,7 @@ const DEFAULT_SLA_TARGETS = {
   }
 };
 
-export const calculateSLAStatus = (ticket: Ticket, slaType: SLAType): SLAInfo => {
+export const calculateSLAStatus = (ticket: Ticket, slaType: SLAType = 'resolution'): SLAInfo => {
   // For resolved or closed tickets, return completed status
   if (['resolved', 'closed', 'fulfilled'].includes(ticket.status)) {
     return {
