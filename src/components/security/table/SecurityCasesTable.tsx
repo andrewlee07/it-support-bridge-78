@@ -5,12 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ChevronDown, ChevronRight, ArrowUpDown, CalendarClock, Eye, Edit, MoreHorizontal } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ArrowUpDown, CalendarClock, Eye, Edit, MoreHorizontal } from 'lucide-react';
 import { SecurityCase } from '@/utils/types/security'; 
-import { format } from 'date-fns';
 import { getUserNameById } from '@/utils/userUtils';
-import SecurityCaseDetail from '@/components/security/SecurityCaseDetail';
 import SecurityCaseSLAIndicator from '@/components/security/components/SecurityCaseSLAIndicator';
 import WatchButton from '@/components/shared/WatchButton';
 
@@ -43,8 +40,6 @@ interface SecurityCasesTableProps {
 
 const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
   cases,
-  expandedCase,
-  selectedCase,
   sortColumn,
   sortDirection,
   typeFilter,
@@ -54,7 +49,6 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
   statusOptions,
   priorityOptions,
   handleSort,
-  toggleExpandRow,
   setTypeFilter,
   setStatusFilter,
   setPriorityFilter,
@@ -80,7 +74,6 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-10"></TableHead>
             <TableHead 
               className="cursor-pointer hover:bg-muted/50"
               onClick={() => handleSort('id')}
@@ -109,7 +102,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
-                      <ChevronDown className="h-4 w-4" />
+                      <ArrowUpDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -146,7 +139,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
-                      <ChevronDown className="h-4 w-4" />
+                      <ArrowUpDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -183,7 +176,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
-                      <ChevronDown className="h-4 w-4" />
+                      <ArrowUpDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -250,146 +243,120 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
             </TableRow>
           ) : (
             cases.map((case_) => (
-              <React.Fragment key={case_.id}>
-                <TableRow className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="px-2 py-2">
-                    <Button
-                      variant="ghost" 
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => toggleExpandRow(case_.id)}
-                    >
-                      <ChevronRight 
-                        className={cn(
-                          "h-4 w-4 transition-transform",
-                          expandedCase === case_.id && "transform rotate-90"
-                        )} 
-                      />
-                    </Button>
-                  </TableCell>
-                  <TableCell className="font-medium">{case_.id}</TableCell>
-                  <TableCell 
-                    className="max-w-sm"
-                    onClick={() => toggleExpandRow(case_.id)}
+              <TableRow key={case_.id} className="hover:bg-muted/50">
+                <TableCell className="font-medium">
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto font-medium text-foreground hover:underline"
+                    onClick={() => handleViewCase(case_)}
                   >
-                    <div>
-                      <p className="font-medium">{case_.title}</p>
-                      <p className="text-sm text-muted-foreground line-clamp-1">{case_.description}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell onClick={() => toggleExpandRow(case_.id)}>
-                    <Badge variant="outline" className={getTypeColor(case_.type)}>
-                      {case_.type}
+                    {case_.id}
+                  </Button>
+                </TableCell>
+                <TableCell className="max-w-sm">
+                  <div>
+                    <p className="font-medium">{case_.title}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-1">{case_.description}</p>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={getTypeColor(case_.type)}>
+                    {case_.type}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge className={getStatusColor(case_.status)}>
+                    {case_.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    {getPriorityIcon(case_.priority)}
+                    <Badge variant="outline" className={getPriorityColor(case_.priority)}>
+                      {case_.priority}
                     </Badge>
-                  </TableCell>
-                  <TableCell onClick={() => toggleExpandRow(case_.id)}>
-                    <Badge className={getStatusColor(case_.status)}>
-                      {case_.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell onClick={() => toggleExpandRow(case_.id)}>
-                    <div className="flex items-center">
-                      {getPriorityIcon(case_.priority)}
-                      <Badge variant="outline" className={getPriorityColor(case_.priority)}>
-                        {case_.priority}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground" onClick={() => toggleExpandRow(case_.id)}>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span>{getUserNameById(case_.reportedBy)}</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>User ID: {case_.reportedBy}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground" onClick={() => toggleExpandRow(case_.id)}>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span>{getTimeDifference(case_.reportedAt)}</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{formatDate(case_.reportedAt)}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <TableCell onClick={() => toggleExpandRow(case_.id)}>
-                    <SecurityCaseSLAIndicator securityCase={case_} darkMode={true} />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-end space-x-1">
-                      <WatchButton 
-                        item={{
-                          id: case_.id,
-                          type: 'incident', // Using 'incident' as a general type for security cases
-                          title: case_.title,
-                          status: case_.status,
-                          createdAt: new Date(case_.reportedAt)
-                        }}
-                        variant="ghost"
-                        size="icon"
-                      />
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewCase(case_);
-                        }}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditCase(case_);
-                        }}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Assign User</DropdownMenuItem>
-                          <DropdownMenuItem>Change Status</DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
-                            Mark as Duplicate
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                {expandedCase === case_.id && (
-                  <TableRow>
-                    <TableCell colSpan={10} className="p-0">
-                      <div className="bg-muted/20 px-6 py-4 rounded-md m-2 border border-border shadow-sm">
-                        {selectedCase && (
-                          <SecurityCaseDetail
-                            securityCase={selectedCase}
-                            isInline={true}
-                          />
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </React.Fragment>
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>{getUserNameById(case_.reportedBy)}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>User ID: {case_.reportedBy}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>{getTimeDifference(case_.reportedAt)}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{formatDate(case_.reportedAt)}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+                <TableCell>
+                  <SecurityCaseSLAIndicator securityCase={case_} darkMode={true} />
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-end space-x-1">
+                    <WatchButton 
+                      item={{
+                        id: case_.id,
+                        type: 'incident', // Using 'incident' as a general type for security cases
+                        title: case_.title,
+                        status: case_.status,
+                        createdAt: new Date(case_.reportedAt)
+                      }}
+                      variant="ghost"
+                      size="icon"
+                    />
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewCase(case_);
+                      }}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditCase(case_);
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Assign User</DropdownMenuItem>
+                        <DropdownMenuItem>Change Status</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive">
+                          Mark as Duplicate
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
             ))
           )}
         </TableBody>

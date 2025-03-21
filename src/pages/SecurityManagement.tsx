@@ -8,7 +8,6 @@ import SecurityPageHeader from '@/components/security/header/SecurityPageHeader'
 import SecurityDashboardStats from '@/components/security/dashboard/SecurityDashboardStats';
 import SecurityFiltersBar from '@/components/security/filters/SecurityFiltersBar';
 import SecurityCasesTable from '@/components/security/table/SecurityCasesTable';
-import SecurityCaseDetail from '@/components/security/SecurityCaseDetail';
 import { useAppNavigation } from '@/utils/routes/navigationUtils';
 
 const SecurityManagement = () => {
@@ -33,8 +32,6 @@ const SecurityManagement = () => {
     setDateRange,
     expandedCase,
     selectedCase,
-    viewDialogOpen,
-    setViewDialogOpen,
     
     // Helper functions
     handleSort,
@@ -42,7 +39,6 @@ const SecurityManagement = () => {
     formatDate,
     getTimeDifference,
     toggleExpandRow,
-    handleViewCase,
     handleEditCase,
     getFilteredCases,
     getTypeColor,
@@ -67,9 +63,9 @@ const SecurityManagement = () => {
   const filteredCases = getFilteredCases();
 
   // Navigate to case detail view
-  const goToCaseDetailView = useCallback((caseId: string) => {
-    console.log(`Navigating to security case detail: ${caseId}`);
-    navigation.goToSecurityCaseDetail(caseId);
+  const goToCaseDetailView = useCallback((caseItem: any) => {
+    console.log(`Navigating to security case detail: ${caseItem.id}`);
+    navigation.goToSecurityCaseDetail(caseItem.id);
   }, [navigation]);
 
   // Handle creating a new security case
@@ -164,19 +160,6 @@ const SecurityManagement = () => {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* View Security Case Detail Dialog */}
-      {selectedCase && (
-        <SecurityCaseDetail
-          securityCase={selectedCase}
-          open={viewDialogOpen}
-          onClose={() => setViewDialogOpen(false)}
-          isInline={false}
-        />
-      )}
-
-      {/* Create Case Dialog would go here */}
-      {/* We would implement a full dialog component in a real application */}
     </div>
   );
 };

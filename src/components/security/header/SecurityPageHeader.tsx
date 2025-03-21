@@ -15,7 +15,7 @@ const SecurityPageHeader: React.FC<SecurityPageHeaderProps> = ({
 }) => {
   return (
     <div className="flex justify-between items-center">
-      <h1 className="text-2xl font-bold tracking-tight">Security Management</h1>
+      <h1 className="text-2xl font-bold tracking-tight">IT Security Management</h1>
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
