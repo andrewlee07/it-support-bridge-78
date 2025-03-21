@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
-import { ArrowRight, Loader2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { ArrowRight, Loader2, ArrowLeft, RefreshCw, Shield } from 'lucide-react';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 const MFAVerification = () => {
   const [verificationCode, setVerificationCode] = useState('');
@@ -85,33 +84,43 @@ const MFAVerification = () => {
               </CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
-              <CardContent className="space-y-4 pt-6">
-                <div className="space-y-2">
-                  <Label htmlFor="verificationCode">Verification Code</Label>
-                  <Input
-                    id="verificationCode"
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={6}
-                    placeholder="123456"
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
-                    required
-                    className="border-[#b047c9]/20 focus-visible:ring-[#b047c9] text-center text-2xl tracking-widest"
-                    autoComplete="one-time-code"
-                  />
+              <CardContent className="space-y-6 pt-6">
+                <div className="space-y-4">
+                  <div className="flex flex-col items-center">
+                    <InputOTP
+                      maxLength={6}
+                      value={verificationCode}
+                      onChange={setVerificationCode}
+                      render={({ slots }) => (
+                        <InputOTPGroup className="gap-2">
+                          {slots.map((slot, index) => (
+                            <InputOTPSlot
+                              key={index}
+                              {...slot}
+                              className="w-10 h-12 text-xl font-medium border-[#b047c9]/20 focus:border-[#b047c9] focus:ring-[#b047c9]"
+                              index={index}
+                            />
+                          ))}
+                        </InputOTPGroup>
+                      )}
+                    />
+                  </div>
+                  <div className="text-sm text-center text-muted-foreground">
+                    <p>A verification code has been sent to:</p>
+                    <p className="font-medium mt-1">{pendingUser.email}</p>
+                  </div>
                 </div>
-                <div className="text-sm text-center text-muted-foreground">
-                  <p>A verification code has been sent to:</p>
-                  <p className="font-medium">{pendingUser.email}</p>
+                
+                <div className="flex items-center justify-center">
+                  <Shield className="h-4 w-4 mr-2 text-[#b047c9]" />
+                  <span className="text-sm text-muted-foreground">Enhanced security with multi-factor authentication</span>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col space-y-3">
+              <CardFooter className="flex flex-col space-y-4">
                 <Button 
                   type="submit" 
                   className="w-full bg-[#b047c9] hover:bg-[#b047c9]/90 text-white" 
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || verificationCode.length < 6}
                 >
                   {isSubmitting ? (
                     <>
