@@ -1,174 +1,143 @@
 
-import { Ticket, TicketStatus, TicketPriority, TicketType, RelatedItem } from '../types';
-import { createAuditEntries } from './auditHelpers';
+import { Ticket } from '../types/ticket';
 
-// Mock tickets
-export const mockTickets: Ticket[] = [
+// Sample incident data
+const incidents: Ticket[] = [
   {
-    id: 'INC00001',
-    title: 'Laptop not starting',
-    description: 'My laptop won\'t power on. I\'ve tried charging it and holding the power button.',
+    id: 'INC-1001',
+    title: 'Network Outage in North Data Center',
+    description: 'Complete network outage affecting all services in the north data center.',
     status: 'in-progress',
     priority: 'P1',
-    category: 'hardware',
-    type: 'incident',
-    createdBy: 'user-3',
-    assignedTo: 'user-2',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
-    updatedAt: new Date(),
-    audit: createAuditEntries('INC00001', 'ticket', 'user-3'),
-    relatedProblems: ['PRB00001', 'PRB00005'],
-  },
-  {
-    id: 'SR00001',
-    title: 'Need access to marketing drive',
-    description: 'I need access to the marketing shared drive for the new campaign.',
-    status: 'open',
-    priority: 'P2',
-    category: 'access',
-    type: 'service',
-    createdBy: 'user-4',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 2)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 2)),
-    audit: createAuditEntries('SR00001', 'ticket', 'user-4'),
-  },
-  {
-    id: 'INC00002',
-    title: 'Email not syncing on mobile',
-    description: 'I can\'t get my email to sync on my company mobile phone.',
-    status: 'resolved',
-    priority: 'P2',
-    category: 'software',
-    type: 'incident',
-    createdBy: 'user-5',
-    assignedTo: 'user-2',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 3)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
-    resolvedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
-    audit: createAuditEntries('INC00002', 'ticket', 'user-5'),
-    relatedProblems: ['PRB00002'],
-  },
-  {
-    id: 'SR00002',
-    title: 'Request for new monitor',
-    description: 'I would like to request a second monitor for my workstation.',
-    status: 'open',
-    priority: 'P4',
-    category: 'hardware',
-    type: 'service',
-    createdBy: 'user-3',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
-    audit: createAuditEntries('SR00002', 'ticket', 'user-3'),
-  },
-  {
-    id: 'INC00003',
-    title: 'Can\'t connect to VPN',
-    description: 'I\'m unable to connect to the company VPN from home.',
-    status: 'open',
-    priority: 'P1',
-    category: 'network',
-    type: 'incident',
-    createdBy: 'user-4',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    audit: createAuditEntries('INC00003', 'ticket', 'user-4'),
-    relatedProblems: ['PRB00001', 'PRB00003'],
-    relatedItems: [
-      {
-        id: 'BUG001',
-        title: 'VPN Client crashes on connection attempt',
-        type: 'bug',
-        status: 'open',
-        createdAt: new Date()
+    category: 'Network',
+    assignedTo: 'user123',
+    createdAt: '2023-06-10T08:30:00Z',
+    updatedAt: '2023-06-10T09:15:00Z',
+    resolvedAt: null,
+    createdBy: 'system',
+    affectedServices: ['web-app', 'api-gateway'],
+    sla: {
+      responseTime: {
+        target: '30m',
+        actual: '15m',
+        status: 'met'
+      },
+      resolutionTime: {
+        target: '4h',
+        actual: null,
+        status: 'pending'
       }
-    ]
+    }
   },
   {
-    id: 'SR00003',
-    title: 'Software installation request',
-    description: 'I need Adobe Photoshop installed on my computer.',
+    id: 'INC-1002',
+    title: 'Authentication Service Degradation',
+    description: 'Users experiencing intermittent login failures due to authentication service issues.',
+    status: 'open',
+    priority: 'P2',
+    category: 'Software',
+    assignedTo: 'user456',
+    createdAt: '2023-06-11T14:45:00Z',
+    updatedAt: '2023-06-11T14:45:00Z',
+    resolvedAt: null,
+    createdBy: 'user789',
+    affectedServices: ['auth-service'],
+    sla: {
+      responseTime: {
+        target: '1h',
+        actual: null,
+        status: 'pending'
+      },
+      resolutionTime: {
+        target: '8h',
+        actual: null,
+        status: 'pending'
+      }
+    }
+  },
+  {
+    id: 'INC-1003',
+    title: 'Database Performance Degradation',
+    description: 'Database queries taking longer than usual, affecting application response times.',
+    status: 'pending',
+    priority: 'P2',
+    category: 'Database',
+    assignedTo: 'user789',
+    createdAt: '2023-06-09T11:20:00Z',
+    updatedAt: '2023-06-09T13:45:00Z',
+    resolvedAt: null,
+    createdBy: 'user123',
+    affectedServices: ['customer-db', 'reporting-service'],
+    sla: {
+      responseTime: {
+        target: '1h',
+        actual: '45m',
+        status: 'met'
+      },
+      resolutionTime: {
+        target: '8h',
+        actual: null,
+        status: 'at-risk'
+      }
+    }
+  },
+  {
+    id: 'INC-1004',
+    title: 'Email Service Outage',
+    description: 'Corporate email service is completely down. Users unable to send or receive emails.',
+    status: 'resolved',
+    priority: 'P1',
+    category: 'Software',
+    assignedTo: 'user456',
+    createdAt: '2023-06-08T09:10:00Z',
+    updatedAt: '2023-06-08T12:30:00Z',
+    resolvedAt: '2023-06-08T12:30:00Z',
+    createdBy: 'user789',
+    affectedServices: ['email-service'],
+    sla: {
+      responseTime: {
+        target: '30m',
+        actual: '25m',
+        status: 'met'
+      },
+      resolutionTime: {
+        target: '4h',
+        actual: '3h 20m',
+        status: 'met'
+      }
+    }
+  },
+  {
+    id: 'INC-1005',
+    title: 'VPN Connection Issues',
+    description: 'Remote employees unable to connect to corporate VPN from specific regions.',
     status: 'in-progress',
     priority: 'P3',
-    category: 'software',
-    type: 'service',
-    createdBy: 'user-5',
-    assignedTo: 'user-2',
-    createdAt: new Date(new Date().setDate(new Date().getDate() - 4)),
-    updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
-    audit: createAuditEntries('SR00003', 'ticket', 'user-5'),
-    relatedItems: [
-      {
-        id: 'BKL001',
-        title: 'Create standard software installation package',
-        type: 'backlogItem',
-        status: 'in-progress',
-        createdAt: new Date()
+    category: 'Network',
+    assignedTo: 'user123',
+    createdAt: '2023-06-12T15:30:00Z',
+    updatedAt: '2023-06-12T16:15:00Z',
+    resolvedAt: null,
+    createdBy: 'user456',
+    affectedServices: ['vpn-service'],
+    sla: {
+      responseTime: {
+        target: '2h',
+        actual: '45m',
+        status: 'met'
+      },
+      resolutionTime: {
+        target: '12h',
+        actual: null,
+        status: 'pending'
       }
-    ]
-  },
+    }
+  }
 ];
 
-// Helper function to filter tickets by type
-export const getTicketsByType = (type: TicketType): Ticket[] => {
-  return mockTickets.filter(ticket => ticket.type === type);
+// Function to get all incidents
+export const getIncidents = (): Ticket[] => {
+  return incidents;
 };
 
-// Helper function to filter tickets by status
-export const getTicketsByStatus = (status: TicketStatus): Ticket[] => {
-  return mockTickets.filter(ticket => ticket.status === status);
-};
-
-// Helper function to filter tickets by priority
-export const getTicketsByPriority = (priority: TicketPriority): Ticket[] => {
-  return mockTickets.filter(ticket => ticket.priority === priority);
-};
-
-// Helper function to get ticket by ID
-export const getTicketById = (id: string): Ticket | undefined => {
-  // Handle partial ID search
-  if (id.startsWith('INC') || id.startsWith('SR')) {
-    return mockTickets.find(ticket => ticket.id === id);
-  } else {
-    // Partial ID search - look for any ticket that contains this ID segment
-    return mockTickets.find(ticket => ticket.id.toLowerCase().includes(id.toLowerCase()));
-  }
-};
-
-// Get the next incident ID number
-export const getNextIncidentIdNumber = (): number => {
-  const existingIds = mockTickets
-    .filter(ticket => ticket.type === 'incident' && ticket.id.startsWith('INC'))
-    .map(ticket => {
-      const numericPart = ticket.id.replace('INC', '');
-      return parseInt(numericPart, 10);
-    });
-  
-  const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
-  return maxId + 1;
-};
-
-// Get the next service request ID number
-export const getNextServiceRequestIdNumber = (): number => {
-  const existingIds = mockTickets
-    .filter(ticket => ticket.type === 'service' && ticket.id.startsWith('SR'))
-    .map(ticket => {
-      const numericPart = ticket.id.replace('SR', '');
-      return parseInt(numericPart, 10);
-    });
-  
-  const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
-  return maxId + 1;
-};
-
-// Generate a new incident ID with format INC00001
-export const generateIncidentId = (): string => {
-  const nextNumber = getNextIncidentIdNumber();
-  return `INC${nextNumber.toString().padStart(5, '0')}`;
-};
-
-// Generate a new service request ID with format SR00001
-export const generateServiceRequestId = (): string => {
-  const nextNumber = getNextServiceRequestIdNumber();
-  return `SR${nextNumber.toString().padStart(5, '0')}`;
-};
+// Additional functions for CRUD operations can be added here

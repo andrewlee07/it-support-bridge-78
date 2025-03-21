@@ -2,11 +2,11 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { X, Calendar, Filter } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { DateRange } from 'react-day-picker';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Badge } from '@/components/ui/badge';
+import { CalendarIcon, X, Search, Filter, Calendar as CalendarIcon2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface IncidentFiltersBarProps {
@@ -21,9 +21,9 @@ interface IncidentFiltersBarProps {
   typeFilter: string | null;
   statusFilter: string | null;
   toggleCardFilter: (filter: string) => void;
-  setPriorityFilter: (priority: string | null) => void;
-  setTypeFilter: (type: string | null) => void;
-  setStatusFilter: (status: string | null) => void;
+  setPriorityFilter: (filter: string | null) => void;
+  setTypeFilter: (filter: string | null) => void;
+  setStatusFilter: (filter: string | null) => void;
   getTypeColor: (type: string) => string;
   getPriorityColor: (priority: string) => string;
   getStatusColor: (status: string) => string;
@@ -40,6 +40,7 @@ const IncidentFiltersBar: React.FC<IncidentFiltersBarProps> = ({
   priorityFilter,
   typeFilter,
   statusFilter,
+  toggleCardFilter,
   setPriorityFilter,
   setTypeFilter,
   setStatusFilter,
@@ -47,145 +48,134 @@ const IncidentFiltersBar: React.FC<IncidentFiltersBarProps> = ({
   getPriorityColor,
   getStatusColor
 }) => {
-  // Filter mapping for display purposes
-  const filterDisplayMap: Record<string, string> = {
-    'all': 'All Incidents',
-    'active': 'Active Incidents',
-    'critical': 'Critical Incidents',
-    'pending': 'Pending Incidents'
+  // Format the selected date range for display
+  const formatDateRange = () => {
+    if (dateRange?.from) {
+      if (dateRange.to) {
+        return `${format(dateRange.from, 'LLL dd, y')} - ${format(dateRange.to, 'LLL dd, y')}`;
+      }
+      return format(dateRange.from, 'LLL dd, y');
+    }
+    return 'Select date range';
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 w-full">
-        <Input 
-          placeholder="Search incidents..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:w-1/3"
-        />
-        <div className="flex flex-wrap gap-2 items-center">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9">
-                <Calendar className="mr-2 h-4 w-4" />
-                {dateRange?.from ? (
-                  dateRange.to ? (
-                    <>
-                      {format(dateRange.from, "LLL dd, y")} -{" "}
-                      {format(dateRange.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(dateRange.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Date Range</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                initialFocus
-                mode="range"
-                defaultMonth={dateRange?.from}
-                selected={dateRange}
-                onSelect={setDateRange}
-                numberOfMonths={2}
-              />
-            </PopoverContent>
-          </Popover>
-
-          {/* More filter buttons could be added here */}
-          <Button variant="outline" size="sm" className="h-9">
-            <Filter className="mr-2 h-4 w-4" />
-            More Filters
-          </Button>
-
-          {hasActiveFilters && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={resetFilters}
-              className="h-9 text-muted-foreground"
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search incidents..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-0 top-0 h-9 w-9 p-0"
+              onClick={() => setSearchQuery('')}
             >
-              <X className="mr-1 h-4 w-4" />
-              Clear Filters
+              <X className="h-4 w-4" />
             </Button>
           )}
         </div>
+        
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="gap-1.5">
+              <CalendarIcon className="h-4 w-4 opacity-50" />
+              <span>{formatDateRange()}</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={dateRange?.from}
+              selected={dateRange}
+              onSelect={setDateRange}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+        
+        {hasActiveFilters && (
+          <Button variant="ghost" onClick={resetFilters} className="flex-shrink-0">
+            <X className="h-4 w-4 mr-2" />
+            Clear filters
+          </Button>
+        )}
       </div>
-
+      
       {/* Active filters display */}
       {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 pt-2">
           {cardFilters.map(filter => (
-            <Badge
-              key={`card-${filter}`}
-              variant="outline"
-              className="bg-blue-50 text-blue-700 hover:bg-blue-100"
+            <Badge 
+              key={filter}
+              variant="secondary"
+              className="flex items-center gap-1 py-1.5"
             >
-              {filterDisplayMap[filter] || filter}
-              <button 
-                className="ml-1 rounded-full hover:bg-blue-200 p-0.5"
+              {filter}
+              <X 
+                className="h-3 w-3 cursor-pointer" 
                 onClick={() => toggleCardFilter(filter)}
-              >
-                <X className="h-3 w-3" />
-              </button>
+              />
             </Badge>
           ))}
           
           {typeFilter && (
             <Badge 
-              variant="outline" 
-              className={getTypeColor(typeFilter)}
+              variant="outline"
+              className={`flex items-center gap-1 py-1.5 ${getTypeColor(typeFilter)}`}
             >
               Type: {typeFilter}
-              <button 
-                className="ml-1 rounded-full hover:bg-opacity-20 hover:bg-black p-0.5"
+              <X 
+                className="h-3 w-3 cursor-pointer" 
                 onClick={() => setTypeFilter(null)}
-              >
-                <X className="h-3 w-3" />
-              </button>
+              />
             </Badge>
           )}
           
           {statusFilter && (
-            <Badge className={getStatusColor(statusFilter)}>
+            <Badge 
+              className={`flex items-center gap-1 py-1.5 ${getStatusColor(statusFilter)}`}
+            >
               Status: {statusFilter}
-              <button 
-                className="ml-1 rounded-full hover:bg-opacity-20 hover:bg-black p-0.5"
+              <X 
+                className="h-3 w-3 cursor-pointer" 
                 onClick={() => setStatusFilter(null)}
-              >
-                <X className="h-3 w-3" />
-              </button>
+              />
             </Badge>
           )}
           
           {priorityFilter && (
             <Badge 
-              variant="outline" 
-              className={getPriorityColor(priorityFilter)}
+              variant="outline"
+              className={`flex items-center gap-1 py-1.5 ${getPriorityColor(priorityFilter)}`}
             >
               Priority: {priorityFilter}
-              <button 
-                className="ml-1 rounded-full hover:bg-opacity-20 hover:bg-black p-0.5"
+              <X 
+                className="h-3 w-3 cursor-pointer" 
                 onClick={() => setPriorityFilter(null)}
-              >
-                <X className="h-3 w-3" />
-              </button>
+              />
             </Badge>
           )}
           
           {dateRange?.from && (
-            <Badge variant="outline" className="bg-purple-50 text-purple-700">
-              Date: {format(dateRange.from, "MMM d, yyyy")}
-              {dateRange.to && ` - ${format(dateRange.to, "MMM d, yyyy")}`}
-              <button 
-                className="ml-1 rounded-full hover:bg-purple-200 p-0.5"
+            <Badge 
+              variant="secondary"
+              className="flex items-center gap-1 py-1.5"
+            >
+              <CalendarIcon2 className="h-3 w-3" />
+              {formatDateRange()}
+              <X 
+                className="h-3 w-3 cursor-pointer" 
                 onClick={() => setDateRange(undefined)}
-              >
-                <X className="h-3 w-3" />
-              </button>
+              />
             </Badge>
           )}
         </div>
