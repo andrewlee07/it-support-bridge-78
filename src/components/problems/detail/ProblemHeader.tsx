@@ -62,28 +62,28 @@ const ProblemHeader = ({ problem, canClose, isClosed }: ProblemHeaderProps) => {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4 p-6 bg-white border rounded-lg shadow-sm">
       <div className="flex items-start justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-2">
             <h1 className="text-2xl font-bold">{problem.id}</h1>
             {getStatusBadge(problem.status)}
             <Badge variant="outline" className="bg-amber-100 text-amber-900 hover:bg-amber-100">Priority: {problem.priority}</Badge>
             <WatchButton item={watchableItem} />
           </div>
-          <h2 className="text-xl font-semibold mb-2">{problem.title}</h2>
+          <h2 className="text-xl font-semibold mb-3">{problem.title}</h2>
           <div className="text-sm text-muted-foreground">
             <p>Created {formatDistanceToNow(new Date(problem.createdAt), { addSuffix: true })} by {getUserNameById(problem.createdBy)}</p>
             {problem.assignedTo && (
-              <p>Assigned to {getUserNameById(problem.assignedTo)}</p>
+              <p className="mt-1">Assigned to {getUserNameById(problem.assignedTo)}</p>
             )}
           </div>
         </div>
       </div>
       
       {problem.knownErrorId && (
-        <div className="flex items-center mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
-          <Database className="text-amber-500 mr-2 h-5 w-5 shrink-0" />
+        <div className="flex items-center p-4 bg-amber-50 border border-amber-200 rounded-md mt-4">
+          <Database className="text-amber-500 mr-3 h-5 w-5 shrink-0" />
           <div>
             <span className="font-medium">Known Error: </span>
             <span>{problem.knownErrorId}</span>
@@ -95,8 +95,8 @@ const ProblemHeader = ({ problem, canClose, isClosed }: ProblemHeaderProps) => {
       )}
       
       {canClose && !isClosed && (
-        <div className="flex items-center mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <AlertCircle className="text-blue-500 mr-2 h-5 w-5 shrink-0" />
+        <div className="flex items-center p-4 bg-blue-50 border border-blue-200 rounded-md mt-4">
+          <AlertCircle className="text-blue-500 mr-3 h-5 w-5 shrink-0" />
           <div>
             <span className="font-medium">This problem is ready to be closed</span>
             <p className="text-sm text-muted-foreground mt-1">
