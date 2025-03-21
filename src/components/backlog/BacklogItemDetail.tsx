@@ -1,29 +1,17 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { TabsContent, Tabs } from '@/components/ui/tabs';
-import { 
-  BacklogItem, 
-  Attachment, 
-  Comment, 
-  BacklogItemComment, 
-  BacklogItemAttachment, 
-  HistoryEntry 
-} from '@/utils/types/backlogTypes';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Tabs } from '@/components/ui/tabs';
+import { BacklogItem } from '@/utils/types/backlogTypes';
 import { getReleases } from '@/utils/api/release';
-import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
 
 // Import refactored components
-import AttachmentList from './attachments/AttachmentList';
-import AttachmentUpload from './attachments/AttachmentUpload';
-import CommentsList from './comments/CommentsList';
-import HistoryList from './history/HistoryList';
-import WatchersList from './watchers/WatchersList';
-import BacklogItemBasicDetails from './detail/BacklogItemBasicDetails';
 import ItemHeaderWithStatus from './detail/ItemHeaderWithStatus';
 import BacklogItemDetailTabs from './BacklogItemDetailTabs';
+import BacklogItemTabContent from './detail/BacklogItemTabContent';
+import { useBacklogItemHandlers } from './detail/useBacklogItemHandlers';
 
 interface BacklogItemDetailProps {
   item: BacklogItem;
@@ -38,76 +26,31 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   onDelete,
   onUpdate
 }) => {
-  const { user } = useAuth();
   const [releaseName, setReleaseName] = useState<string>('None');
   const [activeTab, setActiveTab] = useState<string>('details');
   
-  // States for each feature
-  const [attachments, setAttachments] = useState<Attachment[]>(mapBacklogAttachmentsToAttachments(item.attachments || []));
-  const [comments, setComments] = useState<Comment[]>(mapBacklogCommentsToComments(item.comments || []));
-  const [history, setHistory] = useState<HistoryEntry[]>(item.history || []);
-  const [watchers, setWatchers] = useState<string[]>(item.watchers || []);
-  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
-
-  // Function to convert BacklogItemAttachment to Attachment
-  function mapBacklogAttachmentsToAttachments(backlogAttachments: BacklogItemAttachment[]): Attachment[] {
-    return backlogAttachments.map(att => ({
-      id: att.id,
-      filename: att.filename || att.fileName || '',
-      fileUrl: att.fileUrl || att.url || '',
-      fileType: att.fileType || 'unknown', // Default value if not available
-      fileSize: att.fileSize || 0, // Default value if not available
-      uploadedBy: att.uploadedBy,
-      uploadedAt: att.uploadedAt,
-      // Backward compatibility fields
-      fileName: att.filename || att.fileName,
-      name: att.filename || att.fileName,
-      url: att.fileUrl || att.url
-    }));
-  }
-
-  // Function to convert Attachment to BacklogItemAttachment
-  function mapAttachmentsToBacklogAttachments(attachments: Attachment[]): BacklogItemAttachment[] {
-    return attachments.map(att => ({
-      id: att.id,
-      filename: att.filename,
-      url: att.url || att.fileUrl, // Ensure url is always set
-      uploadedBy: att.uploadedBy,
-      uploadedAt: att.uploadedAt,
-      fileUrl: att.fileUrl,
-      fileType: att.fileType,
-      fileSize: att.fileSize,
-      fileName: att.fileName || att.filename
-    }));
-  }
-
-  // Function to convert BacklogItemComment to Comment
-  function mapBacklogCommentsToComments(backlogComments: BacklogItemComment[]): Comment[] {
-    return backlogComments.map(comment => ({
-      id: comment.id,
-      content: comment.content || comment.text || '',
-      text: comment.text || comment.content || '',
-      author: comment.author,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-      parentId: comment.parentId
-    }));
-  }
-
-  // Function to convert Comments back to BacklogItemComments
-  function mapCommentsToBacklogComments(comments: Comment[]): BacklogItemComment[] {
-    return comments.map(comment => ({
-      id: comment.id,
-      text: comment.text || comment.content || '',
-      content: comment.content || comment.text || '',
-      author: comment.author,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-      parentId: comment.parentId
-    }));
-  }
+  const { 
+    attachments,
+    comments,
+    history,
+    watchers,
+    availableUsers,
+    isCurrentUserWatching,
+    commentsCount,
+    attachmentsCount,
+    watchersCount,
+    isDone,
+    handleAddAttachment,
+    handleDeleteAttachment,
+    handleAddComment,
+    handleEditComment,
+    handleDeleteComment,
+    handleToggleWatch,
+    handleAddWatcher,
+    handleRemoveWatcher
+  } = useBacklogItemHandlers({ item, onUpdate });
   
-  // Get release name and available users
+  // Get release name
   useEffect(() => {
     const fetchReleaseName = async () => {
       if (item.releaseId) {
@@ -123,196 +66,12 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
       }
     };
 
-    const getUsers = async () => {
-      try {
-        const { getAllUsers } = await import('@/utils/mockData/users');
-        const users = await getAllUsers();
-        setAvailableUsers(users);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
     fetchReleaseName();
-    getUsers();
-    
-    // Update component state when the item prop changes
-    setAttachments(mapBacklogAttachmentsToAttachments(item.attachments || []));
-    setComments(mapBacklogCommentsToComments(item.comments || []));
-    setHistory(item.history || []);
-    setWatchers(item.watchers || []);
-  }, [item]);
-
-  // Handlers for attachments
-  const handleAddAttachment = (attachment: Attachment) => {
-    const updatedAttachments = [...attachments, attachment];
-    setAttachments(updatedAttachments);
-    updateItemWithHistory('attachments', `${attachments.length} files`, `${updatedAttachments.length} files`);
-    setActiveTab('attachments');
-  };
-  
-  const handleDeleteAttachment = (id: string) => {
-    const deletedAttachment = attachments.find(a => a.id === id);
-    const updatedAttachments = attachments.filter(a => a.id !== id);
-    setAttachments(updatedAttachments);
-    
-    updateItemWithHistory(
-      'attachments', 
-      `Attachment: ${deletedAttachment?.filename || 'file'}`, 
-      'Removed'
-    );
-    toast.success('Attachment deleted');
-  };
-  
-  // Handlers for comments
-  const handleAddComment = (content: string, parentId?: string) => {
-    if (!user) return;
-    
-    const newComment: Comment = {
-      id: uuidv4(),
-      content: content,
-      text: content, // Set both for compatibility
-      author: user.id,
-      createdAt: new Date(),
-      parentId
-    };
-    
-    const updatedComments = [...comments, newComment];
-    setComments(updatedComments);
-    
-    if (onUpdate) {
-      const updatedItem = {
-        ...item,
-        comments: mapCommentsToBacklogComments(updatedComments),
-        updatedAt: new Date()
-      };
-      
-      onUpdate(updatedItem);
-      toast.success(parentId ? 'Reply added' : 'Comment added');
-    }
-  };
-  
-  const handleEditComment = (id: string, content: string) => {
-    const updatedComments = comments.map(comment => 
-      comment.id === id 
-        ? { ...comment, content, text: content, updatedAt: new Date() } 
-        : comment
-    );
-    
-    setComments(updatedComments);
-    updateItem({ comments: mapCommentsToBacklogComments(updatedComments) });
-    toast.success('Comment updated');
-  };
-  
-  const handleDeleteComment = (id: string) => {
-    const updatedComments = comments.filter(
-      comment => comment.id !== id && comment.parentId !== id
-    );
-    
-    setComments(updatedComments);
-    updateItem({ comments: mapCommentsToBacklogComments(updatedComments) });
-    toast.success('Comment deleted');
-  };
-  
-  // Handlers for watchers
-  const handleToggleWatch = (isWatching: boolean) => {
-    if (!user) return;
-    
-    let updatedWatchers;
-    
-    if (isWatching) {
-      updatedWatchers = [...watchers, user.id];
-    } else {
-      updatedWatchers = watchers.filter(id => id !== user.id);
-    }
-    
-    setWatchers(updatedWatchers);
-    updateItemWithHistory(
-      'watchers',
-      isWatching ? 'Not watching' : 'Watching',
-      isWatching ? 'Watching' : 'Not watching'
-    );
-    
-    toast.success(isWatching ? 'Now watching this item' : 'No longer watching this item');
-  };
-  
-  const handleAddWatcher = (userId: string) => {
-    if (watchers.includes(userId)) return;
-    
-    const updatedWatchers = [...watchers, userId];
-    setWatchers(updatedWatchers);
-    
-    updateItemWithHistory('watchers', watchers.length.toString(), updatedWatchers.length.toString());
-    toast.success('Watcher added');
-  };
-  
-  const handleRemoveWatcher = (userId: string) => {
-    const updatedWatchers = watchers.filter(id => id !== userId);
-    setWatchers(updatedWatchers);
-    
-    updateItemWithHistory('watchers', watchers.length.toString(), updatedWatchers.length.toString());
-    toast.success('Watcher removed');
-  };
-  
-  // Helper functions
-  const updateItem = (partialUpdate: Partial<BacklogItem>) => {
-    if (onUpdate) {
-      const updatedItem = {
-        ...item,
-        ...partialUpdate,
-        updatedAt: new Date()
-      };
-      
-      onUpdate(updatedItem);
-    }
-  };
-  
-  const updateItemWithHistory = (field: string, previousValue: any, newValue: any) => {
-    if (!user || !onUpdate) return;
-    
-    const historyEntry = {
-      id: uuidv4(),
-      field,
-      previousValue,
-      newValue,
-      changedBy: user.id,
-      changedAt: new Date()
-    };
-    
-    const updatedHistory = [...history, historyEntry];
-    setHistory(updatedHistory);
-    
-    const updates: Partial<BacklogItem> = {
-      history: updatedHistory,
-      updatedAt: new Date()
-    };
-    
-    if (field === 'watchers') {
-      updates.watchers = watchers;
-    } else if (field === 'attachments') {
-      // Convert Attachment[] back to BacklogItemAttachment[]
-      updates.attachments = mapAttachmentsToBacklogAttachments(attachments);
-    }
-    
-    updateItem(updates);
-  };
-  
-  // Check if current user is watching
-  const isCurrentUserWatching = user ? watchers.includes(user.id) : false;
-  
-  // Counters for badges
-  const commentsCount = comments.length;
-  const attachmentsCount = attachments.length;
-  const watchersCount = watchers.length;
-  
-  // Check if item is in a completed state
-  const isDone = item.status === 'completed' || item.status === 'deferred';
+  }, [item.releaseId]);
 
   return (
     <Card className="w-full shadow-sm">
-      <CardHeader className="pb-0">
-        <ItemHeaderWithStatus item={item} />
-      </CardHeader>
+      <ItemHeaderWithStatus item={item} />
       
       <CardContent className="pt-4">
         <Tabs value={activeTab} defaultValue="details" className="w-full">
@@ -325,46 +84,25 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
             isDone={isDone}
           />
           
-          <TabsContent value="details" className="m-0">
-            <BacklogItemBasicDetails 
-              item={item}
-              releaseName={releaseName}
-            />
-          </TabsContent>
-          
-          <TabsContent value="attachments" className="m-0">
-            <div className="space-y-4">
-              <AttachmentUpload onUpload={handleAddAttachment} />
-              <AttachmentList 
-                attachments={attachments} 
-                onDelete={onUpdate ? handleDeleteAttachment : undefined} 
-              />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="comments" className="m-0">
-            <CommentsList 
-              comments={comments}
-              onAddComment={handleAddComment}
-              onEditComment={onUpdate ? handleEditComment : undefined}
-              onDeleteComment={onUpdate ? handleDeleteComment : undefined}
-            />
-          </TabsContent>
-          
-          <TabsContent value="history" className="m-0">
-            <HistoryList history={history} />
-          </TabsContent>
-          
-          <TabsContent value="watchers" className="m-0">
-            <WatchersList 
-              watcherIds={watchers}
-              onToggleWatch={handleToggleWatch}
-              onAddWatcher={handleAddWatcher}
-              onRemoveWatcher={handleRemoveWatcher}
-              isCurrentUserWatching={isCurrentUserWatching}
-              availableUsers={availableUsers}
-            />
-          </TabsContent>
+          <BacklogItemTabContent 
+            activeTab={activeTab}
+            item={item}
+            releaseName={releaseName}
+            attachments={attachments}
+            comments={comments}
+            watchers={watchers}
+            history={history}
+            isCurrentUserWatching={isCurrentUserWatching}
+            availableUsers={availableUsers}
+            onAddAttachment={handleAddAttachment}
+            onDeleteAttachment={onUpdate ? handleDeleteAttachment : undefined}
+            onAddComment={handleAddComment}
+            onEditComment={onUpdate ? handleEditComment : undefined}
+            onDeleteComment={onUpdate ? handleDeleteComment : undefined}
+            onToggleWatch={handleToggleWatch}
+            onAddWatcher={handleAddWatcher}
+            onRemoveWatcher={handleRemoveWatcher}
+          />
         </Tabs>
       </CardContent>
       

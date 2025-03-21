@@ -6,8 +6,7 @@ import {
   Paperclip, 
   MessageSquare, 
   History, 
-  Users, 
-  Clock
+  Users
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
