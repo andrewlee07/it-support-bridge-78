@@ -247,3 +247,11 @@ export const updateProblem = (id: string, updates: Partial<Problem>): Problem | 
   
   return mockProblems[index];
 };
+
+// Add the missing function
+export const getNextProblemId = (): string => {
+  const lastId = mockProblems.length > 0 
+    ? parseInt(mockProblems[mockProblems.length - 1].id.substring(2))
+    : 0;
+  return `PB${(lastId + 1).toString().padStart(6, '0')}`;
+};
