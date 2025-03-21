@@ -14,7 +14,8 @@ import {
   ChevronDown,
   ArrowUpDown,
   Search,
-  CalendarClock
+  CalendarClock,
+  X
 } from 'lucide-react';
 import StatCard from '@/components/dashboard/StatCard';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
+import { getUserNameById } from '@/utils/userUtils';
+import { cn } from '@/lib/utils';
 
 const SecurityManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,6 +36,15 @@ const SecurityManagement = () => {
   const [priorityFilter, setPriorityFilter] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [cardFilters, setCardFilters] = useState<{
+    activeCases: boolean;
+    dataBreaches: boolean;
+    complianceIssues: boolean;
+  }>({
+    activeCases: false,
+    dataBreaches: false,
+    complianceIssues: false
+  });
 
   // Mock data for security cases
   const securityCases = [
@@ -43,6 +55,7 @@ const SecurityManagement = () => {
       type: 'Data Breach',
       status: 'Active',
       priority: 'High',
+      reportedBy: 'user-1',
       reportedAt: '2 days ago'
     },
     {
@@ -52,6 +65,7 @@ const SecurityManagement = () => {
       type: 'SAR',
       status: 'Pending',
       priority: 'Medium',
+      reportedBy: 'user-2',
       reportedAt: '5 days ago'
     },
     {
@@ -61,6 +75,7 @@ const SecurityManagement = () => {
       type: 'Compliance',
       status: 'Active',
       priority: 'Medium',
+      reportedBy: 'user-3',
       reportedAt: '2 weeks ago'
     },
     {
@@ -70,6 +85,7 @@ const SecurityManagement = () => {
       type: 'Threat',
       status: 'Resolved',
       priority: 'Low',
+      reportedBy: 'user-1',
       reportedAt: '3 weeks ago'
     }
   ];
@@ -82,6 +98,14 @@ const SecurityManagement = () => {
       setSortColumn(column);
       setSortDirection('asc');
     }
+  };
+
+  // Handle card filter toggle
+  const toggleCardFilter = (filterName: keyof typeof cardFilters) => {
+    setCardFilters(prev => ({
+      ...prev,
+      [filterName]: !prev[filterName]
+    }));
   };
 
   // Get filtered and sorted cases
@@ -112,6 +136,19 @@ const SecurityManagement = () => {
     // Apply status filter
     if (statusFilter) {
       filtered = filtered.filter(case_ => case_.status === statusFilter);
+    }
+    
+    // Apply card filters
+    if (cardFilters.activeCases) {
+      filtered = filtered.filter(case_ => case_.status === 'Active');
+    }
+    
+    if (cardFilters.dataBreaches) {
+      filtered = filtered.filter(case_ => case_.type === 'Data Breach');
+    }
+    
+    if (cardFilters.complianceIssues) {
+      filtered = filtered.filter(case_ => case_.type === 'Compliance');
     }
     
     // Apply sorting
@@ -162,6 +199,11 @@ const SecurityManagement = () => {
   const priorityOptions = ['High', 'Medium', 'Low'];
   const statusOptions = ['Active', 'Pending', 'Resolved'];
 
+  // Count for metric cards
+  const activeCasesCount = securityCases.filter(c => c.status === 'Active').length;
+  const dataBreachesCount = securityCases.filter(c => c.type === 'Data Breach').length;
+  const complianceIssuesCount = securityCases.filter(c => c.type === 'Compliance').length;
+
   // Reset all filters
   const resetFilters = () => {
     setSearchQuery('');
@@ -169,6 +211,22 @@ const SecurityManagement = () => {
     setTypeFilter(null);
     setStatusFilter(null);
     setSortColumn(null);
+    setCardFilters({
+      activeCases: false,
+      dataBreaches: false,
+      complianceIssues: false
+    });
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = () => {
+    return searchQuery !== '' || 
+           priorityFilter !== null || 
+           typeFilter !== null || 
+           statusFilter !== null ||
+           cardFilters.activeCases ||
+           cardFilters.dataBreaches ||
+           cardFilters.complianceIssues;
   };
 
   // Get the sorted and filtered cases
@@ -183,34 +241,50 @@ const SecurityManagement = () => {
         </Button>
       </div>
 
-      {/* Metrics Cards - Placed at the top as requested */}
+      {/* Metrics Cards - Interactive Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
           title="Total Security Cases" 
-          value="64" 
+          value={securityCases.length.toString()} 
           icon={ShieldAlert}
           description="All time security incidents"
+          className="cursor-default"
         />
         <StatCard 
           title="Active Cases" 
-          value="12" 
+          value={activeCasesCount.toString()} 
           icon={ShieldCheck}
           trend={{ value: 5, isPositive: false }}
           description="Currently open cases"
+          className={cn(
+            "cursor-pointer transition-all border-2", 
+            cardFilters.activeCases ? "border-primary bg-primary/5" : "border-transparent"
+          )}
+          onClick={() => toggleCardFilter('activeCases')}
         />
         <StatCard 
           title="Data Breaches" 
-          value="3" 
+          value={dataBreachesCount.toString()} 
           icon={UserX}
           trend={{ value: 2, isPositive: false }}
           description="In current quarter"
+          className={cn(
+            "cursor-pointer transition-all border-2", 
+            cardFilters.dataBreaches ? "border-primary bg-primary/5" : "border-transparent"
+          )}
+          onClick={() => toggleCardFilter('dataBreaches')}
         />
         <StatCard 
           title="Compliance Issues" 
-          value="8" 
+          value={complianceIssuesCount.toString()} 
           icon={Lock}
           trend={{ value: 10, isPositive: true }}
           description="Pending resolution"
+          className={cn(
+            "cursor-pointer transition-all border-2", 
+            cardFilters.complianceIssues ? "border-primary bg-primary/5" : "border-transparent"
+          )}
+          onClick={() => toggleCardFilter('complianceIssues')}
         />
       </div>
 
@@ -229,9 +303,9 @@ const SecurityManagement = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Security Cases</CardTitle>
                 <div className="flex items-center gap-2">
-                  {(priorityFilter || typeFilter || statusFilter || searchQuery) && (
-                    <Button variant="outline" size="sm" onClick={resetFilters} className="h-8">
-                      Clear Filters
+                  {hasActiveFilters() && (
+                    <Button variant="outline" size="sm" onClick={resetFilters} className="h-8 flex items-center gap-1">
+                      <X className="h-4 w-4" /> Clear Filters
                     </Button>
                   )}
                 </div>
@@ -247,6 +321,75 @@ const SecurityManagement = () => {
                   />
                 </div>
               </div>
+              
+              {/* Active filter indicators */}
+              {hasActiveFilters() && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {cardFilters.activeCases && (
+                    <Badge variant="outline" className="bg-blue-50 flex items-center gap-1">
+                      Active Cases
+                      <X 
+                        className="h-3 w-3 ml-1 cursor-pointer" 
+                        onClick={() => toggleCardFilter('activeCases')}
+                      />
+                    </Badge>
+                  )}
+                  {cardFilters.dataBreaches && (
+                    <Badge variant="outline" className="bg-red-50 flex items-center gap-1">
+                      Data Breaches
+                      <X 
+                        className="h-3 w-3 ml-1 cursor-pointer" 
+                        onClick={() => toggleCardFilter('dataBreaches')}
+                      />
+                    </Badge>
+                  )}
+                  {cardFilters.complianceIssues && (
+                    <Badge variant="outline" className="bg-blue-50 flex items-center gap-1">
+                      Compliance Issues
+                      <X 
+                        className="h-3 w-3 ml-1 cursor-pointer" 
+                        onClick={() => toggleCardFilter('complianceIssues')}
+                      />
+                    </Badge>
+                  )}
+                  {priorityFilter && (
+                    <Badge variant="outline" className={`flex items-center gap-1 ${getPriorityColor(priorityFilter)}`}>
+                      Priority: {priorityFilter}
+                      <X 
+                        className="h-3 w-3 ml-1 cursor-pointer" 
+                        onClick={() => setPriorityFilter(null)}
+                      />
+                    </Badge>
+                  )}
+                  {typeFilter && (
+                    <Badge variant="outline" className={`flex items-center gap-1 ${getTypeColor(typeFilter)}`}>
+                      Type: {typeFilter}
+                      <X 
+                        className="h-3 w-3 ml-1 cursor-pointer" 
+                        onClick={() => setTypeFilter(null)}
+                      />
+                    </Badge>
+                  )}
+                  {statusFilter && (
+                    <Badge className={`flex items-center gap-1 ${getStatusColor(statusFilter)}`}>
+                      Status: {statusFilter}
+                      <X 
+                        className="h-3 w-3 ml-1 cursor-pointer" 
+                        onClick={() => setStatusFilter(null)}
+                      />
+                    </Badge>
+                  )}
+                  {searchQuery && (
+                    <Badge variant="outline" className="bg-gray-50 flex items-center gap-1">
+                      Search: {searchQuery}
+                      <X 
+                        className="h-3 w-3 ml-1 cursor-pointer" 
+                        onClick={() => setSearchQuery('')}
+                      />
+                    </Badge>
+                  )}
+                </div>
+              )}
             </CardHeader>
             <CardContent className="p-0">
               <Table>
@@ -360,6 +503,9 @@ const SecurityManagement = () => {
                         </DropdownMenu>
                       </div>
                     </TableHead>
+                    <TableHead>
+                      Reported By
+                    </TableHead>
                     <TableHead 
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => handleSort('reportedAt')}
@@ -379,7 +525,7 @@ const SecurityManagement = () => {
                 <TableBody>
                   {filteredCases.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                         No security cases found matching your criteria
                       </TableCell>
                     </TableRow>
@@ -407,6 +553,9 @@ const SecurityManagement = () => {
                           <Badge variant="outline" className={getPriorityColor(case_.priority)}>
                             {case_.priority}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {getUserNameById(case_.reportedBy)}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {case_.reportedAt}
