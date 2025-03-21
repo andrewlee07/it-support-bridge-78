@@ -272,8 +272,20 @@ export const useSecurityCases = () => {
     // Apply sorting
     if (sortColumn) {
       filtered.sort((a, b) => {
-        const valueA = a[sortColumn as keyof SecurityCase];
-        const valueB = b[sortColumn as keyof SecurityCase];
+        let valueA: any = a[sortColumn as keyof SecurityCase];
+        let valueB: any = b[sortColumn as keyof SecurityCase];
+        
+        // Special handling for date fields
+        if (sortColumn === 'reportedAt') {
+          valueA = new Date(valueA).getTime();
+          valueB = new Date(valueB).getTime();
+        }
+        
+        // Handle string comparisons (case-insensitive)
+        if (typeof valueA === 'string' && typeof valueB === 'string') {
+          valueA = valueA.toLowerCase();
+          valueB = valueB.toLowerCase();
+        }
         
         if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
         if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;

@@ -65,6 +65,14 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
   handleViewCase,
   handleEditCase
 }) => {
+  // Helper function to render sort indicator
+  const renderSortIndicator = (column: string) => {
+    if (sortColumn === column) {
+      return <span className="ml-1">{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>;
+    }
+    return <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />;
+  };
+
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -77,11 +85,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
             >
               <div className="flex items-center">
                 ID
-                {sortColumn === 'id' && (
-                  <span className="ml-1">
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
+                {renderSortIndicator('id')}
               </div>
             </TableHead>
             <TableHead 
@@ -90,20 +94,19 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
             >
               <div className="flex items-center">
                 Case Description
-                {sortColumn === 'title' && (
-                  <span className="ml-1">
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
-                <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
+                {renderSortIndicator('title')}
               </div>
             </TableHead>
-            <TableHead>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('type')}
+            >
               <div className="flex items-center">
                 Type
+                {renderSortIndicator('type')}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -111,26 +114,36 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                     {typeOptions.map(type => (
                       <DropdownMenuItem 
                         key={type}
-                        onClick={() => setTypeFilter(type === typeFilter ? null : type)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTypeFilter(type === typeFilter ? null : type);
+                        }}
                         className={typeFilter === type ? "bg-muted" : ""}
                       >
                         {type}
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setTypeFilter(null)}>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation();
+                      setTypeFilter(null);
+                    }}>
                       Show All
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </TableHead>
-            <TableHead>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('status')}
+            >
               <div className="flex items-center">
                 Status
+                {renderSortIndicator('status')}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -138,26 +151,36 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                     {statusOptions.map(status => (
                       <DropdownMenuItem 
                         key={status}
-                        onClick={() => setStatusFilter(status === statusFilter ? null : status)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setStatusFilter(status === statusFilter ? null : status);
+                        }}
                         className={statusFilter === status ? "bg-muted" : ""}
                       >
                         {status}
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setStatusFilter(null)}>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation();
+                      setStatusFilter(null);
+                    }}>
                       Show All
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </TableHead>
-            <TableHead>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('priority')}
+            >
               <div className="flex items-center">
                 Priority
+                {renderSortIndicator('priority')}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -165,22 +188,34 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                     {priorityOptions.map(priority => (
                       <DropdownMenuItem 
                         key={priority}
-                        onClick={() => setPriorityFilter(priority === priorityFilter ? null : priority)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPriorityFilter(priority === priorityFilter ? null : priority);
+                        }}
                         className={priorityFilter === priority ? "bg-muted" : ""}
                       >
                         {priority}
                       </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setPriorityFilter(null)}>
+                    <DropdownMenuItem onClick={(e) => {
+                      e.stopPropagation();
+                      setPriorityFilter(null);
+                    }}>
                       Show All
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </TableHead>
-            <TableHead>
-              Reported By
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('reportedBy')}
+            >
+              <div className="flex items-center">
+                Reported By
+                {renderSortIndicator('reportedBy')}
+              </div>
             </TableHead>
             <TableHead 
               className="cursor-pointer hover:bg-muted/50"
@@ -189,11 +224,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
               <div className="flex items-center">
                 <CalendarClock className="mr-1 h-4 w-4 opacity-70" />
                 Reported
-                {sortColumn === 'reportedAt' && (
-                  <span className="ml-1">
-                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                  </span>
-                )}
+                {renderSortIndicator('reportedAt')}
               </div>
             </TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
