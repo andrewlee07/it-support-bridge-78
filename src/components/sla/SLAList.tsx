@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -58,6 +57,7 @@ const SLAList = ({ entityType, showActive }: SLAListProps) => {
     if (!entityType) return true;
     if (entityType === 'incident' && sla.ticketType === 'incident') return true;
     if (entityType === 'service-request' && sla.ticketType === 'service') return true;
+    if (entityType === 'security-case' && sla.ticketType === 'security-case') return true;
     return false;
   });
 
@@ -175,7 +175,7 @@ const SLAList = ({ entityType, showActive }: SLAListProps) => {
         isOpen={isCreateModalOpen}
         onClose={closeModals}
         onSave={handleSLASubmit}
-        entityType={entityType as 'incident' | 'service-request' | undefined}
+        entityType={entityType as 'incident' | 'service-request' | 'security-case' | undefined}
       />
 
       {selectedSLA && (
@@ -184,7 +184,7 @@ const SLAList = ({ entityType, showActive }: SLAListProps) => {
           onClose={closeModals}
           onSave={handleSLASubmit}
           sla={selectedSLA}
-          entityType={entityType as 'incident' | 'service-request' | undefined}
+          entityType={entityType as 'incident' | 'service-request' | 'security-case' | undefined}
         />
       )}
     </div>

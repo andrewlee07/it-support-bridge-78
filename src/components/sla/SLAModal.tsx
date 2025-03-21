@@ -10,7 +10,7 @@ export interface SLAModalProps {
   onSave: (slaData: Partial<SLA>) => void;
   sla?: SLA;
   slaId?: string | null;
-  entityType?: 'incident' | 'service-request';
+  entityType?: 'incident' | 'service-request' | 'security-case';
 }
 
 export const SLAModal: React.FC<SLAModalProps> = ({ 
