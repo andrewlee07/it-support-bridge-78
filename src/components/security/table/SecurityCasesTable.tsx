@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ChevronDown, ChevronRight, ArrowUpDown, CalendarClock, Eye, Edit, MoreHorizontal, ArrowUp, ArrowDown } from 'lucide-react';
+import { ChevronDown, ChevronRight, ArrowUpDown, CalendarClock, Eye, Edit, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SecurityCase } from '@/utils/types/security'; // You might need to create this type
 import { format } from 'date-fns';
@@ -65,16 +65,6 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
   handleViewCase,
   handleEditCase
 }) => {
-  // Helper function to render sort indicator
-  const renderSortIndicator = (column: string) => {
-    if (sortColumn === column) {
-      return sortDirection === 'asc' ? 
-        <ArrowUp className="ml-1 h-4 w-4" /> : 
-        <ArrowDown className="ml-1 h-4 w-4" />;
-    }
-    return <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />;
-  };
-
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -87,7 +77,11 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
             >
               <div className="flex items-center">
                 ID
-                {renderSortIndicator('id')}
+                {sortColumn === 'id' && (
+                  <span className="ml-1">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
               </div>
             </TableHead>
             <TableHead 
@@ -96,7 +90,12 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
             >
               <div className="flex items-center">
                 Case Description
-                {renderSortIndicator('title')}
+                {sortColumn === 'title' && (
+                  <span className="ml-1">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
+                <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
               </div>
             </TableHead>
             <TableHead>
@@ -124,14 +123,6 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8" 
-                  onClick={() => handleSort('type')}
-                >
-                  {renderSortIndicator('type')}
-                </Button>
               </div>
             </TableHead>
             <TableHead>
@@ -159,14 +150,6 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8" 
-                  onClick={() => handleSort('status')}
-                >
-                  {renderSortIndicator('status')}
-                </Button>
               </div>
             </TableHead>
             <TableHead>
@@ -194,24 +177,10 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8" 
-                  onClick={() => handleSort('priority')}
-                >
-                  {renderSortIndicator('priority')}
-                </Button>
               </div>
             </TableHead>
-            <TableHead 
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => handleSort('reportedBy')}
-            >
-              <div className="flex items-center">
-                Reported By
-                {renderSortIndicator('reportedBy')}
-              </div>
+            <TableHead>
+              Reported By
             </TableHead>
             <TableHead 
               className="cursor-pointer hover:bg-muted/50"
@@ -220,13 +189,16 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
               <div className="flex items-center">
                 <CalendarClock className="mr-1 h-4 w-4 opacity-70" />
                 Reported
-                {renderSortIndicator('reportedAt')}
+                {sortColumn === 'reportedAt' && (
+                  <span className="ml-1">
+                    {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                  </span>
+                )}
               </div>
             </TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
-        
         <TableBody>
           {cases.length === 0 ? (
             <TableRow>

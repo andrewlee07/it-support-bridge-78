@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -268,26 +269,11 @@ export const useSecurityCases = () => {
       });
     }
     
-    // Apply sorting with enhanced type safety
+    // Apply sorting
     if (sortColumn) {
       filtered.sort((a, b) => {
-        let valueA: any;
-        let valueB: any;
-        
-        // Special case for date fields that need to be compared as dates
-        if (sortColumn === 'reportedAt') {
-          valueA = new Date(a.reportedAt).getTime();
-          valueB = new Date(b.reportedAt).getTime();
-        } else {
-          valueA = a[sortColumn as keyof SecurityCase];
-          valueB = b[sortColumn as keyof SecurityCase];
-        }
-        
-        // Handle string comparisons case-insensitively
-        if (typeof valueA === 'string' && typeof valueB === 'string') {
-          valueA = valueA.toLowerCase();
-          valueB = valueB.toLowerCase();
-        }
+        const valueA = a[sortColumn as keyof SecurityCase];
+        const valueB = b[sortColumn as keyof SecurityCase];
         
         if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
         if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
@@ -385,7 +371,6 @@ export const useSecurityCases = () => {
   const activeCasesCount = mockSecurityCases.filter(c => c.status === 'Active').length;
   const dataBreachesCount = mockSecurityCases.filter(c => c.type === 'Data Breach').length;
   const complianceIssuesCount = mockSecurityCases.filter(c => c.type === 'Compliance').length;
-  const totalCases = mockSecurityCases.length;
 
   return {
     // State
@@ -431,6 +416,6 @@ export const useSecurityCases = () => {
     activeCasesCount,
     dataBreachesCount,
     complianceIssuesCount,
-    totalCases
+    totalCases: mockSecurityCases.length
   };
 };
