@@ -5,7 +5,8 @@ import {
   FormItem, 
   FormLabel, 
   FormControl, 
-  FormMessage 
+  FormMessage,
+  FormDescription
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,7 +19,12 @@ interface BasicInfoSectionProps {
 
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ form }) => {
   return (
-    <>
+    <div className="space-y-6">
+      <div className="mb-2">
+        <h3 className="text-lg font-medium">Basic Information</h3>
+        <p className="text-sm text-muted-foreground">Provide the core details about this task</p>
+      </div>
+      
       <FormField
         control={form.control}
         name="title"
@@ -26,8 +32,15 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ form }) => {
           <FormItem>
             <FormLabel>Title</FormLabel>
             <FormControl>
-              <Input placeholder="Task title" {...field} />
+              <Input 
+                placeholder="Enter task title" 
+                {...field} 
+                className="h-10"
+              />
             </FormControl>
+            <FormDescription>
+              Enter a concise, descriptive title for the task
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -41,16 +54,19 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ form }) => {
             <FormLabel>Description</FormLabel>
             <FormControl>
               <Textarea 
-                placeholder="Detailed description of the task" 
-                className="min-h-[100px]" 
+                placeholder="Provide detailed description of the task" 
+                className="resize-y min-h-[120px]" 
                 {...field} 
               />
             </FormControl>
+            <FormDescription>
+              Include all relevant information about what needs to be done
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 };
 

@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
 import { Task } from '@/utils/types/taskTypes';
 import { formatDistanceToNow } from 'date-fns';
-import { Clock, Calendar, User } from 'lucide-react';
+import { Clock, Calendar, User, CheckCircle, AlertCircle, HourglassIcon, XCircle } from 'lucide-react';
 import WatchButton from '@/components/shared/WatchButton';
 
 interface TaskCardProps {
@@ -18,39 +18,75 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
     ? formatDistanceToNow(new Date(task.dueDate), { addSuffix: true })
     : null;
   
-  // Helper function to determine status color
-  const getStatusColor = (status: string) => {
+  // Helper function to determine status color and icon
+  const getStatusInfo = (status: string) => {
     switch (status) {
       case 'new':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+        return {
+          className: 'bg-blue-50 text-blue-700 border-blue-200',
+          icon: <AlertCircle className="h-3 w-3 mr-1" />
+        };
       case 'in-progress':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+        return {
+          className: 'bg-purple-50 text-purple-700 border-purple-200',
+          icon: <HourglassIcon className="h-3 w-3 mr-1" />
+        };
       case 'on-hold':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return {
+          className: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+          icon: <Clock className="h-3 w-3 mr-1" />
+        };
       case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return {
+          className: 'bg-green-50 text-green-700 border-green-200',
+          icon: <CheckCircle className="h-3 w-3 mr-1" />
+        };
       case 'cancelled':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return {
+          className: 'bg-red-50 text-red-700 border-red-200',
+          icon: <XCircle className="h-3 w-3 mr-1" />
+        };
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+        return {
+          className: 'bg-gray-50 text-gray-700 border-gray-200',
+          icon: <AlertCircle className="h-3 w-3 mr-1" />
+        };
     }
   };
   
   // Helper function to determine priority color
-  const getPriorityColor = (priority: string) => {
+  const getPriorityInfo = (priority: string) => {
     switch (priority) {
       case 'critical':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return {
+          className: 'bg-red-50 text-red-700 border-red-200',
+          label: 'Critical'
+        };
       case 'high':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+        return {
+          className: 'bg-orange-50 text-orange-700 border-orange-200',
+          label: 'High'
+        };
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return {
+          className: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+          label: 'Medium'
+        };
       case 'low':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return {
+          className: 'bg-green-50 text-green-700 border-green-200',
+          label: 'Low'
+        };
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+        return {
+          className: 'bg-gray-50 text-gray-700 border-gray-200',
+          label: 'Unknown'
+        };
     }
   };
+
+  const statusInfo = getStatusInfo(task.status);
+  const priorityInfo = getPriorityInfo(task.priority);
 
   const watchableItem = {
     id: task.id,
@@ -61,23 +97,26 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
     updatedAt: new Date(task.updatedAt)
   };
 
+  // Calculate progress based on checklist if available
+  const checklistProgress = task.checklist?.length 
+    ? Math.round((task.checklist.filter(item => item.completed).length / task.checklist.length) * 100)
+    : null;
+
   return (
     <Card 
-      className="shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer relative" 
+      className="shadow-sm hover:shadow-md transition-shadow h-full cursor-pointer border-gray-200" 
       onClick={onClick}
     >
-      <div className="absolute top-2 right-2 z-10">
-        <WatchButton item={watchableItem} />
-      </div>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start gap-2">
-          <div>
-            <div className="text-xs text-muted-foreground mb-1">{task.id}</div>
-            <h3 className="text-base font-semibold leading-tight">{task.title}</h3>
-          </div>
-          <Badge className={getPriorityColor(task.priority)}>
-            {task.priority}
+      <CardHeader className="pb-2 flex flex-row items-start justify-between">
+        <div>
+          <p className="text-xs text-muted-foreground">{task.id}</p>
+          <h3 className="text-base font-semibold leading-tight mt-1">{task.title}</h3>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Badge variant="outline" className={priorityInfo.className}>
+            {priorityInfo.label}
           </Badge>
+          <WatchButton item={watchableItem} />
         </div>
       </CardHeader>
       <CardContent className="pb-2">
@@ -86,13 +125,28 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
             {task.description}
           </p>
         )}
+        
+        {checklistProgress !== null && (
+          <div className="mt-3">
+            <div className="flex justify-between text-xs mb-1">
+              <span>Progress</span>
+              <span>{checklistProgress}%</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div 
+                className="bg-blue-600 h-1.5 rounded-full" 
+                style={{ width: `${checklistProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex flex-col items-start pt-0">
-        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-          <Badge className={getStatusColor(task.status)}>
-            {task.status}
-          </Badge>
-        </div>
+        <Badge variant="outline" className={`${statusInfo.className} mt-2 gap-1`}>
+          {statusInfo.icon}
+          {task.status.charAt(0).toUpperCase() + task.status.slice(1).replace('-', ' ')}
+        </Badge>
+        
         <div className="grid grid-cols-2 gap-2 w-full mt-3">
           <div className="flex items-center text-xs text-muted-foreground">
             <User className="h-3 w-3 mr-1" />
