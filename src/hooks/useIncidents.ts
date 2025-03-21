@@ -102,13 +102,13 @@ export const useIncidents = () => {
     // Apply sorting
     if (sortColumn) {
       filtered.sort((a, b) => {
-        let aValue = a[sortColumn as keyof typeof a];
-        let bValue = b[sortColumn as keyof typeof b];
+        let aValue: any = a[sortColumn as keyof typeof a];
+        let bValue: any = b[sortColumn as keyof typeof b];
         
         // Special case for date sorting
         if (sortColumn === 'createdAt' || sortColumn === 'updatedAt') {
-          aValue = new Date(aValue as string).getTime();
-          bValue = new Date(bValue as string).getTime();
+          aValue = aValue instanceof Date ? aValue.getTime() : new Date(aValue as string).getTime();
+          bValue = bValue instanceof Date ? bValue.getTime() : new Date(bValue as string).getTime();
         }
         
         // For string comparison
@@ -118,10 +118,15 @@ export const useIncidents = () => {
             : bValue.localeCompare(aValue);
         }
         
-        // For number comparison
-        return sortDirection === 'asc' 
-          ? (aValue as number) - (bValue as number)
-          : (bValue as number) - (aValue as number);
+        // For number comparison (casting explicitly to avoid TS errors)
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return sortDirection === 'asc' 
+            ? aValue - bValue
+            : bValue - aValue;
+        }
+        
+        // Default return for other types
+        return 0;
       });
     }
 
@@ -264,7 +269,7 @@ export const useIncidents = () => {
     }
   }, []);
 
-  // Get icon for ticket priority - Instead of JSX, return icon type/name
+  // Get icon for ticket priority - return icon type instead of JSX
   const getPriorityIcon = useCallback((priority: string) => {
     switch (priority) {
       case 'P1':
