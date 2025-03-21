@@ -74,6 +74,109 @@ const SecurityManagement = () => {
   });
   const [expandedCase, setExpandedCase] = useState<string | null>(null);
   const [selectedCase, setSelectedCase] = useState<any | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+
+  // Handle sorting
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  // Handle card filter toggle
+  const toggleCardFilter = (filterName: keyof typeof cardFilters) => {
+    setCardFilters(prev => ({
+      ...prev,
+      [filterName]: !prev[filterName]
+    }));
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, 'MMM dd, yyyy');
+  };
+
+  // Format time difference for display
+  const getTimeDifference = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return formatDate(dateString);
+  };
+
+  // Handle row expansion
+  const toggleExpandRow = (caseId: string) => {
+    if (expandedCase === caseId) {
+      setExpandedCase(null);
+    } else {
+      setExpandedCase(caseId);
+      const caseDetail = securityCases.find(c => c.id === caseId);
+      setSelectedCase(caseDetail || null);
+    }
+  };
+
+  // Handle case view
+  const handleViewCase = (secCase: any) => {
+    setSelectedCase(secCase);
+    setViewDialogOpen(true);
+  };
+
+  // Handle case edit
+  const handleEditCase = (secCase: any) => {
+    toast.info(`Editing case ${secCase.id}`, {
+      description: "Edit functionality would open edit form"
+    });
+  };
+
+  // Export to CSV
+  const exportToCsv = () => {
+    const filteredCases = getFilteredCases();
+    const headers = ['ID', 'Title', 'Type', 'Status', 'Priority', 'Reported By', 'Reported At'];
+    
+    const csvContent = [
+      headers.join(','),
+      ...filteredCases.map(c => [
+        c.id,
+        `"${c.title.replace(/"/g, '""')}"`,
+        c.type,
+        c.status,
+        c.priority,
+        getUserNameById(c.reportedBy),
+        formatDate(c.reportedAt)
+      ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `security_cases_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Export complete', {
+      description: 'Security cases exported to CSV'
+    });
+  };
+
+  // Export to PDF
+  const exportToPdf = () => {
+    toast.info('PDF Export', {
+      description: 'PDF export functionality would generate a formatted report'
+    });
+  };
 
   // Mock data for security cases
   const securityCases = [
@@ -147,107 +250,6 @@ const SecurityManagement = () => {
       remediationPlan: 'Completed: Enhanced email filtering and security awareness training'
     }
   ];
-
-  // Handle sorting
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortDirection('asc');
-    }
-  };
-
-  // Handle card filter toggle
-  const toggleCardFilter = (filterName: keyof typeof cardFilters) => {
-    setCardFilters(prev => ({
-      ...prev,
-      [filterName]: !prev[filterName]
-    }));
-  };
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return format(date, 'MMM dd, yyyy');
-  };
-
-  // Format time difference for display
-  const getTimeDifference = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    return formatDate(dateString);
-  };
-
-  // Handle row expansion
-  const toggleExpandRow = (caseId: string) => {
-    if (expandedCase === caseId) {
-      setExpandedCase(null);
-    } else {
-      setExpandedCase(caseId);
-      const caseDetail = securityCases.find(c => c.id === caseId);
-      setSelectedCase(caseDetail || null);
-    }
-  };
-
-  // Handle case view
-  const handleViewCase = (secCase: any) => {
-    setSelectedCase(secCase);
-  };
-
-  // Handle case edit
-  const handleEditCase = (secCase: any) => {
-    toast.info(`Editing case ${secCase.id}`, {
-      description: "Edit functionality would open edit form"
-    });
-  };
-
-  // Export to CSV
-  const exportToCsv = () => {
-    const filteredCases = getFilteredCases();
-    const headers = ['ID', 'Title', 'Type', 'Status', 'Priority', 'Reported By', 'Reported At'];
-    
-    const csvContent = [
-      headers.join(','),
-      ...filteredCases.map(c => [
-        c.id,
-        `"${c.title.replace(/"/g, '""')}"`,
-        c.type,
-        c.status,
-        c.priority,
-        getUserNameById(c.reportedBy),
-        formatDate(c.reportedAt)
-      ].join(','))
-    ].join('\n');
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `security_cases_${format(new Date(), 'yyyy-MM-dd')}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast.success('Export complete', {
-      description: 'Security cases exported to CSV'
-    });
-  };
-
-  // Export to PDF
-  const exportToPdf = () => {
-    toast.info('PDF Export', {
-      description: 'PDF export functionality would generate a formatted report'
-    });
-  };
 
   // Update getFilteredCases to handle the new dateRange type
   const getFilteredCases = () => {
@@ -760,7 +762,7 @@ const SecurityManagement = () => {
                               <DropdownMenuItem onClick={() => setPriorityFilter(null)}>
                                 Show All
                               </DropdownMenuItem>
-                            </DropdownMenuContent>
+                            DropdownMenuContent>
                           </DropdownMenu>
                         </div>
                       </TableHead>
@@ -862,5 +864,4 @@ const SecurityManagement = () => {
                                 </Tooltip>
                               </TooltipProvider>
                             </TableCell>
-                            <TableCell>
-                              <div className="flex items-center justify-end space-x-1
+                            <TableCell
