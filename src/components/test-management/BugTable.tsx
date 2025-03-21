@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBugs, updateBug } from '@/utils/mockData/testData';
@@ -81,10 +82,11 @@ const BugTable: React.FC<BugListProps> = ({
             <option value="">All Statuses</option>
             <option value="open">Open</option>
             <option value="in-progress">In Progress</option>
-            <option value="ready">Ready</option>
-            <option value="blocked">Blocked</option>
-            <option value="completed">Completed</option>
-            <option value="deferred">Deferred</option>
+            <option value="fixed">Fixed</option>
+            <option value="verified">Verified</option>
+            <option value="closed">Closed</option>
+            <option value="resolved">Resolved</option>
+            <option value="new">New</option>
           </select>
         </div>
 
@@ -133,17 +135,20 @@ const BugTable: React.FC<BugListProps> = ({
                     <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'in-progress')}>
                       In Progress
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'ready')}>
-                      Ready
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'new')}>
+                      New
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'blocked')}>
-                      Blocked
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'fixed')}>
+                      Fixed
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'completed')}>
-                      Completed
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'verified')}>
+                      Verified
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'deferred')}>
-                      Deferred
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'closed')}>
+                      Closed
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'resolved')}>
+                      Resolved
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
