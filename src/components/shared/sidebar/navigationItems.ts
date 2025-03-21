@@ -19,7 +19,7 @@ import {
   FileCheck,
   PackageOpen,
   Wrench,
-  PuzzlePiece
+  Puzzle
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -64,7 +64,7 @@ export const navigationItems: NavigationItem[] = [
   {
     title: "Problem Management",
     href: "/problems",
-    icon: PuzzlePiece,
+    icon: Puzzle,
     description: "Manage system problems"
   },
   {
