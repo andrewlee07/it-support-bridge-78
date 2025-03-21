@@ -69,9 +69,9 @@ const KnownErrorDatabase = () => {
           {filteredErrors.map((error) => (
             <Card key={error.id} className="cursor-pointer hover:bg-accent/20 transition-colors">
               <CardHeader className="pb-2">
-                <div className="flex justify-between">
-                  <CardTitle className="text-lg flex items-center">
-                    <span className="mr-2">{error.title}</span>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <span>{error.title}</span>
                     <span className="text-sm bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
                       {error.id}
                     </span>

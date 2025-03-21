@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Problem } from '@/utils/types/problem';
-import { Database } from 'lucide-react';
+import { Database, Save, X } from 'lucide-react';
 
 const knownErrorSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters' }),
@@ -174,11 +174,13 @@ const KnownErrorForm: React.FC<KnownErrorFormProps> = ({
                 )}
               />
 
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
                 <Button type="button" variant="outline" onClick={onCancel}>
+                  <X className="h-4 w-4 mr-2" />
                   Cancel
                 </Button>
                 <Button type="submit">
+                  <Save className="h-4 w-4 mr-2" />
                   Create Known Error
                 </Button>
               </div>

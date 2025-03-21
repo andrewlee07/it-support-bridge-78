@@ -110,6 +110,30 @@ let knownErrors: KnownError[] = [
     status: 'active',
     createdAt: new Date('2024-02-14T16:20:00Z'),
     updatedAt: new Date('2024-02-14T16:20:00Z')
+  },
+  {
+    id: 'KE00002',
+    problemId: 'PRB00002',
+    title: 'Document management system crashes with large files',
+    description: 'Memory allocation issue in the file processing module causes the application to crash when handling files larger than 500MB.',
+    symptoms: 'Application crash, error message "Out of memory", processing stuck at 99%',
+    workaround: 'Split large files into smaller chunks under 400MB before uploading. For PDF files, reduce the resolution to decrease file size.',
+    affectedServices: ['Document Management System', 'File Storage'],
+    status: 'active',
+    createdAt: new Date('2024-03-01T10:15:00Z'),
+    updatedAt: new Date('2024-03-01T10:15:00Z')
+  },
+  {
+    id: 'KE00003',
+    problemId: 'PRB00004',
+    title: 'Email delivery delays to external domains',
+    description: 'Misconfigured spam filtering rules causing message queue backlog for emails sent to external domains.',
+    symptoms: 'Delayed email delivery, emails taking 30+ minutes to reach recipients outside the organization',
+    workaround: 'For urgent communications, use the alternate SMTP server by changing the outgoing mail server in your email client settings to "smtp2.company.com".',
+    affectedServices: ['Email', 'Notifications'],
+    status: 'inactive',
+    createdAt: new Date('2024-02-10T11:30:00Z'),
+    updatedAt: new Date('2024-02-10T11:30:00Z')
   }
 ];
 

@@ -26,7 +26,7 @@ const ProblemManagement = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Problem Management</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Problem Management</h1>
             <p className="text-muted-foreground mt-1">
               Identify and address the root causes of recurring incidents
             </p>
@@ -50,12 +50,12 @@ const ProblemManagement = () => {
         </div>
         
         {showForm ? (
-          <Card className="p-6 rounded-lg animate-fade-in">
+          <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Create New Problem</h2>
             <ProblemForm onSubmit={handleSubmit} />
           </Card>
         ) : (
-          <Card className="p-6 rounded-lg animate-fade-in">
+          <Card className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-4">
                 <TabsTrigger value="problems">Problems</TabsTrigger>
