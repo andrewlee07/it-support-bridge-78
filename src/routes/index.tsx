@@ -18,6 +18,7 @@ import { testBugRoutes } from './testBugRoutes';
 import { releaseRoutes } from './releaseRoutes';
 import { taskRoutes } from './taskRoutes';
 import { miscRoutes } from './miscRoutes';
+import { securityRoutes } from './securityRoutes';
 
 const router = createBrowserRouter([
   {
@@ -42,7 +43,8 @@ const router = createBrowserRouter([
       ...testBugRoutes,
       ...userRoutes,
       ...adminRoutes,
-      ...taskRoutes
+      ...taskRoutes,
+      ...securityRoutes
     ]
   }
 ]);

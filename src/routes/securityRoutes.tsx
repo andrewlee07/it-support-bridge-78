@@ -33,6 +33,5 @@ export const securityRoutes: RouteObject[] = [
   {
     path: 'security/case/:id',
     element: <SecurityCaseDetailPage />
-  },
-  // Add other security routes as needed
+  }
 ];
