@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProblemTable from './ProblemTable';
@@ -20,12 +21,12 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC001', 'SVC002'],
     audit: [
       {
-        timestamp: new Date(Date.now() - 600000).toISOString(),
+        timestamp: new Date(Date.now() - 600000),
         message: 'Problem created',
         userName: 'John Doe'
       },
       {
-        timestamp: new Date(Date.now() - 300000).toISOString(),
+        timestamp: new Date(Date.now() - 300000),
         message: 'Status updated to Under Investigation',
         userName: 'Jane Smith'
       }
@@ -45,12 +46,12 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC003'],
     audit: [
       {
-        timestamp: new Date(Date.now() - 86400000).toISOString(),
+        timestamp: new Date(Date.now() - 86400000),
         message: 'Problem created',
         userName: 'Alice Johnson'
       },
       {
-        timestamp: new Date(Date.now() - 43200000).toISOString(),
+        timestamp: new Date(Date.now() - 43200000),
         message: 'Root cause identified: Database connection pool exhaustion',
         userName: 'Bob Williams'
       }
@@ -70,12 +71,12 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC004'],
     audit: [
       {
-        timestamp: new Date(Date.now() - 172800000).toISOString(),
+        timestamp: new Date(Date.now() - 172800000),
         message: 'Problem created',
         userName: 'Charlie Brown'
       },
       {
-        timestamp: new Date(Date.now() - 86400000).toISOString(),
+        timestamp: new Date(Date.now() - 86400000),
         message: 'Added to Known Error Database',
         userName: 'Diana Prince'
       }
@@ -95,7 +96,7 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC005', 'SVC006'],
     audit: [
       {
-        timestamp: new Date(Date.now() - 259200000).toISOString(),
+        timestamp: new Date(Date.now() - 259200000),
         message: 'Problem created',
         userName: 'John Doe'
       }
@@ -115,17 +116,17 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC007'],
     audit: [
       {
-        timestamp: new Date(Date.now() - 345600000).toISOString(),
+        timestamp: new Date(Date.now() - 345600000),
         message: 'Problem created',
         userName: 'Alice Johnson'
       },
       {
-        timestamp: new Date(Date.now() - 259200000).toISOString(),
+        timestamp: new Date(Date.now() - 259200000),
         message: 'Status updated to In Progress',
         userName: 'Charlie Brown'
       },
       {
-        timestamp: new Date(Date.now() - 86400000).toISOString(),
+        timestamp: new Date(Date.now() - 86400000),
         message: 'Problem resolved: Increased authentication service capacity',
         userName: 'Charlie Brown'
       }
@@ -146,12 +147,12 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC008'],
     audit: [
       {
-        timestamp: new Date(Date.now() - 432000000).toISOString(),
+        timestamp: new Date(Date.now() - 432000000),
         message: 'Problem created',
         userName: 'Bob Williams'
       },
       {
-        timestamp: new Date(Date.now() - 345600000).toISOString(),
+        timestamp: new Date(Date.now() - 345600000),
         message: 'Status updated to Pending - Waiting for Vendor',
         userName: 'John Doe'
       }
