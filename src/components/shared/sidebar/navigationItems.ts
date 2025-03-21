@@ -101,6 +101,12 @@ export const navigationItems: NavigationItem[] = [
     description: "Manage testing activities"
   },
   {
+    title: "Bug Management",
+    href: "/bugs",
+    icon: Bug,
+    description: "Track and manage bugs"
+  },
+  {
     title: "Knowledge Base",
     href: "/knowledge",
     icon: FileStack,
