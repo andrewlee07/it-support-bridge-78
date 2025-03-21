@@ -1,134 +1,212 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { getAllProblems } from '@/utils/mockData/problems';
-import ProblemCard from './ProblemCard';
 import ProblemTable from './ProblemTable';
-import TicketViewToggle, { ViewType } from '@/components/tickets/TicketViewToggle';
 import { Problem } from '@/utils/types/problem';
-import { Card } from '@/components/ui/card';
-import { AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
 
-const ProblemList = () => {
+// Mock data for problem management
+const mockProblems: Problem[] = [
+  {
+    id: 'PB001234',
+    title: 'Recurring network outages in Data Center A',
+    description: 'Multiple instances of network downtime occurring during peak hours',
+    status: 'under-investigation',
+    priority: 'P1',
+    createdAt: new Date(Date.now() - 600000).toISOString(),
+    createdBy: 'user1',
+    assignedTo: 'user2',
+    relatedIncidents: ['INC001234', 'INC001235', 'INC001236'],
+    knownErrorId: null,
+    serviceIds: ['SVC001', 'SVC002'],
+    audit: [
+      {
+        timestamp: new Date(Date.now() - 600000).toISOString(),
+        message: 'Problem created',
+        userName: 'John Doe'
+      },
+      {
+        timestamp: new Date(Date.now() - 300000).toISOString(),
+        message: 'Status updated to Under Investigation',
+        userName: 'Jane Smith'
+      }
+    ]
+  },
+  {
+    id: 'PB001235',
+    title: 'Payment gateway intermittent failures',
+    description: 'Payment processing fails randomly for about 5% of transactions',
+    status: 'root-cause-identified',
+    priority: 'P2',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    createdBy: 'user3',
+    assignedTo: 'user4',
+    relatedIncidents: ['INC001237', 'INC001238'],
+    knownErrorId: null,
+    serviceIds: ['SVC003'],
+    audit: [
+      {
+        timestamp: new Date(Date.now() - 86400000).toISOString(),
+        message: 'Problem created',
+        userName: 'Alice Johnson'
+      },
+      {
+        timestamp: new Date(Date.now() - 43200000).toISOString(),
+        message: 'Root cause identified: Database connection pool exhaustion',
+        userName: 'Bob Williams'
+      }
+    ]
+  },
+  {
+    id: 'PB001236',
+    title: 'Email delivery delays',
+    description: 'System emails are being delayed by up to 30 minutes',
+    status: 'known-error',
+    priority: 'P3',
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    createdBy: 'user5',
+    assignedTo: 'user2',
+    relatedIncidents: ['INC001239'],
+    knownErrorId: 'KE00123',
+    serviceIds: ['SVC004'],
+    audit: [
+      {
+        timestamp: new Date(Date.now() - 172800000).toISOString(),
+        message: 'Problem created',
+        userName: 'Charlie Brown'
+      },
+      {
+        timestamp: new Date(Date.now() - 86400000).toISOString(),
+        message: 'Added to Known Error Database',
+        userName: 'Diana Prince'
+      }
+    ]
+  },
+  {
+    id: 'PB001237',
+    title: 'Application server memory leaks',
+    description: 'Memory usage gradually increases until service restart is required',
+    status: 'new',
+    priority: 'P2',
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
+    createdBy: 'user1',
+    assignedTo: null,
+    relatedIncidents: ['INC001240', 'INC001241', 'INC001242', 'INC001243'],
+    knownErrorId: null,
+    serviceIds: ['SVC005', 'SVC006'],
+    audit: [
+      {
+        timestamp: new Date(Date.now() - 259200000).toISOString(),
+        message: 'Problem created',
+        userName: 'John Doe'
+      }
+    ]
+  },
+  {
+    id: 'PB001238',
+    title: 'Authentication service timeouts during peak hours',
+    description: 'Login attempts time out when system is under heavy load',
+    status: 'resolved',
+    priority: 'P1',
+    createdAt: new Date(Date.now() - 345600000).toISOString(),
+    createdBy: 'user3',
+    assignedTo: 'user5',
+    relatedIncidents: ['INC001244', 'INC001245'],
+    knownErrorId: null,
+    serviceIds: ['SVC007'],
+    audit: [
+      {
+        timestamp: new Date(Date.now() - 345600000).toISOString(),
+        message: 'Problem created',
+        userName: 'Alice Johnson'
+      },
+      {
+        timestamp: new Date(Date.now() - 259200000).toISOString(),
+        message: 'Status updated to In Progress',
+        userName: 'Charlie Brown'
+      },
+      {
+        timestamp: new Date(Date.now() - 86400000).toISOString(),
+        message: 'Problem resolved: Increased authentication service capacity',
+        userName: 'Charlie Brown'
+      }
+    ]
+  },
+  {
+    id: 'PB001239',
+    title: 'Customer portal showing incorrect order status',
+    description: 'Order status not updating correctly after order fulfillment',
+    status: 'pending',
+    pendingSubStatus: 'waiting-for-vendor',
+    priority: 'P3',
+    createdAt: new Date(Date.now() - 432000000).toISOString(),
+    createdBy: 'user4',
+    assignedTo: 'user1',
+    relatedIncidents: ['INC001246'],
+    knownErrorId: null,
+    serviceIds: ['SVC008'],
+    audit: [
+      {
+        timestamp: new Date(Date.now() - 432000000).toISOString(),
+        message: 'Problem created',
+        userName: 'Bob Williams'
+      },
+      {
+        timestamp: new Date(Date.now() - 345600000).toISOString(),
+        message: 'Status updated to Pending - Waiting for Vendor',
+        userName: 'John Doe'
+      }
+    ]
+  }
+];
+
+interface ProblemListProps {
+  filterStatus?: string | string[];
+  filterPriority?: string | string[];
+}
+
+const ProblemList: React.FC<ProblemListProps> = ({ 
+  filterStatus,
+  filterPriority
+}) => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [viewType, setViewType] = useState<ViewType>(() => {
-    // Get from localStorage or default to grid
-    const savedView = localStorage.getItem('problem-view');
-    return (savedView as ViewType) || 'grid';
-  });
-
-  // Get problems from mock data
-  const problems = getAllProblems();
-
-  // Filter problems based on search query and filters
-  const filteredProblems = problems.filter((problem) => {
-    const matchesSearch = 
-      problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      problem.id.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || problem.status === statusFilter;
-    const matchesPriority = priorityFilter === 'all' || problem.priority === priorityFilter;
-    
-    return matchesSearch && matchesStatus && matchesPriority;
-  });
+  const [problems, setProblems] = useState<Problem[]>([]);
+  
+  useEffect(() => {
+    // Simulate API call
+    setTimeout(() => {
+      let filteredProblems = [...mockProblems];
+      
+      // Apply status filter if provided
+      if (filterStatus) {
+        const statusFilters = Array.isArray(filterStatus) ? filterStatus : [filterStatus];
+        filteredProblems = filteredProblems.filter(problem => 
+          statusFilters.includes(problem.status)
+        );
+      }
+      
+      // Apply priority filter if provided
+      if (filterPriority) {
+        const priorityFilters = Array.isArray(filterPriority) ? filterPriority : [filterPriority];
+        filteredProblems = filteredProblems.filter(problem => 
+          priorityFilters.includes(problem.priority)
+        );
+      }
+      
+      setProblems(filteredProblems);
+    }, 500);
+  }, [filterStatus, filterPriority]);
 
   const handleProblemClick = (problemId: string) => {
-    navigate(`/problems/${problemId}`);
-  };
-
-  // Handle view change
-  const handleViewChange = (view: ViewType) => {
-    setViewType(view);
-    localStorage.setItem('problem-view', view);
+    // In a real app, this would navigate to a problem detail page
+    console.log(`Navigate to problem detail: ${problemId}`);
+    toast.info(`Viewing problem ${problemId}`);
+    // navigate(`/problems/${problemId}`);
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 justify-between">
-        <div className="flex flex-col md:flex-row gap-4 flex-1">
-          <Input
-            placeholder="Search by problem ID or title..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="md:w-1/2"
-          />
-          <div className="flex flex-col md:flex-row gap-4">
-            <Select
-              value={statusFilter}
-              onValueChange={setStatusFilter}
-            >
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="new">New</SelectItem>
-                <SelectItem value="under-investigation">Under Investigation</SelectItem>
-                <SelectItem value="root-cause-identified">Root Cause Identified</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="known-error">Known Error</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select
-              value={priorityFilter}
-              onValueChange={setPriorityFilter}
-            >
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Filter by priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Priorities</SelectItem>
-                <SelectItem value="P1">P1 - High</SelectItem>
-                <SelectItem value="P2">P2 - Medium</SelectItem>
-                <SelectItem value="P3">P3 - Low</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        
-        <div className="flex shrink-0">
-          <TicketViewToggle view={viewType} onChange={handleViewChange} />
-        </div>
-      </div>
-
-      {filteredProblems.length === 0 ? (
-        <Card className="bg-muted/30 p-6 text-center">
-          <AlertTriangle className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-          <h3 className="text-lg font-medium">No problems found</h3>
-          <p className="text-muted-foreground mt-1">
-            Try adjusting your search or filters
-          </p>
-        </Card>
-      ) : viewType === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredProblems.map((problem) => (
-            <ProblemCard 
-              key={problem.id} 
-              problem={problem} 
-              onClick={() => handleProblemClick(problem.id)}
-            />
-          ))}
-        </div>
-      ) : (
-        <ProblemTable 
-          problems={filteredProblems} 
-          onProblemClick={handleProblemClick} 
-        />
-      )}
+    <div>
+      <ProblemTable problems={problems} onProblemClick={handleProblemClick} />
     </div>
   );
 };
