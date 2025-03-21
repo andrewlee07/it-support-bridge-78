@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -50,6 +49,7 @@ import {
 } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { DateRange } from 'react-day-picker';
 
 const SecurityManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,10 +67,8 @@ const SecurityManagement = () => {
     dataBreaches: false,
     complianceIssues: false
   });
-  const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  // Update the dateRange state type to match DateRange from react-day-picker
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined
   });
@@ -251,7 +249,7 @@ const SecurityManagement = () => {
     });
   };
 
-  // Get filtered and sorted cases
+  // Update getFilteredCases to handle the new dateRange type
   const getFilteredCases = () => {
     let filtered = [...securityCases];
     
@@ -294,8 +292,8 @@ const SecurityManagement = () => {
       filtered = filtered.filter(case_ => case_.type === 'Compliance');
     }
     
-    // Apply date range filter
-    if (dateRange.from) {
+    // Apply date range filter - Updated to handle undefined values properly
+    if (dateRange?.from) {
       const fromDate = new Date(dateRange.from);
       fromDate.setHours(0, 0, 0, 0);
       
@@ -305,7 +303,7 @@ const SecurityManagement = () => {
       });
     }
     
-    if (dateRange.to) {
+    if (dateRange?.to) {
       const toDate = new Date(dateRange.to);
       toDate.setHours(23, 59, 59, 999);
       
@@ -410,15 +408,15 @@ const SecurityManagement = () => {
            cardFilters.complianceIssues;
   };
 
-  // Format date range for display
+  // Update the getDateRangeText function to handle the new dateRange type
   const getDateRangeText = () => {
-    if (dateRange.from && dateRange.to) {
+    if (dateRange?.from && dateRange?.to) {
       return `${format(dateRange.from, 'MMM dd, yyyy')} - ${format(dateRange.to, 'MMM dd, yyyy')}`;
     }
-    if (dateRange.from) {
+    if (dateRange?.from) {
       return `From ${format(dateRange.from, 'MMM dd, yyyy')}`;
     }
-    if (dateRange.to) {
+    if (dateRange?.to) {
       return `Until ${format(dateRange.to, 'MMM dd, yyyy')}`;
     }
     return '';
@@ -521,6 +519,7 @@ const SecurityManagement = () => {
 
         <TabsContent value="all" className="space-y-4">
           <Card>
+            
             <CardHeader className="py-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Security Cases</CardTitle>
@@ -550,11 +549,11 @@ const SecurityManagement = () => {
                       size="sm"
                       className={cn(
                         "h-9 border-dashed flex gap-1",
-                        dateRange.from && "text-primary"
+                        dateRange?.from && "text-primary"
                       )}
                     >
                       <Calendar className="h-4 w-4" />
-                      {dateRange.from ? (
+                      {dateRange?.from ? (
                         getDateRangeText()
                       ) : (
                         "Date Range"
@@ -630,7 +629,7 @@ const SecurityManagement = () => {
                       />
                     </Badge>
                   )}
-                  {dateRange.from && (
+                  {dateRange?.from && (
                     <Badge variant="outline" className="bg-purple-50 text-purple-700 flex items-center gap-1">
                       Date: {getDateRangeText()}
                       <X 
@@ -651,6 +650,7 @@ const SecurityManagement = () => {
                 </div>
               )}
             </CardHeader>
+            
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
@@ -864,177 +864,4 @@ const SecurityManagement = () => {
                               </TooltipProvider>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center justify-end space-x-1">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8"
-                                        onClick={() => handleViewCase(case_)}
-                                      >
-                                        <Eye className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>View Details</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8"
-                                        onClick={() => handleEditCase(case_)}
-                                      >
-                                        <Edit className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Edit Case</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                    >
-                                      <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Assign Case</DropdownMenuItem>
-                                    <DropdownMenuItem>Add Comment</DropdownMenuItem>
-                                    <DropdownMenuItem>Change Status</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-red-600">Close Case</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                          {expandedCase === case_.id && (
-                            <TableRow className="bg-muted/30">
-                              <TableCell colSpan={9} className="p-4">
-                                <div className="space-y-4">
-                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                      <h4 className="text-sm font-medium mb-1">Affected Systems</h4>
-                                      <div className="flex flex-wrap gap-1">
-                                        {case_.affectedSystems?.map((system: string) => (
-                                          <Badge key={system} variant="outline" className="bg-blue-50 text-blue-700">
-                                            {system}
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                    <div>
-                                      <h4 className="text-sm font-medium mb-1">Impacted Users</h4>
-                                      <p>{case_.impactedUsers} users affected</p>
-                                    </div>
-                                    <div>
-                                      <h4 className="text-sm font-medium mb-1">Reported</h4>
-                                      <p>{formatDate(case_.reportedAt)}</p>
-                                    </div>
-                                  </div>
-                                  
-                                  <div>
-                                    <h4 className="text-sm font-medium mb-1">Description</h4>
-                                    <p className="text-sm">{case_.description}</p>
-                                  </div>
-                                  
-                                  <div>
-                                    <h4 className="text-sm font-medium mb-1">Investigation Steps</h4>
-                                    <div className="space-y-2">
-                                      {case_.investigationSteps?.map((step: any, index: number) => (
-                                        <div key={index} className="flex gap-2 text-sm">
-                                          <span className="text-muted-foreground">{step.date}:</span>
-                                          <span>{step.text}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                  
-                                  <div>
-                                    <h4 className="text-sm font-medium mb-1">Remediation Plan</h4>
-                                    <p className="text-sm">{case_.remediationPlan}</p>
-                                  </div>
-                                  
-                                  <div className="flex justify-end gap-2">
-                                    <Button size="sm" variant="outline" onClick={() => toggleExpandRow(case_.id)}>
-                                      Collapse
-                                    </Button>
-                                    <Button size="sm" onClick={() => handleViewCase(case_)}>
-                                      View Full Details
-                                    </Button>
-                                  </div>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </React.Fragment>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Security Case Detail Dialog */}
-          {selectedCase && (
-            <SecurityCaseDetail 
-              securityCase={selectedCase}
-              open={!!selectedCase}
-              onClose={() => setSelectedCase(null)}
-            />
-          )}
-        </TabsContent>
-
-        <TabsContent value="data-breaches">
-          <Card>
-            <CardHeader>
-              <CardTitle>Data Breach Cases</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Select the "All Cases" tab to view sample data.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="sar">
-          <Card>
-            <CardHeader>
-              <CardTitle>Subject Access Requests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Select the "All Cases" tab to view sample data.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="compliance">
-          <Card>
-            <CardHeader>
-              <CardTitle>Compliance Issues</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Select the "All Cases" tab to view sample data.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
-
-export default SecurityManagement;
+                              <div className="flex items-center justify-end space-x
