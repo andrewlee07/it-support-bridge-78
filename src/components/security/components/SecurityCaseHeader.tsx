@@ -29,7 +29,7 @@ const SecurityCaseHeader: React.FC<SecurityCaseHeaderProps> = ({
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <span>Case #{securityCase.id}</span>
             <span>•</span>
-            <span>Created {formatDate(securityCase.createdAt)}</span>
+            <span>Created {formatDate(securityCase.reportedAt)}</span>
             <span>•</span>
             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(securityCase.priority)}`}>
               {securityCase.priority} Priority
