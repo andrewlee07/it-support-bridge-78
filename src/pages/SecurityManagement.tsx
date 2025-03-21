@@ -62,7 +62,7 @@ const SecurityManagement = () => {
   // Get the filtered cases
   const filteredCases = getFilteredCases();
 
-  // Navigate to case detail view - properly pass the case ID string
+  // Navigate to case detail view
   const goToCaseDetailView = useCallback((caseId: string) => {
     console.log(`Navigating to security case detail: ${caseId}`);
     navigation.goToSecurityCaseDetail(caseId);

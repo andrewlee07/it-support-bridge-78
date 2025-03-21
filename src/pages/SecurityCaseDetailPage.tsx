@@ -23,7 +23,11 @@ import {
   MessageSquare,
   Users, 
   ExternalLink,
-  Plus
+  Plus,
+  Mail,
+  Phone,
+  BookPlus,
+  Save
 } from 'lucide-react';
 import { useAppNavigation } from '@/utils/routes/navigationUtils';
 import { getUserNameById } from '@/utils/userUtils';
@@ -34,6 +38,7 @@ import { toast } from 'sonner';
 import { useDisclosure } from '@/hooks/useDisclosure';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
 
 const SecurityCaseDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +46,9 @@ const SecurityCaseDetailPage = () => {
   const appNavigation = useAppNavigation();
   const [activeTab, setActiveTab] = useState<SecurityCaseTab>('overview');
   const { isOpen: addNoteDialogOpen, onOpen: openAddNoteDialog, onClose: closeAddNoteDialog } = useDisclosure();
+  const { isOpen: addStepDialogOpen, onOpen: openAddStepDialog, onClose: closeAddStepDialog } = useDisclosure();
   const [noteText, setNoteText] = useState('');
+  const [stepText, setStepText] = useState('');
   
   // Use the security case detail hook
   const { 
@@ -49,6 +56,7 @@ const SecurityCaseDetailPage = () => {
     loading, 
     error, 
     addNote, 
+    addInvestigationStep,
     updateSecurityCase, 
     resolveSecurityCase, 
     reopenSecurityCase, 
@@ -70,9 +78,10 @@ const SecurityCaseDetailPage = () => {
 
   const handleEdit = useCallback(() => {
     if (id) {
-      appNavigation.goToEditSecurityCase(id);
+      toast.info('Edit functionality would open here');
+      // appNavigation.goToEditSecurityCase(id);
     }
-  }, [id, appNavigation]);
+  }, [id]);
 
   const handleAddNote = useCallback(async () => {
     if (!noteText.trim()) {
@@ -86,6 +95,19 @@ const SecurityCaseDetailPage = () => {
       toast.success('Note added successfully');
     }
   }, [addNote, closeAddNoteDialog, noteText]);
+
+  const handleAddStep = useCallback(async () => {
+    if (!stepText.trim()) {
+      toast.error('Please enter an investigation step');
+      return;
+    }
+    
+    if (await addInvestigationStep(stepText)) {
+      setStepText('');
+      closeAddStepDialog();
+      toast.success('Investigation step added successfully');
+    }
+  }, [addInvestigationStep, closeAddStepDialog, stepText]);
 
   const handleSystemClick = useCallback((system: string) => {
     toast.info(`Viewing details for ${system}`);
@@ -103,6 +125,17 @@ const SecurityCaseDetailPage = () => {
       case 'Active': return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
       case 'Pending': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
       case 'Resolved': return 'bg-green-100 text-green-800 hover:bg-green-100';
+      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
+    }
+  }, []);
+
+  // Get priority color for badges
+  const getPriorityColor = useCallback((priority: string) => {
+    switch (priority) {
+      case 'Critical': 
+      case 'High': return 'bg-red-100 text-red-800 hover:bg-red-100';
+      case 'Medium': return 'bg-orange-100 text-orange-800 hover:bg-orange-100';
+      case 'Low': return 'bg-green-100 text-green-800 hover:bg-green-100';
       default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
     }
   }, []);
@@ -130,13 +163,24 @@ const SecurityCaseDetailPage = () => {
     }
   }, []);
 
+  // Calculate SLA status
+  const responseSLA = securityCase ? calculateSLAStatus(securityCase, 'response') : null;
+  const resolutionSLA = securityCase ? calculateSLAStatus(securityCase, 'resolution') : null;
+
+  // Function to determine color for SLA indicator
+  const getSLAIndicatorColor = (progress: number) => {
+    if (progress <= 20) return "bg-red-500";
+    if (progress <= 50) return "bg-amber-500";
+    return "bg-green-500";
+  };
+  
   if (loading) {
     return (
-      <div className="space-y-6 p-4 sm:p-6 w-full max-w-[1400px] mx-auto">
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm" onClick={handleBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Security Cases
+            Back
           </Button>
         </div>
         <div className="flex items-center justify-center py-12">
@@ -151,11 +195,11 @@ const SecurityCaseDetailPage = () => {
 
   if (error || !securityCase) {
     return (
-      <div className="space-y-6 p-4 sm:p-6 w-full max-w-[1400px] mx-auto">
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm" onClick={handleBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Security Cases
+            Back
           </Button>
         </div>
         <Card>
@@ -175,113 +219,198 @@ const SecurityCaseDetailPage = () => {
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto space-y-6 p-4 sm:p-6">
+    <div className="container mx-auto px-4 py-6 max-w-7xl">
       {/* Header with back button and actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={handleBack}>
+          <Button variant="ghost" size="sm" onClick={handleBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Security Cases
+            Back
           </Button>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" onClick={handleEdit}>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
+          <Button variant="outline" size="sm">
+            <Mail className="mr-2 h-4 w-4" />
+            Email User
           </Button>
-          <Button size="sm" className="bg-primary">
-            Update Status
+          <Button variant="outline" size="sm">
+            <Phone className="mr-2 h-4 w-4" />
+            Call User
+          </Button>
+          <Button variant="outline" size="sm">
+            <BookPlus className="mr-2 h-4 w-4" />
+            Add KB Article
+          </Button>
+          <Button size="sm">
+            <Save className="mr-2 h-4 w-4" />
+            Save
           </Button>
         </div>
       </div>
 
-      {/* Main content in two-column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main content column - approximately 2/3 width */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Case header card */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-2">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-2">
-                <div>
-                  <CardTitle className="text-2xl">{securityCase.title}</CardTitle>
-                  <CardDescription className="mt-1">
-                    <span className="font-mono">{securityCase.id}</span>
-                  </CardDescription>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Badge className={getStatusColor(securityCase.status)}>
-                    {securityCase.status}
-                  </Badge>
-                  <Badge variant="outline" className={getTypeColor(securityCase.type)}>
-                    {securityCase.type}
-                  </Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                {securityCase.description}
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Reported By</p>
-                  <p className="font-medium">{getUserNameById(securityCase.reportedBy)}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Reported At</p>
-                  <p className="font-medium">{formatDate(securityCase.reportedAt)}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Priority</p>
-                  <p className="font-medium">{securityCase.priority}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Impacted Users</p>
-                  <p className="font-medium">{securityCase.impactedUsers}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Case Title and Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">{securityCase.title}</h1>
+        <div className="flex flex-wrap items-center gap-2 mt-1">
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <span className="font-medium">{getUserNameById(securityCase.reportedBy)}</span>
+            <span>|</span>
+            <span>Opened: {formatDate(securityCase.reportedAt)}</span>
+          </div>
+          <Badge className={getPriorityColor(securityCase.priority)}>
+            {securityCase.priority.toUpperCase()}
+          </Badge>
+        </div>
+      </div>
 
-          {/* Tabs for different sections */}
-          <Tabs defaultValue="overview" value={activeTab} onValueChange={(value) => setActiveTab(value as SecurityCaseTab)}>
-            <TabsList className="mb-4 w-full">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="investigation">Investigation</TabsTrigger>
-              <TabsTrigger value="affected-systems">Affected Systems</TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
-              <TabsTrigger value="related-items">Related Items</TabsTrigger>
-            </TabsList>
+      {/* Main Tabs Navigation */}
+      <Tabs defaultValue="overview" value={activeTab} onValueChange={(value) => setActiveTab(value as SecurityCaseTab)}>
+        <TabsList className="mb-6 border-b w-full justify-start rounded-none h-auto p-0">
+          <TabsTrigger 
+            value="overview" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary pb-2 pt-2 px-4"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger 
+            value="investigation" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary pb-2 pt-2 px-4"
+          >
+            Investigation
+          </TabsTrigger>
+          <TabsTrigger 
+            value="affected-systems" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary pb-2 pt-2 px-4"
+          >
+            Affected Services
+          </TabsTrigger>
+          <TabsTrigger 
+            value="notes" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary pb-2 pt-2 px-4"
+          >
+            Notes
+          </TabsTrigger>
+          <TabsTrigger 
+            value="related-items" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary pb-2 pt-2 px-4"
+          >
+            Related Items
+          </TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="overview" className="space-y-6">
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg">Remediation Plan</CardTitle>
+        {/* Main Tab Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main content column - approximately 2/3 width */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Tab content panels */}
+            <TabsContent value="overview" className="mt-0 space-y-6">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle>Security Case Information</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>{securityCase.remediationPlan}</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">ID</p>
+                      <p className="font-mono">
+                        <Link to={`/security/case/${securityCase.id}`} className="hover:underline text-blue-600">
+                          {securityCase.id}
+                        </Link>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Status</p>
+                      <Badge className={getStatusColor(securityCase.status)}>
+                        {securityCase.status}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Priority</p>
+                      <Badge className={getPriorityColor(securityCase.priority)}>
+                        {securityCase.priority}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Type</p>
+                      <Badge variant="outline" className={getTypeColor(securityCase.type)}>
+                        {securityCase.type}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Reported By</p>
+                      <p>{getUserNameById(securityCase.reportedBy)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Reported On</p>
+                      <p>{formatDate(securityCase.reportedAt)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Impacted Users</p>
+                      <p>{securityCase.impactedUsers}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Assigned To</p>
+                      <p>{securityCase.assignedTo ? getUserNameById(securityCase.assignedTo) : "Unassigned"}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
+                    <p className="text-sm">{securityCase.description}</p>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Remediation Plan</p>
+                    <p className="text-sm">{securityCase.remediationPlan}</p>
+                  </div>
+                  
+                  {securityCase.affectedSystems && securityCase.affectedSystems.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-sm font-medium text-muted-foreground mb-2">Affected Services</p>
+                      <div className="flex flex-wrap gap-2">
+                        {securityCase.affectedSystems.map((system, index) => (
+                          <Badge 
+                            key={index} 
+                            variant="outline" 
+                            className="bg-blue-50 text-blue-700 cursor-pointer hover:bg-blue-100"
+                            onClick={() => handleSystemClick(system)}
+                          >
+                            {system}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            </TabsContent>
-
-            <TabsContent value="investigation" className="space-y-6">
-              <Card className="shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-lg">Investigation Steps</CardTitle>
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-2" /> Add Step
-                  </Button>
+              
+              {/* Activity Timeline */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle>Activity Timeline</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="max-h-[400px] overflow-y-auto">
                   <div className="space-y-4">
-                    {securityCase.investigationSteps.map((step, index) => (
-                      <div key={index} className="border-l-2 border-muted pl-4 pb-4">
-                        <div className="flex justify-between mb-1">
-                          <strong className="text-sm font-medium">Step {index + 1}</strong>
-                          <span className="text-sm text-muted-foreground">{formatDate(step.date)}</span>
+                    {securityCase.audit && securityCase.audit.map((entry, index) => (
+                      <div key={index} className="flex gap-3">
+                        <div className="flex flex-col items-center">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                            {entry.action === 'created' && <FileText className="h-4 w-4" />}
+                            {entry.action === 'updated' && <Edit className="h-4 w-4" />}
+                            {entry.action === 'note-added' && <MessageSquare className="h-4 w-4" />}
+                            {entry.action === 'resolved' && <AlertTriangle className="h-4 w-4" />}
+                          </div>
+                          {index < securityCase.audit.length - 1 && <div className="w-0.5 h-full bg-muted" />}
                         </div>
-                        <p className="text-sm">{step.text}</p>
+                        <div className="pb-4">
+                          <div className="flex items-baseline gap-2">
+                            <p className="font-medium">{entry.userName || getUserNameById(entry.performedBy || '')}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatDate(entry.timestamp)}
+                            </p>
+                          </div>
+                          <p className="text-sm">{entry.message}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -289,39 +418,84 @@ const SecurityCaseDetailPage = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="affected-systems" className="space-y-6">
-              <Card className="shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-lg">Affected Systems</CardTitle>
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-2" /> Add System
+            <TabsContent value="investigation" className="mt-0 space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                  <CardTitle>Investigation Steps</CardTitle>
+                  <Button variant="outline" size="sm" onClick={openAddStepDialog}>
+                    <Plus className="h-4 w-4 mr-2" /> Add Step
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {securityCase.affectedSystems.map((system, index) => (
-                      <Card 
-                        key={index} 
-                        className="bg-muted/40 cursor-pointer hover:bg-muted/60 transition-colors"
-                        onClick={() => handleSystemClick(system)}
-                      >
-                        <CardContent className="p-4 flex items-center gap-3">
-                          <Server className="h-5 w-5 text-muted-foreground" />
-                          <div>
-                            <h4 className="font-medium">{system}</h4>
+                  {securityCase.investigationSteps && securityCase.investigationSteps.length > 0 ? (
+                    <div className="space-y-4">
+                      {securityCase.investigationSteps.map((step, index) => (
+                        <div key={index} className="border-l-2 border-muted pl-4 pb-4">
+                          <div className="flex justify-between mb-1">
+                            <strong className="text-sm font-medium">Step {index + 1}</strong>
+                            <span className="text-sm text-muted-foreground">{formatDate(step.date)}</span>
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                          <p className="text-sm">{step.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No investigation steps have been recorded yet</p>
+                      <Button variant="outline" className="mt-4" onClick={openAddStepDialog}>
+                        <Plus className="h-4 w-4 mr-2" /> Add First Investigation Step
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="notes" className="space-y-6">
-              <Card className="shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-lg">Notes</CardTitle>
+            <TabsContent value="affected-systems" className="mt-0 space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                  <CardTitle>Affected Services</CardTitle>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" /> Add Service
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {securityCase.affectedSystems && securityCase.affectedSystems.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {securityCase.affectedSystems.map((system, index) => (
+                        <Card 
+                          key={index} 
+                          className="bg-muted/40 cursor-pointer hover:bg-muted/60 transition-colors"
+                          onClick={() => handleSystemClick(system)}
+                        >
+                          <CardContent className="p-4 flex items-center gap-3">
+                            <Server className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <h4 className="font-medium">{system}</h4>
+                              <p className="text-sm text-muted-foreground">Service</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <Server className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No affected services have been added yet</p>
+                      <Button variant="outline" className="mt-4">
+                        <Plus className="h-4 w-4 mr-2" /> Add Service
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="notes" className="mt-0 space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                  <CardTitle>Notes</CardTitle>
                   <Button variant="outline" size="sm" onClick={openAddNoteDialog}>
                     <Plus className="h-4 w-4 mr-2" /> Add Note
                   </Button>
@@ -343,16 +517,19 @@ const SecurityCaseDetailPage = () => {
                     <div className="text-center py-6 text-muted-foreground">
                       <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
                       <p>No notes have been added yet</p>
+                      <Button variant="outline" className="mt-4" onClick={openAddNoteDialog}>
+                        <Plus className="h-4 w-4 mr-2" /> Add First Note
+                      </Button>
                     </div>
                   )}
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="related-items" className="space-y-6">
-              <Card className="shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-lg">Related Items</CardTitle>
+            <TabsContent value="related-items" className="mt-0 space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                  <CardTitle>Related Items</CardTitle>
                   <Button variant="outline" size="sm">
                     <Plus className="h-4 w-4 mr-2" /> Link Item
                   </Button>
@@ -408,120 +585,139 @@ const SecurityCaseDetailPage = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-          </Tabs>
-        </div>
+          </div>
 
-        {/* Side panel column - approximately 1/3 width */}
-        <div className="space-y-6">
-          {/* SLA Status Card */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">SLA Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <SecurityCaseSLAIndicator securityCase={securityCase} darkMode={false} />
+          {/* Side panel column - approximately 1/3 width */}
+          <div className="space-y-6">
+            {/* SLA Status Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">SLA Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium">Response SLA</span>
+                    <span className="text-sm">
+                      {responseSLA?.targetHours} hours target
+                    </span>
+                  </div>
+                  <Progress 
+                    value={responseSLA?.percentLeft || 0} 
+                    className="h-2" 
+                    indicatorClassName={getSLAIndicatorColor(responseSLA?.percentLeft || 0)} 
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {responseSLA?.timeLeft === 'Completed' 
+                      ? 'First response completed' 
+                      : `${responseSLA?.percentLeft}% time remaining`}
+                  </p>
+                </div>
                 
-                {securityCase.status !== 'Resolved' && (
-                  <div className="text-sm text-muted-foreground flex items-center mt-2">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {securityCase.firstResponseAt ? (
-                      <span>First response in {formatDate(securityCase.firstResponseAt)}</span>
-                    ) : (
-                      <span>Awaiting first response</span>
-                    )}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium">Resolution SLA</span>
+                    <span className="text-sm">
+                      {resolutionSLA?.targetHours} hours target
+                    </span>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Assignee Card */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Assignment</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {securityCase.assignedTo ? (
-                <div className="flex items-center space-x-2">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                    {getUserNameById(securityCase.assignedTo).charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-medium">{getUserNameById(securityCase.assignedTo)}</p>
-                    <p className="text-sm text-muted-foreground">Security analyst</p>
-                  </div>
+                  <Progress 
+                    value={resolutionSLA?.percentLeft || 0} 
+                    className="h-2" 
+                    indicatorClassName={getSLAIndicatorColor(resolutionSLA?.percentLeft || 0)} 
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {resolutionSLA?.timeLeft === 'Completed' 
+                      ? 'Case resolved' 
+                      : resolutionSLA?.isBreached 
+                        ? 'SLA breached' 
+                        : `${resolutionSLA?.percentLeft}% time remaining`}
+                  </p>
                 </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Unassigned</span>
-                  <Button variant="outline" size="sm">Assign</Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Activity Timeline Card */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Activity Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {securityCase.audit && securityCase.audit.length > 0 ? (
-                  <div className="space-y-3">
-                    {securityCase.audit.map((entry, index) => (
-                      <div key={index} className="border-l-2 border-muted pl-4 pb-3">
-                        <div className="text-sm font-medium capitalize">{entry.action || "Update"}</div>
-                        <div className="text-sm">{entry.message}</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {formatDate(entry.timestamp)} by {entry.userName || getUserNameById(entry.performedBy || "")}
-                        </div>
-                      </div>
-                    ))}
+            {/* Assignee Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Assignment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {securityCase.assignedTo ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                      {getUserNameById(securityCase.assignedTo).charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium">{getUserNameById(securityCase.assignedTo)}</p>
+                      <p className="text-sm text-muted-foreground">Security analyst</p>
+                    </div>
                   </div>
                 ) : (
-                  <div className="text-center py-4 text-muted-foreground">
-                    <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No activity recorded yet</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Unassigned</span>
+                    <Button variant="outline" size="sm">Assign</Button>
                   </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* People involved */}
-          <Card className="shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">People Involved</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="text-sm text-muted-foreground">Reported by</div>
-                    <div className="font-medium">{getUserNameById(securityCase.reportedBy)}</div>
+            {/* Related Knowledge */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Related Knowledge</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 border rounded-md hover:bg-accent transition-colors cursor-pointer">
+                    <h4 className="font-medium">Data Breach Response Protocol</h4>
+                    <p className="text-sm text-muted-foreground">Standard procedures for containing and remediation</p>
                   </div>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <div className="p-3 border rounded-md hover:bg-accent transition-colors cursor-pointer">
+                    <h4 className="font-medium">API Security Guidelines</h4>
+                    <p className="text-sm text-muted-foreground">Best practices for securing API endpoints</p>
+                  </div>
                 </div>
-                <Separator />
-                {securityCase.assignedTo && (
-                  <>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="text-sm text-muted-foreground">Assigned to</div>
-                        <div className="font-medium">{getUserNameById(securityCase.assignedTo)}</div>
-                      </div>
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <Separator />
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Similar Security Cases */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Similar Security Cases</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 border rounded-md hover:bg-accent transition-colors cursor-pointer">
+                    <h4 className="font-medium">SEC00042: Customer API data exposure</h4>
+                    <p className="text-sm text-muted-foreground">Resolved on Jan 15, 2023</p>
+                  </div>
+                  <div className="p-3 border rounded-md hover:bg-accent transition-colors cursor-pointer">
+                    <h4 className="font-medium">SEC00078: API gateway misconfiguration</h4>
+                    <p className="text-sm text-muted-foreground">Resolved on Mar 22, 2023</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Communication Section */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Communication</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  placeholder="Add a comment or update..."
+                  className="min-h-[100px] mb-3"
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                />
+                <Button onClick={handleAddNote}>Add Comment</Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      </Tabs>
 
       {/* Add Note Dialog */}
       <Dialog open={addNoteDialogOpen} onOpenChange={closeAddNoteDialog}>
@@ -542,6 +738,29 @@ const SecurityCaseDetailPage = () => {
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <Button onClick={handleAddNote}>Add Note</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Investigation Step Dialog */}
+      <Dialog open={addStepDialogOpen} onOpenChange={closeAddStepDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Investigation Step</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Textarea
+              placeholder="Describe the investigation step..."
+              value={stepText}
+              onChange={(e) => setStepText(e.target.value)}
+              className="min-h-[120px]"
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleAddStep}>Add Step</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

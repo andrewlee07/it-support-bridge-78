@@ -189,6 +189,45 @@ export function useSecurityCaseDetail(securityCaseId: string) {
     }
   };
 
+  // Add investigation step
+  const addInvestigationStep = async (stepText: string) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Update local state
+      setSecurityCase(prev => {
+        if (!prev) return null;
+        
+        const newStep = {
+          date: new Date().toISOString(),
+          text: stepText
+        };
+        
+        // Add audit entry for the step
+        const updatedAudit = [...(prev.audit || []), {
+          timestamp: new Date().toISOString(),
+          performedBy: 'current-user', // This would be the current user ID in a real app
+          action: 'updated',
+          message: 'Investigation step added'
+        }];
+        
+        return {
+          ...prev,
+          investigationSteps: [...(prev.investigationSteps || []), newStep],
+          lastUpdatedAt: new Date().toISOString(),
+          audit: updatedAudit
+        };
+      });
+      
+      return true;
+    } catch (err) {
+      console.error('Error adding investigation step:', err);
+      toast.error('Failed to add investigation step');
+      return false;
+    }
+  };
+
   // Resolve the security case
   const resolveSecurityCase = async (resolutionNotes: string) => {
     try {
@@ -389,6 +428,7 @@ export function useSecurityCaseDetail(securityCaseId: string) {
     error,
     updateSecurityCase,
     addNote,
+    addInvestigationStep,
     resolveSecurityCase,
     reopenSecurityCase,
     assignSecurityCase,
