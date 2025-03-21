@@ -11,8 +11,11 @@ import {
 import { Problem } from '@/utils/types/problem';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
-import { Paperclip, Database, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Paperclip, Database, Clock, Edit, Eye, MoreHorizontal } from 'lucide-react';
+import WatchButton from '@/components/shared/WatchButton';
 
 interface ProblemTableProps {
   problems: Problem[];
@@ -46,6 +49,17 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ problems, onProblemClick })
     return status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
+  const handleViewProblem = (e: React.MouseEvent, problemId: string) => {
+    e.stopPropagation();
+    onProblemClick(problemId);
+  };
+
+  const handleEditProblem = (e: React.MouseEvent, problemId: string) => {
+    e.stopPropagation();
+    console.log('Edit problem:', problemId);
+    // Implement edit functionality
+  };
+
   return (
     <div className="border rounded-md overflow-hidden">
       <Table>
@@ -57,16 +71,24 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ problems, onProblemClick })
             <TableHead>Priority</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Related</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {problems.map((problem) => (
             <TableRow 
               key={problem.id}
-              className="cursor-pointer hover:bg-muted"
-              onClick={() => onProblemClick(problem.id)}
+              className="hover:bg-muted"
             >
-              <TableCell className="font-mono text-xs">{problem.id}</TableCell>
+              <TableCell className="font-mono text-xs">
+                <Button
+                  variant="link"
+                  className="p-0 h-auto font-medium"
+                  onClick={(e) => handleViewProblem(e, problem.id)}
+                >
+                  {problem.id}
+                </Button>
+              </TableCell>
               <TableCell>
                 <div className="font-medium">{problem.title}</div>
                 <div className="text-xs text-muted-foreground line-clamp-1">{problem.description}</div>
@@ -104,6 +126,81 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ problems, onProblemClick })
                     <Paperclip size={14} /> {problem.relatedIncidents.length}
                   </span>
                 )}
+              </TableCell>
+              <TableCell>
+                <div className="flex justify-end space-x-1">
+                  <WatchButton 
+                    item={{
+                      id: problem.id,
+                      type: 'problem',
+                      title: problem.title,
+                      status: problem.status,
+                      createdAt: new Date(problem.createdAt)
+                    }}
+                    variant="ghost"
+                    size="icon"
+                  />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => handleViewProblem(e, problem.id)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => handleEditProblem(e, problem.id)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Edit</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
+                  <DropdownMenu>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>More Options</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Assign User</DropdownMenuItem>
+                      <DropdownMenuItem>Change Status</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-destructive">
+                        Mark as Duplicate
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </TableCell>
             </TableRow>
           ))}

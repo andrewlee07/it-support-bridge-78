@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
 import { Button } from '@/components/ui/button';
-import { Plus, Database, X } from 'lucide-react';
+import { Plus, Database, X, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import ProblemList from '@/components/problems/ProblemList';
 import ProblemForm from '@/components/problems/ProblemForm';
 import KnownErrorDatabase from '@/components/problems/KnownErrorDatabase';
 import { Card } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const ProblemManagement = () => {
   const [activeTab, setActiveTab] = useState('problems');
@@ -19,6 +20,10 @@ const ProblemManagement = () => {
     console.log('Submitting problem:', data);
     setShowForm(false);
     toast.success('Problem record created successfully!');
+  };
+  
+  const handleExport = (type: 'csv' | 'pdf') => {
+    toast.success(`Exporting problems as ${type.toUpperCase()}`);
   };
   
   return (
@@ -32,21 +37,43 @@ const ProblemManagement = () => {
             </p>
           </div>
           
-          {activeTab === 'problems' && (
-            <Button className="shrink-0 flex items-center" onClick={() => setShowForm(!showForm)}>
-              {showForm ? (
-                <>
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Problem
-                </>
-              )}
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExport('csv')}>
+                  Export to CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                  Export to PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            {activeTab === 'problems' && (
+              <Button 
+                className="shrink-0 flex items-center" 
+                onClick={() => setShowForm(!showForm)}
+              >
+                {showForm ? (
+                  <>
+                    <X className="mr-2 h-4 w-4" />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Problem
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
         
         {showForm ? (
