@@ -1,4 +1,3 @@
-
 import React from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,6 @@ import {
   Sliders, ArrowUpDown, LibraryIcon, Bell, LayoutDashboard, ExternalLink,
   Brain, Users, // Added Users icon for Groups & Queues
   InboxIcon, // Added InboxIcon for Queue Configuration
-  Shield, // Added for IT Security Configuration
 } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -67,12 +65,6 @@ const AdminSettings = () => {
       description: 'Configure test management settings, workflows, and mandatory fields',
       icon: <FlaskConical className="h-8 w-8 text-primary/80" />,
       path: '/admin/test-configuration'
-    },
-    {
-      title: 'IT Security Configuration',
-      description: 'Configure IT security case management, SLAs, and mandatory fields',
-      icon: <Shield className="h-8 w-8 text-primary/80" />,
-      path: '/admin/security-case-configuration'
     },
     {
       title: 'Groups & Queues',

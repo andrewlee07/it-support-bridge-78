@@ -1,50 +1,79 @@
 
 import React from 'react';
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage
+} from '@/components/ui/form';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { UseFormReturn } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { SLA } from '@/utils/types/sla';
 
 interface TicketTypeSectionProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<Partial<SLA>>;
 }
 
 const TicketTypeSection: React.FC<TicketTypeSectionProps> = ({ form }) => {
   return (
-    <div className="space-y-4 border rounded-md p-4">
-      <h3 className="text-lg font-medium">Apply To</h3>
-      
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
       <FormField
         control={form.control}
         name="ticketType"
+        rules={{ required: 'Ticket type is required' }}
         render={({ field }) => (
-          <FormItem className="space-y-3">
+          <FormItem>
             <FormLabel>Ticket Type</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                className="flex flex-col space-y-1"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="incident" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Incident</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="service" />
-                  </FormControl>
-                  <FormLabel className="font-normal">Service Request</FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="security-case" />
-                  </FormControl>
-                  <FormLabel className="font-normal">IT Security Case</FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a ticket type" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="incident">Incident</SelectItem>
+                <SelectItem value="service">Service Request</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormDescription>
+              The type of ticket this SLA applies to
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="priorityLevel"
+        rules={{ required: 'Priority is required' }}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Priority Level</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a priority" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="P1">P1 - Critical</SelectItem>
+                <SelectItem value="P2">P2 - High</SelectItem>
+                <SelectItem value="P3">P3 - Medium</SelectItem>
+                <SelectItem value="P4">P4 - Low</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormDescription>
+              The priority level this SLA applies to
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}

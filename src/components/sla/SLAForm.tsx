@@ -12,7 +12,7 @@ export interface SLAFormProps {
   defaultValues?: SLA;
   onSubmit: (data: Partial<SLA>) => void;
   onCancel: () => void;
-  entityType?: 'incident' | 'service-request' | 'security-case';
+  entityType?: 'incident' | 'service-request';
 }
 
 const SLAForm: React.FC<SLAFormProps> = ({ 
@@ -23,9 +23,7 @@ const SLAForm: React.FC<SLAFormProps> = ({
 }) => {
   // Initialize form values based on entityType if provided
   const formDefaultValues = defaultValues ? defaultValues : {
-    ...(entityType === 'service-request' ? { ticketType: 'service' } : 
-        entityType === 'security-case' ? { ticketType: 'security-case' } : 
-        { ticketType: 'incident' })
+    ...(entityType === 'service-request' ? { ticketType: 'service' } : { ticketType: 'incident' })
   } as Partial<SLA>;
 
   const { form, isEditing, handleSubmit } = useSLAForm({

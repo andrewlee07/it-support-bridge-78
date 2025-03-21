@@ -11,7 +11,6 @@ import BugConfiguration from '@/pages/admin/BugConfiguration';
 import ReleaseConfiguration from '@/pages/admin/ReleaseConfiguration';
 import TestConfiguration from '@/pages/admin/TestConfiguration';
 import StatusSynchronizationConfig from '@/pages/admin/StatusSynchronizationConfig';
-import SecurityCaseConfiguration from '@/pages/admin/SecurityCaseConfiguration';
 
 export const adminRoutes = [
   {
@@ -57,9 +56,5 @@ export const adminRoutes = [
   {
     path: '/admin/status-synchronization',
     element: <StatusSynchronizationConfig />,
-  },
-  {
-    path: '/admin/security-case-configuration',
-    element: <SecurityCaseConfiguration />,
   }
 ];

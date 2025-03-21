@@ -189,54 +189,6 @@ export const mockDropdownConfigurations: ConfigurableDropdown[] = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-  
-  // IT Security Case configurations
-  {
-    id: 'dropdown-security-type',
-    entityType: 'security-case',
-    fieldName: 'type',
-    displayName: 'Security Case Type',
-    options: [
-      { id: 'sec-typ-1', label: 'Data Breach', value: 'data-breach', isActive: true, sortOrder: 1 },
-      { id: 'sec-typ-2', label: 'SAR', value: 'sar', isActive: true, sortOrder: 2 },
-      { id: 'sec-typ-3', label: 'Compliance', value: 'compliance', isActive: true, sortOrder: 3 },
-      { id: 'sec-typ-4', label: 'Threat', value: 'threat', isActive: true, sortOrder: 4 },
-    ],
-    isRequired: true,
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: 'dropdown-security-status',
-    entityType: 'security-case',
-    fieldName: 'status',
-    displayName: 'Security Case Status',
-    options: [
-      { id: 'sec-sts-1', label: 'Active', value: 'active', isActive: true, sortOrder: 1 },
-      { id: 'sec-sts-2', label: 'Pending', value: 'pending', isActive: true, sortOrder: 2 },
-      { id: 'sec-sts-3', label: 'Resolved', value: 'resolved', isActive: true, sortOrder: 3 },
-    ],
-    isRequired: true,
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: 'dropdown-security-priority',
-    entityType: 'security-case',
-    fieldName: 'priority',
-    displayName: 'Security Case Priority',
-    options: [
-      { id: 'sec-pri-1', label: 'Low', value: 'low', isActive: true, sortOrder: 1 },
-      { id: 'sec-pri-2', label: 'Medium', value: 'medium', isActive: true, sortOrder: 2 },
-      { id: 'sec-pri-3', label: 'High', value: 'high', isActive: true, sortOrder: 3 },
-    ],
-    isRequired: true,
-    isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
 ];
 
 // In-memory storage for dropdown configurations
