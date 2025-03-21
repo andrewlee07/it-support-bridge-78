@@ -11,12 +11,14 @@ import {
   Box,
   Calendar,
   BookOpen,
-  CheckSquare
+  CheckSquare,
+  Shield
 } from 'lucide-react';
 
 interface NotificationCategoriesSectionProps {
   categories: {
     incidents: boolean;
+    security: boolean;
     bugs: boolean;
     testCases: boolean;
     backlogItems: boolean;
@@ -45,6 +47,17 @@ const NotificationCategoriesSection: React.FC<NotificationCategoriesSectionProps
         <Switch 
           checked={categories.incidents} 
           onCheckedChange={(checked) => onToggle('categories', 'incidents')}
+        />
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Shield className="h-5 w-5 text-blue-500" />
+          <Label>Security</Label>
+        </div>
+        <Switch 
+          checked={categories.security} 
+          onCheckedChange={(checked) => onToggle('categories', 'security')}
         />
       </div>
       

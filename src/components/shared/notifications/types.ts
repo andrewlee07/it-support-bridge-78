@@ -3,7 +3,7 @@ export interface SearchResult {
   id: string;
   title: string;
   description?: string;
-  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'task';
+  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'task' | 'security';
   url: string;
   status?: string;
   priority?: string;
@@ -17,6 +17,7 @@ export interface GlobalSearchProps {
 export interface NotificationSettings {
   categories: {
     incidents: boolean;
+    security: boolean;
     bugs: boolean;
     testCases: boolean;
     backlogItems: boolean;
@@ -42,7 +43,7 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'knowledge' | 'task';
+  type: 'incident' | 'bug' | 'testCase' | 'backlogItem' | 'release' | 'asset' | 'change' | 'knowledge' | 'task' | 'security';
   priority?: 'critical' | 'high' | 'medium' | 'low';
   date: Date;
   read: boolean;

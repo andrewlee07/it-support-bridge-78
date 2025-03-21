@@ -32,6 +32,24 @@ export const EVENT_TO_NOTIFICATION_TYPE: Partial<Record<EventType, Notification[
   'incident.escalated.critical': 'incident',
   'incident.escalated.high': 'incident',
   
+  // Security case events
+  'security.created': 'incident',
+  'security.updated': 'incident',
+  'security.assigned': 'incident',
+  'security.resolved': 'incident',
+  'security.resolved.success': 'incident',
+  'security.resolved.partial': 'incident',
+  'security.closed': 'incident',
+  'security.reopened': 'incident',
+  'security.created.high': 'incident',
+  'security.created.medium': 'incident',
+  'security.created.low': 'incident',
+  'security.escalated': 'incident',
+  'security.escalated.critical': 'incident',
+  'security.investigation.updated': 'incident',
+  'security.breach.detected': 'incident',
+  'security.compliance.issue': 'incident',
+  
   // Service request specific events
   'service.created': 'task',
   'service.created.high': 'task',

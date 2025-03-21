@@ -31,6 +31,25 @@ export const EVENT_TITLE_MAP: Partial<Record<EventType, string>> = {
   'incident.resolved.success': 'Incident successfully resolved',
   'incident.resolved.partial': 'Incident partially resolved',
   
+  // Security case events
+  'security.created': 'New security case created',
+  'security.updated': 'Security case updated',
+  'security.assigned': 'Security case assigned',
+  'security.resolved': 'Security case resolved',
+  'security.closed': 'Security case closed',
+  'security.reopened': 'Security case reopened',
+  'security.created.high': 'High priority security case created',
+  'security.created.medium': 'Medium priority security case created',
+  'security.created.low': 'Low priority security case created',
+  'security.escalated': 'Security case escalated',
+  'security.escalated.critical': 'Security case escalated to critical',
+  'security.updated.critical': 'Critical security case updated',
+  'security.investigation.updated': 'Security investigation updated',
+  'security.breach.detected': 'Data breach detected',
+  'security.compliance.issue': 'Compliance issue detected',
+  'security.resolved.success': 'Security case successfully resolved',
+  'security.resolved.partial': 'Security case partially resolved',
+  
   // Service request specific events
   'service.created': 'New service request created',
   'service.updated': 'Service request updated',

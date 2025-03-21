@@ -1,4 +1,3 @@
-
 import { EventType } from '@/utils/types/eventBus';
 
 /**
@@ -19,6 +18,18 @@ export const categoryToEventTypes: Record<string, EventType[]> = {
     'problem.workaroundAvailable',
     'problem.resolved',
     'problem.closed'
+  ],
+  security: [
+    'security.created',
+    'security.updated',
+    'security.assigned',
+    'security.resolved',
+    'security.closed',
+    'security.reopened',
+    'security.escalated',
+    'security.investigation.updated',
+    'security.breach.detected',
+    'security.compliance.issue'
   ],
   bugs: [
     'test.failed', 
@@ -96,6 +107,7 @@ export const categoryToEventTypes: Record<string, EventType[]> = {
 export const defaultSettings = {
   categories: {
     incidents: true,
+    security: true,
     bugs: true,
     testCases: true,
     backlogItems: true,
@@ -116,4 +128,3 @@ export const defaultSettings = {
     low: true
   }
 };
-

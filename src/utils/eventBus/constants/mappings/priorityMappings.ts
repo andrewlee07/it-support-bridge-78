@@ -32,6 +32,25 @@ export const EVENT_TO_PRIORITY: Partial<Record<EventType, Notification['priority
   'incident.escalated.critical': 'critical',
   'incident.escalated.high': 'high',
   
+  // Security case events
+  'security.created': 'high',
+  'security.updated': 'medium',
+  'security.updated.critical': 'high',
+  'security.assigned': 'high',
+  'security.resolved': 'medium',
+  'security.resolved.success': 'medium',
+  'security.resolved.partial': 'high',
+  'security.closed': 'medium',
+  'security.reopened': 'high',
+  'security.created.high': 'critical',
+  'security.created.medium': 'high',
+  'security.created.low': 'medium',
+  'security.escalated': 'critical',
+  'security.escalated.critical': 'critical',
+  'security.investigation.updated': 'high',
+  'security.breach.detected': 'critical',
+  'security.compliance.issue': 'high',
+  
   // Service request specific events
   'service.created': 'medium',
   'service.created.high': 'high',
