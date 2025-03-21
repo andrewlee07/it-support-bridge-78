@@ -20,7 +20,9 @@ const mockProblems: Problem[] = [
     assignedTo: 'user2',
     relatedIncidents: ['INC001234', 'INC001235', 'INC001236'],
     knownErrorId: null,
-    serviceIds: ['SVC001', 'SVC002'],
+    associatedServices: ['SVC001', 'SVC002'],
+    updatedAt: new Date(Date.now() - 300000),
+    category: 'network',
     audit: [
       {
         id: uuidv4(),
@@ -51,7 +53,9 @@ const mockProblems: Problem[] = [
     assignedTo: 'user4',
     relatedIncidents: ['INC001237', 'INC001238'],
     knownErrorId: null,
-    serviceIds: ['SVC003'],
+    associatedServices: ['SVC003'],
+    updatedAt: new Date(Date.now() - 43200000),
+    category: 'software',
     audit: [
       {
         id: uuidv4(),
@@ -82,7 +86,9 @@ const mockProblems: Problem[] = [
     assignedTo: 'user2',
     relatedIncidents: ['INC001239'],
     knownErrorId: 'KE00123',
-    serviceIds: ['SVC004'],
+    associatedServices: ['SVC004'],
+    updatedAt: new Date(Date.now() - 86400000),
+    category: 'network',
     audit: [
       {
         id: uuidv4(),
@@ -113,7 +119,9 @@ const mockProblems: Problem[] = [
     assignedTo: null,
     relatedIncidents: ['INC001240', 'INC001241', 'INC001242', 'INC001243'],
     knownErrorId: null,
-    serviceIds: ['SVC005', 'SVC006'],
+    associatedServices: ['SVC005', 'SVC006'],
+    updatedAt: new Date(Date.now() - 259200000),
+    category: 'software',
     audit: [
       {
         id: uuidv4(),
@@ -136,7 +144,9 @@ const mockProblems: Problem[] = [
     assignedTo: 'user5',
     relatedIncidents: ['INC001244', 'INC001245'],
     knownErrorId: null,
-    serviceIds: ['SVC007'],
+    associatedServices: ['SVC007'],
+    updatedAt: new Date(Date.now() - 86400000),
+    category: 'software',
     audit: [
       {
         id: uuidv4(),
@@ -176,7 +186,9 @@ const mockProblems: Problem[] = [
     assignedTo: 'user1',
     relatedIncidents: ['INC001246'],
     knownErrorId: null,
-    serviceIds: ['SVC008'],
+    associatedServices: ['SVC008'],
+    updatedAt: new Date(Date.now() - 345600000),
+    category: 'software',
     audit: [
       {
         id: uuidv4(),
