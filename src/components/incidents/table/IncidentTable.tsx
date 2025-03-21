@@ -33,7 +33,7 @@ interface IncidentTableProps {
   getStatusColor: (status: string) => string;
   getTypeColor: (type: string) => string;
   getPriorityColor: (priority: string) => string;
-  getPriorityIcon: (priority: string) => React.ReactNode;
+  getPriorityIcon: (priority: string) => { icon: any, className: string } | null;
   formatDate: (dateString: string) => string;
   getTimeDifference: (dateString: string) => string;
   handleViewTicket: (ticket: any) => void;
@@ -72,6 +72,15 @@ const IncidentTable: React.FC<IncidentTableProps> = ({
       return <span className="ml-1">{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>;
     }
     return <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />;
+  };
+
+  // Helper function to render the priority icon
+  const renderPriorityIcon = (priority: string) => {
+    const iconData = getPriorityIcon(priority);
+    if (!iconData) return null;
+    
+    const IconComponent = iconData.icon;
+    return <IconComponent className={iconData.className} />;
   };
 
   return (
@@ -301,7 +310,7 @@ const IncidentTable: React.FC<IncidentTableProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center">
-                    {getPriorityIcon(ticket.priority)}
+                    {renderPriorityIcon(ticket.priority)}
                     <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
                       {ticket.priority}
                     </Badge>

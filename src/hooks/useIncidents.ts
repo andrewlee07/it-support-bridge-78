@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useMemo } from 'react';
 import { DateRange } from 'react-day-picker';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -265,15 +264,15 @@ export const useIncidents = () => {
     }
   }, []);
 
-  // Get icon for ticket priority
+  // Get icon for ticket priority - Instead of JSX, return icon type/name
   const getPriorityIcon = useCallback((priority: string) => {
     switch (priority) {
       case 'P1':
-        return <AlertCircle className="h-4 w-4 text-red-600 mr-1" />;
+        return { icon: AlertCircle, className: "h-4 w-4 text-red-600 mr-1" };
       case 'P2':
-        return <Bell className="h-4 w-4 text-orange-600 mr-1" />;
+        return { icon: Bell, className: "h-4 w-4 text-orange-600 mr-1" };
       case 'P3':
-        return <AlertTriangle className="h-4 w-4 text-yellow-600 mr-1" />;
+        return { icon: AlertTriangle, className: "h-4 w-4 text-yellow-600 mr-1" };
       default:
         return null;
     }
