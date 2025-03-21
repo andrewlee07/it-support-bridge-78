@@ -27,7 +27,7 @@ const ChangesHeader: React.FC<ChangesHeaderProps> = ({ onCreateNew }) => {
           variant="outline"
           size="default"
           onClick={handleExport}
-          className="bg-background hover:bg-muted"
+          className="bg-secondary/50 border border-border/20 hover:bg-muted"
         >
           <Download className="h-4 w-4 mr-2" />
           Export

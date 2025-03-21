@@ -35,20 +35,22 @@ const Releases = () => {
     }
   };
 
-  // Fix TypeScript errors by ensuring correct types
+  // Type-safe version of status filter change handler
   const handleStatusFilterChange = (value: string[]) => {
     if (releases.setStatusFilter) {
-      releases.setStatusFilter(value);
+      // Convert string[] to ReleaseStatus or undefined
+      const statusFilter = value.length > 0 ? value[0] as any : undefined;
+      releases.setStatusFilter(statusFilter);
     }
   };
 
-  // Ensure metrics data matches the expected format
-  const metricsData = releases.metricsData ? {
-    planned: releases.metricsData.planned || 0,
-    inProgress: releases.metricsData.inProgress || 0,
-    deployed: releases.metricsData.deployed || 0,
-    cancelled: releases.metricsData.cancelled || 0
-  } : { planned: 0, inProgress: 0, deployed: 0, cancelled: 0 };
+  // Create metrics data in the expected format for the ReleaseMetrics component
+  const metricsData = {
+    planned: releases.metricsData?.statusCounts?.Planned || 0,
+    inProgress: releases.metricsData?.statusCounts?.['In Progress'] || 0,
+    deployed: releases.metricsData?.statusCounts?.Deployed || 0,
+    cancelled: releases.metricsData?.statusCounts?.Cancelled || 0
+  };
 
   return (
     <PageTransition>
@@ -59,7 +61,7 @@ const Releases = () => {
           onTabChange={releases.handleTabChange}
           activeTab={releases.activeTab}
           onStatusFilterChange={handleStatusFilterChange}
-          statusFilter={releases.statusFilter}
+          statusFilter={releases.statusFilter ? [releases.statusFilter] : []}
           totalCount={releases.releasesData?.length || 0}
         />
         
@@ -73,9 +75,9 @@ const Releases = () => {
         <Tabs 
           defaultValue="all" 
           onValueChange={(value) => releases.handleTabChange?.(value)}
-          className="bg-background p-1 rounded-lg"
+          className="bg-secondary/50 border border-border/20 p-1 rounded-lg"
         >
-          <TabsList className="mb-4 bg-muted/20 p-1">
+          <TabsList className="mb-4 bg-background/10 p-1">
             <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">All Releases</TabsTrigger>
             <TabsTrigger value="planned" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Planned</TabsTrigger>
             <TabsTrigger value="in-progress" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">In Progress</TabsTrigger>
@@ -83,8 +85,8 @@ const Releases = () => {
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
-            <Card className="bg-background border-0 shadow-sm">
-              <CardHeader className="py-4 bg-background">
+            <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+              <CardHeader className="py-4 bg-secondary/50">
                 {/* Additional filters could go here */}
               </CardHeader>
               
@@ -107,7 +109,7 @@ const Releases = () => {
           
           {/* Other tabs with filtered data */}
           <TabsContent value="planned" className="space-y-4">
-            <Card className="bg-background border-0 shadow-sm">
+            <Card className="bg-secondary/50 border border-border/20 shadow-sm">
               <CardContent className="p-0">
                 <ReleasesList
                   releases={(releases.releasesData || []).filter(release => release.status === 'Planned')}
@@ -127,7 +129,7 @@ const Releases = () => {
           </TabsContent>
           
           <TabsContent value="in-progress" className="space-y-4">
-            <Card className="bg-background border-0 shadow-sm">
+            <Card className="bg-secondary/50 border border-border/20 shadow-sm">
               <CardContent className="p-0">
                 <ReleasesList
                   releases={(releases.releasesData || []).filter(release => release.status === 'In Progress')}
@@ -147,7 +149,7 @@ const Releases = () => {
           </TabsContent>
           
           <TabsContent value="deployed" className="space-y-4">
-            <Card className="bg-background border-0 shadow-sm">
+            <Card className="bg-secondary/50 border border-border/20 shadow-sm">
               <CardContent className="p-0">
                 <ReleasesList
                   releases={(releases.releasesData || []).filter(release => release.status === 'Deployed')}
