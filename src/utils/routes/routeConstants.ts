@@ -32,10 +32,11 @@ export const EDIT_SERVICE_REQUEST = (id: string) => `/service-requests/edit/${id
 
 // IT Security Management routes
 export const SECURITY = '/security';
-export const SECURITY_CASE_DETAIL = (id: string) => `/security/case/${id}`; // Updated path for consistency
+export const SECURITY_CASE_DETAIL = (id: string) => `/security/case/${id}`;
 export const NEW_SECURITY_CASE = '/security/create';
 export const EDIT_SECURITY_CASE = (id: string) => `/security/edit/${id}`;
-export const SECURITY_CASE_VIEW = (id: string) => `/security/view/${id}`;
+// Remove SECURITY_CASE_VIEW as it's duplicate and causing confusion
+// export const SECURITY_CASE_VIEW = (id: string) => `/security/view/${id}`;
 
 // Problem Management routes
 export const PROBLEMS = '/problems';

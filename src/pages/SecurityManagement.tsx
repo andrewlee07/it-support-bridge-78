@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,7 +11,7 @@ import SecurityCaseDetail from '@/components/security/SecurityCaseDetail';
 import { useAppNavigation } from '@/utils/routes/navigationUtils';
 
 const SecurityManagement = () => {
-  const navigate = useAppNavigation();
+  const navigation = useAppNavigation();
   const {
     // State
     searchQuery,
@@ -61,9 +62,9 @@ const SecurityManagement = () => {
   // Get the filtered cases
   const filteredCases = getFilteredCases();
 
-  // Navigate to case detail view - Updated for consistency with routes
+  // Navigate to case detail view
   const goToCaseDetailView = (caseId: string) => {
-    navigate.goToSecurityCaseDetail(caseId);
+    navigation.goToSecurityCaseDetail(caseId);
   };
 
   return (
@@ -139,7 +140,6 @@ const SecurityManagement = () => {
                 formatDate={formatDate}
                 getTimeDifference={getTimeDifference}
                 handleViewCase={(secCase) => {
-                  // Always navigate to the full page view
                   goToCaseDetailView(secCase.id);
                 }}
                 handleEditCase={handleEditCase}

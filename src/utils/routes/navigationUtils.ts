@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import * as ROUTES from './routeConstants';
 
@@ -40,7 +39,6 @@ export const useAppNavigation = () => {
     // IT Security Management
     goToSecurity: () => navigate(ROUTES.SECURITY),
     goToSecurityCaseDetail: (id: string) => navigate(ROUTES.SECURITY_CASE_DETAIL(id)),
-    goToSecurityCaseView: (id: string) => navigate(ROUTES.SECURITY_CASE_VIEW(id)), // Make sure this is consistent
     goToNewSecurityCase: () => navigate(ROUTES.NEW_SECURITY_CASE),
     goToEditSecurityCase: (id: string) => navigate(ROUTES.EDIT_SECURITY_CASE(id)),
     

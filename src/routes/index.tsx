@@ -5,6 +5,7 @@ import MainLayout from '@/layouts/MainLayout';
 import Login from '@/pages/Login';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ErrorPage from '@/pages/ErrorPage';
+import NotFound from '@/pages/NotFound';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './backlogRoutes';
@@ -44,7 +45,12 @@ const router = createBrowserRouter([
       ...userRoutes,
       ...adminRoutes,
       ...taskRoutes,
-      ...securityRoutes
+      ...securityRoutes,
+      // Catch-all route for pages that don't exist
+      {
+        path: '*',
+        element: <NotFound />
+      }
     ]
   }
 ]);
