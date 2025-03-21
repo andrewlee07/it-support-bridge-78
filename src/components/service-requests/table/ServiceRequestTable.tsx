@@ -10,8 +10,11 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, ExternalLink, Edit } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ChevronDown, ChevronUp, ExternalLink, Edit, MoreHorizontal, Eye } from 'lucide-react';
 import { Ticket } from '@/utils/types/ticket';
+import WatchButton from '@/components/shared/WatchButton';
 
 interface ServiceRequestTableProps {
   tickets: Ticket[];
@@ -142,7 +145,7 @@ const ServiceRequestTable: React.FC<ServiceRequestTableProps> = ({
                 </div>
               </TableHead>
               <TableHead
-                className="w-[150px] text-right"
+                className="w-[120px] text-right"
               >
                 Actions
               </TableHead>
@@ -193,24 +196,79 @@ const ServiceRequestTable: React.FC<ServiceRequestTableProps> = ({
                       {getTimeDifference(ticket.createdAt)}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
-                      <Button
+                  <TableCell>
+                    <div className="flex justify-end space-x-1">
+                      <WatchButton 
+                        item={{
+                          id: ticket.id,
+                          type: 'service',
+                          title: ticket.title,
+                          status: ticket.status,
+                          createdAt: new Date(ticket.createdAt)
+                        }}
                         variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewTicket(ticket)}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditTicket(ticket)}
-                      >
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
+                        size="icon"
+                      />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleViewTicket(ticket)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>View</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleEditTicket(ticket)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Edit</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      
+                      <DropdownMenu>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>More Options</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>Assign User</DropdownMenuItem>
+                          <DropdownMenuItem>Change Status</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive">
+                            Mark as Duplicate
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
