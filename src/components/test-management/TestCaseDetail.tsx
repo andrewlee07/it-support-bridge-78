@@ -45,6 +45,15 @@ const TestCaseDetail: React.FC<TestCaseDetailProps> = ({
     console.log('Backlog item linked, refreshing data');
   };
   
+  // Safely access execution history and issues count with fallbacks
+  const executionCount = Array.isArray(testCase.executionHistory) 
+    ? testCase.executionHistory.length 
+    : 0;
+    
+  const issuesCount = Array.isArray(testCase.linkedIssues) 
+    ? testCase.linkedIssues.length 
+    : 0;
+  
   return (
     <Card className="w-full">
       <CardHeader className="flex-row items-center justify-between">
@@ -81,8 +90,8 @@ const TestCaseDetail: React.FC<TestCaseDetailProps> = ({
           <TestCaseTabs 
             activeTab={activeTab} 
             setActiveTab={setActiveTab} 
-            executionCount={testCase.executionHistory?.length || 0}
-            issuesCount={testCase.linkedIssues?.length || 0}
+            executionCount={executionCount}
+            issuesCount={issuesCount}
           />
           
           <TabsContent value="details" className="m-0">

@@ -26,6 +26,9 @@ export interface TestCase {
   relatedBacklogItemIds?: string[]; // IDs of associated backlog items
   coverage?: TestCaseCoverage[];
   lastExecutionDate?: Date; // Added to support TestCoverageTab
+  // Add the missing properties used in TestCaseDetail
+  executionHistory?: TestExecution[]; // History of test executions
+  linkedIssues?: string[]; // IDs of linked issues/bugs
 }
 
 export interface TestCaseCoverage {
@@ -39,4 +42,14 @@ export interface TestCaseCoverage {
 export interface ExportableTestCase extends Omit<TestCase, 'createdAt' | 'updatedAt'> {
   createdAt: string;
   updatedAt: string;
+}
+
+// Added to support executionHistory property
+export interface TestExecution {
+  id: string;
+  testCaseId: string;
+  status: TestStatus;
+  executedBy: string;
+  executedAt: Date;
+  comments?: string;
 }
