@@ -141,14 +141,14 @@ const ProblemManagement = () => {
                   
                   <div className="flex items-center gap-2">
                     <Select 
-                      value={statusFilter || ''}
-                      onValueChange={(value) => setStatusFilter(value === '' ? null : value)}
+                      value={statusFilter || 'all'}
+                      onValueChange={(value) => setStatusFilter(value === 'all' ? null : value)}
                     >
                       <SelectTrigger className="bg-secondary/80">
                         <SelectValue placeholder="All Statuses" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Statuses</SelectItem>
+                        <SelectItem value="all">All Statuses</SelectItem>
                         <SelectItem value="new">New</SelectItem>
                         <SelectItem value="under-investigation">Under Investigation</SelectItem>
                         <SelectItem value="root-cause-identified">Root Cause Identified</SelectItem>
@@ -158,14 +158,14 @@ const ProblemManagement = () => {
                     </Select>
                     
                     <Select
-                      value={priorityFilter || ''}
-                      onValueChange={(value) => setPriorityFilter(value === '' ? null : value)}
+                      value={priorityFilter || 'all'}
+                      onValueChange={(value) => setPriorityFilter(value === 'all' ? null : value)}
                     >
                       <SelectTrigger className="bg-secondary/80">
                         <SelectValue placeholder="All Priorities" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Priorities</SelectItem>
+                        <SelectItem value="all">All Priorities</SelectItem>
                         <SelectItem value="P1">P1</SelectItem>
                         <SelectItem value="P2">P2</SelectItem>
                         <SelectItem value="P3">P3</SelectItem>
