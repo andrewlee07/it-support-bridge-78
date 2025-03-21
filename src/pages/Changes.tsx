@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +9,9 @@ import { useChangeRequests } from '@/hooks/useChangeRequests';
 import { useChangeRequestMutations } from '@/hooks/useChangeRequestMutations';
 import { useAppNavigation } from '@/utils/routes/navigationUtils';
 import { logRouteValidationResults, testAllDefinedRoutes } from '@/utils/testing/linkTesting';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import ChangesTable from '@/components/changes/ChangesTable';
 
 const Changes = () => {
   // In development mode, validate all routes on component mount
@@ -99,22 +101,46 @@ const Changes = () => {
         
         <ChangesSearch searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
-        <ChangeTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          changes={changes}
-          isLoading={isLoading}
-          isError={isError}
-          onApprove={handleApprove}
-          onReject={handleRejectClick}
-          onCreateNew={handleCreateNewRequest}
-          onViewChange={handleViewChange}
-          refetch={refetch}
-          userRole={user?.role}
-          searchQuery={searchQuery}
-          viewMode={viewMode}
-          onViewModeChange={handleViewModeChange}
-        />
+        <Tabs defaultValue="all">
+          <TabsList className="mb-4">
+            <TabsTrigger value="all">All Changes</TabsTrigger>
+            <TabsTrigger value="submitted">Submitted</TabsTrigger>
+            <TabsTrigger value="approved">Approved</TabsTrigger>
+            <TabsTrigger value="in-progress">In Progress</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all" className="space-y-4">
+            <Card>
+              <CardHeader className="py-4">
+                {/* Additional filters could go here */}
+              </CardHeader>
+              
+              <CardContent className="p-0">
+                <ChangesTable
+                  changes={changes}
+                  activeTab={activeTab}
+                  onApprove={handleApprove}
+                  onReject={handleRejectClick}
+                  onViewChange={handleViewChange}
+                  userRole={user?.role}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Other tabs content would follow the same pattern */}
+          <TabsContent value="submitted" className="space-y-4">
+            {/* Similar content as 'all' tab but filtered */}
+          </TabsContent>
+          
+          <TabsContent value="approved" className="space-y-4">
+            {/* Similar content as 'all' tab but filtered */}
+          </TabsContent>
+          
+          <TabsContent value="in-progress" className="space-y-4">
+            {/* Similar content as 'all' tab but filtered */}
+          </TabsContent>
+        </Tabs>
       </div>
 
       <RejectChangeDialog

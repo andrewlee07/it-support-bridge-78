@@ -1,4 +1,3 @@
-
 import React from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import ReleasesHeader from '@/components/releases/ReleasesHeader';

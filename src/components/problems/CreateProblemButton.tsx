@@ -4,12 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { getNextProblemId } from '@/utils/mockData/problems';
 
 const CreateProblemButton: React.FC = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    toast.info("Creating new problem");
+    toast.info("Creating new problem", {
+      description: `Problem ID: ${getNextProblemId()}`,
+      duration: 3000,
+    });
     navigate('/problems/new');
   };
 

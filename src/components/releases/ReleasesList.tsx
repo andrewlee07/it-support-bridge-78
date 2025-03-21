@@ -1,12 +1,11 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Calendar, Clock, FileText, Plus, Tag, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, Calendar, Clock, Eye, Check, X } from 'lucide-react';
 import { Release, ReleaseStatus } from '@/utils/types';
+import { format } from 'date-fns';
 
 interface ReleasesListProps {
   releases: Release[];
@@ -97,26 +96,11 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
 
   if (releases.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium">
-          {viewType === 'planned'
-            ? 'No planned releases'
-            : viewType === 'inProgress'
-            ? 'No releases in progress'
-            : viewType === 'deployed'
-            ? 'No deployed releases'
-            : 'No releases found'}
-        </h3>
-        <p className="text-muted-foreground mt-1">
-          {searchQuery
-            ? 'Try a different search query'
-            : 'Create your first release to get started'}
-        </p>
+      <div className="text-center py-10">
+        <p className="text-muted-foreground">No releases found.</p>
         {!searchQuery && (
           <Button className="mt-4" onClick={onCreateNew}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Release
+            Create New Release
           </Button>
         )}
       </div>
@@ -124,66 +108,87 @@ const ReleasesList: React.FC<ReleasesListProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      {releases.map((release) => (
-        <Card key={release.id} className="shadow-sm">
-          <CardHeader className="pb-2">
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-xl font-medium">{release.title}</CardTitle>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                  <span>{release.id}</span>
-                  <span className="mx-1">•</span>
-                  <Tag className="h-3.5 w-3.5" />
-                  <span>{release.version}</span>
-                </div>
-              </div>
-              <div className="flex gap-2">
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Version</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Planned Date</TableHead>
+            <TableHead>Owner</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {releases.map((release) => (
+            <TableRow 
+              key={release.id} 
+              className="cursor-pointer hover:bg-muted"
+              onClick={() => onViewRelease(release.id)}
+            >
+              <TableCell className="font-medium">{release.id}</TableCell>
+              <TableCell>{release.title}</TableCell>
+              <TableCell>{release.version}</TableCell>
+              <TableCell>
                 <Badge className={getStatusColor(release.status)}>
                   {release.status}
                 </Badge>
+              </TableCell>
+              <TableCell>
                 <Badge className={getTypeColor(release.type)}>
                   {release.type.charAt(0).toUpperCase() + release.type.slice(1)}
                 </Badge>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pb-2">
-            <p className="text-sm">{release.description}</p>
-            <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                <span>Planned: {formatDate(release.plannedDate)}</span>
-              </div>
-              <div className="flex items-center">
-                <User className="h-4 w-4 mr-1" />
-                <span>Owner: {release.owner}</span>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between pt-2 text-sm text-muted-foreground">
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-1" />
-              <span>Created: {formatDate(release.createdAt)}</span>
-            </div>
-            <div className="flex gap-2">
-              {release.approvalStatus === 'pending' && canApprove && (
-                <>
-                  <Button size="sm" variant="outline" onClick={() => onReject(release.id)}>
-                    Reject
+              </TableCell>
+              <TableCell>{formatDate(release.plannedDate)}</TableCell>
+              <TableCell>{release.owner}</TableCell>
+              <TableCell onClick={(e) => e.stopPropagation()}>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewRelease(release.id);
+                    }}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
                   </Button>
-                  <Button size="sm" onClick={() => onApprove(release.id)}>
-                    Approve
-                  </Button>
-                </>
-              )}
-              <Button size="sm" variant="outline" onClick={() => onViewRelease(release.id)}>
-                View
-              </Button>
-            </div>
-          </CardFooter>
-        </Card>
-      ))}
+                  
+                  {release.approvalStatus === 'pending' && canApprove && (
+                    <>
+                      <Button 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onApprove(release.id);
+                        }}
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        Approve
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onReject(release.id);
+                        }}
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Reject
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };

@@ -69,71 +69,86 @@ const ChangesTable: React.FC<ChangesTableProps> = ({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>ID</TableHead>
-          <TableHead>Title</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Risk</TableHead>
-          <TableHead>Created</TableHead>
-          <TableHead>Start Date</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {changes.map(change => (
-          <TableRow key={change.id}>
-            <TableCell className="font-medium">{change.id}</TableCell>
-            <TableCell>{change.title}</TableCell>
-            <TableCell>
-              <Badge className={getStatusColor(change.status)}>
-                {change.status.charAt(0).toUpperCase() + change.status.slice(1)}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <Badge className={getRiskLevelColor(change.riskLevel)}>
-                {change.riskLevel.charAt(0).toUpperCase() + change.riskLevel.slice(1)}
-              </Badge>
-            </TableCell>
-            <TableCell>{format(new Date(change.createdAt), 'MMM d, yyyy')}</TableCell>
-            <TableCell>{format(new Date(change.startDate), 'MMM d, yyyy')}</TableCell>
-            <TableCell>
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => onViewChange(change.id)}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
-                
-                {canApprove && change.status === 'submitted' && (
-                  <>
-                    <Button 
-                      size="sm"
-                      onClick={() => onApprove?.(change.id)}
-                    >
-                      <Check className="h-4 w-4 mr-1" />
-                      Approve
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={() => onReject?.(change.id)}
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Reject
-                    </Button>
-                  </>
-                )}
-              </div>
-            </TableCell>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Risk</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead>Start Date</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {changes.map(change => (
+            <TableRow 
+              key={change.id}
+              className="cursor-pointer hover:bg-muted"
+              onClick={() => onViewChange(change.id)}
+            >
+              <TableCell className="font-medium">{change.id}</TableCell>
+              <TableCell>{change.title}</TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(change.status)}>
+                  {change.status.charAt(0).toUpperCase() + change.status.slice(1)}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge className={getRiskLevelColor(change.riskLevel)}>
+                  {change.riskLevel.charAt(0).toUpperCase() + change.riskLevel.slice(1)}
+                </Badge>
+              </TableCell>
+              <TableCell>{format(new Date(change.createdAt), 'MMM d, yyyy')}</TableCell>
+              <TableCell>{format(new Date(change.startDate), 'MMM d, yyyy')}</TableCell>
+              <TableCell onClick={(e) => e.stopPropagation()}>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewChange(change.id);
+                    }}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                  
+                  {canApprove && change.status === 'submitted' && (
+                    <>
+                      <Button 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onApprove?.(change.id);
+                        }}
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        Approve
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onReject?.(change.id);
+                        }}
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Reject
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 
