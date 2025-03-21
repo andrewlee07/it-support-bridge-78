@@ -71,6 +71,15 @@ import {
   deleteBacklogItem
 } from './backlog';
 
+// Import problem management data
+import {
+  getAllProblems,
+  getProblemById,
+  createProblem,
+  updateProblem,
+  getAllKnownErrors
+} from './problems';
+
 // Export all mock data and helper functions
 export {
   // Users
@@ -151,5 +160,12 @@ export {
   getServiceCategoryById,
   getTeamById,
   getServicesByCategory,
-  mockServiceTicketCounts
+  mockServiceTicketCounts,
+  
+  // Problem Management
+  getAllProblems,
+  getProblemById,
+  createProblem,
+  updateProblem,
+  getAllKnownErrors
 };
