@@ -54,7 +54,6 @@ const SecurityCaseDetailPage = () => {
     loading, 
     error, 
     addNote, 
-    addInvestigationStep,
     updateSecurityCase, 
     resolveSecurityCase, 
     reopenSecurityCase, 
@@ -93,19 +92,6 @@ const SecurityCaseDetailPage = () => {
       toast.success('Note added successfully');
     }
   }, [addNote, closeAddNoteDialog, noteText]);
-
-  const handleAddInvestigationStep = useCallback(async () => {
-    if (!noteText.trim()) {
-      toast.error('Please enter an investigation step');
-      return;
-    }
-    
-    if (await addInvestigationStep(noteText)) {
-      setNoteText('');
-      closeAddNoteDialog();
-      toast.success('Investigation step added successfully');
-    }
-  }, [addInvestigationStep, closeAddNoteDialog, noteText]);
 
   const handleSystemClick = useCallback((system: string) => {
     toast.info(`Viewing details for ${system}`);
@@ -217,7 +203,7 @@ const SecurityCaseDetailPage = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 w-full">
+    <div className="container mx-auto px-4 py-6 w-full max-w-full">
       {/* Header with back button and actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center space-x-2">
@@ -274,7 +260,7 @@ const SecurityCaseDetailPage = () => {
             value="notes" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary pb-2 pt-2 px-4"
           >
-            Notes & Investigation
+            Notes
           </TabsTrigger>
           <TabsTrigger 
             value="affected-systems" 
@@ -413,7 +399,7 @@ const SecurityCaseDetailPage = () => {
             <TabsContent value="notes" className="mt-0 space-y-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-3">
-                  <CardTitle>Notes & Investigation</CardTitle>
+                  <CardTitle>Case Notes</CardTitle>
                   <div className="flex space-x-2">
                     <Button variant="outline" size="sm" onClick={openAddNoteDialog}>
                       <Plus className="h-4 w-4 mr-2" /> Add Note
@@ -421,50 +407,28 @@ const SecurityCaseDetailPage = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* Combined view of investigation steps and notes */}
-                  <div className="space-y-4">
-                    {/* Investigation Steps section */}
-                    {securityCase.investigationSteps && securityCase.investigationSteps.length > 0 && (
-                      <div className="mb-6">
-                        <h3 className="font-medium mb-3">Investigation Steps</h3>
-                        {securityCase.investigationSteps.map((step, index) => (
-                          <div key={`step-${index}`} className="border-l-2 border-blue-300 pl-4 pb-4 mb-3">
-                            <div className="flex justify-between mb-1">
-                              <strong className="text-sm font-medium">Investigation Step {index + 1}</strong>
-                              <span className="text-sm text-muted-foreground">{formatDate(step.date)}</span>
-                            </div>
-                            <p className="text-sm">{step.text}</p>
+                  {/* Case Notes section */}
+                  {securityCase.notes && securityCase.notes.length > 0 ? (
+                    <div className="space-y-4">
+                      {securityCase.notes.map((note) => (
+                        <div key={note.id} className="border-l-2 border-gray-300 pl-4 pb-4 mb-3">
+                          <div className="flex justify-between mb-1">
+                            <div className="font-medium">{getUserNameById(note.createdBy)}</div>
+                            <div className="text-sm text-muted-foreground">{formatDate(note.createdAt)}</div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* Case Notes section */}
-                    {securityCase.notes && securityCase.notes.length > 0 ? (
-                      <div>
-                        <h3 className="font-medium mb-3">Case Notes</h3>
-                        {securityCase.notes.map((note) => (
-                          <div key={note.id} className="border-l-2 border-gray-300 pl-4 pb-4 mb-3">
-                            <div className="flex justify-between mb-1">
-                              <div className="font-medium">{getUserNameById(note.createdBy)}</div>
-                              <div className="text-sm text-muted-foreground">{formatDate(note.createdAt)}</div>
-                            </div>
-                            <p className="text-sm">{note.text}</p>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      securityCase.investigationSteps.length === 0 && (
-                        <div className="text-center py-6 text-muted-foreground">
-                          <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                          <p>No notes or investigation steps have been added yet</p>
-                          <Button variant="outline" className="mt-4" onClick={openAddNoteDialog}>
-                            <Plus className="h-4 w-4 mr-2" /> Add First Note
-                          </Button>
+                          <p className="text-sm">{note.text}</p>
                         </div>
-                      )
-                    )}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No notes have been added yet</p>
+                      <Button variant="outline" className="mt-4" onClick={openAddNoteDialog}>
+                        <Plus className="h-4 w-4 mr-2" /> Add First Note
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -526,14 +490,17 @@ const SecurityCaseDetailPage = () => {
                           {securityCase.relatedTickets.map((ticketId, index) => (
                             <div 
                               key={index} 
-                              className="flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-muted/40 transition-colors"
-                              onClick={() => handleRelatedItemClick(ticketId)}
+                              className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/40 transition-colors"
                             >
                               <div className="flex items-center gap-2">
                                 <FileText className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-mono">{ticketId}</span>
+                                <Link 
+                                  to={`/tickets/${ticketId}`}
+                                  className="font-mono hover:underline text-blue-600"
+                                >
+                                  {ticketId}
+                                </Link>
                               </div>
-                              <ExternalLink className="h-4 w-4" />
                             </div>
                           ))}
                         </div>
@@ -551,14 +518,17 @@ const SecurityCaseDetailPage = () => {
                           {securityCase.relatedAssets.map((assetId, index) => (
                             <div 
                               key={index} 
-                              className="flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-muted/40 transition-colors"
-                              onClick={() => handleRelatedItemClick(assetId)}
+                              className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/40 transition-colors"
                             >
                               <div className="flex items-center gap-2">
                                 <Server className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-mono">{assetId}</span>
+                                <Link 
+                                  to={`/assets/${assetId}`}
+                                  className="font-mono hover:underline text-blue-600"
+                                >
+                                  {assetId}
+                                </Link>
                               </div>
-                              <ExternalLink className="h-4 w-4" />
                             </div>
                           ))}
                         </div>
@@ -686,7 +656,7 @@ const SecurityCaseDetailPage = () => {
         </div>
       </Tabs>
 
-      {/* Add Note/Investigation Step Dialog */}
+      {/* Add Note Dialog */}
       <Dialog open={addNoteDialogOpen} onOpenChange={closeAddNoteDialog}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -699,10 +669,6 @@ const SecurityCaseDetailPage = () => {
               onChange={(e) => setNoteText(e.target.value)}
               className="min-h-[120px]"
             />
-            <div className="flex items-center space-x-2">
-              <input type="checkbox" id="is-investigation-step" className="h-4 w-4" />
-              <label htmlFor="is-investigation-step" className="text-sm">Mark as investigation step</label>
-            </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
