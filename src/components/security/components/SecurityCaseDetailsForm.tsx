@@ -63,7 +63,6 @@ const SecurityCaseDetailsForm: React.FC<SecurityCaseDetailsFormProps> = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Case title"
-            className="bg-background"
           />
         </div>
 
@@ -74,7 +73,6 @@ const SecurityCaseDetailsForm: React.FC<SecurityCaseDetailsFormProps> = ({
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Case description"
             rows={3}
-            className="bg-background"
           />
         </div>
 
@@ -85,7 +83,6 @@ const SecurityCaseDetailsForm: React.FC<SecurityCaseDetailsFormProps> = ({
             onChange={(e) => setRemediationPlan(e.target.value)}
             placeholder="Remediation plan"
             rows={3}
-            className="bg-background"
           />
         </div>
       </CardContent>
