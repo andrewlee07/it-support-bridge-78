@@ -8,7 +8,7 @@ import { Bug } from '../types/test/bug';
 // Mock Bugs data
 export let bugs: Bug[] = [
   {
-    id: 'bug-1',
+    id: 'BUG00001',
     title: 'Login button not working',
     description: 'Login button is not responding when clicked',
     stepsToReproduce: ['Open login page', 'enter credentials', 'click login button'],
@@ -21,7 +21,7 @@ export let bugs: Bug[] = [
     updatedAt: new Date(),
   },
   {
-    id: 'bug-2',
+    id: 'BUG00002',
     title: 'Incorrect error message',
     description: 'Error message is not clear',
     stepsToReproduce: ['Attempt login with invalid credentials'],
@@ -33,9 +33,9 @@ export let bugs: Bug[] = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-  // Add BUG001 to match the URL in the screenshot
+  // Add BUG00003 to match the URL in the screenshot
   {
-    id: 'BUG001',
+    id: 'BUG00003',
     title: 'Navigation menu disappears on mobile',
     description: 'The navigation menu disappears when viewed on mobile devices',
     stepsToReproduce: ['Open the application on a mobile device', 'Observe the navigation menu', 'Notice it is not visible'],

@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { BacklogItem, BacklogItemAttachment, BacklogItemComment } from '@/utils/types/backlogTypes';
 import { mockReleases } from '@/utils/api/release/mockData';
@@ -72,7 +71,7 @@ export const backlogColorThemes = {
 // Mock Backlog Items data
 export let backlogItems: BacklogItem[] = [
   {
-    id: 'BLGI-1001',
+    id: 'BKL00001',
     title: 'Implement user authentication',
     description: 'Add login, registration, and password reset functionality',
     status: 'in-progress',
@@ -95,21 +94,21 @@ export let backlogItems: BacklogItem[] = [
     history: sampleHistoryEntries.slice(0, 2)
   },
   {
-    id: 'BLGI-1002',
+    id: 'BKL00002',
     title: 'Fix login button styling',
     description: 'The login button is misaligned on mobile devices',
     status: 'open',
     priority: 'medium',
     type: 'bug',
     creator: 'user-2',
-    relatedItemId: 'bug-1',
+    relatedItemId: 'BUG00001',
     relatedItemType: 'bug',
     storyPoints: 2,
     labels: ['ui', 'mobile'],
     createdAt: subDays(today, 28),
     updatedAt: subDays(today, 28),
     dueDate: addDays(today, 7),
-    dependsOn: ['BLGI-1001'],
+    dependsOn: ['BKL00001'],
     customColor: "",
     // Enhanced features
     attachments: [convertToBacklogItemAttachment(sampleAttachments[1])],
@@ -118,7 +117,7 @@ export let backlogItems: BacklogItem[] = [
     history: [sampleHistoryEntries[1]]
   },
   {
-    id: 'BLGI-1003',
+    id: 'BKL00003',
     title: 'Add pagination to user list',
     description: 'Implement pagination for the user management screen',
     status: 'open',
@@ -130,13 +129,13 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 20),
     updatedAt: subDays(today, 20),
     dueDate: addDays(today, 21),
-    dependsOn: ['BLGI-1001'],
+    dependsOn: ['BKL00001'],
     customColor: "",
     // Enhanced features
     watchers: ['user-1', 'user-2', 'user-3']
   },
   {
-    id: 'BLGI-1004',
+    id: 'BKL00004',
     title: 'Improve error handling in API',
     description: 'Implement consistent error responses across all API endpoints',
     status: 'open',
@@ -157,7 +156,7 @@ export let backlogItems: BacklogItem[] = [
   },
   // Adding more items with due dates to make the timeline more interesting
   {
-    id: 'BLGI-1005',
+    id: 'BKL00005',
     title: 'Implement dashboard analytics',
     description: 'Create analytics dashboard with charts and KPIs',
     status: 'in-progress',
@@ -170,11 +169,11 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 40),
     updatedAt: subDays(today, 5),
     dueDate: addDays(today, 10),
-    dependsOn: ['BLGI-1004'],
+    dependsOn: ['BKL00004'],
     customColor: "bg-teal-500",
   },
   {
-    id: 'BLGI-1006',
+    id: 'BKL00006',
     title: 'Optimize database queries',
     description: 'Improve performance of slow queries on the users table',
     status: 'ready',
@@ -191,7 +190,7 @@ export let backlogItems: BacklogItem[] = [
     customColor: "",
   },
   {
-    id: 'BLGI-1007',
+    id: 'BKL00007',
     title: 'Implement dark mode',
     description: 'Add support for dark mode throughout the application',
     status: 'completed',
@@ -208,7 +207,7 @@ export let backlogItems: BacklogItem[] = [
     customColor: "",
   },
   {
-    id: 'BLGI-1008',
+    id: 'BKL00008',
     title: 'Fix user profile photo upload',
     description: 'Photos are not being resized correctly when uploaded',
     status: 'blocked',
@@ -221,11 +220,11 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 10),
     updatedAt: subDays(today, 8),
     dueDate: addDays(today, 5),
-    dependsOn: ['BLGI-1002'],
+    dependsOn: ['BKL00002'],
     customColor: "bg-pink-500",
   },
   {
-    id: 'BLGI-1009',
+    id: 'BKL00009',
     title: 'Implement notification system',
     description: 'Create real-time notification system with websockets',
     status: 'in-progress',
@@ -238,11 +237,11 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 35),
     updatedAt: subDays(today, 15),
     dueDate: addDays(today, 25),
-    dependsOn: ['BLGI-1001', 'BLGI-1005'],
+    dependsOn: ['BKL00001', 'BKL00005'],
     customColor: "",
   },
   {
-    id: 'BLGI-1010',
+    id: 'BKL00010',
     title: 'Upgrade React version',
     description: 'Update React to the latest version and fix any compatibility issues',
     status: 'deferred',
@@ -258,7 +257,7 @@ export let backlogItems: BacklogItem[] = [
     customColor: "",
   },
   {
-    id: 'BLGI-1011',
+    id: 'BKL00011',
     title: 'Add export to CSV functionality',
     description: 'Allow users to export data tables to CSV format',
     status: 'ready',
@@ -275,7 +274,7 @@ export let backlogItems: BacklogItem[] = [
     customColor: "bg-indigo-400",
   },
   {
-    id: 'BLGI-1012',
+    id: 'BKL00012',
     title: 'Fix permission issues in admin panel',
     description: 'Some users with admin role cannot access certain settings',
     status: 'in-progress',
@@ -288,11 +287,11 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 5),
     updatedAt: subDays(today, 3),
     dueDate: addDays(today, 2),
-    dependsOn: ['BLGI-1001'],
+    dependsOn: ['BKL00001'],
     customColor: "",
   },
   {
-    id: 'BLGI-1013',
+    id: 'BKL00013',
     title: 'Implement multi-factor authentication',
     description: 'Add support for MFA using authenticator apps',
     status: 'open',
@@ -304,11 +303,11 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 12),
     updatedAt: subDays(today, 12),
     dueDate: addDays(today, 40),
-    dependsOn: ['BLGI-1001'],
+    dependsOn: ['BKL00001'],
     customColor: "",
   },
   {
-    id: 'BLGI-1014',
+    id: 'BKL00014',
     title: 'Create onboarding tutorial',
     description: 'Design and implement an interactive onboarding tutorial for new users',
     status: 'open',
@@ -324,7 +323,7 @@ export let backlogItems: BacklogItem[] = [
     customColor: "bg-emerald-500",
   },
   {
-    id: 'BLGI-1015',
+    id: 'BKL00015',
     title: 'Optimize image loading performance',
     description: 'Implement lazy loading and image optimization for better performance',
     status: 'ready',
@@ -337,12 +336,12 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 18),
     updatedAt: subDays(today, 7),
     dueDate: addDays(today, 15),
-    dependsOn: ['BLGI-1008'],
+    dependsOn: ['BKL00008'],
     customColor: "",
   },
   // Additional items for the timeline
   {
-    id: 'BLGI-1016',
+    id: 'BKL00016',
     title: 'Implement API rate limiting',
     description: 'Add rate limiting to prevent API abuse and improve security',
     status: 'open',
@@ -354,11 +353,11 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 14),
     updatedAt: subDays(today, 14),
     dueDate: addDays(today, 18),
-    dependsOn: ['BLGI-1004'],
+    dependsOn: ['BKL00004'],
     customColor: "",
   },
   {
-    id: 'BLGI-1017',
+    id: 'BKL00017',
     title: 'Create user activity dashboard',
     description: 'Build an admin dashboard showing user activity metrics',
     status: 'open',
@@ -370,11 +369,11 @@ export let backlogItems: BacklogItem[] = [
     createdAt: subDays(today, 10),
     updatedAt: subDays(today, 10),
     dueDate: addDays(today, 35),
-    dependsOn: ['BLGI-1005'],
+    dependsOn: ['BKL00005'],
     customColor: "",
   },
   {
-    id: 'BLGI-1018',
+    id: 'BKL00018',
     title: 'Fix navigation sidebar responsiveness',
     description: 'Sidebar doesn\'t collapse properly on smaller screens',
     status: 'ready',
@@ -391,7 +390,7 @@ export let backlogItems: BacklogItem[] = [
     customColor: "",
   },
   {
-    id: 'BLGI-1019',
+    id: 'BKL00019',
     title: 'Add keyboard shortcuts',
     description: 'Implement keyboard shortcuts for common actions',
     status: 'in-progress',
@@ -408,7 +407,7 @@ export let backlogItems: BacklogItem[] = [
     customColor: "bg-cyan-500",
   },
   {
-    id: 'BLGI-1020',
+    id: 'BKL00020',
     title: 'Implement content moderation system',
     description: 'Create system to filter inappropriate content in user-generated content',
     status: 'open',
@@ -428,7 +427,7 @@ export let backlogItems: BacklogItem[] = [
 // Generate backlog ID
 export const generateBacklogItemId = (): string => {
   const lastId = backlogItems.length > 0 
-    ? parseInt(backlogItems[backlogItems.length - 1].id.split('-')[1])
-    : 1000;
-  return `BLGI-${lastId + 1}`;
+    ? parseInt(backlogItems[backlogItems.length - 1].id.split('00')[1])
+    : 0;
+  return `BKL${(lastId + 1).toString().padStart(5, '0')}`;
 };

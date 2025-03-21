@@ -83,5 +83,5 @@ export const findReleaseItemByRelation = (
  * Generate a new release ID
  */
 export const generateReleaseId = (currentCount: number): string => {
-  return `REL-${1006 + currentCount}`;
+  return `REL${(currentCount + 1).toString().padStart(5, '0')}`;
 };

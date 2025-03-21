@@ -37,7 +37,7 @@ const SecurityManagement = () => {
   // Mock data for security cases
   const securityCases = [
     {
-      id: 'SEC00112',
+      id: 'SEC00001',
       title: 'Customer Data Exposure',
       description: 'Inadvertent exposure of customer data through API misconfiguration',
       type: 'Data Breach',
@@ -46,7 +46,7 @@ const SecurityManagement = () => {
       reportedAt: '2 days ago'
     },
     {
-      id: 'SEC00111',
+      id: 'SEC00002',
       title: 'GDPR Subject Access Request',
       description: 'Customer requesting all personal data held by company',
       type: 'SAR',
@@ -55,7 +55,7 @@ const SecurityManagement = () => {
       reportedAt: '5 days ago'
     },
     {
-      id: 'SEC00105',
+      id: 'SEC00003',
       title: 'Password Policy Non-Compliance',
       description: 'Legacy systems not enforcing new password complexity requirements',
       type: 'Compliance',
@@ -64,7 +64,7 @@ const SecurityManagement = () => {
       reportedAt: '2 weeks ago'
     },
     {
-      id: 'SEC00098',
+      id: 'SEC00004',
       title: 'Phishing Attempt',
       description: 'Targeted phishing campaign against finance department',
       type: 'Threat',

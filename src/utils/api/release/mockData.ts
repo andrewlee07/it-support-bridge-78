@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 // Mock releases data
 export const mockReleases: Release[] = [
   {
-    id: "REL-1001",
+    id: "REL00001",
     title: "Website Modernization",
     version: "2.0.0",
     type: "major",
@@ -23,7 +23,7 @@ export const mockReleases: Release[] = [
     audit: []
   },
   {
-    id: "REL-1002",
+    id: "REL00002",
     title: "Security Patch Release",
     version: "1.5.3",
     type: "patch",
@@ -40,7 +40,7 @@ export const mockReleases: Release[] = [
     audit: []
   },
   {
-    id: "REL-1003",
+    id: "REL00003",
     title: "Feature Enhancement Pack",
     version: "1.6.0",
     type: "minor",
@@ -55,7 +55,7 @@ export const mockReleases: Release[] = [
     audit: []
   },
   {
-    id: "REL-1004",
+    id: "REL00004",
     title: "Database Optimization",
     version: "1.5.4",
     type: "patch",
@@ -72,7 +72,7 @@ export const mockReleases: Release[] = [
     audit: []
   },
   {
-    id: "REL-1005",
+    id: "REL00005",
     title: "Emergency Hotfix",
     version: "1.5.2.1",
     type: "emergency",
@@ -94,7 +94,7 @@ export const mockReleases: Release[] = [
 export const mockReleaseItems: ReleaseItem[] = [
   {
     id: uuidv4(),
-    releaseId: "REL-1001",
+    releaseId: "REL00001",
     itemId: mockChangeRequests[0].id,
     itemType: "change",
     addedAt: new Date(2023, 10, 2),
@@ -102,7 +102,7 @@ export const mockReleaseItems: ReleaseItem[] = [
   },
   {
     id: uuidv4(),
-    releaseId: "REL-1001",
+    releaseId: "REL00001",
     itemId: mockChangeRequests[1].id,
     itemType: "change",
     addedAt: new Date(2023, 10, 3),
@@ -110,7 +110,7 @@ export const mockReleaseItems: ReleaseItem[] = [
   },
   {
     id: uuidv4(),
-    releaseId: "REL-1002",
+    releaseId: "REL00002",
     itemId: mockChangeRequests[2].id,
     itemType: "change",
     addedAt: new Date(2023, 10, 6),
@@ -118,7 +118,7 @@ export const mockReleaseItems: ReleaseItem[] = [
   },
   {
     id: uuidv4(),
-    releaseId: "REL-1004",
+    releaseId: "REL00004",
     itemId: mockTickets[0].id,
     itemType: "incident",
     addedAt: new Date(2023, 9, 11),
