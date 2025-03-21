@@ -1,3 +1,4 @@
+
 import {
   AlertCircle,
   BarChart3,
@@ -14,7 +15,8 @@ import {
   Users,
   Megaphone,
   ExternalLink,
-  ShoppingCart
+  ShoppingCart,
+  ShieldAlert
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -43,6 +45,12 @@ export const navigationItems: NavigationItem[] = [
     href: "/service-requests",
     icon: ClipboardCheck,
     description: "Manage service requests"
+  },
+  {
+    title: "IT Security Management",
+    href: "/security",
+    icon: ShieldAlert,
+    description: "Manage IT security cases and compliance"
   },
   {
     title: "Service Catalog",

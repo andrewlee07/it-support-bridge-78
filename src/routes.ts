@@ -13,6 +13,7 @@ import TestTracking from '@/pages/TestTracking';
 import PortalMyApprovals from '@/pages/PortalMyApprovals';
 import Assets from '@/pages/Assets';
 import Index from '@/pages/Index';
+import SecurityManagement from '@/pages/SecurityManagement';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
@@ -79,6 +80,11 @@ const router = createBrowserRouter([
     ),
     errorElement: React.createElement(ErrorPage),
     children: [
+      // IT Security Management route
+      {
+        path: 'security',
+        element: React.createElement(SecurityManagement)
+      },
       // Test Management route
       {
         path: 'test-tracking',

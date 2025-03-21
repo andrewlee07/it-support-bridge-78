@@ -37,6 +37,12 @@ export const useAppNavigation = () => {
     goToNewServiceRequest: () => navigate(ROUTES.NEW_SERVICE_REQUEST),
     goToEditServiceRequest: (id: string) => navigate(ROUTES.EDIT_SERVICE_REQUEST(id)),
     
+    // IT Security Management
+    goToSecurity: () => navigate(ROUTES.SECURITY),
+    goToSecurityCaseDetail: (id: string) => navigate(ROUTES.SECURITY_CASE_DETAIL(id)),
+    goToNewSecurityCase: () => navigate(ROUTES.NEW_SECURITY_CASE),
+    goToEditSecurityCase: (id: string) => navigate(ROUTES.EDIT_SECURITY_CASE(id)),
+    
     // Problem Management
     goToProblems: () => navigate(ROUTES.PROBLEMS),
     goToProblemDetail: (id: string) => navigate(ROUTES.PROBLEM_DETAIL(id)),

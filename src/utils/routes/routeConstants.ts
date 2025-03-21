@@ -30,6 +30,12 @@ export const SERVICE_REQUEST_DETAIL = (id: string) => `/service-requests/${id}`;
 export const NEW_SERVICE_REQUEST = '/service-requests/create';
 export const EDIT_SERVICE_REQUEST = (id: string) => `/service-requests/edit/${id}`;
 
+// IT Security Management routes
+export const SECURITY = '/security';
+export const SECURITY_CASE_DETAIL = (id: string) => `/security/${id}`;
+export const NEW_SECURITY_CASE = '/security/create';
+export const EDIT_SECURITY_CASE = (id: string) => `/security/edit/${id}`;
+
 // Problem Management routes
 export const PROBLEMS = '/problems';
 export const PROBLEM_DETAIL = (id: string) => `/problems/${id}`;
