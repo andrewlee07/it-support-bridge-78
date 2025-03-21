@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSecurityCases } from '@/hooks/security/useSecurityCases';
@@ -63,11 +63,10 @@ const SecurityManagement = () => {
   const filteredCases = getFilteredCases();
 
   // Navigate to case detail view - ensure this uses the proper path format
-  const goToCaseDetailView = (caseId: string) => {
+  const goToCaseDetailView = useCallback((caseId: string) => {
     console.log(`Navigating to security case detail: ${caseId}`);
-    console.log(`Using route: ${navigation.goToSecurityCaseDetail.toString()}`);
     navigation.goToSecurityCaseDetail(caseId);
-  };
+  }, [navigation]);
 
   return (
     <div className="space-y-6">
@@ -141,9 +140,7 @@ const SecurityManagement = () => {
                 getPriorityIcon={getPriorityIcon}
                 formatDate={formatDate}
                 getTimeDifference={getTimeDifference}
-                handleViewCase={(secCase) => {
-                  goToCaseDetailView(secCase.id);
-                }}
+                handleViewCase={goToCaseDetailView}
                 handleEditCase={handleEditCase}
               />
             </CardContent>

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Card, 
@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { format } from 'date-fns';
 import { 
   ArrowLeft, 
   AlertTriangle, 
@@ -29,53 +28,88 @@ import { useAppNavigation } from '@/utils/routes/navigationUtils';
 import { getUserNameById } from '@/utils/userUtils';
 import { SecurityCase, SecurityCaseTab } from '@/utils/types/security';
 import SecurityCaseSLAIndicator from '@/components/security/components/SecurityCaseSLAIndicator';
-import { useSecurityCases } from '@/hooks/security/useSecurityCases';
+import { useSecurityCaseDetail } from '@/hooks/security/useSecurityCaseDetail';
 import { toast } from 'sonner';
+import { useDisclosure } from '@/hooks/useDisclosure';
 
 const SecurityCaseDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const appNavigation = useAppNavigation();
-  const { mockSecurityCases, formatDate, calculateSLAStatus } = useSecurityCases();
-  const [securityCase, setSecurityCase] = useState<SecurityCase | null>(null);
   const [activeTab, setActiveTab] = useState<SecurityCaseTab>('overview');
-  const [loading, setLoading] = useState(true);
+  const { isOpen: addNoteDialogOpen, onOpen: openAddNoteDialog, onClose: closeAddNoteDialog } = useDisclosure();
+  
+  // Use the security case detail hook instead of local state and fetching
+  const { 
+    securityCase, 
+    loading, 
+    error, 
+    addNote, 
+    updateSecurityCase, 
+    resolveSecurityCase, 
+    reopenSecurityCase, 
+    assignSecurityCase, 
+    calculateSLAStatus 
+  } = useSecurityCaseDetail(id || '');
 
-  // Debug - log the id parameter and current route
+  // Debug - log the id parameter and loading state on initial mount only
   useEffect(() => {
     console.log(`SecurityCaseDetailPage mounted with id: ${id}`);
     console.log(`Current path: ${window.location.pathname}`);
+    
+    // Return a no-op cleanup function to prevent unnecessary re-renders
+    return () => {};
   }, [id]);
 
-  // Fetch the security case details
-  useEffect(() => {
-    // Simulate API call with a timeout
-    setLoading(true);
-    const timeout = setTimeout(() => {
-      if (id) {
-        const foundCase = mockSecurityCases.find(c => c.id === id);
-        if (foundCase) {
-          setSecurityCase(foundCase);
-        } else {
-          toast.error("Security case not found");
-          appNavigation.goToSecurity();
-        }
-      }
-      setLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [id, appNavigation, mockSecurityCases]);
-
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     appNavigation.goToSecurity();
-  };
+  }, [appNavigation]);
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     if (id) {
       appNavigation.goToEditSecurityCase(id);
     }
-  };
+  }, [id, appNavigation]);
+
+  const handleAddNote = useCallback(async (noteText: string) => {
+    if (await addNote(noteText)) {
+      closeAddNoteDialog();
+      toast.success('Note added successfully');
+    }
+  }, [addNote, closeAddNoteDialog]);
+
+  // Get status color for badges
+  const getStatusColor = useCallback((status: string) => {
+    switch (status) {
+      case 'Active': return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
+      case 'Pending': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
+      case 'Resolved': return 'bg-green-100 text-green-800 hover:bg-green-100';
+      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
+    }
+  }, []);
+
+  // Get type color for badges
+  const getTypeColor = useCallback((type: string) => {
+    switch (type) {
+      case 'Data Breach': return 'bg-red-50 text-red-700 border-red-200';
+      case 'SAR': return 'bg-purple-50 text-purple-700 border-purple-200';
+      case 'Compliance': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'Threat': return 'bg-orange-50 text-orange-700 border-orange-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
+    }
+  }, []);
+
+  const formatDate = useCallback((dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch (error) {
+      return dateString;
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -96,7 +130,7 @@ const SecurityCaseDetailPage = () => {
     );
   }
 
-  if (!securityCase) {
+  if (error || !securityCase) {
     return (
       <div className="space-y-6 p-6">
         <div className="flex items-center space-x-2">
@@ -110,7 +144,7 @@ const SecurityCaseDetailPage = () => {
             <AlertTriangle className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium">Security Case Not Found</h3>
             <p className="text-muted-foreground mt-1">
-              The security case you're looking for doesn't exist or has been removed.
+              {error || "The security case you're looking for doesn't exist or has been removed."}
             </p>
             <Button className="mt-6" onClick={handleBack}>
               Return to Security Cases
@@ -120,27 +154,6 @@ const SecurityCaseDetailPage = () => {
       </div>
     );
   }
-
-  // Get status color for badges
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Active': return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
-      case 'Pending': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
-      case 'Resolved': return 'bg-green-100 text-green-800 hover:bg-green-100';
-      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
-    }
-  };
-
-  // Get type color for badges
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'Data Breach': return 'bg-red-50 text-red-700 border-red-200';
-      case 'SAR': return 'bg-purple-50 text-purple-700 border-purple-200';
-      case 'Compliance': return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'Threat': return 'bg-orange-50 text-orange-700 border-orange-200';
-      default: return 'bg-gray-50 text-gray-700 border-gray-200';
-    }
-  };
 
   return (
     <div className="space-y-6 p-6">
@@ -278,7 +291,7 @@ const SecurityCaseDetailPage = () => {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg">Notes</CardTitle>
-                  <Button variant="outline" size="sm">Add Note</Button>
+                  <Button variant="outline" size="sm" onClick={openAddNoteDialog}>Add Note</Button>
                 </CardHeader>
                 <CardContent>
                   {securityCase.notes && securityCase.notes.length > 0 ? (
@@ -397,7 +410,7 @@ const SecurityCaseDetailPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {securityCase.audit ? (
+                {securityCase.audit && securityCase.audit.length > 0 ? (
                   <div className="space-y-3">
                     {securityCase.audit.map((entry, index) => (
                       <div key={index} className="border-l-2 border-muted pl-4 pb-3">
@@ -446,7 +459,6 @@ const SecurityCaseDetailPage = () => {
                     <Separator />
                   </>
                 )}
-                {/* Display more people if needed */}
               </div>
             </CardContent>
           </Card>

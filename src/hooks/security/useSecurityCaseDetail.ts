@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SecurityCase } from '@/utils/types/security';
 import { toast } from 'sonner';
 
-// This is a mock implementation - in a real app, this would fetch from an API
+// Mock security case data - in a real app, this would be fetched from an API
 const mockSecurityCase: SecurityCase = {
   id: 'SEC00001',
   title: 'Customer Data Exposure',
@@ -73,19 +73,28 @@ export function useSecurityCaseDetail(securityCaseId: string) {
   const [securityCase, setSecurityCase] = useState<SecurityCase | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
-  // In a real app, this would fetch the security case from an API
+  // Fetch the security case only once when the component mounts or securityCaseId changes
   useEffect(() => {
+    // Skip if we've already fetched with this ID
+    if (hasFetched.current && securityCase?.id === securityCaseId) {
+      return;
+    }
+
     const fetchSecurityCase = async () => {
       try {
         setLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // In a real app, you would fetch from an API
+        // Simulate API call with a short timeout to minimize flickering
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
         if (securityCaseId) {
+          console.log(`Fetching security case with ID: ${securityCaseId}`);
+          // In a real app, this would be an API call
           setSecurityCase(mockSecurityCase);
           setError(null);
+          hasFetched.current = true;
         } else {
           setError('No security case ID provided');
         }
@@ -103,8 +112,10 @@ export function useSecurityCaseDetail(securityCaseId: string) {
   // Update security case
   const updateSecurityCase = async (updates: Partial<SecurityCase>) => {
     try {
+      // Don't set loading state here to prevent UI flickering
+      
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Update local state
       setSecurityCase(prev => {
@@ -138,8 +149,10 @@ export function useSecurityCaseDetail(securityCaseId: string) {
   // Add a note to the security case
   const addNote = async (noteText: string) => {
     try {
+      // Don't set loading state here to prevent UI flickering
+      
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Update local state
       setSecurityCase(prev => {
@@ -180,7 +193,7 @@ export function useSecurityCaseDetail(securityCaseId: string) {
   const resolveSecurityCase = async (resolutionNotes: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Update local state
       setSecurityCase(prev => {
@@ -225,7 +238,7 @@ export function useSecurityCaseDetail(securityCaseId: string) {
   const reopenSecurityCase = async (reopenReason: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Update local state
       setSecurityCase(prev => {
@@ -270,7 +283,7 @@ export function useSecurityCaseDetail(securityCaseId: string) {
   const assignSecurityCase = async (userId: string) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Update local state
       setSecurityCase(prev => {
