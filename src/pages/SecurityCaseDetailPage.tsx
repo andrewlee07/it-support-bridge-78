@@ -27,6 +27,7 @@ const SecurityCaseDetailPage = () => {
     loading, 
     error, 
     addNote,
+    updateSecurityCase,
     calculateSLAStatus 
   } = useSecurityCaseDetail(id || '');
 
@@ -54,6 +55,10 @@ const SecurityCaseDetailPage = () => {
       toast.success('Note added successfully');
     }
   }, [addNote, closeAddNoteDialog, noteText]);
+
+  const handleUpdateCase = useCallback(async (updatedFields) => {
+    return await updateSecurityCase(updatedFields);
+  }, [updateSecurityCase]);
 
   const handleSystemClick = useCallback((system: string) => {
     toast.info(`Viewing details for ${system}`);
@@ -147,6 +152,7 @@ const SecurityCaseDetailPage = () => {
         resolutionSLA={resolutionSLA}
         getSLAIndicatorColor={getSLAIndicatorColor}
         openAddNoteDialog={openAddNoteDialog}
+        onUpdateSecurityCase={handleUpdateCase}
       />
 
       {/* Add Note Dialog */}
