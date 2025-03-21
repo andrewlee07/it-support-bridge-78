@@ -8,8 +8,10 @@ import SecurityDashboardStats from '@/components/security/dashboard/SecurityDash
 import SecurityFiltersBar from '@/components/security/filters/SecurityFiltersBar';
 import SecurityCasesTable from '@/components/security/table/SecurityCasesTable';
 import SecurityCaseDetail from '@/components/security/SecurityCaseDetail';
+import { useAppNavigation } from '@/utils/routes/navigationUtils';
 
 const SecurityManagement = () => {
+  const navigate = useAppNavigation();
   const {
     // State
     searchQuery,
@@ -59,6 +61,11 @@ const SecurityManagement = () => {
 
   // Get the filtered cases
   const filteredCases = getFilteredCases();
+
+  // Navigate to case detail view
+  const goToCaseDetailView = (caseId: string) => {
+    navigate.goToSecurityCaseView(caseId);
+  };
 
   return (
     <div className="space-y-6">
@@ -132,7 +139,16 @@ const SecurityManagement = () => {
                 getPriorityIcon={getPriorityIcon}
                 formatDate={formatDate}
                 getTimeDifference={getTimeDifference}
-                handleViewCase={handleViewCase}
+                handleViewCase={(secCase) => {
+                  // Either open the dialog or navigate to the full detail view
+                  if (window.innerWidth < 1024) {
+                    // For smaller screens, navigate to the full page view
+                    goToCaseDetailView(secCase.id);
+                  } else {
+                    // For larger screens, open the dialog
+                    handleViewCase(secCase);
+                  }
+                }}
                 handleEditCase={handleEditCase}
               />
             </CardContent>

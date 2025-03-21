@@ -35,6 +35,7 @@ export const SECURITY = '/security';
 export const SECURITY_CASE_DETAIL = (id: string) => `/security/${id}`;
 export const NEW_SECURITY_CASE = '/security/create';
 export const EDIT_SECURITY_CASE = (id: string) => `/security/edit/${id}`;
+export const SECURITY_CASE_VIEW = (id: string) => `/security/view/${id}`;
 
 // Problem Management routes
 export const PROBLEMS = '/problems';
