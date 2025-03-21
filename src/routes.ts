@@ -14,6 +14,7 @@ import PortalMyApprovals from '@/pages/PortalMyApprovals';
 import Assets from '@/pages/Assets';
 import Index from '@/pages/Index';
 import SecurityManagement from '@/pages/SecurityManagement';
+import SecurityCaseDetailPage from '@/pages/SecurityCaseDetailPage';
 
 // Import domain-specific routes with named imports
 import { backlogRoutes } from './routes/backlogRoutes';
@@ -80,10 +81,14 @@ const router = createBrowserRouter([
     ),
     errorElement: React.createElement(ErrorPage),
     children: [
-      // IT Security Management route
+      // IT Security Management routes
       {
         path: 'security',
         element: React.createElement(SecurityManagement)
+      },
+      {
+        path: 'security/case/:id',
+        element: React.createElement(SecurityCaseDetailPage)
       },
       // Test Management route
       {

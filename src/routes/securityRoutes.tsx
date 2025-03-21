@@ -27,11 +27,11 @@ import SecurityCaseDetailPage from '@/pages/SecurityCaseDetailPage';
  */
 export const securityRoutes: RouteObject[] = [
   {
-    path: '/security',
+    path: 'security',
     element: <SecurityManagement />
   },
   {
-    path: '/security/case/:id',
+    path: 'security/case/:id',
     element: <SecurityCaseDetailPage />
   }
 ];
