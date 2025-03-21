@@ -44,12 +44,15 @@ export interface ExportableTestCase extends Omit<TestCase, 'createdAt' | 'update
   updatedAt: string;
 }
 
-// Added to support executionHistory property
+// Updated to match the interface in testExecution.ts by adding testCycleId
 export interface TestExecution {
   id: string;
   testCaseId: string;
+  testCycleId: string; // Added to match other TestExecution interface
   status: TestStatus;
   executedBy: string;
   executedAt: Date;
   comments?: string;
+  linkedBugs?: string[]; // Added for consistency
+  executionDate?: Date; // Added for consistency with testExecution.ts
 }
