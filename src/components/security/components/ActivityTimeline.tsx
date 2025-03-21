@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { SecurityCase } from '@/utils/types/security';
-import { FileText, Edit, MessageSquare, AlertTriangle } from 'lucide-react';
+import { FileText, Edit, MessageSquare, AlertTriangle, CheckCircle, AlertOctagon } from 'lucide-react';
 import { getUserNameById } from '@/utils/userUtils';
 
 interface ActivityTimelineProps {
@@ -28,7 +28,9 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
                   {entry.action === 'created' && <FileText className="h-4 w-4" />}
                   {entry.action === 'updated' && <Edit className="h-4 w-4" />}
                   {entry.action === 'note-added' && <MessageSquare className="h-4 w-4" />}
-                  {entry.action === 'resolved' && <AlertTriangle className="h-4 w-4" />}
+                  {entry.action === 'resolved' && <CheckCircle className="h-4 w-4" />}
+                  {entry.action === 'reopened' && <AlertOctagon className="h-4 w-4" />}
+                  {(!entry.action || entry.action === 'other') && <AlertTriangle className="h-4 w-4" />}
                 </div>
                 {index < securityCase.audit.length - 1 && <div className="w-0.5 h-full bg-muted" />}
               </div>

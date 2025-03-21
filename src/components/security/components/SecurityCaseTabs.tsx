@@ -26,6 +26,7 @@ interface SecurityCaseTabsProps {
   resolutionSLA: any;
   getSLAIndicatorColor: (progress: number) => string;
   openAddNoteDialog: () => void;
+  updateSecurityCase?: (updates: Partial<SecurityCase>) => Promise<boolean>;
 }
 
 const SecurityCaseTabs: React.FC<SecurityCaseTabsProps> = ({
@@ -40,7 +41,8 @@ const SecurityCaseTabs: React.FC<SecurityCaseTabsProps> = ({
   responseSLA,
   resolutionSLA,
   getSLAIndicatorColor,
-  openAddNoteDialog
+  openAddNoteDialog,
+  updateSecurityCase
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as SecurityCaseTab)}>
@@ -83,6 +85,7 @@ const SecurityCaseTabs: React.FC<SecurityCaseTabsProps> = ({
               getTypeColor={getTypeColor}
               formatDate={formatDate}
               handleSystemClick={handleSystemClick}
+              updateSecurityCase={updateSecurityCase}
             />
             
             <ActivityTimeline 

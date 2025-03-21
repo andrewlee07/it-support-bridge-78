@@ -27,6 +27,7 @@ const SecurityCaseDetailPage = () => {
     loading, 
     error, 
     addNote,
+    updateSecurityCase,
     calculateSLAStatus 
   } = useSecurityCaseDetail(id || '');
 
@@ -147,6 +148,7 @@ const SecurityCaseDetailPage = () => {
         resolutionSLA={resolutionSLA}
         getSLAIndicatorColor={getSLAIndicatorColor}
         openAddNoteDialog={openAddNoteDialog}
+        updateSecurityCase={updateSecurityCase}
       />
 
       {/* Add Note Dialog */}
