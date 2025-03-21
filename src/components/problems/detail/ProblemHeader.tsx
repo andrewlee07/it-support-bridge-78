@@ -83,7 +83,7 @@ const ProblemHeader = ({ problem, canClose, isClosed }: ProblemHeaderProps) => {
       
       {problem.knownErrorId && (
         <div className="flex items-center mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
-          <Database className="text-amber-500 mr-2 h-5 w-5" />
+          <Database className="text-amber-500 mr-2 h-5 w-5 shrink-0" />
           <div>
             <span className="font-medium">Known Error: </span>
             <span>{problem.knownErrorId}</span>
@@ -96,7 +96,7 @@ const ProblemHeader = ({ problem, canClose, isClosed }: ProblemHeaderProps) => {
       
       {canClose && !isClosed && (
         <div className="flex items-center mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <AlertCircle className="text-blue-500 mr-2 h-5 w-5" />
+          <AlertCircle className="text-blue-500 mr-2 h-5 w-5 shrink-0" />
           <div>
             <span className="font-medium">This problem is ready to be closed</span>
             <p className="text-sm text-muted-foreground mt-1">

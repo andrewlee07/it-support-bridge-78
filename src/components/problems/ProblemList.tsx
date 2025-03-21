@@ -15,6 +15,7 @@ import ProblemTable from './ProblemTable';
 import TicketViewToggle, { ViewType } from '@/components/tickets/TicketViewToggle';
 import { Problem } from '@/utils/types/problem';
 import { Card } from '@/components/ui/card';
+import { AlertTriangle } from 'lucide-react';
 
 const ProblemList = () => {
   const navigate = useNavigate();
@@ -106,6 +107,7 @@ const ProblemList = () => {
 
       {filteredProblems.length === 0 ? (
         <Card className="bg-muted/30 p-6 text-center">
+          <AlertTriangle className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
           <h3 className="text-lg font-medium">No problems found</h3>
           <p className="text-muted-foreground mt-1">
             Try adjusting your search or filters

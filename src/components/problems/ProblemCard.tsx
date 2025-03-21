@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Paperclip, Database, Clock } from 'lucide-react';
+import { Paperclip, Database, Clock, AlertCircle } from 'lucide-react';
 
 interface ProblemCardProps {
   problem: Problem;
@@ -47,7 +47,10 @@ const ProblemCard: React.FC<ProblemCardProps> = ({ problem, onClick }) => {
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleClick}>
+    <Card 
+      className="hover:shadow-md transition-shadow cursor-pointer border border-border" 
+      onClick={handleClick}
+    >
       <CardContent className="p-5">
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -74,14 +77,21 @@ const ProblemCard: React.FC<ProblemCardProps> = ({ problem, onClick }) => {
           
           {problem.knownErrorId && (
             <div className="flex items-center gap-2 text-sm bg-amber-50 text-amber-800 p-2 rounded">
-              <Database size={16} />
+              <Database size={16} className="shrink-0" />
               <span>Known Error: {problem.knownErrorId}</span>
             </div>
           )}
           
+          {problem.rootCause && !problem.knownErrorId && (
+            <div className="flex items-center gap-2 text-sm bg-yellow-50 text-yellow-800 p-2 rounded">
+              <AlertCircle size={16} className="shrink-0" />
+              <span className="line-clamp-1">Root Cause Identified</span>
+            </div>
+          )}
+          
           {problem.status === 'pending' && problem.pendingSubStatus && (
-            <div className="flex items-center gap-2 text-sm bg-amber-50 text-amber-800 p-2 rounded">
-              <Clock size={16} />
+            <div className="flex items-center gap-2 text-sm bg-blue-50 text-blue-800 p-2 rounded">
+              <Clock size={16} className="shrink-0" />
               <span>Pending: {problem.pendingSubStatus.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
             </div>
           )}
