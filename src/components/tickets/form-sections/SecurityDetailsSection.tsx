@@ -1,30 +1,34 @@
 
 import React from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { UseFormReturn } from 'react-hook-form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
+import { 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormControl, 
+  FormDescription, 
+  FormMessage 
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Ticket } from '@/utils/types/ticket';
+import { Switch } from '@/components/ui/switch';
 import { DatePicker } from '@/components/ui/date-picker';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface SecurityDetailsSectionProps {
-  form: any;
+  form: UseFormReturn<any>;
 }
 
 const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form }) => {
   const category = form.watch('category');
   
   return (
-    <div className="space-y-4 rounded-md border p-4">
-      <h3 className="text-lg font-medium">Security Details</h3>
-      
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <Card>
+      <CardHeader>
+        <CardTitle>Security Details</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         <FormField
           control={form.control}
           name="securityClassification"
@@ -37,7 +41,7 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select classification" />
+                    <SelectValue placeholder="Select classification level" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -48,13 +52,14 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
                 </SelectContent>
               </Select>
               <FormDescription>
-                The security classification determines handling requirements
+                Select the appropriate security classification for this case
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
         
+        {/* Data breach specific fields */}
         {category === 'data-breach' && (
           <>
             <FormField
@@ -62,17 +67,17 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
               name="dataSubjects"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Number of Data Subjects</FormLabel>
+                  <FormLabel>Number of Data Subjects Affected</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
-                      placeholder="How many individuals affected" 
+                      placeholder="e.g., 100" 
                       {...field}
-                      onChange={e => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                     />
                   </FormControl>
                   <FormDescription>
-                    Approximate number of individuals whose data was affected
+                    Approximate number of individuals whose data was compromised
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -98,11 +103,14 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
                       <SelectItem value="data-loss">Data Loss</SelectItem>
                       <SelectItem value="unauthorized-access">Unauthorized Access</SelectItem>
                       <SelectItem value="system-compromise">System Compromise</SelectItem>
-                      <SelectItem value="phishing">Phishing</SelectItem>
-                      <SelectItem value="malware">Malware</SelectItem>
+                      <SelectItem value="phishing">Phishing Attack</SelectItem>
+                      <SelectItem value="malware">Malware/Ransomware</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormDescription>
+                    Select the type of security breach that occurred
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -112,19 +120,19 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
               control={form.control}
               name="reportedToAuthorities"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">Reported to Authorities</FormLabel>
+                    <FormDescription>
+                      Has this breach been reported to relevant authorities?
+                    </FormDescription>
+                  </div>
                   <FormControl>
-                    <Checkbox 
+                    <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Reported to Authorities</FormLabel>
-                    <FormDescription>
-                      Has this breach been reported to relevant authorities
-                    </FormDescription>
-                  </div>
                 </FormItem>
               )}
             />
@@ -134,12 +142,18 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
                 control={form.control}
                 name="reportedDate"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem>
                     <FormLabel>Date Reported</FormLabel>
-                    <DatePicker
-                      date={field.value ? new Date(field.value) : undefined}
-                      setDate={field.onChange}
-                    />
+                    <FormControl>
+                      <DatePicker
+                        date={field.value ? new Date(field.value) : undefined}
+                        setDate={(date) => field.onChange(date)}
+                        placeholder="Select date reported"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Date when the breach was reported to authorities
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -148,6 +162,7 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
           </>
         )}
         
+        {/* SAR specific fields */}
         {category === 'sar' && (
           <>
             <FormField
@@ -162,19 +177,19 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select SAR type" />
+                        <SelectValue placeholder="Select request type" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="access">Right of Access</SelectItem>
-                      <SelectItem value="rectification">Right to Rectification</SelectItem>
-                      <SelectItem value="erasure">Right to Erasure</SelectItem>
-                      <SelectItem value="portability">Right to Data Portability</SelectItem>
-                      <SelectItem value="objection">Right to Object</SelectItem>
+                      <SelectItem value="access">Access Request</SelectItem>
+                      <SelectItem value="rectification">Rectification Request</SelectItem>
+                      <SelectItem value="erasure">Erasure Request (Right to be Forgotten)</SelectItem>
+                      <SelectItem value="portability">Data Portability Request</SelectItem>
+                      <SelectItem value="objection">Objection to Processing</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    The type of Subject Access Request being made
+                    Type of Subject Access Request being made
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -185,26 +200,26 @@ const SecurityDetailsSection: React.FC<SecurityDetailsSectionProps> = ({ form })
               control={form.control}
               name="dpaRequired"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">DPA Verification Required</FormLabel>
+                    <FormDescription>
+                      Does this request require Data Processing Agreement verification?
+                    </FormDescription>
+                  </div>
                   <FormControl>
-                    <Checkbox 
+                    <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>DPA Required</FormLabel>
-                    <FormDescription>
-                      Is a Data Processing Agreement required for this request
-                    </FormDescription>
-                  </div>
                 </FormItem>
               )}
             />
           </>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

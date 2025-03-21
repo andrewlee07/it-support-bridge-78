@@ -13,7 +13,7 @@ import TicketViewToggle, { ViewType } from './TicketViewToggle';
 import { useTicketList } from './hooks/useTicketList';
 
 interface TicketListProps {
-  type: 'incident' | 'service';
+  type: 'incident' | 'service' | 'security';
 }
 
 const TicketList: React.FC<TicketListProps> = ({ type }) => {
@@ -45,16 +45,30 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
     handleTicketCreated,
     setIsViewingTicket,
     handleReopenTicket
-  } = useTicketList(type, id);
+  } = useTicketList(type as any, id);
 
   const handleCardClick = (ticketId: string) => {
-    const basePath = type === 'incident' ? '/incidents' : '/service-requests';
+    let basePath;
+    if (type === 'incident') {
+      basePath = '/incidents';
+    } else if (type === 'service') {
+      basePath = '/service-requests';
+    } else if (type === 'security') {
+      basePath = '/security-cases';
+    }
     console.log(`Navigating to ${basePath}/${ticketId}`);
     navigate(`${basePath}/${ticketId}`);
   };
 
   const handleCloseViewDialog = () => {
-    const basePath = type === 'incident' ? '/incidents' : '/service-requests';
+    let basePath;
+    if (type === 'incident') {
+      basePath = '/incidents';
+    } else if (type === 'service') {
+      basePath = '/service-requests';
+    } else if (type === 'security') {
+      basePath = '/security-cases';
+    }
     navigate(basePath);
   };
 
@@ -82,13 +96,17 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">
-          {type === 'incident' ? 'Incidents' : 'Service Requests'}
+          {type === 'incident' ? 'Incidents' : 
+           type === 'security' ? 'Security Cases' : 'Service Requests'}
         </h1>
         <div className="flex items-center gap-2">
           <TicketViewToggle view={viewType} onChange={handleViewChange} />
           <Button onClick={handleCreateTicket}>
             <PlusCircle className="h-4 w-4 mr-2" />
-            New {type === 'incident' ? 'Incident' : 'Request'}
+            New {
+              type === 'incident' ? 'Incident' :
+              type === 'security' ? 'Security Case' : 'Request'
+            }
           </Button>
         </div>
       </div>
@@ -100,7 +118,7 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
         onSearchChange={setSearchQuery}
         onStatusChange={setStatusFilter}
         onPriorityChange={setPriorityFilter}
-        type={type}
+        type={type as any}
       />
 
       {loading ? (
@@ -110,7 +128,7 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
           searchQuery={searchQuery}
           statusFilter={statusFilter}
           priorityFilter={priorityFilter}
-          type={type}
+          type={type as any}
         />
       ) : viewType === 'grid' ? (
         <TicketGrid 
@@ -125,7 +143,7 @@ const TicketList: React.FC<TicketListProps> = ({ type }) => {
       )}
 
       <TicketDialogs
-        type={type}
+        type={type as any}
         isNewTicketDialogOpen={isNewTicketDialogOpen}
         isViewingTicket={isViewingTicket}
         selectedTicket={selectedTicket}
