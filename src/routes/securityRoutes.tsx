@@ -31,6 +31,7 @@ export const securityRoutes: RouteObject[] = [
     element: <SecurityManagement />
   },
   {
+    // This path should be exactly what's in the URL - 'security/case/:id' to match 'security/case/SEC00001'
     path: 'security/case/:id',
     element: <SecurityCaseDetailPage />
   }
