@@ -55,10 +55,10 @@ const SecurityCaseUpdateForm: React.FC<SecurityCaseUpdateFormProps> = ({
         <div className="space-y-2">
           <label className="text-sm font-medium">Status</label>
           <Select value={status} onValueChange={(value) => setStatus(value as SecurityCaseStatus)}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-background">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background">
               {statusOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}
@@ -71,10 +71,10 @@ const SecurityCaseUpdateForm: React.FC<SecurityCaseUpdateFormProps> = ({
         <div className="space-y-2">
           <label className="text-sm font-medium">Priority</label>
           <Select value={priority} onValueChange={(value) => setPriority(value as SecurityCasePriority)}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-background">
               <SelectValue placeholder="Select priority" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background">
               {priorityOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}

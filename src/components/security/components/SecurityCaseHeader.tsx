@@ -2,7 +2,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { SecurityCase } from '@/utils/types/security';
-import { ArrowLeft } from 'lucide-react';
+import { 
+  Breadcrumb, 
+  BreadcrumbList, 
+  BreadcrumbItem, 
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage
+} from '@/components/ui/breadcrumb';
 import WatchButton from '@/components/shared/WatchButton';
 
 interface SecurityCaseHeaderProps {
@@ -19,12 +26,24 @@ const SecurityCaseHeader: React.FC<SecurityCaseHeaderProps> = ({
   formatDate
 }) => {
   return (
-    <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-      <div className="flex items-center space-x-4">
-        <Button variant="outline" size="sm" onClick={handleBack}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
+    <div className="space-y-4">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/security">Security</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{securityCase.id}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{securityCase.title}</h1>
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -37,28 +56,28 @@ const SecurityCaseHeader: React.FC<SecurityCaseHeaderProps> = ({
             </span>
           </div>
         </div>
-      </div>
-      <div className="flex items-center space-x-2">
-        <WatchButton 
-          item={{
-            id: securityCase.id,
-            type: 'incident', // Using 'incident' as a general type for security cases
-            title: securityCase.title,
-            status: securityCase.status,
-            createdAt: new Date(securityCase.reportedAt)
-          }}
-          variant="outline"
-          size="sm"
-        />
-        <Button variant="outline" size="sm">
-          Export
-        </Button>
-        <Button variant="outline" size="sm">
-          Share
-        </Button>
-        <Button size="sm">
-          Update Status
-        </Button>
+        <div className="flex items-center space-x-2">
+          <WatchButton 
+            item={{
+              id: securityCase.id,
+              type: 'incident', // Using 'incident' as a general type for security cases
+              title: securityCase.title,
+              status: securityCase.status,
+              createdAt: new Date(securityCase.reportedAt)
+            }}
+            variant="outline"
+            size="sm"
+          />
+          <Button variant="outline" size="sm">
+            Export
+          </Button>
+          <Button variant="outline" size="sm">
+            Share
+          </Button>
+          <Button size="sm">
+            Update Status
+          </Button>
+        </div>
       </div>
     </div>
   );
