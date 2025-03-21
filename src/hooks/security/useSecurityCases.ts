@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -23,7 +22,8 @@ const mockSecurityCases: SecurityCase[] = [
       { date: '2023-12-16', text: 'Impact assessment conducted' }
     ],
     impactedUsers: 120,
-    remediationPlan: 'Update API gateway security configurations and implement additional access controls'
+    remediationPlan: 'Update API gateway security configurations and implement additional access controls',
+    firstResponseAt: '2023-12-15T15:45:00'
   },
   {
     id: 'SEC00002',
@@ -40,7 +40,8 @@ const mockSecurityCases: SecurityCase[] = [
       { date: '2023-12-12', text: 'Initial data gathering process started' }
     ],
     impactedUsers: 1,
-    remediationPlan: 'Compile all customer data and prepare secure transfer mechanism'
+    remediationPlan: 'Compile all customer data and prepare secure transfer mechanism',
+    firstResponseAt: '2023-12-10T10:30:00'
   },
   {
     id: 'SEC00003',
@@ -75,7 +76,9 @@ const mockSecurityCases: SecurityCase[] = [
       { date: '2023-11-21', text: 'Security awareness communication sent to all staff' }
     ],
     impactedUsers: 15,
-    remediationPlan: 'Completed: Enhanced email filtering and security awareness training'
+    remediationPlan: 'Completed: Enhanced email filtering and security awareness training',
+    firstResponseAt: '2023-11-20T09:15:00',
+    resolvedAt: '2023-11-22T14:00:00'
   }
 ];
 
@@ -103,6 +106,72 @@ export const useSecurityCases = () => {
   const [selectedCase, setSelectedCase] = useState<SecurityCase | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
+  // Calculate SLA information for a security case
+  const calculateSLAStatus = (securityCase: SecurityCase, slaType: 'response' | 'resolution' = 'resolution') => {
+    // For resolved cases
+    if (securityCase.status === 'Resolved') {
+      return {
+        percentLeft: 100,
+        timeLeft: 'Completed',
+        isBreached: false,
+        breachTime: 0
+      };
+    }
+    
+    // Get SLA target times based on priority and type
+    const getSLATargetHours = (priority: string, type: 'response' | 'resolution'): number => {
+      const targets = {
+        response: {
+          High: 1,
+          Medium: 4,
+          Low: 8
+        },
+        resolution: {
+          High: 24,
+          Medium: 48,
+          Low: 72
+        }
+      };
+      
+      return targets[type][priority as keyof typeof targets[typeof type]] || 
+             (type === 'response' ? 4 : 48); // Default fallback
+    };
+    
+    const reportedAt = new Date(securityCase.reportedAt);
+    const targetHours = getSLATargetHours(securityCase.priority, slaType);
+    const slaTarget = new Date(reportedAt.getTime() + targetHours * 60 * 60 * 1000);
+    
+    // For response SLA, check if first response exists
+    if (slaType === 'response' && securityCase.firstResponseAt) {
+      const responseAt = new Date(securityCase.firstResponseAt);
+      const isBreached = responseAt > slaTarget;
+      
+      return {
+        percentLeft: 100,
+        timeLeft: 'Responded',
+        isBreached,
+        breachTime: isBreached ? responseAt.getTime() - slaTarget.getTime() : 0
+      };
+    }
+    
+    // Calculate time remaining
+    const now = new Date();
+    const isBreached = now > slaTarget;
+    
+    // Calculate percentage of time left
+    const totalDuration = slaTarget.getTime() - reportedAt.getTime();
+    const elapsedDuration = now.getTime() - reportedAt.getTime();
+    const percentUsed = Math.min(100, Math.max(0, (elapsedDuration / totalDuration) * 100));
+    const percentLeft = Math.max(0, 100 - percentUsed);
+    
+    return {
+      percentLeft,
+      timeLeft: isBreached ? 'Breached' : 'On Track',
+      isBreached,
+      breachTime: isBreached ? now.getTime() - slaTarget.getTime() : 0
+    };
+  };
+  
   // Handle sorting
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -272,19 +341,36 @@ export const useSecurityCases = () => {
     // Apply sorting
     if (sortColumn) {
       filtered.sort((a, b) => {
-        let valueA: any = a[sortColumn as keyof SecurityCase];
-        let valueB: any = b[sortColumn as keyof SecurityCase];
+        let valueA: any;
+        let valueB: any;
         
-        // Special handling for date fields
-        if (sortColumn === 'reportedAt') {
-          valueA = new Date(valueA).getTime();
-          valueB = new Date(valueB).getTime();
-        }
-        
-        // Handle string comparisons (case-insensitive)
-        if (typeof valueA === 'string' && typeof valueB === 'string') {
-          valueA = valueA.toLowerCase();
-          valueB = valueB.toLowerCase();
+        // Special handling for SLA column
+        if (sortColumn === 'sla') {
+          const slaA = calculateSLAStatus(a);
+          const slaB = calculateSLAStatus(b);
+          
+          // Sort by breach status first, then by percent left
+          if (slaA.isBreached !== slaB.isBreached) {
+            return slaA.isBreached ? (sortDirection === 'asc' ? 1 : -1) : (sortDirection === 'asc' ? -1 : 1);
+          }
+          
+          valueA = slaA.percentLeft;
+          valueB = slaB.percentLeft;
+        } else {
+          valueA = a[sortColumn as keyof SecurityCase];
+          valueB = b[sortColumn as keyof SecurityCase];
+          
+          // Special handling for date fields
+          if (sortColumn === 'reportedAt' || sortColumn === 'firstResponseAt' || sortColumn === 'resolvedAt') {
+            valueA = new Date(valueA || 0).getTime();
+            valueB = new Date(valueB || 0).getTime();
+          }
+          
+          // Handle string comparisons (case-insensitive)
+          if (typeof valueA === 'string' && typeof valueB === 'string') {
+            valueA = valueA.toLowerCase();
+            valueB = valueB.toLowerCase();
+          }
         }
         
         if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
@@ -428,6 +514,7 @@ export const useSecurityCases = () => {
     activeCasesCount,
     dataBreachesCount,
     complianceIssuesCount,
-    totalCases: mockSecurityCases.length
+    totalCases: mockSecurityCases.length,
+    calculateSLAStatus,
   };
 };

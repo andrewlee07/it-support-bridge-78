@@ -11,6 +11,7 @@ import { SecurityCase } from '@/utils/types/security'; // You might need to crea
 import { format } from 'date-fns';
 import { getUserNameById } from '@/utils/userUtils';
 import SecurityCaseDetail from '@/components/security/SecurityCaseDetail';
+import SecurityCaseSLAIndicator from '@/components/security/components/SecurityCaseSLAIndicator';
 
 interface SecurityCasesTableProps {
   cases: any[]; // Replace with SecurityCase[] once type is defined
@@ -227,13 +228,22 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                 {renderSortIndicator('reportedAt')}
               </div>
             </TableHead>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/50 min-w-[200px]"
+              onClick={() => handleSort('sla')}
+            >
+              <div className="flex items-center">
+                SLA Status
+                {renderSortIndicator('sla')}
+              </div>
+            </TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {cases.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                 No security cases found matching your criteria
               </TableCell>
             </TableRow>
@@ -308,6 +318,9 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
+                  <TableCell onClick={() => toggleExpandRow(case_.id)}>
+                    <SecurityCaseSLAIndicator securityCase={case_} />
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end space-x-1">
                       <Button 
@@ -352,7 +365,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                 </TableRow>
                 {expandedCase === case_.id && (
                   <TableRow>
-                    <TableCell colSpan={9} className="p-0">
+                    <TableCell colSpan={10} className="p-0">
                       <div className="bg-muted/20 px-4 py-3">
                         {selectedCase && (
                           <SecurityCaseDetail

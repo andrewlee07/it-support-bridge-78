@@ -5,9 +5,9 @@ export interface SecurityCase {
   id: string;
   title: string;
   description: string;
-  type: string;
-  status: string;
-  priority: string;
+  type: SecurityCaseType;
+  status: SecurityCaseStatus;
+  priority: SecurityCasePriority;
   reportedBy: string;
   reportedAt: string;
   affectedSystems: string[];
@@ -17,8 +17,16 @@ export interface SecurityCase {
   }[];
   impactedUsers: number;
   remediationPlan: string;
+  firstResponseAt?: string; // Time when case was first responded to
+  resolvedAt?: string; // Time when case was resolved
 }
 
 export type SecurityCaseType = 'Data Breach' | 'SAR' | 'Compliance' | 'Threat';
 export type SecurityCaseStatus = 'Active' | 'Pending' | 'Resolved';
 export type SecurityCasePriority = 'High' | 'Medium' | 'Low';
+
+// SLA types for security cases
+export interface SecurityCaseSLA {
+  responseTimeHours: number; // Target response time in hours
+  resolutionTimeHours: number; // Target resolution time in hours
+}
