@@ -1,15 +1,17 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowUpDown, CalendarClock, Eye, Edit, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, CalendarClock, Eye, Edit, MoreHorizontal, Clock, CheckCircle2 } from 'lucide-react';
 import { SecurityCase } from '@/utils/types/security'; 
 import { getUserNameById } from '@/utils/userUtils';
 import SecurityCaseSLAIndicator from '@/components/security/components/SecurityCaseSLAIndicator';
 import WatchButton from '@/components/shared/WatchButton';
+
+type SLAType = 'response' | 'resolution';
 
 interface SecurityCasesTableProps {
   cases: any[]; // Replace with SecurityCase[] once type is defined
@@ -61,6 +63,9 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
   handleViewCase,
   handleEditCase
 }) => {
+  // Add state for SLA Type
+  const [slaType, setSlaType] = useState<SLAType>('resolution');
+
   // Helper function to render sort indicator
   const renderSortIndicator = (column: string) => {
     if (sortColumn === column) {
@@ -226,9 +231,34 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
               className="cursor-pointer hover:bg-muted/50 min-w-[240px]"
               onClick={() => handleSort('sla')}
             >
-              <div className="flex items-center">
-                SLA Status
-                {renderSortIndicator('sla')}
+              <div className="flex items-center justify-between">
+                <span>SLA Status</span>
+                <div className="flex bg-slate-800 rounded overflow-hidden">
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className={`px-2 py-1 text-xs h-7 rounded-none ${slaType === 'response' ? 'bg-slate-700 text-white' : 'text-slate-300'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSlaType('response');
+                    }}
+                  >
+                    <Clock className="h-3 w-3 mr-1" />
+                    Response
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className={`px-2 py-1 text-xs h-7 rounded-none ${slaType === 'resolution' ? 'bg-slate-700 text-white' : 'text-slate-300'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSlaType('resolution');
+                    }}
+                  >
+                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    Resolution
+                  </Button>
+                </div>
               </div>
             </TableHead>
             <TableHead className="w-[120px]">Actions</TableHead>
@@ -302,7 +332,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                   </TooltipProvider>
                 </TableCell>
                 <TableCell>
-                  <SecurityCaseSLAIndicator securityCase={case_} darkMode={true} />
+                  <SecurityCaseSLAIndicator securityCase={case_} defaultSlaType={slaType} darkMode={true} />
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end space-x-1">

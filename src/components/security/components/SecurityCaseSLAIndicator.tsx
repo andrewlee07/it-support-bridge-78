@@ -1,10 +1,8 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { SecurityCase } from '@/utils/types/security';
 import { format, differenceInHours, differenceInMinutes, addHours } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { Clock, CheckCircle2 } from 'lucide-react';
 
 type SLAType = 'response' | 'resolution';
 
@@ -19,8 +17,6 @@ const SecurityCaseSLAIndicator: React.FC<SecurityCaseSLAIndicatorProps> = ({
   defaultSlaType = 'resolution',
   darkMode = false
 }) => {
-  const [slaType, setSlaType] = useState<SLAType>(defaultSlaType);
-
   // Get SLA target hours based on priority and SLA type
   const getSLATargetHours = (priority: string, type: SLAType): number => {
     const targets = {
@@ -41,7 +37,7 @@ const SecurityCaseSLAIndicator: React.FC<SecurityCaseSLAIndicatorProps> = ({
   };
 
   // Calculate SLA status
-  const calculateSLAStatus = () => {
+  const calculateSLAStatus = (slaType: SLAType) => {
     // For resolved cases
     if (securityCase.status === 'Resolved') {
       return {
@@ -96,7 +92,7 @@ const SecurityCaseSLAIndicator: React.FC<SecurityCaseSLAIndicatorProps> = ({
     };
   };
   
-  const slaStatus = calculateSLAStatus();
+  const slaStatus = calculateSLAStatus(defaultSlaType);
   
   // If case is resolved, show completed state
   if (slaStatus.completed) {
@@ -121,49 +117,17 @@ const SecurityCaseSLAIndicator: React.FC<SecurityCaseSLAIndicatorProps> = ({
   // Dark mode or table mode styling
   const bgClass = darkMode ? 'bg-slate-700' : 'bg-slate-200';
   const textClass = darkMode ? 'text-slate-200' : 'text-slate-700';
-  const buttonActiveBg = darkMode ? 'bg-slate-600 text-white' : 'bg-slate-700 text-white';
-  const buttonInactiveBg = darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-300 text-slate-800 hover:bg-slate-400';
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div>
-          <span className={`text-sm font-medium ${textClass}`}>
-            {slaType.charAt(0).toUpperCase() + slaType.slice(1)} SLA
-          </span>
-        </div>
-        <div className="flex space-x-1">
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className={`px-2 py-1 text-xs h-7 rounded ${slaType === 'response' ? buttonActiveBg : buttonInactiveBg}`}
-            onClick={() => setSlaType('response')}
-          >
-            <Clock className="h-3 w-3 mr-1" />
-            Response
-          </Button>
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className={`px-2 py-1 text-xs h-7 rounded ${slaType === 'resolution' ? buttonActiveBg : buttonInactiveBg}`}
-            onClick={() => setSlaType('resolution')}
-          >
-            <CheckCircle2 className="h-3 w-3 mr-1" />
-            Resolution
-          </Button>
-        </div>
-      </div>
-      
-      <div className="space-y-1">
-        <span className={`text-sm ${slaStatus.isBreached ? "text-red-500 font-medium" : textClass}`}>
-          {slaStatus.timeLeft}
-        </span>
-        <Progress 
-          value={slaStatus.percentLeft} 
-          className={`h-2 ${bgClass}`} 
-          indicatorClassName={barColor} 
-        />
-      </div>
+    <div className="space-y-1">
+      <span className={`text-sm ${slaStatus.isBreached ? "text-red-500 font-medium" : textClass}`}>
+        {slaStatus.timeLeft}
+      </span>
+      <Progress 
+        value={slaStatus.percentLeft} 
+        className={`h-2 ${bgClass}`} 
+        indicatorClassName={barColor} 
+      />
     </div>
   );
 };
