@@ -1,7 +1,8 @@
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
 import { useSecurityCases } from '@/hooks/security/useSecurityCases';
 import SecurityPageHeader from '@/components/security/header/SecurityPageHeader';
 import SecurityDashboardStats from '@/components/security/dashboard/SecurityDashboardStats';
@@ -12,6 +13,9 @@ import { useAppNavigation } from '@/utils/routes/navigationUtils';
 
 const SecurityManagement = () => {
   const navigation = useAppNavigation();
+  // Add a state for the create case dialog
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
   const {
     // State
     searchQuery,
@@ -68,10 +72,23 @@ const SecurityManagement = () => {
     navigation.goToSecurityCaseDetail(caseId);
   }, [navigation]);
 
+  // Handle creating a new security case
+  const handleCreateCase = () => {
+    toast.info('Create Security Case', {
+      description: 'This would open a dialog to create a new security case',
+      duration: 3000,
+    });
+    // In a real implementation, you would open the create case form:
+    // setCreateDialogOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header with export and create buttons */}
-      <SecurityPageHeader handleExport={handleExport} />
+      <SecurityPageHeader 
+        handleExport={handleExport} 
+        handleCreateCase={handleCreateCase}
+      />
 
       {/* Metrics Cards - Interactive Filters */}
       <SecurityDashboardStats
@@ -157,6 +174,9 @@ const SecurityManagement = () => {
           isInline={false}
         />
       )}
+
+      {/* Create Case Dialog would go here */}
+      {/* We would implement a full dialog component in a real application */}
     </div>
   );
 };

@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { getUserNameById } from '@/utils/userUtils';
 import SecurityCaseDetail from '@/components/security/SecurityCaseDetail';
 import SecurityCaseSLAIndicator from '@/components/security/components/SecurityCaseSLAIndicator';
+import WatchButton from '@/components/shared/WatchButton';
 
 interface SecurityCasesTableProps {
   cases: any[]; // Replace with SecurityCase[] once type is defined
@@ -237,7 +238,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                 {renderSortIndicator('sla')}
               </div>
             </TableHead>
-            <TableHead className="w-[100px]">Actions</TableHead>
+            <TableHead className="w-[120px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -323,6 +324,17 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end space-x-1">
+                      <WatchButton 
+                        item={{
+                          id: case_.id,
+                          type: 'incident', // Using 'incident' as a general type for security cases
+                          title: case_.title,
+                          status: case_.status,
+                          createdAt: new Date(case_.reportedAt)
+                        }}
+                        variant="ghost"
+                        size="icon"
+                      />
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -366,7 +378,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                 {expandedCase === case_.id && (
                   <TableRow>
                     <TableCell colSpan={10} className="p-0">
-                      <div className="bg-muted/20 px-4 py-3">
+                      <div className="bg-muted/20 px-6 py-4 rounded-md m-2 border border-border shadow-sm">
                         {selectedCase && (
                           <SecurityCaseDetail
                             securityCase={selectedCase}

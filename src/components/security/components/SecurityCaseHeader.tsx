@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { SecurityCase } from '@/utils/types/security';
 import { ArrowLeft } from 'lucide-react';
+import WatchButton from '@/components/shared/WatchButton';
 
 interface SecurityCaseHeaderProps {
   securityCase: SecurityCase;
@@ -38,6 +39,17 @@ const SecurityCaseHeader: React.FC<SecurityCaseHeaderProps> = ({
         </div>
       </div>
       <div className="flex items-center space-x-2">
+        <WatchButton 
+          item={{
+            id: securityCase.id,
+            type: 'incident', // Using 'incident' as a general type for security cases
+            title: securityCase.title,
+            status: securityCase.status,
+            createdAt: new Date(securityCase.reportedAt)
+          }}
+          variant="outline"
+          size="sm"
+        />
         <Button variant="outline" size="sm">
           Export
         </Button>
