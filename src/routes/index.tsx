@@ -33,7 +33,13 @@ const router = createBrowserRouter([
     ),
     errorElement: React.createElement(ErrorPage),
     children: [
-      // Add all routes from domain-specific files
+      // Important: We need to handle absolute routes correctly here
+      ...securityRoutes.map(route => ({
+        ...route,
+        // Remove leading slash if it exists to make it relative to parent
+        path: route.path?.startsWith('/') ? route.path.substring(1) : route.path,
+      })),
+      // Add all other routes from domain-specific files
       ...miscRoutes,
       ...ticketRoutes,
       ...problemRoutes,
@@ -45,7 +51,6 @@ const router = createBrowserRouter([
       ...userRoutes,
       ...adminRoutes,
       ...taskRoutes,
-      ...securityRoutes,
       // Catch-all route for pages that don't exist
       {
         path: '*',

@@ -27,12 +27,11 @@ import SecurityCaseDetailPage from '@/pages/SecurityCaseDetailPage';
  */
 export const securityRoutes: RouteObject[] = [
   {
-    path: 'security',
+    path: '/security',
     element: <SecurityManagement />
   },
   {
-    // This path should be exactly what's in the URL - 'security/case/:id' to match 'security/case/SEC00001'
-    path: 'security/case/:id',
+    path: '/security/case/:id',
     element: <SecurityCaseDetailPage />
   }
 ];

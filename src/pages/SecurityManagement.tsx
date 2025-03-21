@@ -62,8 +62,9 @@ const SecurityManagement = () => {
   // Get the filtered cases
   const filteredCases = getFilteredCases();
 
-  // Navigate to case detail view
+  // Navigate to case detail view - ensure this uses the proper path format
   const goToCaseDetailView = (caseId: string) => {
+    console.log(`Navigating to security case detail: ${caseId}`);
     navigation.goToSecurityCaseDetail(caseId);
   };
 

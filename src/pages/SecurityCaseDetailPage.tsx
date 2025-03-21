@@ -41,6 +41,12 @@ const SecurityCaseDetailPage = () => {
   const [activeTab, setActiveTab] = useState<SecurityCaseTab>('overview');
   const [loading, setLoading] = useState(true);
 
+  // Debug - log the id parameter and current route
+  useEffect(() => {
+    console.log(`SecurityCaseDetailPage mounted with id: ${id}`);
+    console.log(`Current path: ${window.location.pathname}`);
+  }, [id]);
+
   // Fetch the security case details
   useEffect(() => {
     // Simulate API call with a timeout
