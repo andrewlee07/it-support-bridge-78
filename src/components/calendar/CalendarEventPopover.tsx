@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { CalendarEvent } from '@/utils/types/calendar';
 import { ExternalLink, Calendar, Clock, User, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getEventStatusColor } from './utils/eventColorUtils';
 
 interface CalendarEventPopoverProps {
   event: CalendarEvent;
@@ -36,19 +37,13 @@ const CalendarEventPopover: React.FC<CalendarEventPopoverProps> = ({
   };
 
   const renderStatus = (status: string) => {
-    const statusColors = {
-      'approved': 'bg-green-100 text-green-800 border-green-200',
-      'pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      'completed': 'bg-blue-100 text-blue-800 border-blue-200',
-      'in-progress': 'bg-purple-100 text-purple-800 border-purple-200'
-    };
-    
-    const colorClass = statusColors[status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800 border-gray-200';
+    const statusClassName = getEventStatusColor(event.type, status);
+    const baseClasses = 'px-2.5 py-0.5 rounded-full text-xs font-medium';
     
     return (
       <Badge 
         variant="outline"
-        className={colorClass}
+        className={`${statusClassName} ${baseClasses}`}
       >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
@@ -64,9 +59,10 @@ const CalendarEventPopover: React.FC<CalendarEventPopoverProps> = ({
             <Badge 
               className={
                 event.type === 'change' 
-                  ? 'bg-blue-100 text-blue-800' 
-                  : 'bg-purple-100 text-purple-800'
+                  ? 'bg-blue-100 text-blue-800 border border-blue-300' 
+                  : 'bg-purple-100 text-purple-800 border border-purple-300'
               }
+              variant="outline"
             >
               {event.type === 'change' ? 'Change' : 'Release'}
             </Badge>

@@ -2,6 +2,7 @@
 import React from 'react';
 import { format, isSameDay } from 'date-fns';
 import { CalendarEvent } from '@/utils/types/calendar';
+import { getEventColorClass } from '../utils/eventColorUtils';
 
 interface DayViewProps {
   date: Date;
@@ -26,7 +27,7 @@ const DayView: React.FC<DayViewProps> = ({
     <div className="p-4 h-full overflow-y-auto">
       <h2 className="text-xl font-semibold mb-4">{format(date, 'EEEE, MMMM d, yyyy')}</h2>
       
-      <div className="border rounded-md p-4 min-h-[450px]">
+      <div className="border rounded-md p-4 min-h-[450px] border-gray-200">
         {dayEvents.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">No events scheduled for this day</div>
         ) : (
@@ -34,11 +35,13 @@ const DayView: React.FC<DayViewProps> = ({
             {dayEvents.map((event) => (
               <div 
                 key={event.id}
-                className="p-3 rounded-md border cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                className={`p-3 rounded-md border cursor-pointer ${getEventColorClass(event)} hover:shadow-md transition-shadow`}
                 onClick={() => onEventClick(event)}
               >
                 <div className="flex items-center">
-                  <div className={`w-3 h-3 rounded-full mr-2 ${getEventColorClass(event)}`}></div>
+                  <div className={`w-3 h-3 rounded-full mr-2 ${
+                    event.type === 'change' ? 'bg-blue-500' : 'bg-purple-500'
+                  }`}></div>
                   <div className="text-sm font-medium">{format(new Date(event.date), 'h:mm a')}</div>
                 </div>
                 <div className="font-medium mt-1">{event.title}</div>

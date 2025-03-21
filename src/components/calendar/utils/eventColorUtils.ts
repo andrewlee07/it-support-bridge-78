@@ -15,7 +15,7 @@ export const getEventColorClass = (event: CalendarEvent): string => {
 
 // Helper function to get event color based on type and status for consistent appearance
 export const getEventStatusColor = (type: string, status: string): string => {
-  // Change request colors
+  // Change request colors - follow style guide status colors
   if (type === 'change') {
     switch (status.toLowerCase()) {
       case 'approved':

@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CalendarEvent } from '@/utils/types/calendar';
+import { getEventStatusColor } from './utils/eventColorUtils';
 
 interface CalendarEventListProps {
   events: CalendarEvent[];
@@ -46,14 +47,14 @@ const CalendarEventList: React.FC<CalendarEventListProps> = ({
   return (
     <div className="space-y-4">
       {Object.entries(groupedEvents).map(([dateStr, dateEvents]) => (
-        <Card key={dateStr} className="overflow-hidden">
+        <Card key={dateStr} className="overflow-hidden border border-gray-200">
           <CardHeader className="bg-muted py-2 px-4">
             <h3 className="text-sm font-medium">
               {format(new Date(dateStr), 'EEEE, MMMM d, yyyy')}
             </h3>
           </CardHeader>
           <CardContent className="p-0">
-            <ul className="divide-y">
+            <ul className="divide-y divide-gray-200">
               {dateEvents.map((event) => (
                 <li 
                   key={event.id}
@@ -71,9 +72,10 @@ const CalendarEventList: React.FC<CalendarEventListProps> = ({
                     <Badge 
                       className={
                         event.type === 'change' 
-                          ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' 
-                          : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+                          ? 'bg-blue-100 hover:bg-blue-200 text-blue-800 border border-blue-300'
+                          : 'bg-purple-100 hover:bg-purple-200 text-purple-800 border border-purple-300'
                       }
+                      variant="outline"
                     >
                       {event.type === 'change' ? 'Change' : 'Release'}
                     </Badge>

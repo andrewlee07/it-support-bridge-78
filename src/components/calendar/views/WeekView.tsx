@@ -47,13 +47,13 @@ const WeekView: React.FC<WeekViewProps> = ({
           const dayEvents = events.filter(event => isSameDay(new Date(event.date), day));
           
           return (
-            <div key={index} className="border rounded-md h-full">
+            <div key={index} className="border rounded-md h-full border-gray-200">
               <div className={`text-center p-2 border-b ${isSameDay(day, new Date()) ? 'bg-blue-100 dark:bg-blue-900/30' : ''}`}>
                 <div className="font-medium">{dayName}</div>
                 <div className="text-lg">{dayNumber}</div>
               </div>
               
-              <div className="p-2 overflow-y-auto">
+              <div className="p-2 overflow-y-auto max-h-[400px]">
                 {dayEvents.length === 0 ? (
                   <div className="text-xs text-gray-400 text-center py-2">No events</div>
                 ) : (
@@ -61,11 +61,11 @@ const WeekView: React.FC<WeekViewProps> = ({
                     {dayEvents.map(event => (
                       <div 
                         key={event.id}
-                        className={`p-2 rounded text-xs cursor-pointer ${getEventColorClass(event)}`}
+                        className={`p-2 rounded text-xs cursor-pointer ${getEventColorClass(event)} hover:shadow-sm transition-shadow`}
                         onClick={() => onEventClick(event)}
                       >
                         <div className="font-medium">{format(new Date(event.date), 'h:mm a')}</div>
-                        <div>{event.title}</div>
+                        <div className="line-clamp-2">{event.title}</div>
                       </div>
                     ))}
                   </div>

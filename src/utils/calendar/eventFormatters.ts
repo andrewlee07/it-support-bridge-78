@@ -68,27 +68,29 @@ export const getEventLabel = (event: CalendarEvent): string => {
 };
 
 /**
- * Get color for a calendar event based on type and status
- * Colors are designed to work in both light and dark modes
+ * Get color classes for a calendar event based on type and status
+ * Using consistent style guide colors
  */
 export const getEventColor = (event: CalendarEvent): string => {
-  // Dark mode friendly color scheme based on type and status
+  // Standard color classes based on type and status
   if (event.type === 'change') {
-    switch (event.status) {
-      case 'approved': return 'bg-green-100 dark:bg-green-900/60 border-green-500 text-green-800 dark:text-green-200';
-      case 'submitted': return 'bg-yellow-100 dark:bg-yellow-900/60 border-yellow-500 text-yellow-800 dark:text-yellow-200';
-      case 'in-progress': return 'bg-blue-100 dark:bg-blue-900/60 border-blue-500 text-blue-800 dark:text-blue-200';
-      case 'completed': return 'bg-purple-100 dark:bg-purple-900/60 border-purple-500 text-purple-800 dark:text-purple-200';
-      default: return 'bg-gray-100 dark:bg-gray-800/60 border-gray-500 text-gray-800 dark:text-gray-200';
+    switch (event.status.toLowerCase()) {
+      case 'approved': return 'bg-green-100 dark:bg-green-900/60 border-green-300 text-green-800 dark:text-green-200';
+      case 'submitted': return 'bg-yellow-100 dark:bg-yellow-900/60 border-yellow-300 text-yellow-800 dark:text-yellow-200';
+      case 'in-progress': return 'bg-blue-100 dark:bg-blue-900/60 border-blue-300 text-blue-800 dark:text-blue-200';
+      case 'completed': return 'bg-purple-100 dark:bg-purple-900/60 border-purple-300 text-purple-800 dark:text-purple-200';
+      case 'rejected': 
+      case 'cancelled': return 'bg-red-100 dark:bg-red-900/60 border-red-300 text-red-800 dark:text-red-200';
+      default: return 'bg-gray-100 dark:bg-gray-800/60 border-gray-300 text-gray-800 dark:text-gray-200';
     }
   } else {
     // Release colors
-    switch (event.status) {
-      case 'Planned': return 'bg-indigo-100 dark:bg-indigo-900/60 border-indigo-500 text-indigo-800 dark:text-indigo-200';
-      case 'In Progress': return 'bg-cyan-100 dark:bg-cyan-900/60 border-cyan-500 text-cyan-800 dark:text-cyan-200';
-      case 'Deployed': return 'bg-teal-100 dark:bg-teal-900/60 border-teal-500 text-teal-800 dark:text-teal-200';
-      case 'Cancelled': return 'bg-red-100 dark:bg-red-900/60 border-red-500 text-red-800 dark:text-red-200';
-      default: return 'bg-gray-100 dark:bg-gray-800/60 border-gray-500 text-gray-800 dark:text-gray-200';
+    switch (event.status.toLowerCase()) {
+      case 'planned': return 'bg-indigo-100 dark:bg-indigo-900/60 border-indigo-300 text-indigo-800 dark:text-indigo-200';
+      case 'in progress': return 'bg-cyan-100 dark:bg-cyan-900/60 border-cyan-300 text-cyan-800 dark:text-cyan-200';
+      case 'deployed': return 'bg-teal-100 dark:bg-teal-900/60 border-teal-300 text-teal-800 dark:text-teal-200';
+      case 'cancelled': return 'bg-red-100 dark:bg-red-900/60 border-red-300 text-red-800 dark:text-red-200';
+      default: return 'bg-gray-100 dark:bg-gray-800/60 border-gray-300 text-gray-800 dark:text-gray-200';
     }
   }
 };
