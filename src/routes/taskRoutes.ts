@@ -3,14 +3,13 @@ import React from 'react';
 import Tasks from '@/pages/Tasks';
 import TaskDashboard from '@/pages/TaskDashboard';
 import TaskDetailPage from '@/pages/TaskDetailPage';
-import TasksPage from '@/pages/TasksPage';
 import CreateTaskPage from '@/pages/CreateTaskPage';
 import EditTaskPage from '@/pages/EditTaskPage';
 
 export const taskRoutes = [
   {
     path: '/tasks',
-    element: React.createElement(TasksPage)
+    element: React.createElement(Tasks)
   },
   {
     path: '/tasks/dashboard',
