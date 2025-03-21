@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,8 @@ import { fetchTasks } from '@/utils/api/taskApi';
 import { Task, TaskStatus, TaskPriority, isTaskOverdue } from '@/utils/types/taskTypes';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Download } from 'lucide-react';
 
 const Tasks: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +36,12 @@ const Tasks: React.FC = () => {
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [finishDateOption, setFinishDateOption] = useState<string>('any');
   const [customFinishDate, setCustomFinishDate] = useState<Date | undefined>(undefined);
+
+  // Sample statistics for dashboard cards
+  const totalTasks = 35;
+  const activeTasks = 18;
+  const overdueTasks = 7;
+  const tasksDueToday = 4;
 
   // Load tasks
   useEffect(() => {
@@ -61,7 +68,7 @@ const Tasks: React.FC = () => {
     loadTasks();
   }, [searchQuery, statusFilter, priorityFilter, onlyAssignedToMe, user?.id]);
 
-  // Apply client-side filters (overdue, goals, finish date)
+  // Apply client-side filters
   useEffect(() => {
     let result = [...tasks];
     
@@ -174,6 +181,10 @@ const Tasks: React.FC = () => {
     setPriorityFilter(priorities);
   };
 
+  const handleExport = (type: 'csv' | 'pdf') => {
+    toast.success(`Exporting tasks as ${type.toUpperCase()}`);
+  };
+
   const renderTaskView = () => {
     if (loading) {
       return (
@@ -214,25 +225,77 @@ const Tasks: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="container py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
-            <p className="text-muted-foreground">Manage and track your tasks</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/tasks/dashboard')}>
-              Dashboard
-            </Button>
-            <Button onClick={handleCreateTask}>
+      <div className="space-y-6">
+        {/* Page Header with export and create buttons */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight">Task Management</h1>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="bg-secondary/50 border border-border/20 hover:bg-muted">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExport('csv')}>
+                  Export to CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                  Export to PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <Button onClick={handleCreateTask} className="bg-primary hover:bg-primary/90">
               <PlusCircle className="mr-2 h-4 w-4" />
-              New Task
+              Create Task
             </Button>
           </div>
         </div>
 
-        <Card className="mb-6">
-          <CardContent className="pt-6">
+        {/* Dashboard Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <p className="text-sm font-medium text-muted-foreground">Total Tasks</p>
+                <div className="text-4xl font-bold">{totalTasks}</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <p className="text-sm font-medium text-muted-foreground">Active Tasks</p>
+                <div className="text-4xl font-bold">{activeTasks}</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <p className="text-sm font-medium text-muted-foreground">Overdue Tasks</p>
+                <div className="text-4xl font-bold">{overdueTasks}</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <p className="text-sm font-medium text-muted-foreground">Due Today</p>
+                <div className="text-4xl font-bold">{tasksDueToday}</div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs and search */}
+        <Card className="bg-secondary/50 border border-border/20">
+          <CardContent className="p-6">
             <div className="flex flex-col gap-4">
               <TaskSearch
                 searchQuery={searchQuery}
@@ -263,7 +326,11 @@ const Tasks: React.FC = () => {
           </CardContent>
         </Card>
 
-        {renderTaskView()}
+        <Card className="bg-secondary/50 border border-border/20">
+          <CardContent className="p-0">
+            {renderTaskView()}
+          </CardContent>
+        </Card>
 
         <Dialog open={isNewTaskDialogOpen} onOpenChange={setIsNewTaskDialogOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
