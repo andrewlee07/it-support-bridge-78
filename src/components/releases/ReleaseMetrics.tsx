@@ -17,9 +17,9 @@ const ReleaseMetrics: React.FC<ReleaseMetricsProps> = ({ metrics, isLoading }) =
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map(i => (
-          <Card key={i} className="bg-white shadow-sm">
+          <Card key={i} className="bg-background border-0 shadow-sm">
             <CardContent className="p-6">
-              <div className="h-16 animate-pulse bg-gray-200 rounded"></div>
+              <div className="h-16 animate-pulse bg-gray-800/50 rounded"></div>
             </CardContent>
           </Card>
         ))}
@@ -31,46 +31,38 @@ const ReleaseMetrics: React.FC<ReleaseMetricsProps> = ({ metrics, isLoading }) =
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card className="bg-white shadow-sm">
+      <Card className="bg-background border-0 shadow-sm">
         <CardContent className="p-6">
-          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex flex-col items-center justify-center space-y-2 py-4">
             <p className="text-sm font-medium text-muted-foreground">Planned Releases</p>
-          </div>
-          <div className="flex items-center">
-            <div className="text-2xl font-bold">{planned}</div>
+            <div className="text-4xl font-bold text-foreground">{planned}</div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="bg-white shadow-sm">
+      <Card className="bg-background border-0 shadow-sm">
         <CardContent className="p-6">
-          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex flex-col items-center justify-center space-y-2 py-4">
             <p className="text-sm font-medium text-muted-foreground">Releases In Progress</p>
-          </div>
-          <div className="flex items-center">
-            <div className="text-2xl font-bold">{inProgress}</div>
+            <div className="text-4xl font-bold text-foreground">{inProgress}</div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="bg-white shadow-sm">
+      <Card className="bg-background border-0 shadow-sm">
         <CardContent className="p-6">
-          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex flex-col items-center justify-center space-y-2 py-4">
             <p className="text-sm font-medium text-muted-foreground">Deployed Releases</p>
-          </div>
-          <div className="flex items-center">
-            <div className="text-2xl font-bold">{deployed}</div>
+            <div className="text-4xl font-bold text-foreground">{deployed}</div>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="bg-white shadow-sm">
+      <Card className="bg-background border-0 shadow-sm">
         <CardContent className="p-6">
-          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="flex flex-col items-center justify-center space-y-2 py-4">
             <p className="text-sm font-medium text-muted-foreground">Cancelled Releases</p>
-          </div>
-          <div className="flex items-center">
-            <div className="text-2xl font-bold">{cancelled}</div>
+            <div className="text-4xl font-bold text-foreground">{cancelled}</div>
           </div>
         </CardContent>
       </Card>

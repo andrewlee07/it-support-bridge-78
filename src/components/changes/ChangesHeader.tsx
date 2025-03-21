@@ -25,14 +25,15 @@ const ChangesHeader: React.FC<ChangesHeaderProps> = ({ onCreateNew }) => {
       <div className="flex gap-2 w-full sm:w-auto">
         <Button
           variant="outline"
-          size="sm"
+          size="default"
           onClick={handleExport}
+          className="bg-background hover:bg-muted"
         >
           <Download className="h-4 w-4 mr-2" />
           Export
         </Button>
         
-        <Button onClick={onCreateNew} size="sm">
+        <Button onClick={onCreateNew} size="default" className="bg-primary hover:bg-primary/90">
           <Plus className="h-4 w-4 mr-2" />
           New Change
         </Button>

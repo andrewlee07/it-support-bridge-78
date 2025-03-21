@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -34,6 +35,21 @@ const Releases = () => {
     }
   };
 
+  // Fix TypeScript errors by ensuring correct types
+  const handleStatusFilterChange = (value: string[]) => {
+    if (releases.setStatusFilter) {
+      releases.setStatusFilter(value);
+    }
+  };
+
+  // Ensure metrics data matches the expected format
+  const metricsData = releases.metricsData ? {
+    planned: releases.metricsData.planned || 0,
+    inProgress: releases.metricsData.inProgress || 0,
+    deployed: releases.metricsData.deployed || 0,
+    cancelled: releases.metricsData.cancelled || 0
+  } : { planned: 0, inProgress: 0, deployed: 0, cancelled: 0 };
+
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -42,31 +58,33 @@ const Releases = () => {
           onCreateNew={releases.handleCreateNew}
           onTabChange={releases.handleTabChange}
           activeTab={releases.activeTab}
-          onStatusFilterChange={releases.setStatusFilter}
+          onStatusFilterChange={handleStatusFilterChange}
           statusFilter={releases.statusFilter}
           totalCount={releases.releasesData?.length || 0}
         />
         
         {/* Metrics Cards */}
-        {releases.metricsData && (
-          <ReleaseMetrics 
-            metrics={releases.metricsData} 
-            isLoading={releases.isLoadingMetrics} 
-          />
-        )}
+        <ReleaseMetrics 
+          metrics={metricsData} 
+          isLoading={releases.isLoadingMetrics || false} 
+        />
 
         {/* Tabs for different release types */}
-        <Tabs defaultValue="all" onValueChange={(value) => releases.handleTabChange?.(value)}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="all">All Releases</TabsTrigger>
-            <TabsTrigger value="planned">Planned</TabsTrigger>
-            <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-            <TabsTrigger value="deployed">Deployed</TabsTrigger>
+        <Tabs 
+          defaultValue="all" 
+          onValueChange={(value) => releases.handleTabChange?.(value)}
+          className="bg-background p-1 rounded-lg"
+        >
+          <TabsList className="mb-4 bg-muted/20 p-1">
+            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">All Releases</TabsTrigger>
+            <TabsTrigger value="planned" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Planned</TabsTrigger>
+            <TabsTrigger value="in-progress" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">In Progress</TabsTrigger>
+            <TabsTrigger value="deployed" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Deployed</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
-            <Card>
-              <CardHeader className="py-4">
+            <Card className="bg-background border-0 shadow-sm">
+              <CardHeader className="py-4 bg-background">
                 {/* Additional filters could go here */}
               </CardHeader>
               
@@ -89,7 +107,7 @@ const Releases = () => {
           
           {/* Other tabs with filtered data */}
           <TabsContent value="planned" className="space-y-4">
-            <Card>
+            <Card className="bg-background border-0 shadow-sm">
               <CardContent className="p-0">
                 <ReleasesList
                   releases={(releases.releasesData || []).filter(release => release.status === 'Planned')}
@@ -109,7 +127,7 @@ const Releases = () => {
           </TabsContent>
           
           <TabsContent value="in-progress" className="space-y-4">
-            <Card>
+            <Card className="bg-background border-0 shadow-sm">
               <CardContent className="p-0">
                 <ReleasesList
                   releases={(releases.releasesData || []).filter(release => release.status === 'In Progress')}
@@ -129,7 +147,7 @@ const Releases = () => {
           </TabsContent>
           
           <TabsContent value="deployed" className="space-y-4">
-            <Card>
+            <Card className="bg-background border-0 shadow-sm">
               <CardContent className="p-0">
                 <ReleasesList
                   releases={(releases.releasesData || []).filter(release => release.status === 'Deployed')}
