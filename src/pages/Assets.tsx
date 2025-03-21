@@ -11,6 +11,7 @@ import AssetEditForm from '@/components/assets/form/AssetEditForm';
 import AssetAddForm from '@/components/assets/form/AssetAddForm';
 import AssetLoadingIndicator from '@/components/assets/detail/AssetLoadingIndicator';
 import { toast } from 'sonner';
+import PageTransition from '@/components/shared/PageTransition';
 
 const Assets: React.FC = () => {
   const navigate = useNavigate();
@@ -65,7 +66,6 @@ const Assets: React.FC = () => {
   };
 
   const handleAddDialogChange = (open: boolean) => {
-    console.log("Add dialog change:", open);
     setIsAddingAsset(open);
   };
 
@@ -78,7 +78,6 @@ const Assets: React.FC = () => {
   };
 
   const handleAddAssetClick = () => {
-    console.log("Add asset button clicked");
     setIsAddingAsset(true);
   };
 
@@ -130,61 +129,67 @@ const Assets: React.FC = () => {
   };
 
   if (loading && !isEditingAsset && !selectedAsset && !isAddingAsset) {
-    return <AssetLoadingIndicator />;
+    return (
+      <PageTransition>
+        <AssetLoadingIndicator />
+      </PageTransition>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <AssetList 
-        onAssetClick={handleAssetClick}
-        onAddAssetClick={handleAddAssetClick}
-      />
+    <PageTransition>
+      <div className="space-y-6">
+        <AssetList 
+          onAssetClick={handleAssetClick}
+          onAddAssetClick={handleAddAssetClick}
+        />
 
-      <Dialog open={isViewingAsset && !!selectedAsset} onOpenChange={handleViewDialogChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Asset Details</DialogTitle>
-            {!isEditingAsset && <DialogDescription>View and manage asset information</DialogDescription>}
-          </DialogHeader>
-          
-          {error && (
-            <TicketLoadingError entityName="Asset" returnPath="/assets" />
-          )}
+        <Dialog open={isViewingAsset && !!selectedAsset} onOpenChange={handleViewDialogChange}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Asset Details</DialogTitle>
+              {!isEditingAsset && <DialogDescription>View and manage asset information</DialogDescription>}
+            </DialogHeader>
+            
+            {error && (
+              <TicketLoadingError entityName="Asset" returnPath="/assets" />
+            )}
 
-          {selectedAsset && !isEditingAsset && (
-            <AssetDetailView 
-              asset={selectedAsset} 
-              onClose={() => handleViewDialogChange(false)} 
-              onEditClick={handleEditClick} 
-            />
-          )}
+            {selectedAsset && !isEditingAsset && (
+              <AssetDetailView 
+                asset={selectedAsset} 
+                onClose={() => handleViewDialogChange(false)} 
+                onEditClick={handleEditClick} 
+              />
+            )}
 
-          {selectedAsset && isEditingAsset && (
-            <AssetEditForm 
-              asset={selectedAsset} 
-              onCancel={handleCancelEdit} 
-              onSave={handleSaveAsset} 
+            {selectedAsset && isEditingAsset && (
+              <AssetEditForm 
+                asset={selectedAsset} 
+                onCancel={handleCancelEdit} 
+                onSave={handleSaveAsset} 
+                loading={loading} 
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isAddingAsset} onOpenChange={handleAddDialogChange}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Add New Asset</DialogTitle>
+              <DialogDescription>Enter the details for the new asset</DialogDescription>
+            </DialogHeader>
+            
+            <AssetAddForm 
+              onCancel={handleCancelAddAsset} 
+              onSave={handleAddAsset} 
               loading={loading} 
             />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isAddingAsset} onOpenChange={handleAddDialogChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add New Asset</DialogTitle>
-            <DialogDescription>Enter the details for the new asset</DialogDescription>
-          </DialogHeader>
-          
-          <AssetAddForm 
-            onCancel={handleCancelAddAsset} 
-            onSave={handleAddAsset} 
-            loading={loading} 
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </PageTransition>
   );
 };
 
