@@ -1,13 +1,19 @@
+
 import React from 'react';
 import { Ticket } from '@/utils/types/ticket';
+import { CloseTicketValues } from './TicketCloseForm';
+import { UpdateTicketValues } from './TicketUpdateForm';
 
 export interface TicketDetailViewProps {
   ticket: Ticket;
   type: 'incident' | 'service' | 'security';
-  onUpdateTicket: (values: any) => void;
-  onCloseTicket: (values: any) => void;
+  onUpdateTicket: (values: UpdateTicketValues) => void;
+  onCloseTicket: (values: CloseTicketValues) => void;
   onAddNote: (note: string) => void;
   onReopenTicket: (reason: string) => void;
+  onUpdate?: (values: UpdateTicketValues) => void;
+  onClose?: (values: CloseTicketValues) => void;
+  onReopen?: (reason: string) => void;
 }
 
 const TicketDetailView: React.FC<TicketDetailViewProps> = ({

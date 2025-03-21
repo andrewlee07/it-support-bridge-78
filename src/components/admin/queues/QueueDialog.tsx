@@ -63,7 +63,7 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
       name: initialData?.name || '',
       description: initialData?.description || '',
       groupId: initialData?.groupId || '',
-      ticketTypes: initialData?.filterCriteria.ticketTypes || [],
+      ticketTypes: initialData?.filterCriteria.ticketTypes || [] as TicketType[],
       defaultAssignee: initialData?.defaultAssignee || '',
       isDefault: initialData?.isDefault || false,
       capacity: initialData?.capacity || undefined

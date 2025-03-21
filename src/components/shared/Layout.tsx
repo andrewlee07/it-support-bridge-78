@@ -6,7 +6,7 @@ import Header from './Header';
 
 const Layout: React.FC = () => {
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />

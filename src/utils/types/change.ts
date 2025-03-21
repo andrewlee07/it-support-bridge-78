@@ -1,10 +1,11 @@
 
 // Change management types
-import { Ticket } from './ticket';
+import { Ticket, TicketPriority } from './ticket';
+import { AuditEntry } from './audit';
 
 export type ChangeStatus = 'draft' | 'submitted' | 'approved' | 'in-progress' | 'completed' | 'failed' | 'cancelled';
 export type RiskLevel = 'low' | 'medium' | 'high';
-export type ChangeCategory = 'standard' | 'normal' | 'emergency';
+export type ChangeCategory = 'standard' | 'normal' | 'emergency' | 'hardware' | 'software' | 'network' | 'access' | 'security' | 'other';
 export type ClosureReason = 'successful' | 'successful-with-issues' | 'rolled-back' | 'failed';
 export type ApproverRole = 'it' | 'user' | 'change-manager';
 
@@ -24,6 +25,10 @@ export interface ChangeRequest extends Omit<Ticket, 'status' | 'category'> {
   approvedAt?: Date;
   implementor?: string; // Person implementing the change
   approvers?: ChangeApprover[]; // List of approvers
+  audit?: AuditEntry[]; // Audit trail
+  createdBy?: string; // Creator
+  impact?: string; // Impact level
+  urgency?: string; // Urgency level
 }
 
 export interface ChangeApprover {

@@ -1,76 +1,73 @@
 
-// Define the entity types that can be configured in the system
 export type ConfigurableEntityType = 
   | 'incident' 
-  | 'service-request'
-  | 'problem'
-  | 'change'
-  | 'backlog-item'
-  | 'security'
-  | 'bug'
-  | 'ticket'
-  | 'asset'
-  | 'user'
-  | 'release';
+  | 'service-request' 
+  | 'change' 
+  | 'problem' 
+  | 'security' 
+  | 'ticket' 
+  | 'asset' 
+  | 'user' 
+  | 'release' 
+  | 'bug' 
+  | 'backlog';
 
-// Configuration metadata
-export interface ConfigurationMeta {
-  entityType: ConfigurableEntityType;
-  lastModified: Date;
-  modifiedBy: string;
-  version: number;
-}
-
-// Define the structure for a configurable dropdown
-export interface ConfigurableDropdown {
-  id: string;
-  name: string;
-  options: DropdownOption[];
-  entityType: ConfigurableEntityType;
-  displayName: string;
-  fieldName: string;
-  isRequired: boolean;
-}
-
-// Define the structure for a dropdown option
-export interface DropdownOption {
-  id: string;
-  label: string;
-  value: string;
-  color?: string;
-  isActive?: boolean;
-  sortOrder?: number;
-}
-
-// Props for the DropdownConfigForm
-export interface DropdownConfigFormProps {
-  entityType: ConfigurableEntityType;
-  onSave: (dropdown: ConfigurableDropdown) => void;
-  onCancel: () => void;
-  onClose: () => void;
-  isNew: boolean;
-  configId?: string;
-}
-
-// Define the structure for mandatory field configuration
 export interface MandatoryFieldConfig {
   fieldName: string;
   displayName: string;
   isRequired: boolean;
   entityType: ConfigurableEntityType;
   description?: string;
-  isResolutionField?: boolean;
 }
 
-// Define the structure for module configuration
+export interface DropdownOption {
+  id: string;
+  label: string;
+  value: string;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface ConfigurableDropdown {
+  id: string;
+  entityType: ConfigurableEntityType;
+  options: DropdownOption[];
+  createdAt: Date;
+  updatedAt: Date;
+  displayName?: string;
+  fieldName?: string;
+  isRequired?: boolean;
+  isActive?: boolean;
+}
+
+export interface DropdownConfigFormProps {
+  entityType: ConfigurableEntityType;
+  onSave: (data: Partial<ConfigurableDropdown>) => void;
+  onCancel: () => void;
+  configId?: string;
+  isNew?: boolean;
+  onClose?: () => void;
+}
+
 export interface ModuleConfiguration {
   id: string;
-  moduleName: string;
-  configName: string;
-  configDisplayName: string;
-  configValue: string;
+  name: string;
   description: string;
-  updatedAt: Date;
-  updatedBy: string;
   isEnabled: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  configOptions?: Record<string, any>;
+  moduleType?: string;
+  configType?: string;
+  isActive?: boolean;
+}
+
+export interface NavigationItem {
+  href: string;
+  icon?: any;
+  title: string;
+  label?: string;
+  disabled?: boolean;
+  external?: boolean;
+  submenu?: NavigationItem[];
 }

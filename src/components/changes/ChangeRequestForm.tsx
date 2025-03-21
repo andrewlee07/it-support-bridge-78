@@ -54,6 +54,10 @@ interface ChangeRequestFormProps {
   onSubmit: (values: ChangeRequestFormValues) => void;
   initialData?: Partial<ChangeRequest>;
   isLoading?: boolean;
+  onCancel?: () => void;
+  isEditing?: boolean;
+  isSubmitting?: boolean;
+  isClosing?: boolean;
 }
 
 const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
@@ -86,11 +90,14 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
     
     let risk: 'low' | 'medium' | 'high' = 'low';
     
-    if (impact === 'high' && urgency === 'high') {
+    if ((impact === 'high' && urgency === 'high') || 
+        (initialData?.impact === 'high' && initialData?.urgency === 'high')) {
       risk = 'high';
-    } else if (impact === 'high' || urgency === 'high') {
+    } else if ((impact === 'high' || urgency === 'high') ||
+               (initialData?.impact === 'high' || initialData?.urgency === 'high')) {
       risk = 'medium';
-    } else if (impact === 'medium' && urgency === 'medium') {
+    } else if ((impact === 'medium' && urgency === 'medium') ||
+               (initialData?.impact === 'medium' && initialData?.urgency === 'medium')) {
       risk = 'medium';
     } else {
       risk = 'low';
@@ -98,7 +105,7 @@ const ChangeRequestForm: React.FC<ChangeRequestFormProps> = ({
     
     setCalculatedRisk(risk);
     form.setValue('riskLevel', risk);
-  }, [form.watch('impact'), form.watch('urgency')]);
+  }, [form.watch('impact'), form.watch('urgency'), initialData?.impact, initialData?.urgency]);
 
   const handleSubmit = (values: ChangeRequestFormValues) => {
     onSubmit(values);

@@ -2,74 +2,91 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { navigationItems } from './navigationItems';
+import { NavigationItem } from '@/utils/types/configuration';
+
+const navigationItems: NavigationItem[] = [
+  {
+    title: 'Dashboard',
+    href: '/',
+    label: 'Dashboard'
+  },
+  {
+    title: 'Incidents',
+    href: '/incidents',
+    label: 'Incidents'
+  },
+  {
+    title: 'Service Requests',
+    href: '/service-requests',
+    label: 'Service Requests'
+  },
+  {
+    title: 'Security Cases',
+    href: '/security-cases',
+    label: 'Security'
+  },
+  {
+    title: 'Problems',
+    href: '/problems',
+    label: 'Problems'
+  },
+  {
+    title: 'Changes',
+    href: '/changes',
+    label: 'Changes'
+  },
+  {
+    title: 'Releases',
+    href: '/releases',
+    label: 'Releases'
+  },
+  {
+    title: 'Assets',
+    href: '/assets',
+    label: 'Assets'
+  },
+  {
+    title: 'Announcements',
+    href: '/announcements',
+    label: 'Announcements'
+  },
+  {
+    title: 'Knowledge Base',
+    href: '/knowledge',
+    label: 'Knowledge'
+  },
+  {
+    title: 'Testing',
+    href: '/testing',
+    label: 'Testing'
+  },
+  {
+    title: 'Administration',
+    href: '/admin',
+    label: 'Administration'
+  }
+];
 
 const MainNav: React.FC = () => {
   const location = useLocation();
 
   return (
-    <nav className="space-y-1 px-2">
+    <nav className="space-y-1">
       {navigationItems.map((item) => (
-        <React.Fragment key={item.href}>
-          {item.label && (
-            <div className="px-3 py-2 text-xs font-semibold text-muted-foreground">
-              {item.label}
-            </div>
+        <Link
+          key={item.href}
+          to={item.href}
+          className={cn(
+            'flex items-center py-2 px-4 text-sm font-medium rounded-md',
+            location.pathname === item.href
+              ? 'bg-primary/10 text-primary'
+              : 'text-muted-foreground hover:bg-muted'
           )}
-          {item.items ? (
-            <div className="space-y-1">
-              {item.items.map((subItem) => (
-                <NavLink
-                  key={subItem.href}
-                  href={subItem.href}
-                  icon={subItem.icon}
-                  isActive={location.pathname === subItem.href}
-                >
-                  {subItem.title}
-                </NavLink>
-              ))}
-            </div>
-          ) : (
-            <NavLink
-              href={item.href}
-              icon={item.icon}
-              isActive={location.pathname === item.href}
-            >
-              {item.title}
-            </NavLink>
-          )}
-        </React.Fragment>
+        >
+          {item.label}
+        </Link>
       ))}
     </nav>
-  );
-};
-
-interface NavLinkProps {
-  href: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-  isActive?: boolean;
-}
-
-const NavLink: React.FC<NavLinkProps> = ({
-  href,
-  icon,
-  children,
-  isActive,
-}) => {
-  return (
-    <Link
-      to={href}
-      className={cn(
-        "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-        isActive 
-          ? "bg-primary text-primary-foreground" 
-          : "hover:bg-accent hover:text-accent-foreground"
-      )}
-    >
-      {icon && <span className="text-muted-foreground">{icon}</span>}
-      <span>{children}</span>
-    </Link>
   );
 };
 
