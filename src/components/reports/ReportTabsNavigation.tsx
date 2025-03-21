@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, Laptop, Clock, MessageSquare, FileText, Wrench, Bug, Box, Briefcase } from 'lucide-react';
+import { BarChart, Clock, MessageSquare, FileCheck, FileText, Wrench, PuzzlePiece, PackageOpen, Briefcase } from 'lucide-react';
 
 const ReportTabsNavigation: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ const ReportTabsNavigation: React.FC = () => {
         Dashboard
       </TabsTrigger>
       <TabsTrigger value="incidents" className="flex items-center gap-1">
-        <Laptop className="h-4 w-4" />
+        <MessageSquare className="h-4 w-4" />
         Incidents
       </TabsTrigger>
       <TabsTrigger value="service" className="flex items-center gap-1">
@@ -19,7 +19,7 @@ const ReportTabsNavigation: React.FC = () => {
         Service Requests
       </TabsTrigger>
       <TabsTrigger value="problems" className="flex items-center gap-1">
-        <Bug className="h-4 w-4" />
+        <PuzzlePiece className="h-4 w-4" />
         Problems
       </TabsTrigger>
       <TabsTrigger value="changes" className="flex items-center gap-1">
@@ -27,7 +27,7 @@ const ReportTabsNavigation: React.FC = () => {
         Changes
       </TabsTrigger>
       <TabsTrigger value="releases" className="flex items-center gap-1">
-        <Box className="h-4 w-4" />
+        <PackageOpen className="h-4 w-4" />
         Releases
       </TabsTrigger>
       <TabsTrigger value="assets" className="flex items-center gap-1">

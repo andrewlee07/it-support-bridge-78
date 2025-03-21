@@ -8,7 +8,6 @@ import {
   Cog,
   LayoutDashboard,
   List,
-  PackageOpen,
   ScrollText,
   Server,
   FileStack,
@@ -16,7 +15,11 @@ import {
   Megaphone,
   ExternalLink,
   ShoppingCart,
-  ShieldAlert
+  ShieldAlert,
+  FileCheck,
+  PackageOpen,
+  Wrench,
+  PuzzlePiece
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -61,13 +64,13 @@ export const navigationItems: NavigationItem[] = [
   {
     title: "Problem Management",
     href: "/problems",
-    icon: Bug,
+    icon: PuzzlePiece,
     description: "Manage system problems"
   },
   {
     title: "Change Management",
     href: "/changes",
-    icon: PackageOpen,
+    icon: Wrench,
     description: "Manage change requests"
   },
   {
@@ -97,7 +100,7 @@ export const navigationItems: NavigationItem[] = [
   {
     title: "Test Management",
     href: "/test-tracking",
-    icon: Bug,
+    icon: FileCheck,
     description: "Manage testing activities"
   },
   {
@@ -138,7 +141,7 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     title: "Admin Settings",
-    href: "/admin",  // Updated from /admin/process-configuration to /admin
+    href: "/admin",
     icon: Cog,
     description: "Configure system settings"
   },
