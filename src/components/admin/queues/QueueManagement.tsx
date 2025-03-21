@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { InboxIcon, Plus } from 'lucide-react';
 import QueueTable from './QueueTable';
-import QueueDialog from './QueueDialog';
+import QueueDialog, { QueueFormValues } from './QueueDialog';
 import { useQueueManagement } from './useQueueManagement';
 import { Card } from '@/components/ui/card';
 
@@ -44,7 +44,7 @@ const QueueManagement: React.FC = () => {
       <QueueDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
-        onSubmit={handleSubmitQueue}
+        onSubmit={(values: QueueFormValues) => handleSubmitQueue(values)}
         initialData={editingQueue || undefined}
         isEditing={isEditing}
       />

@@ -32,14 +32,14 @@ const queueFormSchema = z.object({
   description: z.string().optional(),
   groupId: z.string(),
   ticketTypes: z.array(
-    z.enum(['incident', 'service', 'change'] as const)
+    z.enum(['incident', 'service', 'change', 'security'] as const)
   ).min(1, { message: 'Select at least one ticket type' }),
   defaultAssignee: z.string().optional(),
   isDefault: z.boolean().optional(),
   capacity: z.number().optional()
 });
 
-type QueueFormValues = z.infer<typeof queueFormSchema>;
+export type QueueFormValues = z.infer<typeof queueFormSchema>;
 
 interface QueueDialogProps {
   open: boolean;
@@ -74,7 +74,8 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
   const ticketTypeOptions = [
     { value: 'incident', label: 'Incident' },
     { value: 'service', label: 'Service Request' },
-    { value: 'change', label: 'Change Request' }
+    { value: 'change', label: 'Change Request' },
+    { value: 'security', label: 'Security Case' }
   ];
 
   // Available groups for dropdown
@@ -181,14 +182,28 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
               name="capacity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Queue Capacity</FormLabel>
+                  <FormLabel>Capacity</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
-                      placeholder="Maximum number of tickets" 
+                      placeholder="Max number of tickets" 
                       {...field}
                       onChange={e => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="defaultAssignee"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Default Assignee</FormLabel>
+                  <FormControl>
+                    <Input placeholder="User ID of default assignee" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -205,13 +220,12 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
                       type="checkbox"
                       checked={field.value}
                       onChange={field.onChange}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel>Default Queue</FormLabel>
                     <p className="text-sm text-muted-foreground">
-                      Make this the default queue for the selected group
+                      Make this the default queue for tickets with no specific routing
                     </p>
                   </div>
                 </FormItem>
@@ -223,7 +237,7 @@ const QueueDialog: React.FC<QueueDialogProps> = ({
                 Cancel
               </Button>
               <Button type="submit">
-                {isEditing ? 'Save Changes' : 'Create Queue'}
+                {isEditing ? 'Update Queue' : 'Create Queue'}
               </Button>
             </DialogFooter>
           </form>
