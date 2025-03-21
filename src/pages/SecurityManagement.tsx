@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -864,66 +863,4 @@ const SecurityManagement = () => {
                               </TooltipProvider>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center justify-end space-x-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => handleViewCase(case_)}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => handleEditCase(case_)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                      <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>
-                                      View Details
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                      Assign Case
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-red-600">
-                                      Close Case
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                          {expandedCase === case_.id && (
-                            <TableRow>
-                              <TableCell colSpan={9} className="p-0 border-b-0">
-                                <div className="bg-muted/30 p-4">
-                                  <SecurityCaseDetail securityCase={case_} />
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </React.Fragment>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
-
-export default SecurityManagement;
+                              <div className="flex items-center justify-end space-x-1
