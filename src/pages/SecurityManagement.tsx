@@ -15,7 +15,14 @@ import {
   ArrowUpDown,
   Search,
   CalendarClock,
-  X
+  X,
+  Download,
+  FileText,
+  Calendar,
+  ChevronRight,
+  Eye,
+  Edit,
+  MoreHorizontal
 } from 'lucide-react';
 import StatCard from '@/components/dashboard/StatCard';
 import { Input } from '@/components/ui/input';
@@ -28,6 +35,21 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getUserNameById } from '@/utils/userUtils';
 import { cn } from '@/lib/utils';
+import SecurityCaseDetail from '@/components/security/SecurityCaseDetail';
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 const SecurityManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,6 +67,15 @@ const SecurityManagement = () => {
     dataBreaches: false,
     complianceIssues: false
   });
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined
+  });
+  const [expandedCase, setExpandedCase] = useState<string | null>(null);
+  const [selectedCase, setSelectedCase] = useState<any | null>(null);
 
   // Mock data for security cases
   const securityCases = [
@@ -56,7 +87,14 @@ const SecurityManagement = () => {
       status: 'Active',
       priority: 'High',
       reportedBy: 'user-1',
-      reportedAt: '2 days ago'
+      reportedAt: '2023-12-15T14:30:00',
+      affectedSystems: ['Customer Portal', 'API Gateway'],
+      investigationSteps: [
+        { date: '2023-12-15', text: 'Initial discovery and containment' },
+        { date: '2023-12-16', text: 'Impact assessment conducted' }
+      ],
+      impactedUsers: 120,
+      remediationPlan: 'Update API gateway security configurations and implement additional access controls'
     },
     {
       id: 'SEC00002',
@@ -66,7 +104,14 @@ const SecurityManagement = () => {
       status: 'Pending',
       priority: 'Medium',
       reportedBy: 'user-2',
-      reportedAt: '5 days ago'
+      reportedAt: '2023-12-10T09:15:00',
+      affectedSystems: ['CRM', 'Customer Database'],
+      investigationSteps: [
+        { date: '2023-12-10', text: 'Request received and logged' },
+        { date: '2023-12-12', text: 'Initial data gathering process started' }
+      ],
+      impactedUsers: 1,
+      remediationPlan: 'Compile all customer data and prepare secure transfer mechanism'
     },
     {
       id: 'SEC00003',
@@ -76,7 +121,14 @@ const SecurityManagement = () => {
       status: 'Active',
       priority: 'Medium',
       reportedBy: 'user-3',
-      reportedAt: '2 weeks ago'
+      reportedAt: '2023-12-01T11:45:00',
+      affectedSystems: ['Legacy HR System', 'Vendor Portal'],
+      investigationSteps: [
+        { date: '2023-12-01', text: 'Non-compliance identified during routine audit' },
+        { date: '2023-12-03', text: 'Technical assessment of affected systems' }
+      ],
+      impactedUsers: 50,
+      remediationPlan: 'Update password policies on legacy systems or implement compensating controls'
     },
     {
       id: 'SEC00004',
@@ -86,7 +138,15 @@ const SecurityManagement = () => {
       status: 'Resolved',
       priority: 'Low',
       reportedBy: 'user-1',
-      reportedAt: '3 weeks ago'
+      reportedAt: '2023-11-20T08:30:00',
+      affectedSystems: ['Email System'],
+      investigationSteps: [
+        { date: '2023-11-20', text: 'Phishing emails identified and reported' },
+        { date: '2023-11-20', text: 'Email security rules updated' },
+        { date: '2023-11-21', text: 'Security awareness communication sent to all staff' }
+      ],
+      impactedUsers: 15,
+      remediationPlan: 'Completed: Enhanced email filtering and security awareness training'
     }
   ];
 
@@ -106,6 +166,89 @@ const SecurityManagement = () => {
       ...prev,
       [filterName]: !prev[filterName]
     }));
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, 'MMM dd, yyyy');
+  };
+
+  // Format time difference for display
+  const getTimeDifference = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return formatDate(dateString);
+  };
+
+  // Handle row expansion
+  const toggleExpandRow = (caseId: string) => {
+    if (expandedCase === caseId) {
+      setExpandedCase(null);
+    } else {
+      setExpandedCase(caseId);
+      const caseDetail = securityCases.find(c => c.id === caseId);
+      setSelectedCase(caseDetail || null);
+    }
+  };
+
+  // Handle case view
+  const handleViewCase = (secCase: any) => {
+    setSelectedCase(secCase);
+  };
+
+  // Handle case edit
+  const handleEditCase = (secCase: any) => {
+    toast.info(`Editing case ${secCase.id}`, {
+      description: "Edit functionality would open edit form"
+    });
+  };
+
+  // Export to CSV
+  const exportToCsv = () => {
+    const filteredCases = getFilteredCases();
+    const headers = ['ID', 'Title', 'Type', 'Status', 'Priority', 'Reported By', 'Reported At'];
+    
+    const csvContent = [
+      headers.join(','),
+      ...filteredCases.map(c => [
+        c.id,
+        `"${c.title.replace(/"/g, '""')}"`,
+        c.type,
+        c.status,
+        c.priority,
+        getUserNameById(c.reportedBy),
+        formatDate(c.reportedAt)
+      ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `security_cases_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Export complete', {
+      description: 'Security cases exported to CSV'
+    });
+  };
+
+  // Export to PDF
+  const exportToPdf = () => {
+    toast.info('PDF Export', {
+      description: 'PDF export functionality would generate a formatted report'
+    });
   };
 
   // Get filtered and sorted cases
@@ -151,6 +294,27 @@ const SecurityManagement = () => {
       filtered = filtered.filter(case_ => case_.type === 'Compliance');
     }
     
+    // Apply date range filter
+    if (dateRange.from) {
+      const fromDate = new Date(dateRange.from);
+      fromDate.setHours(0, 0, 0, 0);
+      
+      filtered = filtered.filter(case_ => {
+        const caseDate = new Date(case_.reportedAt);
+        return caseDate >= fromDate;
+      });
+    }
+    
+    if (dateRange.to) {
+      const toDate = new Date(dateRange.to);
+      toDate.setHours(23, 59, 59, 999);
+      
+      filtered = filtered.filter(case_ => {
+        const caseDate = new Date(case_.reportedAt);
+        return caseDate <= toDate;
+      });
+    }
+    
     // Apply sorting
     if (sortColumn) {
       filtered.sort((a: any, b: any) => {
@@ -194,6 +358,20 @@ const SecurityManagement = () => {
     }
   };
 
+  // Get priority icon based on level
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case 'High':
+        return <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>;
+      case 'Medium':
+        return <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>;
+      case 'Low':
+        return <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>;
+      default:
+        return null;
+    }
+  };
+
   // Filter options
   const typeOptions = ['Data Breach', 'SAR', 'Compliance', 'Threat'];
   const priorityOptions = ['High', 'Medium', 'Low'];
@@ -211,6 +389,7 @@ const SecurityManagement = () => {
     setTypeFilter(null);
     setStatusFilter(null);
     setSortColumn(null);
+    setDateRange({ from: undefined, to: undefined });
     setCardFilters({
       activeCases: false,
       dataBreaches: false,
@@ -224,9 +403,34 @@ const SecurityManagement = () => {
            priorityFilter !== null || 
            typeFilter !== null || 
            statusFilter !== null ||
+           dateRange.from !== undefined ||
+           dateRange.to !== undefined ||
            cardFilters.activeCases ||
            cardFilters.dataBreaches ||
            cardFilters.complianceIssues;
+  };
+
+  // Format date range for display
+  const getDateRangeText = () => {
+    if (dateRange.from && dateRange.to) {
+      return `${format(dateRange.from, 'MMM dd, yyyy')} - ${format(dateRange.to, 'MMM dd, yyyy')}`;
+    }
+    if (dateRange.from) {
+      return `From ${format(dateRange.from, 'MMM dd, yyyy')}`;
+    }
+    if (dateRange.to) {
+      return `Until ${format(dateRange.to, 'MMM dd, yyyy')}`;
+    }
+    return '';
+  };
+
+  // Handle Export Actions
+  const handleExport = (type: 'csv' | 'pdf') => {
+    if (type === 'csv') {
+      exportToCsv();
+    } else {
+      exportToPdf();
+    }
   };
 
   // Get the sorted and filtered cases
@@ -234,11 +438,29 @@ const SecurityManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold">IT Security Management</h1>
-        <Button className="flex items-center gap-1">
-          <Plus className="h-4 w-4" /> Create Security Case
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="flex items-center gap-1">
+                <Download className="h-4 w-4" /> Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport('csv')}>
+                <FileText className="h-4 w-4 mr-2" /> Export to CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                <FileText className="h-4 w-4 mr-2" /> Export to PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <Button className="flex items-center gap-1">
+            <Plus className="h-4 w-4" /> Create Security Case
+          </Button>
+        </div>
       </div>
 
       {/* Metrics Cards - Interactive Filters */}
@@ -320,6 +542,35 @@ const SecurityManagement = () => {
                     className="pl-8 h-9"
                   />
                 </div>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "h-9 border-dashed flex gap-1",
+                        dateRange.from && "text-primary"
+                      )}
+                    >
+                      <Calendar className="h-4 w-4" />
+                      {dateRange.from ? (
+                        getDateRangeText()
+                      ) : (
+                        "Date Range"
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <CalendarComponent
+                      initialFocus
+                      mode="range"
+                      selected={dateRange}
+                      onSelect={setDateRange}
+                      numberOfMonths={1}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               
               {/* Active filter indicators */}
@@ -379,6 +630,15 @@ const SecurityManagement = () => {
                       />
                     </Badge>
                   )}
+                  {dateRange.from && (
+                    <Badge variant="outline" className="bg-purple-50 text-purple-700 flex items-center gap-1">
+                      Date: {getDateRangeText()}
+                      <X 
+                        className="h-3 w-3 ml-1 cursor-pointer" 
+                        onClick={() => setDateRange({ from: undefined, to: undefined })}
+                      />
+                    </Badge>
+                  )}
                   {searchQuery && (
                     <Badge variant="outline" className="bg-gray-50 flex items-center gap-1">
                       Search: {searchQuery}
@@ -392,181 +652,352 @@ const SecurityManagement = () => {
               )}
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort('id')}
-                    >
-                      <div className="flex items-center">
-                        ID
-                        {sortColumn === 'id' && (
-                          <span className="ml-1">
-                            {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                          </span>
-                        )}
-                      </div>
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort('title')}
-                    >
-                      <div className="flex items-center">
-                        Case Description
-                        {sortColumn === 'title' && (
-                          <span className="ml-1">
-                            {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                          </span>
-                        )}
-                        <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      <div className="flex items-center">
-                        Type
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <ChevronDown className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {typeOptions.map(type => (
-                              <DropdownMenuItem 
-                                key={type}
-                                onClick={() => setTypeFilter(type === typeFilter ? null : type)}
-                                className={typeFilter === type ? "bg-muted" : ""}
-                              >
-                                {type}
-                              </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setTypeFilter(null)}>
-                              Show All
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      <div className="flex items-center">
-                        Status
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <ChevronDown className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {statusOptions.map(status => (
-                              <DropdownMenuItem 
-                                key={status}
-                                onClick={() => setStatusFilter(status === statusFilter ? null : status)}
-                                className={statusFilter === status ? "bg-muted" : ""}
-                              >
-                                {status}
-                              </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setStatusFilter(null)}>
-                              Show All
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      <div className="flex items-center">
-                        Priority
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <ChevronDown className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {priorityOptions.map(priority => (
-                              <DropdownMenuItem 
-                                key={priority}
-                                onClick={() => setPriorityFilter(priority === priorityFilter ? null : priority)}
-                                className={priorityFilter === priority ? "bg-muted" : ""}
-                              >
-                                {priority}
-                              </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setPriorityFilter(null)}>
-                              Show All
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      Reported By
-                    </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSort('reportedAt')}
-                    >
-                      <div className="flex items-center">
-                        <CalendarClock className="mr-1 h-4 w-4 opacity-70" />
-                        Reported
-                        {sortColumn === 'reportedAt' && (
-                          <span className="ml-1">
-                            {sortDirection === 'asc' ? ' ↑' : ' ↓'}
-                          </span>
-                        )}
-                      </div>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCases.length === 0 ? (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                        No security cases found matching your criteria
-                      </TableCell>
+                      <TableHead className="w-10"></TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handleSort('id')}
+                      >
+                        <div className="flex items-center">
+                          ID
+                          {sortColumn === 'id' && (
+                            <span className="ml-1">
+                              {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                            </span>
+                          )}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handleSort('title')}
+                      >
+                        <div className="flex items-center">
+                          Case Description
+                          {sortColumn === 'title' && (
+                            <span className="ml-1">
+                              {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                            </span>
+                          )}
+                          <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
+                        </div>
+                      </TableHead>
+                      <TableHead>
+                        <div className="flex items-center">
+                          Type
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <ChevronDown className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {typeOptions.map(type => (
+                                <DropdownMenuItem 
+                                  key={type}
+                                  onClick={() => setTypeFilter(type === typeFilter ? null : type)}
+                                  className={typeFilter === type ? "bg-muted" : ""}
+                                >
+                                  {type}
+                                </DropdownMenuItem>
+                              ))}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => setTypeFilter(null)}>
+                                Show All
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableHead>
+                      <TableHead>
+                        <div className="flex items-center">
+                          Status
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <ChevronDown className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {statusOptions.map(status => (
+                                <DropdownMenuItem 
+                                  key={status}
+                                  onClick={() => setStatusFilter(status === statusFilter ? null : status)}
+                                  className={statusFilter === status ? "bg-muted" : ""}
+                                >
+                                  {status}
+                                </DropdownMenuItem>
+                              ))}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => setStatusFilter(null)}>
+                                Show All
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableHead>
+                      <TableHead>
+                        <div className="flex items-center">
+                          Priority
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <ChevronDown className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {priorityOptions.map(priority => (
+                                <DropdownMenuItem 
+                                  key={priority}
+                                  onClick={() => setPriorityFilter(priority === priorityFilter ? null : priority)}
+                                  className={priorityFilter === priority ? "bg-muted" : ""}
+                                >
+                                  {priority}
+                                </DropdownMenuItem>
+                              ))}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => setPriorityFilter(null)}>
+                                Show All
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableHead>
+                      <TableHead>
+                        Reported By
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handleSort('reportedAt')}
+                      >
+                        <div className="flex items-center">
+                          <CalendarClock className="mr-1 h-4 w-4 opacity-70" />
+                          Reported
+                          {sortColumn === 'reportedAt' && (
+                            <span className="ml-1">
+                              {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                            </span>
+                          )}
+                        </div>
+                      </TableHead>
+                      <TableHead className="w-[100px]">Actions</TableHead>
                     </TableRow>
-                  ) : (
-                    filteredCases.map((case_) => (
-                      <TableRow key={case_.id} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="font-medium">{case_.id}</TableCell>
-                        <TableCell className="max-w-sm">
-                          <div>
-                            <p className="font-medium">{case_.title}</p>
-                            <p className="text-sm text-muted-foreground">{case_.description}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={getTypeColor(case_.type)}>
-                            {case_.type}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(case_.status)}>
-                            {case_.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={getPriorityColor(case_.priority)}>
-                            {case_.priority}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {getUserNameById(case_.reportedBy)}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {case_.reportedAt}
+                  </TableHeader>
+                  <TableBody>
+                    {filteredCases.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                          No security cases found matching your criteria
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                    ) : (
+                      filteredCases.map((case_) => (
+                        <React.Fragment key={case_.id}>
+                          <TableRow className="cursor-pointer hover:bg-muted/50">
+                            <TableCell className="px-2 py-2">
+                              <Button
+                                variant="ghost" 
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => toggleExpandRow(case_.id)}
+                              >
+                                <ChevronRight 
+                                  className={cn(
+                                    "h-4 w-4 transition-transform",
+                                    expandedCase === case_.id && "transform rotate-90"
+                                  )} 
+                                />
+                              </Button>
+                            </TableCell>
+                            <TableCell className="font-medium">{case_.id}</TableCell>
+                            <TableCell 
+                              className="max-w-sm"
+                              onClick={() => toggleExpandRow(case_.id)}
+                            >
+                              <div>
+                                <p className="font-medium">{case_.title}</p>
+                                <p className="text-sm text-muted-foreground line-clamp-1">{case_.description}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell onClick={() => toggleExpandRow(case_.id)}>
+                              <Badge variant="outline" className={getTypeColor(case_.type)}>
+                                {case_.type}
+                              </Badge>
+                            </TableCell>
+                            <TableCell onClick={() => toggleExpandRow(case_.id)}>
+                              <Badge className={getStatusColor(case_.status)}>
+                                {case_.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell onClick={() => toggleExpandRow(case_.id)}>
+                              <div className="flex items-center">
+                                {getPriorityIcon(case_.priority)}
+                                <Badge variant="outline" className={getPriorityColor(case_.priority)}>
+                                  {case_.priority}
+                                </Badge>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground" onClick={() => toggleExpandRow(case_.id)}>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span>{getUserNameById(case_.reportedBy)}</span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>User ID: {case_.reportedBy}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground" onClick={() => toggleExpandRow(case_.id)}>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span>{getTimeDifference(case_.reportedAt)}</span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{formatDate(case_.reportedAt)}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center justify-end space-x-1">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => handleViewCase(case_)}
+                                      >
+                                        <Eye className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>View Details</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                                
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => handleEditCase(case_)}
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Edit Case</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                                
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem>Assign Case</DropdownMenuItem>
+                                    <DropdownMenuItem>Add Comment</DropdownMenuItem>
+                                    <DropdownMenuItem>Change Status</DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="text-red-600">Close Case</DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          {expandedCase === case_.id && (
+                            <TableRow className="bg-muted/30">
+                              <TableCell colSpan={9} className="p-4">
+                                <div className="space-y-4">
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                      <h4 className="text-sm font-medium mb-1">Affected Systems</h4>
+                                      <div className="flex flex-wrap gap-1">
+                                        {case_.affectedSystems?.map((system: string) => (
+                                          <Badge key={system} variant="outline" className="bg-blue-50 text-blue-700">
+                                            {system}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <h4 className="text-sm font-medium mb-1">Impacted Users</h4>
+                                      <p>{case_.impactedUsers} users affected</p>
+                                    </div>
+                                    <div>
+                                      <h4 className="text-sm font-medium mb-1">Reported</h4>
+                                      <p>{formatDate(case_.reportedAt)}</p>
+                                    </div>
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="text-sm font-medium mb-1">Description</h4>
+                                    <p className="text-sm">{case_.description}</p>
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="text-sm font-medium mb-1">Investigation Steps</h4>
+                                    <div className="space-y-2">
+                                      {case_.investigationSteps?.map((step: any, index: number) => (
+                                        <div key={index} className="flex gap-2 text-sm">
+                                          <span className="text-muted-foreground">{step.date}:</span>
+                                          <span>{step.text}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="text-sm font-medium mb-1">Remediation Plan</h4>
+                                    <p className="text-sm">{case_.remediationPlan}</p>
+                                  </div>
+                                  
+                                  <div className="flex justify-end gap-2">
+                                    <Button size="sm" variant="outline" onClick={() => toggleExpandRow(case_.id)}>
+                                      Collapse
+                                    </Button>
+                                    <Button size="sm" onClick={() => handleViewCase(case_)}>
+                                      View Full Details
+                                    </Button>
+                                  </div>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </React.Fragment>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
+          
+          {/* Security Case Detail Dialog */}
+          {selectedCase && (
+            <SecurityCaseDetail 
+              securityCase={selectedCase}
+              open={!!selectedCase}
+              onClose={() => setSelectedCase(null)}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="data-breaches">
