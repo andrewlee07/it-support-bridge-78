@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import ProblemTable from './ProblemTable';
 import { Problem } from '@/utils/types/problem';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
+import { AuditEntry } from '@/utils/types/audit';
 
 // Mock data for problem management
 const mockProblems: Problem[] = [
@@ -21,11 +23,17 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC001', 'SVC002'],
     audit: [
       {
+        id: uuidv4(),
+        entityId: 'PB001234',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 600000),
         message: 'Problem created',
         userName: 'John Doe'
       },
       {
+        id: uuidv4(),
+        entityId: 'PB001234',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 300000),
         message: 'Status updated to Under Investigation',
         userName: 'Jane Smith'
@@ -46,11 +54,17 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC003'],
     audit: [
       {
+        id: uuidv4(),
+        entityId: 'PB001235',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 86400000),
         message: 'Problem created',
         userName: 'Alice Johnson'
       },
       {
+        id: uuidv4(),
+        entityId: 'PB001235',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 43200000),
         message: 'Root cause identified: Database connection pool exhaustion',
         userName: 'Bob Williams'
@@ -71,11 +85,17 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC004'],
     audit: [
       {
+        id: uuidv4(),
+        entityId: 'PB001236',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 172800000),
         message: 'Problem created',
         userName: 'Charlie Brown'
       },
       {
+        id: uuidv4(),
+        entityId: 'PB001236',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 86400000),
         message: 'Added to Known Error Database',
         userName: 'Diana Prince'
@@ -96,6 +116,9 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC005', 'SVC006'],
     audit: [
       {
+        id: uuidv4(),
+        entityId: 'PB001237',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 259200000),
         message: 'Problem created',
         userName: 'John Doe'
@@ -116,16 +139,25 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC007'],
     audit: [
       {
+        id: uuidv4(),
+        entityId: 'PB001238',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 345600000),
         message: 'Problem created',
         userName: 'Alice Johnson'
       },
       {
+        id: uuidv4(),
+        entityId: 'PB001238',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 259200000),
         message: 'Status updated to In Progress',
         userName: 'Charlie Brown'
       },
       {
+        id: uuidv4(),
+        entityId: 'PB001238',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 86400000),
         message: 'Problem resolved: Increased authentication service capacity',
         userName: 'Charlie Brown'
@@ -147,11 +179,17 @@ const mockProblems: Problem[] = [
     serviceIds: ['SVC008'],
     audit: [
       {
+        id: uuidv4(),
+        entityId: 'PB001239',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 432000000),
         message: 'Problem created',
         userName: 'Bob Williams'
       },
       {
+        id: uuidv4(),
+        entityId: 'PB001239',
+        entityType: 'problem',
         timestamp: new Date(Date.now() - 345600000),
         message: 'Status updated to Pending - Waiting for Vendor',
         userName: 'John Doe'
