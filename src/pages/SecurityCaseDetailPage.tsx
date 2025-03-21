@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   Card, 
   CardContent,
@@ -22,7 +22,8 @@ import {
   Server, 
   MessageSquare,
   Users, 
-  ExternalLink 
+  ExternalLink,
+  Plus
 } from 'lucide-react';
 import { useAppNavigation } from '@/utils/routes/navigationUtils';
 import { getUserNameById } from '@/utils/userUtils';
@@ -31,6 +32,8 @@ import SecurityCaseSLAIndicator from '@/components/security/components/SecurityC
 import { useSecurityCaseDetail } from '@/hooks/security/useSecurityCaseDetail';
 import { toast } from 'sonner';
 import { useDisclosure } from '@/hooks/useDisclosure';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 
 const SecurityCaseDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,8 +41,9 @@ const SecurityCaseDetailPage = () => {
   const appNavigation = useAppNavigation();
   const [activeTab, setActiveTab] = useState<SecurityCaseTab>('overview');
   const { isOpen: addNoteDialogOpen, onOpen: openAddNoteDialog, onClose: closeAddNoteDialog } = useDisclosure();
+  const [noteText, setNoteText] = useState('');
   
-  // Use the security case detail hook instead of local state and fetching
+  // Use the security case detail hook
   const { 
     securityCase, 
     loading, 
@@ -52,10 +56,9 @@ const SecurityCaseDetailPage = () => {
     calculateSLAStatus 
   } = useSecurityCaseDetail(id || '');
 
-  // Debug - log the id parameter and loading state on initial mount only
+  // Log the id parameter and loading state on initial mount only
   useEffect(() => {
     console.log(`SecurityCaseDetailPage mounted with id: ${id}`);
-    console.log(`Current path: ${window.location.pathname}`);
     
     // Return a no-op cleanup function to prevent unnecessary re-renders
     return () => {};
@@ -71,12 +74,28 @@ const SecurityCaseDetailPage = () => {
     }
   }, [id, appNavigation]);
 
-  const handleAddNote = useCallback(async (noteText: string) => {
+  const handleAddNote = useCallback(async () => {
+    if (!noteText.trim()) {
+      toast.error('Please enter a note');
+      return;
+    }
+    
     if (await addNote(noteText)) {
+      setNoteText('');
       closeAddNoteDialog();
       toast.success('Note added successfully');
     }
-  }, [addNote, closeAddNoteDialog]);
+  }, [addNote, closeAddNoteDialog, noteText]);
+
+  const handleSystemClick = useCallback((system: string) => {
+    toast.info(`Viewing details for ${system}`);
+    // In a real app, this would navigate to the system details page
+  }, []);
+
+  const handleRelatedItemClick = useCallback((itemId: string) => {
+    toast.info(`Navigating to ${itemId}`);
+    // In a real app, this would navigate to the related item
+  }, []);
 
   // Get status color for badges
   const getStatusColor = useCallback((status: string) => {
@@ -113,7 +132,7 @@ const SecurityCaseDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-4 sm:p-6 w-full max-w-[1400px] mx-auto">
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm" onClick={handleBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -132,7 +151,7 @@ const SecurityCaseDetailPage = () => {
 
   if (error || !securityCase) {
     return (
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-4 sm:p-6 w-full max-w-[1400px] mx-auto">
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm" onClick={handleBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -156,7 +175,7 @@ const SecurityCaseDetailPage = () => {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="w-full max-w-[1400px] mx-auto space-y-6 p-4 sm:p-6">
       {/* Header with back button and actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center space-x-2">
@@ -170,7 +189,7 @@ const SecurityCaseDetailPage = () => {
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Button>
-          <Button size="sm">
+          <Button size="sm" className="bg-primary">
             Update Status
           </Button>
         </div>
@@ -181,12 +200,14 @@ const SecurityCaseDetailPage = () => {
         {/* Main content column - approximately 2/3 width */}
         <div className="lg:col-span-2 space-y-6">
           {/* Case header card */}
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-2">
                 <div>
                   <CardTitle className="text-2xl">{securityCase.title}</CardTitle>
-                  <CardDescription className="mt-1">{securityCase.id}</CardDescription>
+                  <CardDescription className="mt-1">
+                    <span className="font-mono">{securityCase.id}</span>
+                  </CardDescription>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Badge className={getStatusColor(securityCase.status)}>
@@ -225,7 +246,7 @@ const SecurityCaseDetailPage = () => {
 
           {/* Tabs for different sections */}
           <Tabs defaultValue="overview" value={activeTab} onValueChange={(value) => setActiveTab(value as SecurityCaseTab)}>
-            <TabsList className="mb-4">
+            <TabsList className="mb-4 w-full">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="investigation">Investigation</TabsTrigger>
               <TabsTrigger value="affected-systems">Affected Systems</TabsTrigger>
@@ -234,7 +255,7 @@ const SecurityCaseDetailPage = () => {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
-              <Card>
+              <Card className="shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-lg">Remediation Plan</CardTitle>
                 </CardHeader>
@@ -245,9 +266,12 @@ const SecurityCaseDetailPage = () => {
             </TabsContent>
 
             <TabsContent value="investigation" className="space-y-6">
-              <Card>
-                <CardHeader>
+              <Card className="shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg">Investigation Steps</CardTitle>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" /> Add Step
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -266,14 +290,21 @@ const SecurityCaseDetailPage = () => {
             </TabsContent>
 
             <TabsContent value="affected-systems" className="space-y-6">
-              <Card>
-                <CardHeader>
+              <Card className="shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg">Affected Systems</CardTitle>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" /> Add System
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {securityCase.affectedSystems.map((system, index) => (
-                      <Card key={index} className="bg-muted/40">
+                      <Card 
+                        key={index} 
+                        className="bg-muted/40 cursor-pointer hover:bg-muted/60 transition-colors"
+                        onClick={() => handleSystemClick(system)}
+                      >
                         <CardContent className="p-4 flex items-center gap-3">
                           <Server className="h-5 w-5 text-muted-foreground" />
                           <div>
@@ -288,10 +319,12 @@ const SecurityCaseDetailPage = () => {
             </TabsContent>
 
             <TabsContent value="notes" className="space-y-6">
-              <Card>
+              <Card className="shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg">Notes</CardTitle>
-                  <Button variant="outline" size="sm" onClick={openAddNoteDialog}>Add Note</Button>
+                  <Button variant="outline" size="sm" onClick={openAddNoteDialog}>
+                    <Plus className="h-4 w-4 mr-2" /> Add Note
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   {securityCase.notes && securityCase.notes.length > 0 ? (
@@ -317,9 +350,12 @@ const SecurityCaseDetailPage = () => {
             </TabsContent>
 
             <TabsContent value="related-items" className="space-y-6">
-              <Card>
-                <CardHeader>
+              <Card className="shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-lg">Related Items</CardTitle>
+                  <Button variant="outline" size="sm">
+                    <Plus className="h-4 w-4 mr-2" /> Link Item
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -328,14 +364,16 @@ const SecurityCaseDetailPage = () => {
                         <h4 className="font-medium mb-3">Related Tickets</h4>
                         <div className="space-y-2">
                           {securityCase.relatedTickets.map((ticketId, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 border rounded-md">
+                            <div 
+                              key={index} 
+                              className="flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-muted/40 transition-colors"
+                              onClick={() => handleRelatedItemClick(ticketId)}
+                            >
                               <div className="flex items-center gap-2">
                                 <FileText className="h-4 w-4 text-muted-foreground" />
-                                <span>{ticketId}</span>
+                                <span className="font-mono">{ticketId}</span>
                               </div>
-                              <Button variant="ghost" size="sm">
-                                <ExternalLink className="h-4 w-4" />
-                              </Button>
+                              <ExternalLink className="h-4 w-4" />
                             </div>
                           ))}
                         </div>
@@ -344,6 +382,26 @@ const SecurityCaseDetailPage = () => {
                       <div className="text-center py-6 text-muted-foreground">
                         <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p>No related tickets found</p>
+                      </div>
+                    )}
+                    {securityCase.relatedAssets && securityCase.relatedAssets.length > 0 && (
+                      <div className="mt-6">
+                        <h4 className="font-medium mb-3">Related Assets</h4>
+                        <div className="space-y-2">
+                          {securityCase.relatedAssets.map((assetId, index) => (
+                            <div 
+                              key={index} 
+                              className="flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-muted/40 transition-colors"
+                              onClick={() => handleRelatedItemClick(assetId)}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Server className="h-4 w-4 text-muted-foreground" />
+                                <span className="font-mono">{assetId}</span>
+                              </div>
+                              <ExternalLink className="h-4 w-4" />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -356,7 +414,7 @@ const SecurityCaseDetailPage = () => {
         {/* Side panel column - approximately 1/3 width */}
         <div className="space-y-6">
           {/* SLA Status Card */}
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">SLA Status</CardTitle>
             </CardHeader>
@@ -379,7 +437,7 @@ const SecurityCaseDetailPage = () => {
           </Card>
 
           {/* Assignee Card */}
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Assignment</CardTitle>
             </CardHeader>
@@ -404,7 +462,7 @@ const SecurityCaseDetailPage = () => {
           </Card>
 
           {/* Activity Timeline Card */}
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Activity Timeline</CardTitle>
             </CardHeader>
@@ -414,7 +472,7 @@ const SecurityCaseDetailPage = () => {
                   <div className="space-y-3">
                     {securityCase.audit.map((entry, index) => (
                       <div key={index} className="border-l-2 border-muted pl-4 pb-3">
-                        <div className="text-sm font-medium">{entry.action || "Update"}</div>
+                        <div className="text-sm font-medium capitalize">{entry.action || "Update"}</div>
                         <div className="text-sm">{entry.message}</div>
                         <div className="text-xs text-muted-foreground mt-1">
                           {formatDate(entry.timestamp)} by {entry.userName || getUserNameById(entry.performedBy || "")}
@@ -433,7 +491,7 @@ const SecurityCaseDetailPage = () => {
           </Card>
 
           {/* People involved */}
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">People Involved</CardTitle>
             </CardHeader>
@@ -464,6 +522,29 @@ const SecurityCaseDetailPage = () => {
           </Card>
         </div>
       </div>
+
+      {/* Add Note Dialog */}
+      <Dialog open={addNoteDialogOpen} onOpenChange={closeAddNoteDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Note</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Textarea
+              placeholder="Type your note here..."
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              className="min-h-[120px]"
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleAddNote}>Add Note</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -12,8 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
-import { X } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
 import { getUserNameById } from '@/utils/userUtils';
+import { Link } from 'react-router-dom';
 
 export interface SecurityCaseDetailProps {
   securityCase: {
@@ -60,7 +61,12 @@ const SecurityCaseDetail: React.FC<SecurityCaseDetailProps> = ({
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-lg font-semibold">{securityCase.title}</h3>
-          <p className="text-sm text-muted-foreground">{securityCase.description}</p>
+          <p className="text-sm text-muted-foreground">
+            <Link to={`/security/case/${securityCase.id}`} className="text-blue-600 hover:underline font-mono">
+              {securityCase.id}
+            </Link>
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">{securityCase.description}</p>
         </div>
         <Badge className={getStatusColor(securityCase.status)}>
           {securityCase.status}
@@ -88,7 +94,7 @@ const SecurityCaseDetail: React.FC<SecurityCaseDetailProps> = ({
             <h4 className="text-sm font-medium text-muted-foreground">Affected Systems</h4>
             <div className="flex flex-wrap gap-1 mt-1">
               {securityCase.affectedSystems.map(system => (
-                <Badge key={system} variant="outline" className="bg-blue-50 text-blue-700">
+                <Badge key={system} variant="outline" className="bg-blue-50 text-blue-700 cursor-pointer hover:bg-blue-100">
                   {system}
                 </Badge>
               ))}
@@ -140,6 +146,14 @@ const SecurityCaseDetail: React.FC<SecurityCaseDetailProps> = ({
         </DialogHeader>
         <Separator />
         {detailContent}
+        <div className="mt-4 text-right">
+          <Link to={`/security/case/${securityCase.id}`}>
+            <Button variant="outline" size="sm" className="gap-2">
+              <span>View Full Details</span>
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       </DialogContent>
     </Dialog>
   );
