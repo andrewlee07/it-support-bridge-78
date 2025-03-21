@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { SecurityCase } from '@/utils/types/security';
 import { DateRange } from 'react-day-picker';
+import React from 'react';
 
 // This is a mock implementation - in a real app, this would fetch from an API
 const mockSecurityCases: SecurityCase[] = [
@@ -316,11 +317,11 @@ export const useSecurityCases = () => {
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
       case 'High':
-        return <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>;
+        return React.createElement('div', { className: "w-3 h-3 rounded-full bg-red-500 mr-2" });
       case 'Medium':
-        return <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>;
+        return React.createElement('div', { className: "w-3 h-3 rounded-full bg-yellow-500 mr-2" });
       case 'Low':
-        return <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>;
+        return React.createElement('div', { className: "w-3 h-3 rounded-full bg-green-500 mr-2" });
       default:
         return null;
     }
