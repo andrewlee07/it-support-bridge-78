@@ -12,7 +12,7 @@ import { CloseTicketValues } from './TicketCloseForm';
 import { toast } from 'sonner';
 
 interface TicketDialogsProps {
-  type: 'incident' | 'service' | 'security';
+  type: 'incident' | 'service';
   isNewTicketDialogOpen: boolean;
   isViewingTicket: boolean;
   selectedTicket: Ticket | null;
@@ -22,7 +22,7 @@ interface TicketDialogsProps {
   onTicketUpdate: (data: UpdateTicketValues) => void;
   onTicketClose: (data: CloseTicketValues) => void;
   onAddNote?: (note: string) => void;
-  onReopenTicket?: (reason: string) => void;
+  onReopenTicket?: (reason: string) => void; // Updated to accept a string parameter
 }
 
 const TicketDialogs: React.FC<TicketDialogsProps> = ({
@@ -42,13 +42,7 @@ const TicketDialogs: React.FC<TicketDialogsProps> = ({
     // In a real app, you would make an API call to create the ticket
     console.log('Creating ticket:', data);
     onTicketCreated();
-    
-    const successMessage = 
-      type === 'incident' ? 'Incident created successfully' :
-      type === 'security' ? 'Security case created successfully' :
-      'Service request created successfully';
-    
-    toast.success(successMessage);
+    toast.success(type === 'incident' ? 'Incident created successfully' : 'Service request created successfully');
   };
 
   return (
@@ -57,11 +51,7 @@ const TicketDialogs: React.FC<TicketDialogsProps> = ({
       <Dialog open={isNewTicketDialogOpen} onOpenChange={onNewTicketDialogOpenChange}>
         <DialogContent className="w-[95vw] max-w-4xl max-h-[95vh] overflow-y-auto">
           <h2 className="text-xl font-semibold mb-4">
-            Create New {
-              type === 'incident' ? 'Incident' :
-              type === 'security' ? 'Security Case' :
-              'Service Request'
-            }
+            Create New {type === 'incident' ? 'Incident' : 'Service Request'}
           </h2>
           <TicketForm onSubmit={handleCreateTicket} type={type} />
         </DialogContent>
@@ -74,10 +64,10 @@ const TicketDialogs: React.FC<TicketDialogsProps> = ({
             <TicketDetailView
               ticket={selectedTicket}
               type={type}
-              onUpdateTicket={onTicketUpdate}
-              onCloseTicket={onTicketClose}
-              onAddNote={onAddNote || (() => {})}
-              onReopenTicket={onReopenTicket || (() => {})}
+              onUpdate={onTicketUpdate}
+              onClose={onTicketClose}
+              onAddNote={onAddNote}
+              onReopen={onReopenTicket}
             />
           ) : (
             <div>Loading...</div>

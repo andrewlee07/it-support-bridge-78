@@ -1,13 +1,13 @@
 
-import React, { useState } from 'react';
-import { useQueueManagement } from '@/hooks/useQueueManagement';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { InboxIcon, Plus } from 'lucide-react';
+import QueueTable from './QueueTable';
 import QueueDialog from './QueueDialog';
-import QueueList from './QueueList';
+import { useQueueManagement } from './useQueueManagement';
+import { Card } from '@/components/ui/card';
 
-export const QueueManagement = () => {
+const QueueManagement: React.FC = () => {
   const {
     queues,
     dialogOpen,
@@ -21,37 +21,33 @@ export const QueueManagement = () => {
   } = useQueueManagement();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Queue Management</h1>
-        <Button onClick={handleAddQueue} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+        <div className="flex items-center gap-2">
+          <InboxIcon className="h-5 w-5" />
+          <h3 className="text-lg font-medium">Queue Management</h3>
+        </div>
+        <Button onClick={handleAddQueue}>
+          <Plus className="h-4 w-4 mr-2" />
           Add Queue
         </Button>
       </div>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Queues</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <QueueList 
-            queues={queues}
-            onEdit={handleEditQueue}
-            onDelete={handleDeleteQueue}
-          />
-        </CardContent>
-      </Card>
-      
-      {dialogOpen && (
-        <QueueDialog
-          open={dialogOpen}
-          onOpenChange={handleCloseDialog}
-          onSubmit={handleSubmitQueue}
-          queue={editingQueue}
-          isEditing={isEditing}
+
+      <Card className="p-4">
+        <QueueTable 
+          queues={queues} 
+          onEdit={handleEditQueue} 
+          onDelete={handleDeleteQueue} 
         />
-      )}
+      </Card>
+
+      <QueueDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        onSubmit={handleSubmitQueue}
+        initialData={editingQueue || undefined}
+        isEditing={isEditing}
+      />
     </div>
   );
 };

@@ -1,20 +1,25 @@
 
-export type AuditEntityType = 'problem' | 'change' | 'ticket' | 'asset' | 'user' | 'release' | 'security' | 'role' | 'group' | 'permission' | 'bug';
-
 export interface AuditEntry {
   id: string;
   entityId: string;
   entityType: AuditEntityType;
-  action?: string;
   timestamp: Date;
   userId?: string;
+  userName?: string;
+  
+  // Add properties that are being used in various components
   performedBy?: string;
   message?: string;
+  action?: string;
   details?: string;
-  userName?: string;
-  user?: string;
-  oldValue?: string;
+  
+  // Additional fields used in problem management
   newValue?: string;
+  oldValue?: string;
+  user?: string;
   description?: string;
   assignedTo?: string;
 }
+
+export type AuditEntityType = 'change' | 'ticket' | 'user' | 'asset' | 'release' | 'problem' | 'group' | 'role' | 'permission';
+

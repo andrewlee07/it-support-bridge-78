@@ -1,17 +1,27 @@
 
 import React from 'react';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { TicketType } from '@/utils/types/ticket';
-import {
+import { UseFormReturn } from 'react-hook-form';
+import { 
+  FormField,
+  FormControl,
+  FormDescription,
+  FormItem,
+  FormLabel,
+  FormMessage 
+} from '@/components/ui/form';
+import { 
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { TicketType } from '@/utils/types';
 
 interface CategoryPrioritySectionProps {
-  form: any;
+  form: UseFormReturn<any>;
   isFieldRequired: (fieldName: string) => boolean;
   type: TicketType;
 }
@@ -22,42 +32,31 @@ const CategoryPrioritySection: React.FC<CategoryPrioritySectionProps> = ({
   type
 }) => {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
       <FormField
         control={form.control}
         name="category"
+        rules={{ required: isFieldRequired('category') ? 'Category is required' : false }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel className={isFieldRequired('category') ? 'font-medium' : ''}>
-              Category {isFieldRequired('category') && <span className="text-destructive">*</span>}
-            </FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormLabel>{isFieldRequired('category') && <span className="text-red-500 mr-1">*</span>}Category</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value || "hardware"}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                {type === 'security' ? (
-                  // Security-specific categories
-                  <>
-                    <SelectItem value="security">General Security</SelectItem>
-                    <SelectItem value="data-breach">Data Breach</SelectItem>
-                    <SelectItem value="sar">Subject Access Request</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </>
-                ) : (
-                  // Standard categories for other ticket types
-                  <>
-                    <SelectItem value="hardware">Hardware</SelectItem>
-                    <SelectItem value="software">Software</SelectItem>
-                    <SelectItem value="network">Network</SelectItem>
-                    <SelectItem value="access">Access</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </>
-                )}
+                <SelectItem value="hardware">Hardware</SelectItem>
+                <SelectItem value="software">Software</SelectItem>
+                <SelectItem value="network">Network</SelectItem>
+                <SelectItem value="access">Access</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
+            <FormDescription>
+              Select the category that best fits your {type}.
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -66,12 +65,11 @@ const CategoryPrioritySection: React.FC<CategoryPrioritySectionProps> = ({
       <FormField
         control={form.control}
         name="priority"
+        rules={{ required: isFieldRequired('priority') ? 'Priority is required' : false }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel className={isFieldRequired('priority') ? 'font-medium' : ''}>
-              Priority {isFieldRequired('priority') && <span className="text-destructive">*</span>}
-            </FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormLabel>{isFieldRequired('priority') && <span className="text-red-500 mr-1">*</span>}Priority</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value || "P3"}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a priority" />
@@ -84,6 +82,9 @@ const CategoryPrioritySection: React.FC<CategoryPrioritySectionProps> = ({
                 <SelectItem value="P4">P4 - Low</SelectItem>
               </SelectContent>
             </Select>
+            <FormDescription>
+              Select the priority level of your {type}.
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}

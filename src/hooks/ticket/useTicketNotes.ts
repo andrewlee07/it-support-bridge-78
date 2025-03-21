@@ -1,57 +1,42 @@
 
-import { useState } from 'react';
 import { toast } from 'sonner';
 import { TicketWithNotes, TicketNote } from '@/utils/types/ticket';
-import { v4 as uuidv4 } from 'uuid';
+import { createAuditEntry } from '@/utils/auditUtils';
+import { AuditEntry } from '@/utils/types/audit';
 
-export const useTicketNotes = (ticket: TicketWithNotes, updateTicket: (ticket: TicketWithNotes) => void) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const addNote = async (content: string, isPrivate: boolean = false) => {
-    if (!content.trim()) {
-      toast.error('Note content cannot be empty');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const newNote: TicketNote = {
-        id: uuidv4(),
+export const useTicketNotes = (
+  ticket: TicketWithNotes | null,
+  setTicket: (ticket: TicketWithNotes | null) => void
+) => {
+  const handleAddNote = (note: string) => {
+    if (ticket && note.trim()) {
+      const noteItem: TicketNote = {
+        id: `note-${Date.now()}`,
         ticketId: ticket.id,
-        content: content,
-        createdBy: 'current-user', // In a real app, this would be the authenticated user
+        text: note,
         createdAt: new Date(),
-        isPrivate: isPrivate
+        createdBy: 'current-user',
+        isInternal: false
       };
-
-      // Create a copy of the ticket with the new note added
-      const updatedTicket = { 
+      
+      // Create an audit entry for adding a note
+      const noteAuditEntry: AuditEntry = createAuditEntry(
+        ticket.id,
+        'ticket',
+        `Note added: ${note.substring(0, 30)}${note.length > 30 ? '...' : ''}`,
+        'current-user'
+      );
+      
+      const updatedTicket = {
         ...ticket,
-        notes: [...ticket.notes, newNote],
-        audit: [...(ticket.audit || []), {
-          id: uuidv4(),
-          entityId: ticket.id,
-          entityType: 'ticket',
-          message: `Added ${isPrivate ? 'private' : ''} note`,
-          performedBy: 'current-user',
-          timestamp: new Date(),
-        }]
+        notes: [...(ticket.notes || []), noteItem],
+        audit: [...(ticket.audit || []), noteAuditEntry],
+        updatedAt: new Date()
       };
-
-      // Update the ticket in the state/backend
-      updateTicket(updatedTicket);
-      toast.success('Note added successfully');
-    } catch (error) {
-      console.error('Error adding note:', error);
-      toast.error('Failed to add note');
-    } finally {
-      setIsSubmitting(false);
+      setTicket(updatedTicket);
+      toast.success("Note added successfully");
     }
   };
 
-  return {
-    addNote,
-    isSubmitting
-  };
+  return { handleAddNote };
 };

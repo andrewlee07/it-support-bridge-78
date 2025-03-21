@@ -1,89 +1,115 @@
 
 import { AuditEntry } from './audit';
 
-export type TicketType = 'incident' | 'service' | 'problem' | 'change' | 'security';
-export type TicketPriority = 'critical' | 'high' | 'medium' | 'low' | 'P1' | 'P2' | 'P3' | 'P4';
-export type TicketCategory = 'hardware' | 'software' | 'network' | 'access' | 'security' | 'other' | 'data-breach' | 'sar';
-export type TicketStatus = 'open' | 'in-progress' | 'on-hold' | 'resolved' | 'closed' | 'new' | 'approved' | 'fulfilled' | 'pending';
+export type TicketStatus = 'open' | 'in-progress' | 'pending' | 'resolved' | 'closed' | 'fulfilled' | 'new' | 'approved' | 'on-hold';
+export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4' | 'high' | 'medium' | 'low';
+export type TicketCategory = 'software' | 'hardware' | 'network' | 'access' | 'other';
+export type PendingSubStatus = 'awaiting-customer' | 'awaiting-third-party' | 'awaiting-maintenance' | 'awaiting-approval' | 'customer-info' | 'customer-testing' | 'third-party' | 'approval' | 'development';
+export type RelatedItemType = 'incident' | 'problem' | 'change' | 'service' | 'bug' | 
+                              'knownError' | 'knowledge' | 'backlogItem' | 'task' | 'backlog';
+export type TicketType = 'incident' | 'service' | 'change';
 
-export type PendingSubStatus = 'awaiting-approval' | 'awaiting-customer' | 'awaiting-third-party' | 'awaiting-parts';
+// Adding TicketFilter and TestCoverageRelationship types that were referenced but missing
+export type TicketFilter = {
+  status?: TicketStatus[];
+  priority?: TicketPriority[];
+  category?: TicketCategory[];
+  assignedTo?: string[];
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  searchText?: string;
+};
 
-export interface Ticket {
+export type TestCoverageRelationship = {
   id: string;
-  title: string;
-  description: string;
-  type: TicketType;
-  status: TicketStatus;
-  priority: TicketPriority;
-  category: TicketCategory;
+  ticketId: string;
+  testCaseId: string;
+  relationshipType: 'covers' | 'affects';
   createdAt: Date;
-  updatedAt: Date;
-  resolvedAt?: Date;
-  closedAt?: Date;
-  reportedBy: string;
-  assignedTo?: string;
-  dueDate?: Date;
-  
-  // Added properties for ChangeRequest compatibility
-  createdBy?: string;
-  audit?: AuditEntry[];
-  
-  // Added properties for security tickets
-  securityClassification?: 'public' | 'internal' | 'confidential' | 'restricted';
-  breachType?: string;
-  dataSubjects?: string;
-  reportedToAuthorities?: boolean;
-  reportedDate?: Date;
-  sarRequestType?: string;
-  dpaRequired?: boolean;
-  
-  // Service-related properties
-  serviceId?: string;
-  
-  // Relations
-  relatedItems?: RelatedItem[];
-  relatedProblems?: string[];
-  associatedAssets?: string[];
-  affectedServices?: string[];
-  
-  // Incident-specific properties
-  impactLevel?: string;
-  urgency?: string;
-  firstResponseAt?: Date;
-  
-  // Customer-related
-  customerId?: string;
-  
-  // Notes
-  notes?: TicketNote[];
+};
+
+export interface RelatedItem {
+  id: string;
+  type: RelatedItemType;
+  status: string;
+  title: string;
+  createdAt: Date;
 }
 
 export interface TicketNote {
   id: string;
   ticketId: string;
-  content: string;
-  createdBy: string;
+  text: string;
   createdAt: Date;
-  isPrivate: boolean;
+  createdBy: string;
+  isInternal: boolean;
 }
 
-export interface TicketWithNotes extends Ticket {
-  notes: TicketNote[];
-}
-
-export interface RelatedItem {
+export interface Ticket {
   id: string;
   title: string;
-  type: string;
-  status: string;
-  relationship: string;
-  createdAt?: Date;
+  description: string;
+  status: TicketStatus;
+  priority: TicketPriority;
+  category: TicketCategory;
+  createdBy: string;
+  assignedTo?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  resolvedAt?: Date;
+  closedAt?: Date;
+  type: TicketType;
+  audit: AuditEntry[];
+  
+  // Fields for pending status
+  pendingSubStatus?: PendingSubStatus;
+  pendingReason?: string;
+  
+  // Fields for resolution
+  resolutionNotes?: string;
+  rootCause?: string;
+  resolution?: string;
+  
+  // Fields for reopening
+  reopenReason?: string;
+  reopenedAt?: Date;
+  
+  // Related items
+  relatedItems?: RelatedItem[];
+  
+  // Service-specific fields
+  serviceId?: string;
+  requestType?: string;
+  
+  // Incident-specific fields
+  impactLevel?: string;
+  urgency?: string;
+  affectedServices?: string[];
+  
+  // SLA information
+  slaTarget?: Date;
+  slaStatus?: 'within' | 'warning' | 'breached';
+  firstResponseAt?: Date;
+  
+  // Customer information
+  customerId?: string;
+  customerName?: string;
+  customerEmail?: string;
+  
+  // Additional metadata
+  tags?: string[];
+  attachments?: any[];
+  relatedProblems?: string[];
+  associatedAssets?: string[];
+  notes?: TicketNote[];
+  
+  // Watch list functionality
+  watchers?: string[];
 }
 
-export interface TicketUpdatePayload {
-  priority?: TicketPriority;
-  category?: TicketCategory;
-  status?: TicketStatus;
-  assignedTo?: string;
-  description?: string;
+// Extended ticket interface with notes
+export interface TicketWithNotes extends Ticket {
+  notes: TicketNote[];
 }

@@ -39,12 +39,11 @@ export const useRelatedItemCreation = ({
         
         // Add the bug to related items
         if (onUpdate) {
-          const relatedItem: RelatedItem = {
+          const relatedItem = {
             id: response.data.id,
-            type: 'bug',
+            type: 'bug' as const,
             status: 'open',
             title: response.data.title,
-            relationship: 'created-from',
             createdAt: new Date()
           };
           
@@ -78,12 +77,11 @@ export const useRelatedItemCreation = ({
       
       // Add the backlog item to related items
       if (onUpdate) {
-        const relatedItem: RelatedItem = {
+        const relatedItem = {
           id: item.id || `backlog-${Date.now()}`,
-          type: 'backlogItem',
+          type: 'backlogItem' as const,
           status: item.status || 'open',
           title: item.title,
-          relationship: 'created-from',
           createdAt: new Date()
         };
         
@@ -129,7 +127,6 @@ export const useRelatedItemCreation = ({
             type: 'task',
             status: response.data.status,
             title: response.data.title,
-            relationship: 'created-from',
             createdAt: new Date()
           };
           

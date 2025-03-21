@@ -5,13 +5,11 @@ import { ConfigurableEntityType } from '@/utils/types/configuration';
 import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
 import DropdownConfigList from '@/components/settings/dropdowns/DropdownConfigList';
 import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigForm';
-import { useToast } from '@/hooks/use-toast';
 
 const BugDropdownFieldsTab = () => {
   const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const entityType: ConfigurableEntityType = 'bug'; // Using 'bug' as the entity type
-  const { toast } = useToast();
 
   // Dropdown configurations
   const { data: configurations, isLoading, refetch } = useQuery({
@@ -35,14 +33,6 @@ const BugDropdownFieldsTab = () => {
     refetch();
   };
 
-  const handleSave = (data: any) => {
-    toast({
-      title: "Success",
-      description: "Configuration saved successfully"
-    });
-    refetch();
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div className="md:col-span-1">
@@ -59,10 +49,8 @@ const BugDropdownFieldsTab = () => {
         {(isAddingNew || selectedConfigId) && (
           <DropdownConfigForm
             entityType={entityType}
-            configId={selectedConfigId || undefined}
+            configId={selectedConfigId}
             onClose={handleFormClose}
-            onSave={handleSave}
-            onCancel={handleFormClose}
             isNew={isAddingNew}
           />
         )}

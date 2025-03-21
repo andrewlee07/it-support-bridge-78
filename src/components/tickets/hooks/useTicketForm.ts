@@ -18,51 +18,17 @@ export const useTicketForm = ({ onSubmit, type }: UseTicketFormProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [servicesByCategory, setServicesByCategory] = useState<Record<string, any[]>>({});
   
-  // Different default values based on ticket type
-  let defaultCategory: TicketCategory = 'hardware';
-  if (type === 'security') {
-    defaultCategory = 'security';
-  }
-  
-  const defaultValues: any = {
+  const defaultValues = {
     title: '',
     description: '',
-    category: defaultCategory,
+    category: 'hardware' as TicketCategory, // Default to hardware instead of empty string
     priority: 'P3' as TicketPriority, // Default to P3 (medium priority)
     type: type,
-    serviceId: '',
-    associatedAssets: [] as string[],
+    serviceId: '', // This is okay as we handle it in the component
+    associatedAssets: [] as string[], // Add associated assets field
   };
   
-  // Add security-specific default values
-  if (type === 'security') {
-    defaultValues.securityClassification = 'internal';
-    defaultValues.reportedToAuthorities = false;
-    defaultValues.dpaRequired = false;
-  }
-  
   const form = useForm({ defaultValues });
-  
-  // Update category options when type is security
-  useEffect(() => {
-    if (type === 'security') {
-      // Watch the category value for security cases
-      const subscription = form.watch((value, { name }) => {
-        if (name === 'category') {
-          // Reset security-specific fields when category changes
-          if (value.category === 'data-breach') {
-            form.setValue('dataSubjects', undefined);
-            form.setValue('breachType', undefined);
-          } else if (value.category === 'sar') {
-            form.setValue('sarRequestType', undefined);
-          }
-        }
-      });
-      
-      // Cleanup subscription on unmount
-      return () => subscription.unsubscribe();
-    }
-  }, [form, type]);
   
   // Fetch mandatory fields and services when component mounts
   useEffect(() => {
@@ -80,9 +46,6 @@ export const useTicketForm = ({ onSubmit, type }: UseTicketFormProps) => {
             break;
           case 'change':
             entityType = 'change';
-            break;
-          case 'security':
-            entityType = 'security';
             break;
           default:
             entityType = 'incident';

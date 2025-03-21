@@ -1,63 +1,65 @@
-
-import { useState } from 'react';
 import { toast } from 'sonner';
-import { TicketWithNotes, TicketNote } from '@/utils/types/ticket';
+import { TicketStatus, TicketWithNotes, TicketNote } from '@/utils/types/ticket';
 import { CloseTicketValues } from '@/components/tickets/TicketCloseForm';
-import { v4 as uuidv4 } from 'uuid';
+import { createAuditEntry } from '@/utils/auditUtils';
+import { AuditEntry } from '@/utils/types/audit';
 
-export const useTicketClose = (ticket: TicketWithNotes, updateTicket: (ticket: TicketWithNotes) => void) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export const useTicketClose = (
+  ticket: TicketWithNotes | null,
+  setTicket: (ticket: TicketWithNotes | null) => void
+) => {
+  const handleCloseTicket = (values: CloseTicketValues) => {
+    if (ticket) {
+      // Check if there are any unresolved related items
+      const hasUnresolvedItems = (ticket.relatedItems || []).some(item => {
+        if (item.type === 'bug') {
+          return !['closed', 'resolved', 'fixed'].includes(item.status.toLowerCase());
+        }
+        return false;
+      });
 
-  const closeTicket = async (values: CloseTicketValues) => {
-    setIsSubmitting(true);
+      if (hasUnresolvedItems) {
+        toast.error('Cannot close ticket with unresolved bugs');
+        return;
+      }
 
-    try {
-      const now = new Date();
-      
-      // Create a note from the resolution
-      const newNote: TicketNote = {
-        id: uuidv4(),
+      // Add a new note to the notes array with the close information
+      const closeNote: TicketNote = {
+        id: `note-close-${Date.now()}`,
         ticketId: ticket.id,
-        content: values.resolutionNotes || 'Ticket closed',
-        createdBy: 'current-user', // In a real app, this would be the authenticated user
-        createdAt: now,
-        isPrivate: false
+        text: values.notes,
+        createdAt: new Date(),
+        createdBy: 'current-user',
+        isInternal: false
       };
       
-      // Create a copy of the ticket with updated status and resolution
+      // Create an audit entry for closing the ticket
+      const closeAuditEntry: AuditEntry = createAuditEntry(
+        ticket.id,
+        'ticket',
+        `Ticket closed: ${values.closureReason || 'No reason provided'}`,
+        'current-user'
+      );
+      
       const updatedTicket = {
         ...ticket,
-        status: 'closed',
-        closedAt: now,
-        closureCode: values.closureCode,
-        closureNotes: values.resolutionNotes,
-        notes: [...ticket.notes, newNote],
-        audit: [
-          ...(ticket.audit || []),
-          {
-            id: uuidv4(),
-            entityId: ticket.id,
-            entityType: 'ticket',
-            message: `Ticket closed with code: ${values.closureCode}`,
-            performedBy: 'current-user',
-            timestamp: now,
-          }
-        ]
+        status: values.status as TicketStatus,
+        updatedAt: new Date(),
+        closedAt: new Date(),
+        // Keep existing notes and append the new close note
+        notes: [...(ticket.notes || []), closeNote],
+        // Add the close audit entry
+        audit: [...(ticket.audit || []), closeAuditEntry],
+        // Store additional values in a way that doesn't conflict with the Ticket type
+        _rootCause: values.rootCause,
+        _closureReason: values.closureReason,
+        resolution: values.resolution
       };
-
-      // Update the ticket in the state/backend
-      updateTicket(updatedTicket);
+      setTicket(updatedTicket);
+      
       toast.success('Ticket closed successfully');
-    } catch (error) {
-      console.error('Error closing ticket:', error);
-      toast.error('Failed to close ticket');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
-  return {
-    closeTicket,
-    isSubmitting
-  };
+  return { handleCloseTicket };
 };
