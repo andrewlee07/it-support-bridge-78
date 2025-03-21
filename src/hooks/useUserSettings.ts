@@ -12,6 +12,7 @@ export const useUserSettings = () => {
   const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
     categories: {
       incidents: true,
+      security: true,
       bugs: true,
       testCases: true,
       backlogItems: true,
