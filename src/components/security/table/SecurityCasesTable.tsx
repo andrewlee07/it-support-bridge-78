@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ChevronDown, ChevronRight, ArrowUpDown, CalendarClock, Eye, Edit, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SecurityCase } from '@/utils/types/security'; // You might need to create this type
+import { SecurityCase } from '@/utils/types/security'; 
 import { format } from 'date-fns';
 import { getUserNameById } from '@/utils/userUtils';
 import SecurityCaseDetail from '@/components/security/SecurityCaseDetail';
@@ -229,7 +229,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
               </div>
             </TableHead>
             <TableHead 
-              className="cursor-pointer hover:bg-muted/50 min-w-[200px]"
+              className="cursor-pointer hover:bg-muted/50 min-w-[240px]"
               onClick={() => handleSort('sla')}
             >
               <div className="flex items-center">
@@ -319,7 +319,7 @@ const SecurityCasesTable: React.FC<SecurityCasesTableProps> = ({
                     </TooltipProvider>
                   </TableCell>
                   <TableCell onClick={() => toggleExpandRow(case_.id)}>
-                    <SecurityCaseSLAIndicator securityCase={case_} />
+                    <SecurityCaseSLAIndicator securityCase={case_} darkMode={true} />
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end space-x-1">

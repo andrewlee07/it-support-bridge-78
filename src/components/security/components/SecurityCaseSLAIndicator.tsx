@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { SecurityCase } from '@/utils/types/security';
 import { format, differenceInHours, differenceInMinutes, addHours } from 'date-fns';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Button } from '@/components/ui/button';
 import { Clock, CheckCircle2 } from 'lucide-react';
 
 type SLAType = 'response' | 'resolution';
@@ -11,11 +11,13 @@ type SLAType = 'response' | 'resolution';
 interface SecurityCaseSLAIndicatorProps {
   securityCase: SecurityCase;
   defaultSlaType?: SLAType;
+  darkMode?: boolean;
 }
 
 const SecurityCaseSLAIndicator: React.FC<SecurityCaseSLAIndicatorProps> = ({ 
   securityCase, 
-  defaultSlaType = 'resolution' 
+  defaultSlaType = 'resolution',
+  darkMode = false
 }) => {
   const [slaType, setSlaType] = useState<SLAType>(defaultSlaType);
 
@@ -83,7 +85,7 @@ const SecurityCaseSLAIndicator: React.FC<SecurityCaseSLAIndicatorProps> = ({
     } else {
       const hours = differenceInHours(slaTarget, now);
       const mins = differenceInMinutes(slaTarget, now) % 60;
-      timeLeft = `${hours > 0 ? `${hours}h ` : ''}${mins}m remaining`;
+      timeLeft = `${hours}h ${mins}m remaining`;
     }
     
     return {
@@ -100,50 +102,68 @@ const SecurityCaseSLAIndicator: React.FC<SecurityCaseSLAIndicatorProps> = ({
   if (slaStatus.completed) {
     return <div className="text-gray-500">Completed</div>;
   }
-  
+
   // Calculate gradient color based on percentage left
-  const getGradientColor = (percentLeft: number) => {
-    if (percentLeft <= 0) return 'bg-red-600'; // Breached
-    if (percentLeft <= 30) return 'bg-gradient-to-r from-red-500 to-amber-500'; // At risk
-    if (percentLeft <= 60) return 'bg-gradient-to-r from-amber-500 to-green-500'; // Warning
-    return 'bg-green-500'; // On target
+  const getProgressColor = (percentLeft: number, isBreached: boolean) => {
+    if (isBreached) return 'bg-red-600'; // Breached
+    
+    // Use gradient colors based on time remaining
+    if (percentLeft <= 30) {
+      return 'bg-gradient-to-r from-red-500 to-amber-500'; // Critical (getting close to breach)
+    } else if (percentLeft <= 60) {
+      return 'bg-gradient-to-r from-amber-500 to-green-500'; // Warning
+    }
+    return 'bg-green-500'; // Healthy
   };
   
-  const barColor = getGradientColor(slaStatus.percentLeft);
-  
+  const barColor = getProgressColor(slaStatus.percentLeft, slaStatus.isBreached);
+
+  // Dark mode or table mode styling
+  const bgClass = darkMode ? 'bg-slate-700' : 'bg-slate-200';
+  const textClass = darkMode ? 'text-slate-200' : 'text-slate-700';
+  const buttonActiveBg = darkMode ? 'bg-slate-600 text-white' : 'bg-slate-700 text-white';
+  const buttonInactiveBg = darkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-300 text-slate-800 hover:bg-slate-400';
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div>
-          <ToggleGroup 
-            type="single" 
-            value={slaType} 
-            onValueChange={(value) => value && setSlaType(value as SLAType)}
-            className="border rounded-md"
-          >
-            <ToggleGroupItem value="response" size="sm" className="px-2 text-xs">
-              <Clock className="h-3 w-3 mr-1" />
-              Response
-            </ToggleGroupItem>
-            <ToggleGroupItem value="resolution" size="sm" className="px-2 text-xs">
-              <CheckCircle2 className="h-3 w-3 mr-1" />
-              Resolution
-            </ToggleGroupItem>
-          </ToggleGroup>
+          <span className={`text-sm font-medium ${textClass}`}>
+            {slaType.charAt(0).toUpperCase() + slaType.slice(1)} SLA
+          </span>
         </div>
-        <span className="text-sm">
-          {slaStatus.isBreached ? (
-            <span className="text-red-600 font-medium">{slaStatus.timeLeft}</span>
-          ) : (
-            <span>{slaStatus.timeLeft}</span>
-          )}
-        </span>
+        <div className="flex space-x-1">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className={`px-2 py-1 text-xs h-7 rounded ${slaType === 'response' ? buttonActiveBg : buttonInactiveBg}`}
+            onClick={() => setSlaType('response')}
+          >
+            <Clock className="h-3 w-3 mr-1" />
+            Response
+          </Button>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className={`px-2 py-1 text-xs h-7 rounded ${slaType === 'resolution' ? buttonActiveBg : buttonInactiveBg}`}
+            onClick={() => setSlaType('resolution')}
+          >
+            <CheckCircle2 className="h-3 w-3 mr-1" />
+            Resolution
+          </Button>
+        </div>
       </div>
-      <Progress 
-        value={slaStatus.percentLeft} 
-        className="h-2" 
-        indicatorClassName={barColor} 
-      />
+      
+      <div className="space-y-1">
+        <span className={`text-sm ${slaStatus.isBreached ? "text-red-500 font-medium" : textClass}`}>
+          {slaStatus.timeLeft}
+        </span>
+        <Progress 
+          value={slaStatus.percentLeft} 
+          className={`h-2 ${bgClass}`} 
+          indicatorClassName={barColor} 
+        />
+      </div>
     </div>
   );
 };
