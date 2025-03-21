@@ -17,18 +17,8 @@ const incidents: Ticket[] = [
     createdBy: 'system',
     affectedServices: ['web-app', 'api-gateway'],
     type: 'incident', // Add required type field
-    sla: {
-      responseTime: {
-        target: '30m',
-        actual: '15m',
-        status: 'met'
-      },
-      resolutionTime: {
-        target: '4h',
-        actual: null,
-        status: 'pending'
-      }
-    }
+    audit: [], // Add required audit field
+    // Remove sla field as it's not in the Ticket type
   },
   {
     id: 'INC-1002',
@@ -44,18 +34,8 @@ const incidents: Ticket[] = [
     createdBy: 'user789',
     affectedServices: ['auth-service'],
     type: 'incident', // Add required type field
-    sla: {
-      responseTime: {
-        target: '1h',
-        actual: null,
-        status: 'pending'
-      },
-      resolutionTime: {
-        target: '8h',
-        actual: null,
-        status: 'pending'
-      }
-    }
+    audit: [], // Add required audit field
+    // Remove sla field as it's not in the Ticket type
   },
   {
     id: 'INC-1003',
@@ -71,18 +51,8 @@ const incidents: Ticket[] = [
     createdBy: 'user123',
     affectedServices: ['customer-db', 'reporting-service'],
     type: 'incident', // Add required type field
-    sla: {
-      responseTime: {
-        target: '1h',
-        actual: '45m',
-        status: 'met'
-      },
-      resolutionTime: {
-        target: '8h',
-        actual: null,
-        status: 'at-risk'
-      }
-    }
+    audit: [], // Add required audit field
+    // Remove sla field as it's not in the Ticket type
   },
   {
     id: 'INC-1004',
@@ -98,18 +68,8 @@ const incidents: Ticket[] = [
     createdBy: 'user789',
     affectedServices: ['email-service'],
     type: 'incident', // Add required type field
-    sla: {
-      responseTime: {
-        target: '30m',
-        actual: '25m',
-        status: 'met'
-      },
-      resolutionTime: {
-        target: '4h',
-        actual: '3h 20m',
-        status: 'met'
-      }
-    }
+    audit: [], // Add required audit field
+    // Remove sla field as it's not in the Ticket type
   },
   {
     id: 'INC-1005',
@@ -125,18 +85,8 @@ const incidents: Ticket[] = [
     createdBy: 'user456',
     affectedServices: ['vpn-service'],
     type: 'incident', // Add required type field
-    sla: {
-      responseTime: {
-        target: '2h',
-        actual: '45m',
-        status: 'met'
-      },
-      resolutionTime: {
-        target: '12h',
-        actual: null,
-        status: 'pending'
-      }
-    }
+    audit: [], // Add required audit field
+    // Remove sla field as it's not in the Ticket type
   }
 ];
 
@@ -155,7 +105,8 @@ const serviceRequests: Ticket[] = [
     resolvedAt: null,
     createdBy: 'user789',
     type: 'service',
-    affectedServices: []
+    affectedServices: [],
+    audit: [], // Add required audit field
   },
   {
     id: 'SR-1002',
@@ -170,7 +121,8 @@ const serviceRequests: Ticket[] = [
     resolvedAt: null,
     createdBy: 'user456',
     type: 'service',
-    affectedServices: []
+    affectedServices: [],
+    audit: [], // Add required audit field
   }
 ];
 
