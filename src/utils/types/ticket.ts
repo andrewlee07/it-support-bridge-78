@@ -1,13 +1,12 @@
-
 import { AuditEntry } from './audit';
 
 export type TicketStatus = 'open' | 'in-progress' | 'pending' | 'resolved' | 'closed' | 'fulfilled' | 'new' | 'approved' | 'on-hold';
 export type TicketPriority = 'P1' | 'P2' | 'P3' | 'P4' | 'high' | 'medium' | 'low';
-export type TicketCategory = 'software' | 'hardware' | 'network' | 'access' | 'other';
+export type TicketCategory = 'software' | 'hardware' | 'network' | 'access' | 'other' | 'security' | 'data-breach' | 'sar';
 export type PendingSubStatus = 'awaiting-customer' | 'awaiting-third-party' | 'awaiting-maintenance' | 'awaiting-approval' | 'customer-info' | 'customer-testing' | 'third-party' | 'approval' | 'development';
 export type RelatedItemType = 'incident' | 'problem' | 'change' | 'service' | 'bug' | 
-                              'knownError' | 'knowledge' | 'backlogItem' | 'task' | 'backlog';
-export type TicketType = 'incident' | 'service' | 'change';
+                              'knownError' | 'knowledge' | 'backlogItem' | 'task' | 'backlog' | 'security';
+export type TicketType = 'incident' | 'service' | 'change' | 'security';
 
 // Adding TicketFilter and TestCoverageRelationship types that were referenced but missing
 export type TicketFilter = {
@@ -107,6 +106,15 @@ export interface Ticket {
   
   // Watch list functionality
   watchers?: string[];
+
+  // Security-specific fields
+  securityClassification?: 'public' | 'internal' | 'confidential' | 'restricted';
+  dataSubjects?: number;
+  breachType?: 'data-loss' | 'unauthorized-access' | 'system-compromise' | 'phishing' | 'malware' | 'other';
+  sarRequestType?: 'access' | 'rectification' | 'erasure' | 'portability' | 'objection';
+  dpaRequired?: boolean;
+  reportedToAuthorities?: boolean;
+  reportedDate?: Date;
 }
 
 // Extended ticket interface with notes

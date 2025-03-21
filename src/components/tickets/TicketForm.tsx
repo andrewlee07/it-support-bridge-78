@@ -9,6 +9,7 @@ import CategoryPrioritySection from './form-sections/CategoryPrioritySection';
 import AssetServiceSection from './form-sections/AssetServiceSection';
 import FormActions from './form-sections/FormActions';
 import FormHeader from './form-sections/FormHeader';
+import SecurityDetailsSection from './form-sections/SecurityDetailsSection';
 
 interface TicketFormProps {
   onSubmit: (data: Partial<Ticket>) => void;
@@ -52,11 +53,16 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type }) => {
           type={type} 
         />
         
-        {/* Add the new Asset and Service section */}
-        {type === 'incident' && (
+        {/* Add the Security Details section for security cases */}
+        {type === 'security' && (
+          <SecurityDetailsSection form={form} />
+        )}
+        
+        {/* Add the Asset and Service section */}
+        {(type === 'incident' || type === 'security') && (
           <AssetServiceSection
             form={form}
-            type="incident"
+            type={type}
           />
         )}
         

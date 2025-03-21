@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Bug, ListTodo, ClipboardList } from 'lucide-react';
+import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TicketTabsProps {
   activeTab: string;
@@ -14,36 +13,18 @@ const TicketTabs: React.FC<TicketTabsProps> = ({
   activeTab,
   onTabChange,
   isResolved,
-  isServiceRequest
+  isServiceRequest,
 }) => {
-  const resolveTabLabel = isServiceRequest ? 'fulfill' : 'resolve';
+  // Determine if this is a security case (not a service request)
+  const isSecurityCase = !isServiceRequest && activeTab.includes('security');
   
   return (
-    <TabsList className="mb-4 flex flex-wrap">
-      <TabsTrigger value="details">Details</TabsTrigger>
-      <TabsTrigger value="activity">Activity</TabsTrigger>
-      {!isResolved && (
-        <>
-          <TabsTrigger value="update">Update</TabsTrigger>
-          <TabsTrigger value={resolveTabLabel}>{isServiceRequest ? 'Fulfill' : 'Resolve'}</TabsTrigger>
-          <TabsTrigger value="notes">Add Note</TabsTrigger>
-          <TabsTrigger value="create-task" className="flex items-center">
-            <ClipboardList className="w-4 h-4 mr-1" />
-            Create Task
-          </TabsTrigger>
-          {isServiceRequest ? (
-            <TabsTrigger value="create-backlog" className="flex items-center">
-              <ListTodo className="w-4 h-4 mr-1" />
-              Create Backlog
-            </TabsTrigger>
-          ) : (
-            <TabsTrigger value="create-bug" className="flex items-center">
-              <Bug className="w-4 h-4 mr-1" />
-              Create Bug
-            </TabsTrigger>
-          )}
-        </>
-      )}
+    <TabsList className="mb-4">
+      <TabsTrigger value="details">
+        {isServiceRequest ? 'Request Details' : isSecurityCase ? 'Security Case Details' : 'Incident Details'}
+      </TabsTrigger>
+      <TabsTrigger value="related">Related Items</TabsTrigger>
+      <TabsTrigger value="tasks">Tasks</TabsTrigger>
     </TabsList>
   );
 };

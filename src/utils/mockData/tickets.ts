@@ -1,4 +1,3 @@
-
 import { Ticket, TicketStatus, TicketPriority, TicketType, RelatedItem } from '../types';
 import { createAuditEntries } from './auditHelpers';
 
@@ -107,6 +106,58 @@ export const mockTickets: Ticket[] = [
       }
     ]
   },
+  
+  // Add security cases
+  {
+    id: 'SEC00001',
+    title: 'Suspicious login attempts detected',
+    description: 'Multiple failed login attempts from unusual IP addresses have been detected on the customer portal.',
+    status: 'in-progress',
+    priority: 'P1',
+    category: 'security',
+    type: 'security',
+    createdBy: 'user-2',
+    assignedTo: 'user-3',
+    createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
+    updatedAt: new Date(),
+    audit: createAuditEntries('SEC00001', 'security', 'user-2'),
+    securityClassification: 'confidential',
+  },
+  {
+    id: 'SEC00002',
+    title: 'Marketing database breach',
+    description: 'Potential unauthorized access to the marketing database containing customer email addresses and preferences.',
+    status: 'open',
+    priority: 'P1',
+    category: 'data-breach',
+    type: 'security',
+    createdBy: 'user-5',
+    createdAt: new Date(new Date().setDate(new Date().getDate() - 2)),
+    updatedAt: new Date(new Date().setDate(new Date().getDate() - 2)),
+    audit: createAuditEntries('SEC00002', 'security', 'user-5'),
+    securityClassification: 'restricted',
+    dataSubjects: 1240,
+    breachType: 'unauthorized-access',
+    reportedToAuthorities: true,
+    reportedDate: new Date(new Date().setDate(new Date().getDate() - 1)),
+  },
+  {
+    id: 'SEC00003',
+    title: 'SAR Request - John Smith',
+    description: 'Subject Access Request from John Smith requesting all personal data held by the company.',
+    status: 'open',
+    priority: 'P3',
+    category: 'sar',
+    type: 'security',
+    createdBy: 'user-1',
+    assignedTo: 'user-4',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    audit: createAuditEntries('SEC00003', 'security', 'user-1'),
+    securityClassification: 'confidential',
+    sarRequestType: 'access',
+    dpaRequired: true,
+  },
 ];
 
 // Helper function to filter tickets by type
@@ -171,4 +222,17 @@ export const generateIncidentId = (): string => {
 export const generateServiceRequestId = (): string => {
   const nextNumber = getNextServiceRequestIdNumber();
   return `SR${nextNumber.toString().padStart(5, '0')}`;
+};
+
+// Generate a new security case ID with format SEC00001
+export const generateSecurityCaseId = (): string => {
+  const existingIds = mockTickets
+    .filter(ticket => ticket.type === 'security' && ticket.id.startsWith('SEC'))
+    .map(ticket => {
+      const numericPart = ticket.id.replace('SEC', '');
+      return parseInt(numericPart, 10);
+    });
+  
+  const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+  return `SEC${(maxId + 1).toString().padStart(5, '0')}`;
 };
