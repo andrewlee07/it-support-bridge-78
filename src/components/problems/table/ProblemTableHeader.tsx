@@ -19,7 +19,7 @@ const ProblemTableHeader: React.FC<ProblemTableHeaderProps> = ({
   setSlaType
 }) => {
   return (
-    <TableHeader>
+    <TableHeader className="bg-secondary/30">
       <TableRow>
         <SortableColumnHeader 
           title="ID" 

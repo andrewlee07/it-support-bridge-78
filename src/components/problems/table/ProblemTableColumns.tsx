@@ -28,7 +28,7 @@ export const SortableColumnHeader: React.FC<SortableColumnHeaderProps> = ({
 
   return (
     <TableHead 
-      className="cursor-pointer hover:bg-muted/50"
+      className="cursor-pointer hover:bg-muted/20 text-muted-foreground"
       onClick={() => onSort(column)}
     >
       <div className="flex items-center">
@@ -63,16 +63,16 @@ export const SLAColumnHeader: React.FC<SLAColumnHeaderProps> = ({
 
   return (
     <TableHead 
-      className="cursor-pointer hover:bg-muted/50 min-w-[240px]"
+      className="cursor-pointer hover:bg-muted/20 min-w-[240px] text-muted-foreground"
       onClick={() => onSort('sla')}
     >
       <div className="flex items-center justify-between">
         <span>SLA Status</span>
-        <div className="flex bg-slate-800 rounded overflow-hidden">
+        <div className="flex bg-secondary rounded overflow-hidden">
           <Button 
             size="sm" 
             variant="ghost" 
-            className={`px-2 py-1 text-xs h-7 rounded-none ${slaType === 'response' ? 'bg-slate-700 text-white' : 'text-slate-300'}`}
+            className={`px-2 py-1 text-xs h-7 rounded-none ${slaType === 'response' ? 'bg-secondary text-white' : 'text-muted-foreground'}`}
             onClick={(e) => {
               e.stopPropagation();
               onSLATypeChange('response');
@@ -84,7 +84,7 @@ export const SLAColumnHeader: React.FC<SLAColumnHeaderProps> = ({
           <Button 
             size="sm" 
             variant="ghost" 
-            className={`px-2 py-1 text-xs h-7 rounded-none ${slaType === 'resolution' ? 'bg-slate-700 text-white' : 'text-slate-300'}`}
+            className={`px-2 py-1 text-xs h-7 rounded-none ${slaType === 'resolution' ? 'bg-secondary text-white' : 'text-muted-foreground'}`}
             onClick={(e) => {
               e.stopPropagation();
               onSLATypeChange('resolution');

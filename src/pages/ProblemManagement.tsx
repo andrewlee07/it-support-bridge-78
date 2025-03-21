@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -10,6 +11,8 @@ import ProblemForm from '@/components/problems/ProblemForm';
 import KnownErrorDatabase from '@/components/problems/KnownErrorDatabase';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Download } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const ProblemManagement = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -48,7 +51,7 @@ const ProblemManagement = () => {
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" className="bg-secondary/50 border border-border/20 hover:bg-muted">
                   <Download className="mr-2 h-4 w-4" />
                   Export
                 </Button>
@@ -63,7 +66,7 @@ const ProblemManagement = () => {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            <Button onClick={handleCreateProblem} disabled={showForm}>
+            <Button onClick={handleCreateProblem} disabled={showForm} className="bg-primary hover:bg-primary/90">
               <FilePlus className="mr-2 h-4 w-4" />
               Create Problem
             </Button>
@@ -110,7 +113,7 @@ const ProblemManagement = () => {
         </div>
         
         {showForm ? (
-          <Card className="p-6">
+          <Card className="p-6 bg-secondary/50 border border-border/20">
             <h2 className="text-xl font-semibold mb-4">Create New Problem</h2>
             <ProblemForm onSubmit={handleSubmit} />
           </Card>
@@ -123,44 +126,52 @@ const ProblemManagement = () => {
               <TabsTrigger value="kedb">Known Error DB</TabsTrigger>
             </TabsList>
             
-            <Card>
+            <Card className="bg-secondary/50 border border-border/20">
               <CardHeader className="py-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
                   <div className="relative w-full sm:w-96">
-                    <input
+                    <Input
                       type="text"
                       placeholder="Search problems..."
-                      className="w-full pl-3 pr-10 py-2 border rounded-md"
+                      className="w-full pl-3 pr-10 py-2 bg-secondary/80"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <select 
-                      className="border p-2 rounded-md"
+                    <Select 
                       value={statusFilter || ''}
-                      onChange={(e) => setStatusFilter(e.target.value === '' ? null : e.target.value)}
+                      onValueChange={(value) => setStatusFilter(value === '' ? null : value)}
                     >
-                      <option value="">All Statuses</option>
-                      <option value="new">New</option>
-                      <option value="under-investigation">Under Investigation</option>
-                      <option value="root-cause-identified">Root Cause Identified</option>
-                      <option value="known-error">Known Error</option>
-                      <option value="resolved">Resolved</option>
-                    </select>
+                      <SelectTrigger className="bg-secondary/80">
+                        <SelectValue placeholder="All Statuses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">All Statuses</SelectItem>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="under-investigation">Under Investigation</SelectItem>
+                        <SelectItem value="root-cause-identified">Root Cause Identified</SelectItem>
+                        <SelectItem value="known-error">Known Error</SelectItem>
+                        <SelectItem value="resolved">Resolved</SelectItem>
+                      </SelectContent>
+                    </Select>
                     
-                    <select 
-                      className="border p-2 rounded-md"
+                    <Select
                       value={priorityFilter || ''}
-                      onChange={(e) => setPriorityFilter(e.target.value === '' ? null : e.target.value)}
+                      onValueChange={(value) => setPriorityFilter(value === '' ? null : value)}
                     >
-                      <option value="">All Priorities</option>
-                      <option value="P1">P1</option>
-                      <option value="P2">P2</option>
-                      <option value="P3">P3</option>
-                      <option value="P4">P4</option>
-                    </select>
+                      <SelectTrigger className="bg-secondary/80">
+                        <SelectValue placeholder="All Priorities" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">All Priorities</SelectItem>
+                        <SelectItem value="P1">P1</SelectItem>
+                        <SelectItem value="P2">P2</SelectItem>
+                        <SelectItem value="P3">P3</SelectItem>
+                        <SelectItem value="P4">P4</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </CardHeader>

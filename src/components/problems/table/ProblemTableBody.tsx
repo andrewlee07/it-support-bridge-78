@@ -46,7 +46,7 @@ const ProblemTableBody: React.FC<ProblemTableBodyProps> = ({
   return (
     <TableBody>
       {problems.map((problem) => (
-        <TableRow key={problem.id} className="hover:bg-muted/50">
+        <TableRow key={problem.id} className="hover:bg-muted/20 border-b border-border/10">
           <ProblemIDCell 
             problem={problem} 
             onProblemClick={onProblemClick} 

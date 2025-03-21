@@ -36,7 +36,7 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ problems, onProblemClick })
 
   return (
     <div className="overflow-x-auto">
-      <Table>
+      <Table className="border-separate border-spacing-0">
         <ProblemTableHeader
           sortColumn={sortColumn}
           sortDirection={sortDirection}

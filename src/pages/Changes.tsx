@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -134,7 +135,7 @@ const Changes = () => {
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
-            <Card>
+            <Card className="bg-secondary/50 border border-border/20">
               <CardHeader className="py-4">
                 {/* Additional filters could go here */}
               </CardHeader>
@@ -154,7 +155,7 @@ const Changes = () => {
           
           {/* Other tabs would use filtered data */}
           <TabsContent value="submitted" className="space-y-4">
-            <Card>
+            <Card className="bg-secondary/50 border border-border/20">
               <CardContent className="p-0">
                 <ChangesTable
                   changes={changes?.filter(change => change.status === 'submitted')}
@@ -169,7 +170,7 @@ const Changes = () => {
           </TabsContent>
           
           <TabsContent value="approved" className="space-y-4">
-            <Card>
+            <Card className="bg-secondary/50 border border-border/20">
               <CardContent className="p-0">
                 <ChangesTable
                   changes={changes?.filter(change => change.status === 'approved')}
@@ -184,7 +185,7 @@ const Changes = () => {
           </TabsContent>
           
           <TabsContent value="in-progress" className="space-y-4">
-            <Card>
+            <Card className="bg-secondary/50 border border-border/20">
               <CardContent className="p-0">
                 <ChangesTable
                   changes={changes?.filter(change => change.status === 'in-progress')}
