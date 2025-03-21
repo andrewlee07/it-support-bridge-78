@@ -1,9 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { TabsContent, Tabs } from '@/components/ui/tabs';
 import { 
   BacklogItem, 
   Attachment, 
@@ -12,9 +10,7 @@ import {
   BacklogItemAttachment, 
   HistoryEntry 
 } from '@/utils/types/backlogTypes';
-import { format } from 'date-fns';
 import { getReleases } from '@/utils/api/release';
-import { Paperclip, MessageSquare, History, Users, Clock } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -27,6 +23,7 @@ import HistoryList from './history/HistoryList';
 import WatchersList from './watchers/WatchersList';
 import BacklogItemBasicDetails from './detail/BacklogItemBasicDetails';
 import ItemHeaderWithStatus from './detail/ItemHeaderWithStatus';
+import BacklogItemDetailTabs from './BacklogItemDetailTabs';
 
 interface BacklogItemDetailProps {
   item: BacklogItem;
@@ -307,47 +304,26 @@ const BacklogItemDetail: React.FC<BacklogItemDetailProps> = ({
   const commentsCount = comments.length;
   const attachmentsCount = attachments.length;
   const watchersCount = watchers.length;
+  
+  // Check if item is in a completed state
+  const isDone = item.status === 'completed' || item.status === 'deferred';
 
   return (
     <Card className="w-full shadow-sm">
-      <ItemHeaderWithStatus item={item} />
+      <CardHeader className="pb-0">
+        <ItemHeaderWithStatus item={item} />
+      </CardHeader>
       
-      <CardContent className="pt-0">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mt-2 mb-4">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="attachments" className="flex items-center gap-1">
-              <Paperclip className="h-4 w-4" />
-              Attachments
-              {attachmentsCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1">
-                  {attachmentsCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="comments" className="flex items-center gap-1">
-              <MessageSquare className="h-4 w-4" />
-              Comments
-              {commentsCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1">
-                  {commentsCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="history">
-              <History className="h-4 w-4 mr-1" />
-              History
-            </TabsTrigger>
-            <TabsTrigger value="watchers" className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              Watchers
-              {watchersCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1">
-                  {watchersCount}
-                </Badge>
-              )}
-            </TabsTrigger>
-          </TabsList>
+      <CardContent className="pt-4">
+        <Tabs value={activeTab} defaultValue="details" className="w-full">
+          <BacklogItemDetailTabs 
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            attachmentsCount={attachmentsCount}
+            commentsCount={commentsCount}
+            watchersCount={watchersCount}
+            isDone={isDone}
+          />
           
           <TabsContent value="details" className="m-0">
             <BacklogItemBasicDetails 

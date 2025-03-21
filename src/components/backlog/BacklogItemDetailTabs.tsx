@@ -1,63 +1,100 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BacklogItem } from '@/utils/types/backlogTypes';
-import { TestCase } from '@/utils/types/test/testCase';
-import { Info, TestTube } from 'lucide-react';
-import TestCoverageTab from './TestCoverageTab';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import TestCaseDetails from '@/components/test-management/TestCaseDetails';
+import React from 'react';
+import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Database, 
+  Paperclip, 
+  MessageSquare, 
+  History, 
+  Users, 
+  Clock
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface BacklogItemDetailTabsProps {
-  backlogItem: BacklogItem;
-  children?: React.ReactNode; // For the Info tab content
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  attachmentsCount: number;
+  commentsCount: number;
+  watchersCount: number;
+  isDone: boolean;
 }
 
-const BacklogItemDetailTabs: React.FC<BacklogItemDetailTabsProps> = ({ 
-  backlogItem, 
-  children 
-}) => {
-  const [selectedTestCase, setSelectedTestCase] = useState<TestCase | null>(null);
-  const [isTestCaseDialogOpen, setIsTestCaseDialogOpen] = useState(false);
-
-  const handleViewTestCase = (testCase: TestCase) => {
-    setSelectedTestCase(testCase);
-    setIsTestCaseDialogOpen(true);
-  };
-
+const BacklogItemDetailTabs = ({ 
+  activeTab, 
+  setActiveTab,
+  attachmentsCount,
+  commentsCount,
+  watchersCount,
+  isDone
+}: BacklogItemDetailTabsProps) => {
   return (
-    <Tabs defaultValue="info" className="w-full mt-6">
-      <TabsList>
-        <TabsTrigger value="info" className="flex items-center">
-          <Info className="h-4 w-4 mr-2" />
-          Details
-        </TabsTrigger>
-        <TabsTrigger value="tests" className="flex items-center">
-          <TestTube className="h-4 w-4 mr-2" />
-          Test Coverage
-        </TabsTrigger>
-      </TabsList>
+    <TabsList className="mb-6 w-full flex flex-wrap justify-start">
+      <TabsTrigger 
+        value="details" 
+        className="flex items-center"
+        onClick={() => setActiveTab('details')}
+        data-state={activeTab === 'details' ? 'active' : ''}
+      >
+        <Database className="w-4 h-4 mr-1" />
+        Details
+      </TabsTrigger>
       
-      <TabsContent value="info">
-        {children}
-      </TabsContent>
+      <TabsTrigger 
+        value="attachments" 
+        className="flex items-center gap-1"
+        onClick={() => setActiveTab('attachments')}
+        data-state={activeTab === 'attachments' ? 'active' : ''}
+      >
+        <Paperclip className="h-4 w-4" />
+        Attachments
+        {attachmentsCount > 0 && (
+          <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1">
+            {attachmentsCount}
+          </Badge>
+        )}
+      </TabsTrigger>
       
-      <TabsContent value="tests">
-        <TestCoverageTab 
-          backlogItem={backlogItem}
-          onViewTestCase={handleViewTestCase}
-        />
-      </TabsContent>
-
-      {/* Test Case Details Dialog */}
-      <Dialog open={isTestCaseDialogOpen} onOpenChange={setIsTestCaseDialogOpen}>
-        <DialogContent className="sm:max-w-3xl">
-          {selectedTestCase && (
-            <TestCaseDetails testCase={selectedTestCase} />
-          )}
-        </DialogContent>
-      </Dialog>
-    </Tabs>
+      <TabsTrigger 
+        value="comments" 
+        className="flex items-center gap-1"
+        onClick={() => setActiveTab('comments')}
+        data-state={activeTab === 'comments' ? 'active' : ''}
+      >
+        <MessageSquare className="h-4 w-4" />
+        Comments
+        {commentsCount > 0 && (
+          <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1">
+            {commentsCount}
+          </Badge>
+        )}
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="history" 
+        className="flex items-center"
+        onClick={() => setActiveTab('history')}
+        data-state={activeTab === 'history' ? 'active' : ''}
+      >
+        <History className="h-4 w-4 mr-1" />
+        History
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="watchers" 
+        className="flex items-center gap-1"
+        onClick={() => setActiveTab('watchers')}
+        data-state={activeTab === 'watchers' ? 'active' : ''}
+      >
+        <Users className="h-4 w-4" />
+        Watchers
+        {watchersCount > 0 && (
+          <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1">
+            {watchersCount}
+          </Badge>
+        )}
+      </TabsTrigger>
+    </TabsList>
   );
 };
 
