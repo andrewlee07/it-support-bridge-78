@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import PageTransition from '@/components/shared/PageTransition';
 import { useToast } from '@/hooks/use-toast';
 import BugsTab from '@/components/test-management/BugsTab';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 
 const Bugs = () => {

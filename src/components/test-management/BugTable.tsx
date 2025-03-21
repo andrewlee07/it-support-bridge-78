@@ -1,290 +1,167 @@
-
-import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Eye, Edit, MoreHorizontal, ArrowUpDown, CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchBugs, updateBug } from '@/utils/mockData/testData';
 import { Bug } from '@/utils/types/test/bug';
 import { BugStatus } from '@/utils/types/test/testStatus';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Bug as BugIcon, Eye, Edit, MoreHorizontal } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
+import BugForm from './BugForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { getUserNameById } from '@/utils/userUtils';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
-interface BugTableProps {
-  bugs: Bug[];
-  onView: (bug: Bug) => void;
-  onEdit: (bug: Bug) => void;
-  onStatusUpdate: (id: string, status: BugStatus) => void;
+interface BugListProps {
+  bugs?: Bug[];
+  onView?: (bug: Bug) => void;
+  onEdit?: (bug: Bug) => void;
+  onStatusUpdate?: (id: string, status: BugStatus) => void;
   onStatusFilterChange?: (status: string | null) => void;
   onSeverityFilterChange?: (severity: string | null) => void;
   statusFilter?: string | null;
   severityFilter?: string | null;
 }
 
-const BugTable: React.FC<BugTableProps> = ({
-  bugs,
-  onView,
-  onEdit,
+const BugTable: React.FC<BugListProps> = ({ 
+  bugs, 
+  onView, 
+  onEdit, 
   onStatusUpdate,
   onStatusFilterChange,
   onSeverityFilterChange,
   statusFilter,
   severityFilter
 }) => {
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'open':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'in-progress':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'resolved':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'closed':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'reopened':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+  const handleStatusChange = (id: string, status: BugStatus) => {
+    if (onStatusUpdate) {
+      onStatusUpdate(id, status);
     }
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity.toLowerCase()) {
-      case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low':
-        return 'bg-green-100 text-green-800 border-green-200';
-      default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+  const handleStatusFilter = (status: string | null) => {
+    if (onStatusFilterChange) {
+      onStatusFilterChange(status);
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case 'high':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'low':
-        return 'bg-green-100 text-green-800 border-green-200';
-      default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+  const handleSeverityFilter = (severity: string | null) => {
+    if (onSeverityFilterChange) {
+      onSeverityFilterChange(severity);
     }
   };
-
-  const formatTimestamp = (date: Date) => {
-    return format(date, 'MMM d, yyyy HH:mm');
-  };
-
-  const getTimeDifference = (date: Date) => {
-    const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
-    
-    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-    
-    if (diffInDays > 0) {
-      return `${diffInDays}d ago`;
-    } else if (diffInHours > 0) {
-      return `${diffInHours}h ago`;
-    } else if (diffInMinutes > 0) {
-      return `${diffInMinutes}m ago`;
-    } else {
-      return 'Just now';
-    }
-  };
-
-  // Filter options based on actual data
-  const statusOptions = Array.from(new Set(bugs.map(bug => bug.status)));
-  const severityOptions = Array.from(new Set(bugs.map(bug => bug.severity)));
 
   return (
-    <div className="overflow-x-auto">
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="status-filter">Filter by Status:</Label>
+          <select
+            id="status-filter"
+            className="px-3 py-2 border rounded-md"
+            value={statusFilter || ''}
+            onChange={(e) => handleStatusFilter(e.target.value === '' ? null : e.target.value)}
+          >
+            <option value="">All Statuses</option>
+            <option value="open">Open</option>
+            <option value="in-progress">In Progress</option>
+            <option value="ready">Ready</option>
+            <option value="blocked">Blocked</option>
+            <option value="completed">Completed</option>
+            <option value="deferred">Deferred</option>
+          </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="severity-filter">Filter by Severity:</Label>
+          <select
+            id="severity-filter"
+            className="px-3 py-2 border rounded-md"
+            value={severityFilter || ''}
+            onChange={(e) => handleSeverityFilter(e.target.value === '' ? null : e.target.value)}
+          >
+            <option value="">All Severities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Bug Title</TableHead>
-            <TableHead className="w-[120px]">
-              <div className="flex items-center">
-                Status
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {statusOptions.map(status => (
-                      <DropdownMenuItem 
-                        key={status}
-                        onClick={() => onStatusFilterChange?.(status === statusFilter ? null : status)}
-                        className={statusFilter === status ? "bg-muted" : ""}
-                      >
-                        {status}
-                      </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onStatusFilterChange?.(null)}>
-                      Show All
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </TableHead>
-            <TableHead className="w-[120px]">
-              <div className="flex items-center">
-                Severity
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 ml-1">
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {severityOptions.map(severity => (
-                      <DropdownMenuItem 
-                        key={severity}
-                        onClick={() => onSeverityFilterChange?.(severity === severityFilter ? null : severity)}
-                        className={severityFilter === severity ? "bg-muted" : ""}
-                      >
-                        {severity}
-                      </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onSeverityFilterChange?.(null)}>
-                      Show All
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </TableHead>
-            <TableHead className="w-[120px]">Priority</TableHead>
-            <TableHead className="w-[150px]">Assigned To</TableHead>
-            <TableHead className="w-[150px]">Reported</TableHead>
-            <TableHead className="text-right w-[100px]">Actions</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Severity</TableHead>
+            <TableHead>Priority</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {bugs.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                No bugs found matching your criteria
+          {bugs && bugs.map((bug) => (
+            <TableRow key={bug.id}>
+              <TableCell>{bug.title}</TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      {bug.status} <MoreHorizontal className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'open')}>
+                      Open
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'in-progress')}>
+                      In Progress
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'ready')}>
+                      Ready
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'blocked')}>
+                      Blocked
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'completed')}>
+                      Completed
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusChange(bug.id, 'deferred')}>
+                      Deferred
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+              <TableCell>{bug.severity}</TableCell>
+              <TableCell>{bug.priority}</TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" size="icon" onClick={() => onView && onView(bug)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={() => onEdit && onEdit(bug)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
-          ) : (
-            bugs.map((bug) => (
-              <TableRow key={bug.id} className="hover:bg-muted/50">
-                <TableCell className="font-medium">
-                  <Button 
-                    variant="link" 
-                    className="p-0 h-auto font-medium text-foreground hover:underline"
-                    onClick={() => onView(bug)}
-                  >
-                    {bug.id}
-                  </Button>
-                </TableCell>
-                <TableCell className="max-w-xs">
-                  <div className="truncate font-medium">{bug.title}</div>
-                  <div className="truncate text-sm text-muted-foreground">{bug.description}</div>
-                </TableCell>
-                <TableCell>
-                  <Badge className={getStatusColor(bug.status)}>{bug.status}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge className={getSeverityColor(bug.severity)}>{bug.severity}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={getPriorityColor(bug.priority)}>{bug.priority}</Badge>
-                </TableCell>
-                <TableCell>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="line-clamp-1">
-                          {getUserNameById(bug.assignedDeveloper || '')}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>ID: {bug.assignedDeveloper || 'Unassigned'}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span>{getTimeDifference(bug.createdAt)}</span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{formatTimestamp(bug.createdAt)}</p>
-                        <p className="text-xs">By: {getUserNameById(bug.reportedBy || bug.createdBy)}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end space-x-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8" 
-                      onClick={() => onView(bug)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8" 
-                      onClick={() => onEdit(bug)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem 
-                          onClick={() => onStatusUpdate(bug.id, 'in-progress')}
-                          disabled={bug.status === 'in-progress'}
-                        >
-                          <Clock className="mr-2 h-4 w-4" />
-                          Mark In Progress
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => onStatusUpdate(bug.id, 'resolved')}
-                          disabled={bug.status === 'resolved'}
-                        >
-                          <CheckCircle className="mr-2 h-4 w-4" />
-                          Mark Resolved
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          onClick={() => onStatusUpdate(bug.id, 'reopened')}
-                          disabled={bug.status === 'reopened' || bug.status === 'open'}
-                          className="text-orange-500"
-                        >
-                          <AlertCircle className="mr-2 h-4 w-4" />
-                          Reopen Bug
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
+          ))}
         </TableBody>
       </Table>
     </div>
