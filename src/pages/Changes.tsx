@@ -87,43 +87,35 @@ const Changes = () => {
 
         {/* Metrics Cards - Interactive Filters */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-white shadow-sm">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
                 <p className="text-sm font-medium text-muted-foreground">Total Changes</p>
-              </div>
-              <div className="flex items-center">
-                <div className="text-2xl font-bold">{totalChanges}</div>
+                <div className="text-4xl font-bold">{totalChanges}</div>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
                 <p className="text-sm font-medium text-muted-foreground">Submitted</p>
-              </div>
-              <div className="flex items-center">
-                <div className="text-2xl font-bold">{submittedChanges}</div>
+                <div className="text-4xl font-bold">{submittedChanges}</div>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
                 <p className="text-sm font-medium text-muted-foreground">Approved</p>
-              </div>
-              <div className="flex items-center">
-                <div className="text-2xl font-bold">{approvedChanges}</div>
+                <div className="text-4xl font-bold">{approvedChanges}</div>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
                 <p className="text-sm font-medium text-muted-foreground">In Progress</p>
-              </div>
-              <div className="flex items-center">
-                <div className="text-2xl font-bold">{inProgressChanges}</div>
+                <div className="text-4xl font-bold">{inProgressChanges}</div>
               </div>
             </CardContent>
           </Card>

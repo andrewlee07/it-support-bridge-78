@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -73,38 +72,38 @@ const ProblemManagement = () => {
 
         {/* Dashboard Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-white">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex flex-col space-y-2">
-                <p className="text-sm text-muted-foreground">Total Problems</p>
-                <h2 className="text-3xl font-bold">{totalProblems}</h2>
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <p className="text-sm font-medium text-muted-foreground">Total Problems</p>
+                <div className="text-4xl font-bold">{totalProblems}</div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex flex-col space-y-2">
-                <p className="text-sm text-muted-foreground">Active Problems</p>
-                <h2 className="text-3xl font-bold">{activeProblemsCount}</h2>
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <p className="text-sm font-medium text-muted-foreground">Active Problems</p>
+                <div className="text-4xl font-bold">{activeProblemsCount}</div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex flex-col space-y-2">
-                <p className="text-sm text-muted-foreground">Critical Problems</p>
-                <h2 className="text-3xl font-bold">{criticalProblemsCount}</h2>
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <p className="text-sm font-medium text-muted-foreground">Critical Problems</p>
+                <div className="text-4xl font-bold">{criticalProblemsCount}</div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className="bg-secondary/50 border border-border/20 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex flex-col space-y-2">
-                <p className="text-sm text-muted-foreground">Known Errors</p>
-                <h2 className="text-3xl font-bold">{knownErrorsCount}</h2>
+              <div className="flex flex-col items-center justify-center space-y-3 py-4">
+                <p className="text-sm font-medium text-muted-foreground">Known Errors</p>
+                <div className="text-4xl font-bold">{knownErrorsCount}</div>
               </div>
             </CardContent>
           </Card>
