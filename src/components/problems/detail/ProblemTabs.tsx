@@ -12,6 +12,7 @@ const ProblemTabs = ({ activeTab, isClosed }: ProblemTabsProps) => {
   return (
     <TabsList className="mb-6 w-full flex flex-wrap justify-start">
       <TabsTrigger value="details" className="flex items-center">
+        <Database className="w-4 h-4 mr-1" />
         Details
       </TabsTrigger>
       <TabsTrigger value="activity" className="flex items-center">

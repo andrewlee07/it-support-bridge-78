@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
 import ReleaseDetailContent from '@/components/releases/detail/ReleaseDetailContent';
 import ReleaseDetailDialogs from '@/components/releases/detail/ReleaseDetailDialogs';
