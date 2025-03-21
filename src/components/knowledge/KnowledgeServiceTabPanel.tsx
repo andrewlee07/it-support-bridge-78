@@ -32,7 +32,7 @@ const KnowledgeServiceTabPanel: React.FC<KnowledgeServiceTabPanelProps> = ({ ser
   if (articles.length === 0) {
     return (
       <div className="py-4">
-        <Card className="bg-gray-50">
+        <Card className="bg-gray-50 border-gray-200">
           <CardContent className="pt-6 pb-6 flex flex-col items-center justify-center">
             <FileText className="h-12 w-12 text-gray-400 mb-2" />
             <h3 className="text-lg font-medium">No knowledge articles</h3>
@@ -46,7 +46,7 @@ const KnowledgeServiceTabPanel: React.FC<KnowledgeServiceTabPanelProps> = ({ ser
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium flex items-center">
           <BookOpen className="h-5 w-5 mr-2" />
@@ -59,7 +59,7 @@ const KnowledgeServiceTabPanel: React.FC<KnowledgeServiceTabPanelProps> = ({ ser
 
       <div className="grid grid-cols-1 gap-4">
         {articles.map(article => (
-          <Card key={article.id}>
+          <Card key={article.id} className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">{article.title}</CardTitle>
               <CardDescription>
@@ -74,7 +74,7 @@ const KnowledgeServiceTabPanel: React.FC<KnowledgeServiceTabPanelProps> = ({ ser
             <CardFooter className="pt-2">
               <div className="flex flex-wrap gap-1">
                 {article.tags.map(tag => (
-                  <Badge key={tag} variant="secondary">
+                  <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                     <Tag className="h-3 w-3 mr-1" />
                     {tag}
                   </Badge>

@@ -5,7 +5,7 @@ import { getKnowledgeArticlesByService } from '@/utils/api/knowledgeApi';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { FileText } from 'lucide-react';
+import { FileText, Tag, BookOpen } from 'lucide-react';
 import { KnowledgeArticle } from '@/utils/types/knowledge';
 import { Button } from '@/components/ui/button';
 
@@ -37,8 +37,8 @@ const KnowledgeArticlesByService: React.FC<KnowledgeArticlesByServiceProps> = ({
   if (articles.length === 0) {
     return (
       <div className="py-4">
-        <Card className="bg-gray-50">
-          <CardContent className="pt-6 flex flex-col items-center justify-center">
+        <Card className="bg-gray-50 border-gray-200">
+          <CardContent className="pt-6 pb-6 flex flex-col items-center justify-center">
             <FileText className="h-12 w-12 text-gray-400 mb-2" />
             <h3 className="text-lg font-medium">No knowledge articles</h3>
             <p className="text-gray-500 text-center mt-1">
@@ -51,7 +51,7 @@ const KnowledgeArticlesByService: React.FC<KnowledgeArticlesByServiceProps> = ({
   }
 
   const renderArticleCard = (article: KnowledgeArticle) => (
-    <Card key={article.id} className="mb-4">
+    <Card key={article.id} className="mb-4 shadow-sm hover:shadow-md transition-shadow border-gray-200">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">{article.title}</CardTitle>
         <CardDescription>
@@ -64,7 +64,10 @@ const KnowledgeArticlesByService: React.FC<KnowledgeArticlesByServiceProps> = ({
         />
         <div className="flex flex-wrap gap-1 mt-2">
           {article.tags.map(tag => (
-            <Badge key={tag} variant="secondary">{tag}</Badge>
+            <Badge key={tag} variant="outline" className="flex items-center gap-1">
+              <Tag className="h-3 w-3" />
+              {tag}
+            </Badge>
           ))}
         </div>
       </CardContent>
@@ -74,7 +77,10 @@ const KnowledgeArticlesByService: React.FC<KnowledgeArticlesByServiceProps> = ({
   return (
     <div className="py-2">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">Knowledge Articles for {serviceName}</h3>
+        <h3 className="text-lg font-medium flex items-center">
+          <BookOpen className="h-5 w-5 mr-2" />
+          Knowledge Articles for {serviceName}
+        </h3>
         <Button variant="outline" size="sm" onClick={() => window.open('/knowledge', '_blank')}>
           View All Articles
         </Button>

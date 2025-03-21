@@ -4,7 +4,7 @@ import { KnowledgeArticle } from '@/utils/types/knowledge';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Clock, File, Search, Eye } from 'lucide-react';
+import { ArrowRight, Clock, File, Search, Eye, Tag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface KnowledgeArticlesListProps {
@@ -29,17 +29,19 @@ const KnowledgeArticlesList: React.FC<KnowledgeArticlesListProps> = ({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h2 className="text-xl font-semibold">
         {articles.length} {articles.length === 1 ? 'Article' : 'Articles'} Found
       </h2>
       <div className="grid grid-cols-1 gap-4">
         {articles.map((article) => (
-          <Card key={article.id} className="hover:shadow-md transition-shadow">
+          <Card key={article.id} className="hover:shadow-md transition-shadow border-gray-200">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-lg line-clamp-1">{article.title}</CardTitle>
-                <Badge>{article.type}</Badge>
+                <Badge variant="outline" className="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 border-blue-300">
+                  {article.type}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent>
@@ -49,7 +51,8 @@ const KnowledgeArticlesList: React.FC<KnowledgeArticlesListProps> = ({
               </p>
               <div className="flex flex-wrap gap-1 mt-3">
                 {article.tags.slice(0, 3).map((tag) => (
-                  <Badge key={tag} variant="outline">
+                  <Badge key={tag} variant="outline" className="flex items-center gap-1">
+                    <Tag className="h-3 w-3" />
                     {tag}
                   </Badge>
                 ))}
@@ -67,10 +70,6 @@ const KnowledgeArticlesList: React.FC<KnowledgeArticlesListProps> = ({
                 <div className="flex items-center">
                   <Eye className="h-3.5 w-3.5 mr-1" />
                   <span>{article.viewCount} views</span>
-                </div>
-                <div className="flex items-center">
-                  <File className="h-3.5 w-3.5 mr-1" />
-                  <span>{article.id}</span>
                 </div>
               </div>
               <Button variant="ghost" onClick={() => onArticleSelect(article)}>

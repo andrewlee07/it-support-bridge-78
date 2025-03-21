@@ -3,10 +3,12 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getKnowledgeArticleById } from '@/utils/api/knowledgeApi';
-import { ChevronLeft, Star } from 'lucide-react';
+import { ChevronLeft, Star, Calendar, Eye, Tag, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import PortalHeader from '@/components/portal/PortalHeader';
+import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 
 const KnowledgeArticleDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +34,7 @@ const KnowledgeArticleDetail: React.FC = () => {
         </div>
         
         {isLoading ? (
-          <Card className="p-6">
+          <Card className="p-6 border-gray-200 shadow-sm">
             <div className="animate-pulse">
               <div className="h-8 bg-muted rounded w-3/4 mb-4"></div>
               <div className="h-4 bg-muted rounded w-full mb-2"></div>
@@ -41,21 +43,32 @@ const KnowledgeArticleDetail: React.FC = () => {
             </div>
           </Card>
         ) : error ? (
-          <Card className="p-6">
-            <h1 className="text-xl font-medium mb-4">Error</h1>
-            <p className="text-muted-foreground">
-              Unable to load the requested knowledge article.
-            </p>
-            <Button asChild className="mt-4">
-              <Link to="/portal">Return to Portal</Link>
-            </Button>
+          <Card className="p-6 border-gray-200 shadow-sm">
+            <CardHeader>
+              <CardTitle>Error</CardTitle>
+              <CardDescription>
+                Unable to load the requested knowledge article.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button asChild className="mt-4">
+                <Link to="/portal">Return to Portal</Link>
+              </Button>
+            </CardFooter>
           </Card>
         ) : article ? (
-          <Card className="p-6">
-            <div className="mb-4">
-              <h1 className="text-2xl font-bold mb-2">{article.title}</h1>
-              <div className="flex items-center mb-2">
-                <div className="flex items-center mr-4">
+          <Card className="border-gray-200 shadow-md">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-2xl font-bold">{article.title}</CardTitle>
+              <CardDescription className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Badge variant="outline" className="mr-2">{article.type}</Badge>
+                  <div className="flex items-center text-muted-foreground text-sm">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Last updated: {format(new Date(article.updatedAt), 'MMM d, yyyy')}
+                  </div>
+                </div>
+                <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
@@ -65,44 +78,60 @@ const KnowledgeArticleDetail: React.FC = () => {
                     />
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  Last updated: {new Date(article.updatedAt).toLocaleDateString()}
-                </span>
-              </div>
-              
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="pt-4">
               <div className="flex flex-wrap gap-2 mb-4">
                 {article.tags.map(tag => (
-                  <span key={tag} className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs">
+                  <Badge
+                    key={tag}
+                    variant="outline"
+                    className="flex items-center gap-1"
+                  >
+                    <Tag className="h-3 w-3" />
                     {tag}
-                  </span>
+                  </Badge>
                 ))}
               </div>
-            </div>
+              
+              <div className="prose prose-sm max-w-none dark:prose-invert">
+                <p>{article.content}</p>
+              </div>
+            </CardContent>
             
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <p>{article.content}</p>
-            </div>
-            
-            <div className="mt-6 pt-4 border-t">
-              <p className="text-sm text-muted-foreground">
-                Views: {article.viewCount} • Document Type: {article.type}
-              </p>
-              <p className="text-sm mt-2">
-                Was this article helpful?{' '}
-                <Button variant="link" className="p-0 h-auto">Yes</Button>{' '}
-                <Button variant="link" className="p-0 h-auto">No</Button>
-              </p>
-            </div>
+            <CardFooter className="flex flex-wrap justify-between items-center pt-4 border-t">
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Eye className="h-4 w-4 mr-1" />
+                <span>{article.viewCount} views</span>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <p className="text-sm">Was this article helpful?</p>
+                <Button variant="outline" size="sm" className="h-8 px-3">
+                  <ThumbsUp className="h-4 w-4 mr-1" />
+                  Yes
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 px-3">
+                  <ThumbsDown className="h-4 w-4 mr-1" />
+                  No
+                </Button>
+              </div>
+            </CardFooter>
           </Card>
         ) : (
-          <Card className="p-6">
-            <h1 className="text-xl font-medium mb-4">Article Not Found</h1>
-            <p className="text-muted-foreground">
-              The requested knowledge article could not be found.
-            </p>
-            <Button asChild className="mt-4">
-              <Link to="/portal">Return to Portal</Link>
-            </Button>
+          <Card className="p-6 border-gray-200 shadow-sm">
+            <CardHeader>
+              <CardTitle>Article Not Found</CardTitle>
+              <CardDescription>
+                The requested knowledge article could not be found.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button asChild className="mt-4">
+                <Link to="/portal">Return to Portal</Link>
+              </Button>
+            </CardFooter>
           </Card>
         )}
       </div>

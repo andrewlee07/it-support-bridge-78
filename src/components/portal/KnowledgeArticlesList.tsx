@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { KnowledgeArticle } from '@/utils/types/knowledge';
 import ArticleItem from './ArticleItem';
 import { Card } from '@/components/ui/card';
+import { BookOpen } from 'lucide-react';
 
 // This would be replaced with an actual API call in a real application
 const fetchPublishedArticles = async (): Promise<KnowledgeArticle[]> => {
@@ -89,8 +90,8 @@ const KnowledgeArticlesList: React.FC<KnowledgeArticlesListProps> = ({
 
   if (isLoading) {
     return (
-      <Card className={`p-5 ${className}`}>
-        {showHeader && <h3 className="text-lg font-medium mb-4">Knowledge Articles</h3>}
+      <Card className={`p-5 border-gray-200 shadow-sm ${className}`}>
+        {showHeader && <h3 className="text-lg font-medium mb-4 flex items-center"><BookOpen className="h-5 w-5 mr-2" />Knowledge Articles</h3>}
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="animate-pulse">
@@ -105,8 +106,8 @@ const KnowledgeArticlesList: React.FC<KnowledgeArticlesListProps> = ({
 
   if (error || !articles) {
     return (
-      <Card className={`p-5 ${className}`}>
-        {showHeader && <h3 className="text-lg font-medium mb-4">Knowledge Articles</h3>}
+      <Card className={`p-5 border-gray-200 shadow-sm ${className}`}>
+        {showHeader && <h3 className="text-lg font-medium mb-4 flex items-center"><BookOpen className="h-5 w-5 mr-2" />Knowledge Articles</h3>}
         <div className="text-sm text-muted-foreground">
           Unable to load knowledge articles.
         </div>
@@ -117,8 +118,8 @@ const KnowledgeArticlesList: React.FC<KnowledgeArticlesListProps> = ({
   const displayedArticles = articles.slice(0, maxItems);
 
   return (
-    <Card className={`p-5 ${className}`}>
-      {showHeader && <h3 className="text-lg font-medium mb-4">Knowledge Articles</h3>}
+    <Card className={`p-5 border-gray-200 shadow-sm ${className}`}>
+      {showHeader && <h3 className="text-lg font-medium mb-4 flex items-center"><BookOpen className="h-5 w-5 mr-2" />Knowledge Articles</h3>}
       <div className="space-y-4">
         {displayedArticles.map(article => (
           <ArticleItem
@@ -131,7 +132,7 @@ const KnowledgeArticlesList: React.FC<KnowledgeArticlesListProps> = ({
         ))}
       </div>
       {articles.length > maxItems && (
-        <a href="/knowledge" className="text-sm text-primary hover:text-primary/80 block mt-4">
+        <a href="/knowledge" className="text-sm text-primary hover:text-primary/80 block mt-4 flex items-center">
           View all articles ({articles.length})
         </a>
       )}

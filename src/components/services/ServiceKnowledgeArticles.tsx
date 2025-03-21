@@ -14,11 +14,13 @@ import {
   HelpCircle, 
   ExternalLink, 
   Eye, 
-  FileText 
+  FileText,
+  Tag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getKnowledgeArticlesForService } from '@/utils/mockData/knowledgeArticles';
 import { getUserById } from '@/utils/mockData/users';
+import { Badge } from '@/components/ui/badge';
 
 interface ServiceKnowledgeArticlesProps {
   serviceId: string;
@@ -51,7 +53,7 @@ const ServiceKnowledgeArticles: React.FC<ServiceKnowledgeArticlesProps> = ({ ser
   
   if (allKnowledgeArticles.length === 0) {
     return (
-      <Card>
+      <Card className="border-gray-200 shadow-sm">
         <CardHeader>
           <CardTitle className="text-xl flex items-center gap-2">
             <Book className="h-5 w-5" />
@@ -71,7 +73,7 @@ const ServiceKnowledgeArticles: React.FC<ServiceKnowledgeArticlesProps> = ({ ser
   }
   
   return (
-    <Card>
+    <Card className="border-gray-200 shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl flex items-center gap-2">
           <Book className="h-5 w-5" />
@@ -100,7 +102,7 @@ const ServiceKnowledgeArticles: React.FC<ServiceKnowledgeArticlesProps> = ({ ser
                 const author = getUserById(article.authorId);
                 
                 return (
-                  <div key={article.id} className="border rounded-md p-4">
+                  <div key={article.id} className="border rounded-md p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-2">
                         {getTypeIcon(article.relationshipType)}
@@ -134,12 +136,14 @@ const ServiceKnowledgeArticles: React.FC<ServiceKnowledgeArticlesProps> = ({ ser
                     {article.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {article.tags.map(tag => (
-                          <span 
+                          <Badge
                             key={tag} 
-                            className="bg-muted text-xs px-2 py-0.5 rounded-full text-muted-foreground"
+                            variant="outline"
+                            className="text-xs flex items-center gap-1"
                           >
+                            <Tag className="h-3 w-3" />
                             {tag}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     )}

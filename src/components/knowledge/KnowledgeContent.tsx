@@ -108,7 +108,7 @@ const KnowledgeContent: React.FC<KnowledgeContentProps> = ({
           />
         </div>
         <div className="md:col-span-3">
-          <div className="flex flex-col items-center justify-center h-60 border rounded-md p-6 bg-gray-50">
+          <div className="flex flex-col items-center justify-center h-60 border rounded-md p-6 bg-gray-50 border-gray-200">
             <FileText className="h-16 w-16 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium">No articles found</h3>
             <p className="text-gray-500 text-center mt-2">
@@ -135,7 +135,7 @@ const KnowledgeContent: React.FC<KnowledgeContentProps> = ({
       <div className="md:col-span-3">
         <div className="grid grid-cols-1 gap-4">
           {articles.map((article) => (
-            <Card key={article.id}>
+            <Card key={article.id} className="border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div>
@@ -170,10 +170,10 @@ const KnowledgeContent: React.FC<KnowledgeContentProps> = ({
                   dangerouslySetInnerHTML={{ __html: article.content }} 
                 />
               </CardContent>
-              <CardFooter className="flex flex-wrap justify-between items-center pt-2">
+              <CardFooter className="flex flex-wrap justify-between items-center pt-2 border-t">
                 <div className="flex flex-wrap gap-1">
                   {article.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => onTagSelect(tag)}>
+                    <Badge key={tag} variant="secondary" className="cursor-pointer flex items-center gap-1" onClick={() => onTagSelect(tag)}>
                       <Tag className="h-3 w-3 mr-1" />
                       {tag}
                     </Badge>
