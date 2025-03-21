@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -762,7 +763,7 @@ const SecurityManagement = () => {
                               <DropdownMenuItem onClick={() => setPriorityFilter(null)}>
                                 Show All
                               </DropdownMenuItem>
-                            DropdownMenuContent>
+                            </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
                       </TableHead>
@@ -864,4 +865,84 @@ const SecurityManagement = () => {
                                 </Tooltip>
                               </TooltipProvider>
                             </TableCell>
-                            <TableCell
+                            <TableCell>
+                              <div className="flex items-center justify-end space-x-1">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-8 w-8" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleViewCase(case_);
+                                  }}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-8 w-8" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditCase(case_);
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem>Assign User</DropdownMenuItem>
+                                    <DropdownMenuItem>Change Status</DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="text-destructive">
+                                      Mark as Duplicate
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          {expandedCase === case_.id && (
+                            <TableRow>
+                              <TableCell colSpan={9} className="p-0">
+                                <div className="bg-muted/20 px-4 py-3">
+                                  {selectedCase && (
+                                    <SecurityCaseDetail
+                                      securityCase={selectedCase}
+                                      isInline={true}
+                                    />
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </React.Fragment>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* View Security Case Detail Dialog */}
+      {selectedCase && (
+        <SecurityCaseDetail
+          securityCase={selectedCase}
+          open={viewDialogOpen}
+          onClose={() => setViewDialogOpen(false)}
+          isInline={false}
+        />
+      )}
+    </div>
+  );
+};
+
+export default SecurityManagement;
