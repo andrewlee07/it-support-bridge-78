@@ -1,46 +1,23 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
-import ProblemForm from './ProblemForm';
-import { createProblem, getNextProblemId } from '@/utils/mockData/problems';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-const CreateProblemButton = () => {
-  const [open, setOpen] = useState(false);
+const CreateProblemButton: React.FC = () => {
+  const navigate = useNavigate();
 
-  const handleSubmit = (data: any) => {
-    try {
-      createProblem(data);
-      setOpen(false);
-      toast.success('Problem created successfully');
-    } catch (error) {
-      toast.error('Failed to create problem');
-    }
+  const handleClick = () => {
+    toast.info("Creating new problem");
+    navigate('/problems/new');
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          New Problem
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Create New Problem</DialogTitle>
-        </DialogHeader>
-        <ProblemForm onSubmit={handleSubmit} />
-      </DialogContent>
-    </Dialog>
+    <Button className="ml-4" onClick={handleClick}>
+      <Plus className="mr-2 h-4 w-4" />
+      New Problem
+    </Button>
   );
 };
 
