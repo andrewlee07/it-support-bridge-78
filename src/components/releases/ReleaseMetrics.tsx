@@ -1,25 +1,13 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface ReleaseMetricsProps {
   metrics: {
-    totalReleases: number;
-    statusCounts: {
-      Planned: number;
-      'In Progress': number;
-      Deployed: number;
-      Cancelled: number;
-    };
-    typeCounts: {
-      major: number;
-      minor: number;
-      patch: number;
-      emergency: number;
-    };
-    upcomingReleases: number;
-    deployedThisMonth: number;
+    planned: number;
+    inProgress: number;
+    deployed: number;
+    cancelled: number;
   };
   isLoading: boolean;
 }
@@ -27,16 +15,11 @@ interface ReleaseMetricsProps {
 const ReleaseMetrics: React.FC<ReleaseMetricsProps> = ({ metrics, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
-                <div className="h-4 bg-muted rounded w-24" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-8 bg-muted rounded w-16" />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map(i => (
+          <Card key={i} className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="h-16 animate-pulse bg-gray-200 rounded"></div>
             </CardContent>
           </Card>
         ))}
@@ -44,61 +27,51 @@ const ReleaseMetrics: React.FC<ReleaseMetricsProps> = ({ metrics, isLoading }) =
     );
   }
 
+  const { planned, inProgress, deployed, cancelled } = metrics;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            <div className="flex items-center">
-              <Package className="h-4 w-4 mr-2" />
-              Total Releases
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{metrics.totalReleases}</div>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <Card className="bg-white shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <p className="text-sm font-medium text-muted-foreground">Planned Releases</p>
+          </div>
+          <div className="flex items-center">
+            <div className="text-2xl font-bold">{planned}</div>
+          </div>
         </CardContent>
       </Card>
       
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-2" />
-              Upcoming Releases
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{metrics.upcomingReleases}</div>
+      <Card className="bg-white shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <p className="text-sm font-medium text-muted-foreground">Releases In Progress</p>
+          </div>
+          <div className="flex items-center">
+            <div className="text-2xl font-bold">{inProgress}</div>
+          </div>
         </CardContent>
       </Card>
       
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            <div className="flex items-center">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Deployed This Month
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{metrics.deployedThisMonth}</div>
+      <Card className="bg-white shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <p className="text-sm font-medium text-muted-foreground">Deployed Releases</p>
+          </div>
+          <div className="flex items-center">
+            <div className="text-2xl font-bold">{deployed}</div>
+          </div>
         </CardContent>
       </Card>
       
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            <div className="flex items-center">
-              <AlertTriangle className="h-4 w-4 mr-2" />
-              Emergency Releases
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{metrics.typeCounts.emergency}</div>
+      <Card className="bg-white shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <p className="text-sm font-medium text-muted-foreground">Cancelled Releases</p>
+          </div>
+          <div className="flex items-center">
+            <div className="text-2xl font-bold">{cancelled}</div>
+          </div>
         </CardContent>
       </Card>
     </div>

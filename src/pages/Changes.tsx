@@ -1,27 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { toast } from 'sonner';
 import PageTransition from '@/components/shared/PageTransition';
-import { useAuth } from '@/contexts/AuthContext';
 import ChangesHeader from '@/components/changes/ChangesHeader';
 import ChangesSearch from '@/components/changes/ChangesSearch';
-import ChangeTabs from '@/components/changes/ChangeTabs';
+import ChangesTable from '@/components/changes/ChangesTable';
 import RejectChangeDialog from '@/components/changes/RejectChangeDialog';
 import { useChangeRequests } from '@/hooks/useChangeRequests';
 import { useChangeRequestMutations } from '@/hooks/useChangeRequestMutations';
 import { useAppNavigation } from '@/utils/routes/navigationUtils';
-import { logRouteValidationResults, testAllDefinedRoutes } from '@/utils/testing/linkTesting';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import ChangesTable from '@/components/changes/ChangesTable';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Changes = () => {
-  // In development mode, validate all routes on component mount
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const results = testAllDefinedRoutes();
-      logRouteValidationResults(results);
-    }
-  }, []);
-  
   const { user } = useAuth();
   const navigation = useAppNavigation();
   
@@ -29,19 +20,14 @@ const Changes = () => {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [selectedChangeId, setSelectedChangeId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>(() => {
-    // Get saved preference from localStorage or default to grid
-    const savedPreference = localStorage.getItem('changeViewMode');
-    return (savedPreference as 'grid' | 'table') || 'grid';
-  });
   
   // Custom hooks
   const {
+    changes,
     activeTab,
     setActiveTab,
     searchQuery,
     handleSearchChange,
-    changes,
     isLoading,
     isError,
     refetch
@@ -51,15 +37,11 @@ const Changes = () => {
   
   const { approveMutation, rejectMutation } = useChangeRequestMutations(user?.id || '');
 
-  // Save view mode preference to localStorage
-  useEffect(() => {
-    localStorage.setItem('changeViewMode', viewMode);
-  }, [viewMode]);
-
   // Event handlers
   const handleApprove = (changeId: string) => {
     if (!user) return;
     approveMutation.mutate(changeId);
+    toast.success('Change request approved');
   };
 
   const handleRejectClick = (changeId: string) => {
@@ -75,6 +57,8 @@ const Changes = () => {
       reason: rejectionReason
     });
     
+    toast.success('Change request rejected');
+    
     // Reset state
     setRejectDialogOpen(false);
     setRejectionReason('');
@@ -85,23 +69,71 @@ const Changes = () => {
     navigation.goToNewChange();
   };
 
-  const handleViewChange = (changeId: string) => {
+  const handleViewChange = useCallback((changeId: string) => {
     navigation.goToChangeDetail(changeId);
-    console.log(`Navigating to change: ${changeId} using consistent navigation utility`);
-  };
+  }, [navigation]);
 
-  const handleViewModeChange = (mode: 'grid' | 'table') => {
-    setViewMode(mode);
-  };
+  // Get cards data
+  const totalChanges = changes?.length || 0;
+  const submittedChanges = changes?.filter(change => change.status === 'submitted').length || 0;
+  const approvedChanges = changes?.filter(change => change.status === 'approved').length || 0;
+  const inProgressChanges = changes?.filter(change => change.status === 'in-progress').length || 0;
 
   return (
     <PageTransition>
       <div className="space-y-6">
+        {/* Page Header with export and create buttons */}
         <ChangesHeader onCreateNew={handleCreateNewRequest} />
-        
+
+        {/* Metrics Cards - Interactive Filters */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Changes</p>
+              </div>
+              <div className="flex items-center">
+                <div className="text-2xl font-bold">{totalChanges}</div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <p className="text-sm font-medium text-muted-foreground">Submitted</p>
+              </div>
+              <div className="flex items-center">
+                <div className="text-2xl font-bold">{submittedChanges}</div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <p className="text-sm font-medium text-muted-foreground">Approved</p>
+              </div>
+              <div className="flex items-center">
+                <div className="text-2xl font-bold">{approvedChanges}</div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <p className="text-sm font-medium text-muted-foreground">In Progress</p>
+              </div>
+              <div className="flex items-center">
+                <div className="text-2xl font-bold">{inProgressChanges}</div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search Bar */}
         <ChangesSearch searchQuery={searchQuery} onSearchChange={handleSearchChange} />
 
-        <Tabs defaultValue="all">
+        {/* Tabs for different change types */}
+        <Tabs defaultValue="all" onValueChange={(value) => setActiveTab(value)}>
           <TabsList className="mb-4">
             <TabsTrigger value="all">All Changes</TabsTrigger>
             <TabsTrigger value="submitted">Submitted</TabsTrigger>
@@ -128,17 +160,50 @@ const Changes = () => {
             </Card>
           </TabsContent>
           
-          {/* Other tabs content would follow the same pattern */}
+          {/* Other tabs would use filtered data */}
           <TabsContent value="submitted" className="space-y-4">
-            {/* Similar content as 'all' tab but filtered */}
+            <Card>
+              <CardContent className="p-0">
+                <ChangesTable
+                  changes={changes?.filter(change => change.status === 'submitted')}
+                  activeTab={activeTab}
+                  onApprove={handleApprove}
+                  onReject={handleRejectClick}
+                  onViewChange={handleViewChange}
+                  userRole={user?.role}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="approved" className="space-y-4">
-            {/* Similar content as 'all' tab but filtered */}
+            <Card>
+              <CardContent className="p-0">
+                <ChangesTable
+                  changes={changes?.filter(change => change.status === 'approved')}
+                  activeTab={activeTab}
+                  onApprove={handleApprove}
+                  onReject={handleRejectClick}
+                  onViewChange={handleViewChange}
+                  userRole={user?.role}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="in-progress" className="space-y-4">
-            {/* Similar content as 'all' tab but filtered */}
+            <Card>
+              <CardContent className="p-0">
+                <ChangesTable
+                  changes={changes?.filter(change => change.status === 'in-progress')}
+                  activeTab={activeTab}
+                  onApprove={handleApprove}
+                  onReject={handleRejectClick}
+                  onViewChange={handleViewChange}
+                  userRole={user?.role}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
