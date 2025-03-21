@@ -23,7 +23,43 @@ const mockSecurityCases: SecurityCase[] = [
     ],
     impactedUsers: 120,
     remediationPlan: 'Update API gateway security configurations and implement additional access controls',
-    firstResponseAt: '2023-12-15T15:45:00'
+    firstResponseAt: '2023-12-15T15:45:00',
+    notes: [
+      {
+        id: 'note-1',
+        text: 'Initial assessment shows customer data may have been exposed for up to 4 hours before containment',
+        createdBy: 'user-2',
+        createdAt: '2023-12-15T16:30:00'
+      },
+      {
+        id: 'note-2',
+        text: 'Forensic investigation has begun to determine the extent of the exposure',
+        createdBy: 'user-3',
+        createdAt: '2023-12-16T09:15:00'
+      }
+    ],
+    audit: [
+      {
+        timestamp: '2023-12-15T14:30:00',
+        performedBy: 'user-1',
+        action: 'Created',
+        message: 'Security case created'
+      },
+      {
+        timestamp: '2023-12-15T15:45:00',
+        performedBy: 'user-2',
+        action: 'Updated',
+        message: 'Initial response recorded'
+      },
+      {
+        timestamp: '2023-12-16T10:30:00',
+        performedBy: 'user-3',
+        action: 'Updated',
+        message: 'Added investigation steps'
+      }
+    ],
+    assignedTo: 'user-2',
+    relatedTickets: ['INC0001', 'INC0002']
   },
   {
     id: 'SEC00002',
@@ -516,5 +552,8 @@ export const useSecurityCases = () => {
     complianceIssuesCount,
     totalCases: mockSecurityCases.length,
     calculateSLAStatus,
+    
+    // Expose mock data for direct access in detail view
+    mockSecurityCases
   };
 };
