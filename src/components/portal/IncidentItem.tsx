@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -10,8 +9,8 @@ interface IncidentItemProps {
 }
 
 const IncidentItem: React.FC<IncidentItemProps> = ({ title, date, time, id }) => {
-  // Extract the incident number without the "INC" prefix for URL
-  const incidentId = id.replace('INC', '');
+  // Extract the incident number for URL - keeping only the numeric part
+  const incidentId = id.replace(/INC0*/, '');
   
   return (
     <Link to={`/incidents/${incidentId}`} className="block p-3 rounded-md hover:bg-accent transition-colors">

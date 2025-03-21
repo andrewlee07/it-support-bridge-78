@@ -4,7 +4,7 @@ import { Ticket } from '../types/ticket';
 // Sample incident data
 const incidents: Ticket[] = [
   {
-    id: 'INC-1001',
+    id: 'INC00001',
     title: 'Network Outage in North Data Center',
     description: 'Complete network outage affecting all services in the north data center.',
     status: 'in-progress',
@@ -21,7 +21,7 @@ const incidents: Ticket[] = [
     // Remove sla field as it's not in the Ticket type
   },
   {
-    id: 'INC-1002',
+    id: 'INC00002',
     title: 'Authentication Service Degradation',
     description: 'Users experiencing intermittent login failures due to authentication service issues.',
     status: 'open',
@@ -38,7 +38,7 @@ const incidents: Ticket[] = [
     // Remove sla field as it's not in the Ticket type
   },
   {
-    id: 'INC-1003',
+    id: 'INC00003',
     title: 'Database Performance Degradation',
     description: 'Database queries taking longer than usual, affecting application response times.',
     status: 'pending',
@@ -55,7 +55,7 @@ const incidents: Ticket[] = [
     // Remove sla field as it's not in the Ticket type
   },
   {
-    id: 'INC-1004',
+    id: 'INC00004',
     title: 'Email Service Outage',
     description: 'Corporate email service is completely down. Users unable to send or receive emails.',
     status: 'resolved',
@@ -72,7 +72,7 @@ const incidents: Ticket[] = [
     // Remove sla field as it's not in the Ticket type
   },
   {
-    id: 'INC-1005',
+    id: 'INC00005',
     title: 'VPN Connection Issues',
     description: 'Remote employees unable to connect to corporate VPN from specific regions.',
     status: 'in-progress',
@@ -93,7 +93,7 @@ const incidents: Ticket[] = [
 // Add service tickets for complete data
 const serviceRequests: Ticket[] = [
   {
-    id: 'SR-1001',
+    id: 'SR00001',
     title: 'New Employee Onboarding',
     description: 'Setup required for new employee starting on Monday',
     status: 'open',
@@ -109,7 +109,7 @@ const serviceRequests: Ticket[] = [
     audit: [], // Add required audit field
   },
   {
-    id: 'SR-1002',
+    id: 'SR00002',
     title: 'Software Installation Request',
     description: 'Need Adobe Creative Suite installed on design team laptops',
     status: 'in-progress',
@@ -157,16 +157,16 @@ export const getTicketsByPriority = (priority: string): Ticket[] => {
 // Helper function to generate new incident ID
 export const generateIncidentId = (): string => {
   const lastIncident = incidents[incidents.length - 1];
-  const lastId = parseInt(lastIncident.id.replace('INC-', ''));
+  const lastId = parseInt(lastIncident.id.replace('INC', ''));
   const newId = lastId + 1;
-  return `INC-${newId.toString().padStart(4, '0')}`;
+  return `INC${newId.toString().padStart(5, '0')}`;
 };
 
 // Helper function to generate new service request ID
 export const generateServiceRequestId = (): string => {
   const serviceRequests = mockTickets.filter(ticket => ticket.type === 'service');
   const lastRequest = serviceRequests[serviceRequests.length - 1];
-  const lastId = parseInt(lastRequest.id.replace('SR-', ''));
+  const lastId = parseInt(lastRequest.id.replace('SR', ''));
   const newId = lastId + 1;
-  return `SR-${newId.toString().padStart(4, '0')}`;
+  return `SR${newId.toString().padStart(5, '0')}`;
 };
