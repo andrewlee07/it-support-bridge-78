@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -62,9 +61,9 @@ const SecurityManagement = () => {
   // Get the filtered cases
   const filteredCases = getFilteredCases();
 
-  // Navigate to case detail view
+  // Navigate to case detail view - Updated for consistency with routes
   const goToCaseDetailView = (caseId: string) => {
-    navigate.goToSecurityCaseView(caseId);
+    navigate.goToSecurityCaseDetail(caseId);
   };
 
   return (
@@ -140,14 +139,8 @@ const SecurityManagement = () => {
                 formatDate={formatDate}
                 getTimeDifference={getTimeDifference}
                 handleViewCase={(secCase) => {
-                  // Either open the dialog or navigate to the full detail view
-                  if (window.innerWidth < 1024) {
-                    // For smaller screens, navigate to the full page view
-                    goToCaseDetailView(secCase.id);
-                  } else {
-                    // For larger screens, open the dialog
-                    handleViewCase(secCase);
-                  }
+                  // Always navigate to the full page view
+                  goToCaseDetailView(secCase.id);
                 }}
                 handleEditCase={handleEditCase}
               />
