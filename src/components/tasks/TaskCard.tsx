@@ -6,6 +6,7 @@ import { Task } from '@/utils/types/taskTypes';
 import { formatDistanceToNow } from 'date-fns';
 import { Clock, Calendar, User, CheckCircle, AlertCircle, HourglassIcon, XCircle } from 'lucide-react';
 import WatchButton from '@/components/shared/WatchButton';
+import { getTaskStatusVisuals, getTaskPriorityVisuals } from '@/utils/types/taskTypes';
 
 interface TaskCardProps {
   task: Task;
@@ -18,75 +19,43 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
     ? formatDistanceToNow(new Date(task.dueDate), { addSuffix: true })
     : null;
   
-  // Helper function to determine status color and icon
-  const getStatusInfo = (status: string) => {
+  // Get visuals using the utility functions
+  const statusVisuals = getTaskStatusVisuals(task.status);
+  const priorityVisuals = getTaskPriorityVisuals(task.priority);
+  
+  // Helper function to determine status icon
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'new':
-        return {
-          className: 'bg-blue-50 text-blue-700 border-blue-200',
-          icon: <AlertCircle className="h-3 w-3 mr-1" />
-        };
+        return <AlertCircle className="h-3 w-3 mr-1" />;
       case 'in-progress':
-        return {
-          className: 'bg-purple-50 text-purple-700 border-purple-200',
-          icon: <HourglassIcon className="h-3 w-3 mr-1" />
-        };
+        return <HourglassIcon className="h-3 w-3 mr-1" />;
       case 'on-hold':
-        return {
-          className: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-          icon: <Clock className="h-3 w-3 mr-1" />
-        };
+        return <Clock className="h-3 w-3 mr-1" />;
       case 'completed':
-        return {
-          className: 'bg-green-50 text-green-700 border-green-200',
-          icon: <CheckCircle className="h-3 w-3 mr-1" />
-        };
+        return <CheckCircle className="h-3 w-3 mr-1" />;
       case 'cancelled':
-        return {
-          className: 'bg-red-50 text-red-700 border-red-200',
-          icon: <XCircle className="h-3 w-3 mr-1" />
-        };
+        return <XCircle className="h-3 w-3 mr-1" />;
       default:
-        return {
-          className: 'bg-gray-50 text-gray-700 border-gray-200',
-          icon: <AlertCircle className="h-3 w-3 mr-1" />
-        };
+        return <AlertCircle className="h-3 w-3 mr-1" />;
     }
   };
   
-  // Helper function to determine priority color
-  const getPriorityInfo = (priority: string) => {
+  // Format the priority label
+  const getPriorityLabel = (priority: string) => {
     switch (priority) {
       case 'critical':
-        return {
-          className: 'bg-red-50 text-red-700 border-red-200',
-          label: 'Critical'
-        };
+        return 'Critical';
       case 'high':
-        return {
-          className: 'bg-orange-50 text-orange-700 border-orange-200',
-          label: 'High'
-        };
+        return 'High';
       case 'medium':
-        return {
-          className: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-          label: 'Medium'
-        };
+        return 'Medium';
       case 'low':
-        return {
-          className: 'bg-green-50 text-green-700 border-green-200',
-          label: 'Low'
-        };
+        return 'Low';
       default:
-        return {
-          className: 'bg-gray-50 text-gray-700 border-gray-200',
-          label: 'Unknown'
-        };
+        return 'Unknown';
     }
   };
-
-  const statusInfo = getStatusInfo(task.status);
-  const priorityInfo = getPriorityInfo(task.priority);
 
   const watchableItem = {
     id: task.id,
@@ -113,8 +82,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
           <h3 className="text-base font-semibold leading-tight mt-1">{task.title}</h3>
         </div>
         <div className="flex items-center space-x-2">
-          <Badge variant="outline" className={priorityInfo.className}>
-            {priorityInfo.label}
+          <Badge variant="outline" className={priorityVisuals.badge}>
+            {getPriorityLabel(task.priority)}
           </Badge>
           <WatchButton item={watchableItem} />
         </div>
@@ -134,7 +103,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
             </div>
             <div className="w-full bg-gray-100 rounded-full h-1.5">
               <div 
-                className="bg-blue-600 h-1.5 rounded-full" 
+                className="bg-primary h-1.5 rounded-full" 
                 style={{ width: `${checklistProgress}%` }}
               ></div>
             </div>
@@ -142,8 +111,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
         )}
       </CardContent>
       <CardFooter className="flex flex-col items-start pt-0">
-        <Badge variant="outline" className={`${statusInfo.className} mt-2 gap-1`}>
-          {statusInfo.icon}
+        <Badge variant="outline" className={`${statusVisuals.badge} mt-2 gap-1 flex items-center`}>
+          {getStatusIcon(task.status)}
           {task.status.charAt(0).toUpperCase() + task.status.slice(1).replace('-', ' ')}
         </Badge>
         

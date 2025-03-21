@@ -14,13 +14,13 @@ const FormActions: React.FC<FormActionsProps> = ({ isEditing, onCancel }) => {
         type="button" 
         variant="outline" 
         onClick={onCancel}
-        className="h-10"
+        className="h-10 px-4 py-2"
       >
         Cancel
       </Button>
       <Button 
         type="submit"
-        className="h-10"
+        className="h-10 px-4 py-2 bg-primary text-white hover:bg-primary/90"
       >
         {isEditing ? 'Update SLA' : 'Create SLA'}
       </Button>
