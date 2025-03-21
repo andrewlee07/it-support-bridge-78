@@ -1,4 +1,6 @@
 
+import { AuditEntry } from './audit';
+
 export type TicketType = 'incident' | 'service' | 'problem' | 'change' | 'security';
 export type TicketPriority = 'critical' | 'high' | 'medium' | 'low' | 'P1' | 'P2' | 'P3' | 'P4';
 export type TicketCategory = 'hardware' | 'software' | 'network' | 'access' | 'security' | 'other' | 'data-breach' | 'sar';
@@ -48,6 +50,12 @@ export interface Ticket {
   impactLevel?: string;
   urgency?: string;
   firstResponseAt?: Date;
+  
+  // Customer-related
+  customerId?: string;
+  
+  // Notes
+  notes?: TicketNote[];
 }
 
 export interface TicketNote {

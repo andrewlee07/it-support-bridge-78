@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -29,7 +30,7 @@ const ticketFormSchema = z.object({
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
   type: z.enum(['incident', 'service', 'problem', 'security']),
   priority: z.enum(['critical', 'high', 'medium', 'low']),
-  category: z.enum(['hardware', 'software', 'network', 'access', 'security', 'other']),
+  category: z.enum(['hardware', 'software', 'network', 'access', 'security', 'other', 'data-breach', 'sar']),
 });
 
 // Define the form values type based on the schema
@@ -38,7 +39,7 @@ export type TicketFormValues = z.infer<typeof ticketFormSchema>;
 // Update at the beginning of the file
 interface TicketFormProps {
   onSubmit: (data: Partial<Ticket>) => void;
-  type?: string;
+  type?: 'incident' | 'service' | 'security';
 }
 
 const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type = 'incident' }) => {
@@ -48,7 +49,7 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type = 'incident' }) 
     defaultValues: {
       title: '',
       description: '',
-      type: type as TicketType,
+      type: type as any,
       priority: 'medium',
       category: 'other',
     },
@@ -156,6 +157,12 @@ const TicketForm: React.FC<TicketFormProps> = ({ onSubmit, type = 'incident' }) 
                   <SelectItem value="access">Access</SelectItem>
                   <SelectItem value="security">Security</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
+                  {type === 'security' && (
+                    <>
+                      <SelectItem value="data-breach">Data Breach</SelectItem>
+                      <SelectItem value="sar">Subject Access Request</SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />

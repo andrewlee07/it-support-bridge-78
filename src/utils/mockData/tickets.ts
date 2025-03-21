@@ -1,3 +1,4 @@
+
 import { Ticket, TicketStatus, TicketPriority, TicketType, RelatedItem } from '../types';
 import { createAuditEntries } from './auditHelpers';
 
@@ -12,6 +13,7 @@ export const mockTickets: Ticket[] = [
     category: 'hardware',
     type: 'incident',
     createdBy: 'user-3',
+    reportedBy: 'user-3',
     assignedTo: 'user-2',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
     updatedAt: new Date(),
@@ -27,6 +29,7 @@ export const mockTickets: Ticket[] = [
     category: 'access',
     type: 'service',
     createdBy: 'user-4',
+    reportedBy: 'user-4',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 2)),
     updatedAt: new Date(new Date().setDate(new Date().getDate() - 2)),
     audit: createAuditEntries('SR00001', 'ticket', 'user-4'),
@@ -40,6 +43,7 @@ export const mockTickets: Ticket[] = [
     category: 'software',
     type: 'incident',
     createdBy: 'user-5',
+    reportedBy: 'user-5',
     assignedTo: 'user-2',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 3)),
     updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
@@ -56,6 +60,7 @@ export const mockTickets: Ticket[] = [
     category: 'hardware',
     type: 'service',
     createdBy: 'user-3',
+    reportedBy: 'user-3',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
     updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
     audit: createAuditEntries('SR00002', 'ticket', 'user-3'),
@@ -69,6 +74,7 @@ export const mockTickets: Ticket[] = [
     category: 'network',
     type: 'incident',
     createdBy: 'user-4',
+    reportedBy: 'user-4',
     createdAt: new Date(),
     updatedAt: new Date(),
     audit: createAuditEntries('INC00003', 'ticket', 'user-4'),
@@ -79,6 +85,7 @@ export const mockTickets: Ticket[] = [
         title: 'VPN Client crashes on connection attempt',
         type: 'bug',
         status: 'open',
+        relationship: 'causes',
         createdAt: new Date()
       }
     ]
@@ -92,6 +99,7 @@ export const mockTickets: Ticket[] = [
     category: 'software',
     type: 'service',
     createdBy: 'user-5',
+    reportedBy: 'user-5',
     assignedTo: 'user-2',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 4)),
     updatedAt: new Date(new Date().setDate(new Date().getDate() - 1)),
@@ -102,6 +110,7 @@ export const mockTickets: Ticket[] = [
         title: 'Create standard software installation package',
         type: 'backlogItem',
         status: 'in-progress',
+        relationship: 'improves',
         createdAt: new Date()
       }
     ]
@@ -117,6 +126,7 @@ export const mockTickets: Ticket[] = [
     category: 'security',
     type: 'security',
     createdBy: 'user-2',
+    reportedBy: 'user-2',
     assignedTo: 'user-3',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 1)),
     updatedAt: new Date(),
@@ -132,11 +142,12 @@ export const mockTickets: Ticket[] = [
     category: 'data-breach',
     type: 'security',
     createdBy: 'user-5',
+    reportedBy: 'user-5',
     createdAt: new Date(new Date().setDate(new Date().getDate() - 2)),
     updatedAt: new Date(new Date().setDate(new Date().getDate() - 2)),
     audit: createAuditEntries('SEC00002', 'security', 'user-5'),
     securityClassification: 'restricted',
-    dataSubjects: 1240,
+    dataSubjects: '1240',
     breachType: 'unauthorized-access',
     reportedToAuthorities: true,
     reportedDate: new Date(new Date().setDate(new Date().getDate() - 1)),
@@ -150,6 +161,7 @@ export const mockTickets: Ticket[] = [
     category: 'sar',
     type: 'security',
     createdBy: 'user-1',
+    reportedBy: 'user-1',
     assignedTo: 'user-4',
     createdAt: new Date(),
     updatedAt: new Date(),

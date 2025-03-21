@@ -9,14 +9,16 @@ import OptionsList from '@/components/settings/dropdowns/OptionsList';
 import { ConfigurableEntityType } from '@/utils/types';
 import { useQuery } from '@tanstack/react-query';
 import { dropdownConfigurationApi } from '@/utils/api/dropdownConfigurationApi';
+import { useToast } from '@/hooks/use-toast';
 
 const ConfigurationSettings = () => {
   const [activeTab, setActiveTab] = useState<ConfigurableEntityType>('ticket');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Fetch dropdown configurations based on active tab
-  const { data: configurations, isLoading } = useQuery({
+  const { data: configurations, isLoading, refetch } = useQuery({
     queryKey: ['dropdownConfigurations', activeTab],
     queryFn: () => dropdownConfigurationApi.getDropdownConfigurationsByEntity(activeTab),
   });
@@ -32,6 +34,16 @@ const ConfigurationSettings = () => {
 
   const handleCloseForm = () => {
     setIsFormOpen(false);
+    refetch();
+  };
+
+  const handleSaveForm = (data: any) => {
+    toast({
+      title: "Success",
+      description: "Configuration saved successfully"
+    });
+    setIsFormOpen(false);
+    refetch();
   };
 
   return (
@@ -106,10 +118,12 @@ const ConfigurationSettings = () => {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DropdownConfigForm 
-            onClose={handleCloseForm} 
+            onClose={handleCloseForm}
+            onSave={handleSaveForm}
+            onCancel={handleCloseForm}
             entityType={activeTab}
             isNew={!selectedConfigId}
-            configId={selectedConfigId}
+            configId={selectedConfigId || undefined}
           />
         </DialogContent>
       </Dialog>

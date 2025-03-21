@@ -3,6 +3,7 @@ import React from 'react';
 import { Ticket } from '@/utils/types/ticket';
 import { CloseTicketValues } from './TicketCloseForm';
 import { UpdateTicketValues } from './TicketUpdateForm';
+import TicketDetailContainer from './TicketDetailContainer';
 
 export interface TicketDetailViewProps {
   ticket: Ticket;
@@ -22,14 +23,23 @@ const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   onUpdateTicket,
   onCloseTicket,
   onAddNote,
-  onReopenTicket
+  onReopenTicket,
+  onUpdate,
+  onClose,
+  onReopen
 }) => {
   return (
-    <div>
-      <h1>{ticket.title}</h1>
-      <p>{ticket.description}</p>
-      {/* Placeholder for actual implementation */}
-    </div>
+    <TicketDetailContainer
+      ticket={ticket}
+      type={type}
+      onUpdateTicket={onUpdateTicket}
+      onCloseTicket={onCloseTicket}
+      onAddNote={onAddNote}
+      onReopenTicket={onReopenTicket}
+      onUpdate={onUpdate}
+      onClose={onClose}
+      onReopen={onReopen}
+    />
   );
 };
 

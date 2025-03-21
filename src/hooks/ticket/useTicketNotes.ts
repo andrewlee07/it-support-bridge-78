@@ -1,42 +1,57 @@
 
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { TicketWithNotes, TicketNote } from '@/utils/types/ticket';
-import { createAuditEntry } from '@/utils/auditUtils';
-import { AuditEntry } from '@/utils/types/audit';
+import { v4 as uuidv4 } from 'uuid';
 
-export const useTicketNotes = (
-  ticket: TicketWithNotes | null,
-  setTicket: (ticket: TicketWithNotes | null) => void
-) => {
-  const handleAddNote = (note: string) => {
-    if (ticket && note.trim()) {
-      const noteItem: TicketNote = {
-        id: `note-${Date.now()}`,
+export const useTicketNotes = (ticket: TicketWithNotes, updateTicket: (ticket: TicketWithNotes) => void) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const addNote = async (content: string, isPrivate: boolean = false) => {
+    if (!content.trim()) {
+      toast.error('Note content cannot be empty');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const newNote: TicketNote = {
+        id: uuidv4(),
         ticketId: ticket.id,
-        text: note,
+        content: content,
+        createdBy: 'current-user', // In a real app, this would be the authenticated user
         createdAt: new Date(),
-        createdBy: 'current-user',
-        isInternal: false
+        isPrivate: isPrivate
       };
-      
-      // Create an audit entry for adding a note
-      const noteAuditEntry: AuditEntry = createAuditEntry(
-        ticket.id,
-        'ticket',
-        `Note added: ${note.substring(0, 30)}${note.length > 30 ? '...' : ''}`,
-        'current-user'
-      );
-      
-      const updatedTicket = {
+
+      // Create a copy of the ticket with the new note added
+      const updatedTicket = { 
         ...ticket,
-        notes: [...(ticket.notes || []), noteItem],
-        audit: [...(ticket.audit || []), noteAuditEntry],
-        updatedAt: new Date()
+        notes: [...ticket.notes, newNote],
+        audit: [...(ticket.audit || []), {
+          id: uuidv4(),
+          entityId: ticket.id,
+          entityType: 'ticket',
+          message: `Added ${isPrivate ? 'private' : ''} note`,
+          performedBy: 'current-user',
+          timestamp: new Date(),
+        }]
       };
-      setTicket(updatedTicket);
-      toast.success("Note added successfully");
+
+      // Update the ticket in the state/backend
+      updateTicket(updatedTicket);
+      toast.success('Note added successfully');
+    } catch (error) {
+      console.error('Error adding note:', error);
+      toast.error('Failed to add note');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  return { handleAddNote };
+  return {
+    addNote,
+    isSubmitting
+  };
 };

@@ -1,46 +1,75 @@
 
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { TicketStatus, TicketWithNotes, TicketNote } from '@/utils/types/ticket';
-import { createAuditEntry } from '@/utils/auditUtils';
-import { AuditEntry } from '@/utils/types/audit';
+import { TicketWithNotes, TicketNote } from '@/utils/types/ticket';
+import { v4 as uuidv4 } from 'uuid';
 
-export const useTicketReopen = (
-  ticket: TicketWithNotes | null,
-  setTicket: (ticket: TicketWithNotes | null) => void
-) => {
-  const handleReopenTicket = (reason: string) => {
-    if (ticket) {
-      const reopenNote: TicketNote = {
-        id: `note-reopen-${Date.now()}`,
+export const useTicketReopen = (ticket: TicketWithNotes, updateTicket: (ticket: TicketWithNotes) => void) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const reopenTicket = async (reason: string) => {
+    if (!reason.trim()) {
+      toast.error('Reopen reason cannot be empty');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const now = new Date();
+      
+      // Create a note for the reopen reason
+      const newNote: TicketNote = {
+        id: uuidv4(),
         ticketId: ticket.id,
-        text: `Ticket reopened: ${reason}`,
-        createdAt: new Date(),
-        createdBy: 'current-user',
-        isInternal: false
+        content: `Ticket reopened: ${reason}`,
+        createdBy: 'current-user', // In a real app, this would be the authenticated user
+        createdAt: now,
+        isPrivate: false
       };
       
-      // Create an audit entry for reopening the ticket
-      const reopenAuditEntry: AuditEntry = createAuditEntry(
-        ticket.id,
-        'ticket',
-        `Ticket reopened: ${reason}`,
-        'current-user'
-      );
+      // Determine the appropriate status for reopening
+      // For most tickets, we'll set it back to "in-progress"
+      let newStatus = 'in-progress';
       
+      // But if it's a service request, we might set it back to "open"
+      if (ticket.type === 'service') {
+        newStatus = 'open';
+      }
+      
+      // Create a copy of the ticket with updated status
       const updatedTicket = {
         ...ticket,
-        status: 'open' as TicketStatus,
-        updatedAt: new Date(),
-        reopenedAt: new Date(),
-        notes: [...(ticket.notes || []), reopenNote],
-        audit: [...(ticket.audit || []), reopenAuditEntry],
-        _reopenReason: reason
+        status: newStatus,
+        closedAt: undefined, // Clear the closed date
+        resolvedAt: undefined, // Clear the resolved date if it exists
+        notes: [...ticket.notes, newNote],
+        audit: [
+          ...(ticket.audit || []),
+          {
+            id: uuidv4(),
+            entityId: ticket.id,
+            entityType: 'ticket',
+            message: `Ticket reopened: ${reason}`,
+            performedBy: 'current-user',
+            timestamp: now,
+          }
+        ]
       };
-      setTicket(updatedTicket);
-      
+
+      // Update the ticket in the state/backend
+      updateTicket(updatedTicket);
       toast.success('Ticket reopened successfully');
+    } catch (error) {
+      console.error('Error reopening ticket:', error);
+      toast.error('Failed to reopen ticket');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  return { handleReopenTicket };
+  return {
+    reopenTicket,
+    isSubmitting
+  };
 };

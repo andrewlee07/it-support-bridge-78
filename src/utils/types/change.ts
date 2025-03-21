@@ -25,8 +25,6 @@ export interface ChangeRequest extends Omit<Ticket, 'status' | 'category'> {
   approvedAt?: Date;
   implementor?: string; // Person implementing the change
   approvers?: ChangeApprover[]; // List of approvers
-  audit?: AuditEntry[]; // Audit trail
-  createdBy?: string; // Creator
   impact?: string; // Impact level
   urgency?: string; // Urgency level
 }

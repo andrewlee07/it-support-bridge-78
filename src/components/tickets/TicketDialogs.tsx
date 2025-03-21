@@ -74,10 +74,10 @@ const TicketDialogs: React.FC<TicketDialogsProps> = ({
             <TicketDetailView
               ticket={selectedTicket}
               type={type}
-              onUpdate={onTicketUpdate}
-              onClose={onTicketClose}
-              onAddNote={onAddNote}
-              onReopen={onReopenTicket}
+              onUpdateTicket={onTicketUpdate}
+              onCloseTicket={onTicketClose}
+              onAddNote={onAddNote || (() => {})}
+              onReopenTicket={onReopenTicket || (() => {})}
             />
           ) : (
             <div>Loading...</div>

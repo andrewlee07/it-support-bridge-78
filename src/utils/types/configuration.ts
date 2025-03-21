@@ -18,6 +18,7 @@ export interface MandatoryFieldConfig {
   isRequired: boolean;
   entityType: ConfigurableEntityType;
   description?: string;
+  isResolutionField?: boolean;
 }
 
 export interface DropdownOption {
@@ -59,6 +60,9 @@ export interface ModuleConfiguration {
   configOptions?: Record<string, any>;
   moduleType?: string;
   configType?: string;
+  configName?: string;
+  configDisplayName?: string;
+  configValue?: string;
   isActive?: boolean;
 }
 

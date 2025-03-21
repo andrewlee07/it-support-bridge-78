@@ -1,110 +1,123 @@
+
 import { ConfigurableEntityType, MandatoryFieldConfig } from '@/utils/types/configuration';
 
-// Function to generate mandatory fields for incidents
-const getIncidentMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'incident', description: 'Title of the incident' },
-  { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'incident', description: 'Detailed description of the incident' },
-  { fieldName: 'category', displayName: 'Category', isRequired: true, entityType: 'incident', description: 'Category of the incident' },
-  { fieldName: 'priority', displayName: 'Priority', isRequired: true, entityType: 'incident', description: 'Priority of the incident' }
-];
-
-// Function to generate mandatory fields for service requests
-const getServiceRequestMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'service-request', description: 'Title of the service request' },
-  { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'service-request', description: 'Detailed description of the service request' },
-  { fieldName: 'serviceId', displayName: 'Service', isRequired: true, entityType: 'service-request', description: 'Service being requested' },
-  { fieldName: 'requestType', displayName: 'Request Type', isRequired: true, entityType: 'service-request', description: 'Type of service request' }
-];
-
-// Function to generate mandatory fields for changes
-const getChangeMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'change', description: 'Title of the change request' },
-  { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'change', description: 'Detailed description of the change request' },
-  { fieldName: 'category', displayName: 'Category', isRequired: true, entityType: 'change', description: 'Category of the change request' },
-  { fieldName: 'implementationPlan', displayName: 'Implementation Plan', isRequired: true, entityType: 'change', description: 'Plan for implementing the change' },
-  { fieldName: 'rollbackPlan', displayName: 'Rollback Plan', isRequired: true, entityType: 'change', description: 'Plan for rolling back the change' }
-];
-
-// Function to generate mandatory fields for problems
-const getProblemMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'problem', description: 'Title of the problem' },
-  { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'problem', description: 'Detailed description of the problem' },
-  { fieldName: 'category', displayName: 'Category', isRequired: true, entityType: 'problem', description: 'Category of the problem' },
-  { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'problem', description: 'Status of the problem' },
-  { fieldName: 'priority', displayName: 'Priority', isRequired: true, entityType: 'problem', description: 'Priority of the problem' }
-];
-
-// Function to generate mandatory fields for security cases
-const getSecurityMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'security', description: 'Title of the security case' },
-  { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'security', description: 'Detailed description of the security case' },
-  { fieldName: 'category', displayName: 'Category', isRequired: true, entityType: 'security', description: 'Category of the security case' },
-  { fieldName: 'priority', displayName: 'Priority', isRequired: true, entityType: 'security', description: 'Priority of the security case' }
-];
-
-// Function to generate mandatory fields for tickets
-const getTicketMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'ticket', description: 'Title of the ticket' },
-  { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'ticket', description: 'Detailed description of the ticket' },
-  { fieldName: 'type', displayName: 'Type', isRequired: true, entityType: 'ticket', description: 'Type of the ticket' },
-  { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'ticket', description: 'Status of the ticket' },
-  { fieldName: 'priority', displayName: 'Priority', isRequired: true, entityType: 'ticket', description: 'Priority of the ticket' }
-];
-
-// Function to generate mandatory fields for assets
-const getAssetMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'name', displayName: 'Name', isRequired: true, entityType: 'asset', description: 'Name of the asset' },
-  { fieldName: 'type', displayName: 'Type', isRequired: true, entityType: 'asset', description: 'Type of the asset' },
-  { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'asset', description: 'Status of the asset' }
-];
-
-// Function to generate mandatory fields for users
-const getUserMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'name', displayName: 'Name', isRequired: true, entityType: 'user', description: 'Name of the user' },
-  { fieldName: 'email', displayName: 'Email', isRequired: true, entityType: 'user', description: 'Email of the user' },
-  { fieldName: 'role', displayName: 'Role', isRequired: true, entityType: 'user', description: 'Role of the user' }
-];
-
-// Function to generate mandatory fields for releases
-const getReleaseMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'release', description: 'Title of the release' },
-  { fieldName: 'version', displayName: 'Version', isRequired: true, entityType: 'release', description: 'Version of the release' },
-  { fieldName: 'type', displayName: 'Type', isRequired: true, entityType: 'release', description: 'Type of the release' },
-  { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'release', description: 'Status of the release' }
-];
-
-// Function to generate mandatory fields for bugs
-const getBugMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'bug', description: 'Title of the bug' },
-  { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'bug', description: 'Detailed description of the bug' },
-  { fieldName: 'severity', displayName: 'Severity', isRequired: true, entityType: 'bug', description: 'Severity of the bug' },
-  { fieldName: 'priority', displayName: 'Priority', isRequired: true, entityType: 'bug', description: 'Priority of the bug' }
-];
-
-// Function to generate mandatory fields for backlog
-const getBacklogMandatoryFields = (): MandatoryFieldConfig[] => [
-  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'backlog', description: 'Title of the backlog item' },
-  { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'backlog', description: 'Detailed description of the backlog item' },
-  { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'backlog', description: 'Status of the backlog item' },
-  { fieldName: 'priority', displayName: 'Priority', isRequired: true, entityType: 'backlog', description: 'Priority of the backlog item' }
-];
-
-// Predefined mandatory fields
-const mandatoryFieldsConfig: Record<ConfigurableEntityType, MandatoryFieldConfig[]> = {
-  'incident': [...getIncidentMandatoryFields()],
-  'service-request': [...getServiceRequestMandatoryFields()],
-  'change': [...getChangeMandatoryFields()],
-  'problem': [...getProblemMandatoryFields()],
-  'security': [...getSecurityMandatoryFields()],
-  'ticket': [...getTicketMandatoryFields()],
-  'asset': [...getAssetMandatoryFields()],
-  'user': [...getUserMandatoryFields()],
-  'release': [...getReleaseMandatoryFields()],
-  'bug': [...getBugMandatoryFields()],
-  'backlog': [...getBacklogMandatoryFields()]
+// Function to get mandatory fields configuration
+export const getMandatoryFieldsConfig = async (entityType: ConfigurableEntityType): Promise<MandatoryFieldConfig[]> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockMandatoryFields[entityType] || []);
+    }, 500);
+  });
 };
 
-// Function to get mandatory fields configuration for a specific entity type
-export const getMandatoryFieldsConfig = async (entityType: ConfigurableEntityType): Promise<MandatoryFieldConfig[]> => {
-  return mandatoryFieldsConfig[entityType] || [];
+// Function to update mandatory fields configuration
+export const updateMandatoryFieldsConfig = async (
+  entityType: ConfigurableEntityType,
+  fields: MandatoryFieldConfig[]
+): Promise<boolean> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      mockMandatoryFields[entityType] = fields;
+      resolve(true);
+    }, 500);
+  });
+};
+
+// Function to get status synchronization settings
+export const getStatusSynchronizationSettings = async (): Promise<Record<string, any>> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        enabled: true,
+        syncChangeToTicket: true,
+        syncReleaseToTicket: false
+      });
+    }, 500);
+  });
+};
+
+// Function to update status synchronization settings
+export const updateStatusSynchronizationSettings = async (settings: Record<string, any>): Promise<boolean> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, 500);
+  });
+};
+
+// Function to synchronize release status
+export const synchronizeReleaseStatus = async (releaseId: string, status: string): Promise<boolean> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, 500);
+  });
+};
+
+// Mock data
+const mockMandatoryFields: Record<ConfigurableEntityType, MandatoryFieldConfig[]> = {
+  'incident': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'incident', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'incident', isResolutionField: false },
+    { fieldName: 'assignedTo', displayName: 'Assigned To', isRequired: false, entityType: 'incident', isResolutionField: false },
+    { fieldName: 'resolutionNotes', displayName: 'Resolution Notes', isRequired: true, entityType: 'incident', isResolutionField: true },
+    { fieldName: 'rootCause', displayName: 'Root Cause', isRequired: false, entityType: 'incident', isResolutionField: true },
+  ],
+  'service-request': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'service-request', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'service-request', isResolutionField: false },
+    { fieldName: 'requestedFor', displayName: 'Requested For', isRequired: false, entityType: 'service-request', isResolutionField: false },
+    { fieldName: 'fulfillmentNotes', displayName: 'Fulfillment Notes', isRequired: true, entityType: 'service-request', isResolutionField: true },
+  ],
+  'change': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'change', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'change', isResolutionField: false },
+    { fieldName: 'implementationPlan', displayName: 'Implementation Plan', isRequired: true, entityType: 'change', isResolutionField: false },
+    { fieldName: 'rollbackPlan', displayName: 'Rollback Plan', isRequired: true, entityType: 'change', isResolutionField: false },
+    { fieldName: 'closureNotes', displayName: 'Closure Notes', isRequired: true, entityType: 'change', isResolutionField: true },
+  ],
+  'problem': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'problem', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'problem', isResolutionField: false },
+    { fieldName: 'rootCause', displayName: 'Root Cause', isRequired: true, entityType: 'problem', isResolutionField: true },
+    { fieldName: 'workaround', displayName: 'Workaround', isRequired: false, entityType: 'problem', isResolutionField: false },
+  ],
+  'security': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'security', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'security', isResolutionField: false },
+    { fieldName: 'securityClassification', displayName: 'Security Classification', isRequired: true, entityType: 'security', isResolutionField: false },
+    { fieldName: 'resolutionNotes', displayName: 'Resolution Notes', isRequired: true, entityType: 'security', isResolutionField: true },
+  ],
+  'ticket': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'ticket', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'ticket', isResolutionField: false },
+  ],
+  'asset': [
+    { fieldName: 'name', displayName: 'Name', isRequired: true, entityType: 'asset', isResolutionField: false },
+    { fieldName: 'assetType', displayName: 'Asset Type', isRequired: true, entityType: 'asset', isResolutionField: false },
+  ],
+  'user': [
+    { fieldName: 'name', displayName: 'Name', isRequired: true, entityType: 'user', isResolutionField: false },
+    { fieldName: 'email', displayName: 'Email', isRequired: true, entityType: 'user', isResolutionField: false },
+  ],
+  'release': [
+    { fieldName: 'name', displayName: 'Name', isRequired: true, entityType: 'release', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'release', isResolutionField: false },
+    { fieldName: 'releaseNotes', displayName: 'Release Notes', isRequired: true, entityType: 'release', isResolutionField: true },
+  ],
+  'bug': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'bug', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'bug', isResolutionField: false },
+    { fieldName: 'stepsToReproduce', displayName: 'Steps to Reproduce', isRequired: true, entityType: 'bug', isResolutionField: false },
+  ],
+  'backlog': [
+    { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'backlog', isResolutionField: false },
+    { fieldName: 'description', displayName: 'Description', isRequired: false, entityType: 'backlog', isResolutionField: false },
+    { fieldName: 'acceptanceCriteria', displayName: 'Acceptance Criteria', isRequired: true, entityType: 'backlog', isResolutionField: false },
+  ]
 };
