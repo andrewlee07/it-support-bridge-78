@@ -65,6 +65,7 @@ const SecurityManagement = () => {
   // Navigate to case detail view - ensure this uses the proper path format
   const goToCaseDetailView = (caseId: string) => {
     console.log(`Navigating to security case detail: ${caseId}`);
+    console.log(`Using route: ${navigation.goToSecurityCaseDetail.toString()}`);
     navigation.goToSecurityCaseDetail(caseId);
   };
 

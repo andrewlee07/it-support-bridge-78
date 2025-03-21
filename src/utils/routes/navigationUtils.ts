@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import * as ROUTES from './routeConstants';
 
@@ -38,7 +39,11 @@ export const useAppNavigation = () => {
     
     // IT Security Management
     goToSecurity: () => navigate(ROUTES.SECURITY),
-    goToSecurityCaseDetail: (id: string) => navigate(ROUTES.SECURITY_CASE_DETAIL(id)),
+    goToSecurityCaseDetail: (id: string) => {
+      const route = ROUTES.SECURITY_CASE_DETAIL(id);
+      console.log(`Navigation: Redirecting to ${route}`);
+      navigate(route);
+    },
     goToNewSecurityCase: () => navigate(ROUTES.NEW_SECURITY_CASE),
     goToEditSecurityCase: (id: string) => navigate(ROUTES.EDIT_SECURITY_CASE(id)),
     
