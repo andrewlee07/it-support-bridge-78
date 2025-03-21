@@ -2,17 +2,17 @@
 import React, { useState } from 'react';
 import { 
   Card, 
-  CardContent, 
-  CardDescription, 
+  CardContent,
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { TestCase } from '@/utils/types/test/testCase';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { TestCase } from '@/utils/types/testTypes';
 import TestCaseInformation from './components/TestCaseInformation';
 import TestExecutionHistory from './components/TestExecutionHistory';
 import BacklogItemLinkingSection from './components/BacklogItemLinkingSection';
+import TestCaseTabs from './TestCaseTabs';
 import { ChevronLeft, Pencil, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -59,7 +59,7 @@ const TestCaseDetail: React.FC<TestCaseDetailProps> = ({
             Back to List
           </Button>
           <CardTitle>{testCase.title}</CardTitle>
-          <CardDescription>Test case details and execution history</CardDescription>
+          <p className="text-muted-foreground text-sm">Test case details and execution history</p>
         </div>
         <div className="flex space-x-2">
           {onEdit && (
@@ -77,22 +77,43 @@ const TestCaseDetail: React.FC<TestCaseDetailProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="executions">Execution History</TabsTrigger>
-            <TabsTrigger value="traceability">Traceability</TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} className="space-y-4">
+          <TestCaseTabs 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            executionCount={testCase.executionHistory?.length || 0}
+            issuesCount={testCase.linkedIssues?.length || 0}
+          />
           
-          <TabsContent value="details">
+          <TabsContent value="details" className="m-0">
             <TestCaseInformation testCase={testCase} />
           </TabsContent>
           
-          <TabsContent value="executions">
+          <TabsContent value="executions" className="m-0">
             <TestExecutionHistory testCaseId={testCase.id} />
           </TabsContent>
           
-          <TabsContent value="traceability">
+          <TabsContent value="history" className="m-0">
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center py-4 text-muted-foreground">
+                  Test case history will be displayed here
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="issues" className="m-0">
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center py-4 text-muted-foreground">
+                  Related issues will be displayed here
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="traceability" className="m-0">
             <BacklogItemLinkingSection 
               testCaseId={testCase.id} 
               testCase={testCase}

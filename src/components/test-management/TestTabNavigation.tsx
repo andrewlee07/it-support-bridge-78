@@ -1,36 +1,30 @@
 
 import React from 'react';
-import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from 'react-router-dom';
-import {
-  Activity,
-  ClipboardList,
-  Bug,
-  PlayCircle
-} from 'lucide-react';
+import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Layout, FileSpreadsheet, Bug, Play } from 'lucide-react';
 
 interface TestTabNavigationProps {
   activeTab: string;
 }
 
-const TestTabNavigation = ({ activeTab }: TestTabNavigationProps) => {
+const TestTabNavigation: React.FC<TestTabNavigationProps> = ({ activeTab }) => {
   return (
-    <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2">
+    <TabsList className="mb-6 grid grid-cols-4 w-full md:w-auto">
       <TabsTrigger value="dashboard" className="flex items-center gap-2">
-        <Activity className="h-4 w-4" />
-        <span className="hidden md:inline">Dashboard</span>
+        <Layout className="h-4 w-4" />
+        <span>Dashboard</span>
       </TabsTrigger>
       <TabsTrigger value="testcases" className="flex items-center gap-2">
-        <ClipboardList className="h-4 w-4" />
-        <span className="hidden md:inline">Test Cases</span>
+        <FileSpreadsheet className="h-4 w-4" />
+        <span>Test Cases</span>
       </TabsTrigger>
       <TabsTrigger value="bugs" className="flex items-center gap-2">
         <Bug className="h-4 w-4" />
-        <span className="hidden md:inline">Bugs</span>
+        <span>Bugs</span>
       </TabsTrigger>
       <TabsTrigger value="execution" className="flex items-center gap-2">
-        <PlayCircle className="h-4 w-4" />
-        <span className="hidden md:inline">Test Execution</span>
+        <Play className="h-4 w-4" />
+        <span>Execution</span>
       </TabsTrigger>
     </TabsList>
   );

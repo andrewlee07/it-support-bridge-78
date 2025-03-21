@@ -2,7 +2,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, AlertCircle, Clock } from 'lucide-react';
-import { TestStatus } from '@/utils/types/test/testStatus';
+import { TestStatus } from '@/utils/types/testTypes';
 
 interface StatusBadgeProps {
   status: TestStatus;

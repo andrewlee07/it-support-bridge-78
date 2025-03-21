@@ -4,8 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { TestCase, mapTestStatus } from '@/utils/types/testTypes';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TestCase } from '@/utils/types/testTypes';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { testCaseSchema, TestCaseFormValues } from './forms/testCaseSchema';
 import TestCaseFormFields from './forms/TestCaseFormFields';
@@ -15,7 +15,7 @@ interface TestCaseFormProps {
   initialData?: Partial<TestCase>;
   onSuccess?: (testCase: TestCase) => void;
   onCancel?: () => void;
-  releaseId?: string; // Added for direct association with a release
+  releaseId?: string;
 }
 
 const TestCaseForm: React.FC<TestCaseFormProps> = ({
@@ -43,8 +43,8 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
         : 'not-run',
       assignedTester: initialData?.assignedTester || user?.id || '',
       relatedRequirement: initialData?.relatedRequirement || '',
-      releaseId: initialData?.releaseId || releaseId || '', // Use provided releaseId or from initialData
-      applicable: initialData?.applicable || !!releaseId, // If releaseId is provided, mark as applicable
+      releaseId: initialData?.releaseId || releaseId || '',
+      applicable: initialData?.applicable || !!releaseId,
     },
   });
 
@@ -62,6 +62,11 @@ const TestCaseForm: React.FC<TestCaseFormProps> = ({
     <Card className="w-full">
       <CardHeader>
         <CardTitle>{isEditing ? 'Edit Test Case' : 'Create New Test Case'}</CardTitle>
+        <CardDescription>
+          {isEditing 
+            ? 'Update test case details and steps' 
+            : 'Define a new test case with steps and expected results'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <FormProvider {...form}>
