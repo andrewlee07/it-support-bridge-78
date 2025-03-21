@@ -160,16 +160,16 @@ const ServiceRequestTable: React.FC<ServiceRequestTableProps> = ({
             {tickets.map((ticket) => (
               <React.Fragment key={ticket.id}>
                 <TableRow className={expandedTicket === ticket.id ? "bg-muted/50" : ""}>
-                  <TableCell 
-                    className="font-medium cursor-pointer"
-                    onClick={() => toggleExpandRow(ticket.id)}
-                  >
-                    {ticket.id}
+                  <TableCell className="font-medium">
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto font-medium"
+                      onClick={() => handleViewTicket(ticket)}
+                    >
+                      {ticket.id}
+                    </Button>
                   </TableCell>
-                  <TableCell 
-                    className="cursor-pointer"
-                    onClick={() => toggleExpandRow(ticket.id)}
-                  >
+                  <TableCell>
                     <div className="font-medium">{ticket.title}</div>
                   </TableCell>
                   <TableCell>
