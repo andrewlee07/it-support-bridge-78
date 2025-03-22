@@ -1,10 +1,10 @@
 
-import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tag, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
 import { Asset } from '@/utils/types/asset';
-import AssetGrid from './AssetGrid';
-import AssetEmptyState from './AssetEmptyState';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AssetTable from './AssetTable';
+import AssetFilters from './AssetFilters';
+import { useAssetFilters } from '@/hooks/useAssetFilters';
 
 interface AssetTabsProps {
   assets: Asset[];
@@ -12,57 +12,149 @@ interface AssetTabsProps {
 }
 
 const AssetTabs: React.FC<AssetTabsProps> = ({ assets, onAssetClick }) => {
-  const hardwareAssets = assets.filter(a => a.type === 'hardware');
+  const [activeTab, setActiveTab] = useState('all');
   
+  const {
+    searchQuery,
+    statusFilter,
+    typeFilter,
+    setSearchQuery,
+    setStatusFilter,
+    setTypeFilter,
+    statusOptions,
+    typeOptions,
+    filteredAssets,
+    hasActiveFilters,
+    resetFilters,
+    getAssetCountByType,
+    getAssetCountByStatus
+  } = useAssetFilters(assets);
+
+  const handleViewAsset = (assetId: string) => {
+    onAssetClick(assetId);
+  };
+
+  const handleEditAsset = (assetId: string) => {
+    onAssetClick(assetId);
+  };
+
+  // Filter assets based on active tab
+  const getTabAssets = () => {
+    if (activeTab === 'all') {
+      return filteredAssets;
+    } else if (activeTab === 'hardware') {
+      return filteredAssets.filter(asset => asset.type === 'hardware');
+    } else if (activeTab === 'software') {
+      return filteredAssets.filter(asset => asset.type === 'software');
+    } else if (activeTab === 'licenses') {
+      return filteredAssets.filter(asset => asset.type === 'license');
+    }
+    return filteredAssets;
+  };
+
   return (
-    <Tabs defaultValue="all" className="animate-fade-in">
-      <TabsList className="mb-4">
-        <TabsTrigger value="all">All Assets</TabsTrigger>
-        <TabsTrigger value="hardware">Hardware</TabsTrigger>
-        <TabsTrigger value="software">Software</TabsTrigger>
-        <TabsTrigger value="licenses">Licenses</TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="all" className="mt-0">
-        {assets.length > 0 ? (
-          <AssetGrid assets={assets} onAssetClick={onAssetClick} />
-        ) : (
-          <AssetEmptyState 
-            icon={Tag} 
-            title="No Assets Found" 
-            description="There are no assets available in the system." 
+    <div>
+      <Tabs defaultValue="all" onValueChange={setActiveTab}>
+        <TabsList className="p-4 bg-secondary/30">
+          <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+            All Assets ({filteredAssets.length})
+          </TabsTrigger>
+          <TabsTrigger value="hardware">
+            Hardware ({getAssetCountByType('hardware')})
+          </TabsTrigger>
+          <TabsTrigger value="software">
+            Software ({getAssetCountByType('software')})
+          </TabsTrigger>
+          <TabsTrigger value="licenses">
+            Licenses ({getAssetCountByType('license')})
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="all" className="p-4">
+          <AssetFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            typeFilter={typeFilter}
+            setTypeFilter={setTypeFilter}
+            hasActiveFilters={hasActiveFilters}
+            resetFilters={resetFilters}
+            statusOptions={statusOptions}
+            typeOptions={typeOptions}
           />
-        )}
-      </TabsContent>
-      
-      <TabsContent value="hardware" className="mt-0">
-        {hardwareAssets.length > 0 ? (
-          <AssetGrid assets={hardwareAssets} onAssetClick={onAssetClick} />
-        ) : (
-          <AssetEmptyState 
-            icon={Tag} 
-            title="No Hardware Assets" 
-            description="There are no hardware assets available in the system." 
+          <AssetTable 
+            assets={getTabAssets()} 
+            onAssetClick={onAssetClick}
+            onViewAsset={handleViewAsset}
+            onEditAsset={handleEditAsset}
           />
-        )}
-      </TabsContent>
-      
-      <TabsContent value="software" className="mt-0">
-        <AssetEmptyState 
-          icon={Tag} 
-          title="Software Assets" 
-          description="Software asset tracking will be available in a future update." 
-        />
-      </TabsContent>
-      
-      <TabsContent value="licenses" className="mt-0">
-        <AssetEmptyState 
-          icon={Calendar} 
-          title="License Management" 
-          description="License management will be available in a future update." 
-        />
-      </TabsContent>
-    </Tabs>
+        </TabsContent>
+        
+        <TabsContent value="hardware" className="p-4">
+          <AssetFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            typeFilter={typeFilter}
+            setTypeFilter={setTypeFilter}
+            hasActiveFilters={hasActiveFilters}
+            resetFilters={resetFilters}
+            statusOptions={statusOptions}
+            typeOptions={typeOptions}
+          />
+          <AssetTable 
+            assets={getTabAssets()} 
+            onAssetClick={onAssetClick}
+            onViewAsset={handleViewAsset}
+            onEditAsset={handleEditAsset}
+          />
+        </TabsContent>
+        
+        <TabsContent value="software" className="p-4">
+          <AssetFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            typeFilter={typeFilter}
+            setTypeFilter={setTypeFilter}
+            hasActiveFilters={hasActiveFilters}
+            resetFilters={resetFilters}
+            statusOptions={statusOptions}
+            typeOptions={typeOptions}
+          />
+          <AssetTable 
+            assets={getTabAssets()} 
+            onAssetClick={onAssetClick}
+            onViewAsset={handleViewAsset}
+            onEditAsset={handleEditAsset}
+          />
+        </TabsContent>
+        
+        <TabsContent value="licenses" className="p-4">
+          <AssetFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            typeFilter={typeFilter}
+            setTypeFilter={setTypeFilter}
+            hasActiveFilters={hasActiveFilters}
+            resetFilters={resetFilters}
+            statusOptions={statusOptions}
+            typeOptions={typeOptions}
+          />
+          <AssetTable 
+            assets={getTabAssets()} 
+            onAssetClick={onAssetClick}
+            onViewAsset={handleViewAsset}
+            onEditAsset={handleEditAsset}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
