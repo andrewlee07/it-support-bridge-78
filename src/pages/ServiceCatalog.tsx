@@ -4,7 +4,8 @@ import { useLocation } from 'react-router-dom';
 import PageTransition from '@/components/shared/PageTransition';
 import ServiceList from '@/components/services/ServiceList';
 import ServiceManagement from '@/components/services/ServiceManagement';
-import { ServiceWithCategory } from '@/utils/types/service';
+import ServiceDialog from '@/components/services/ServiceDialog';
+import { ServiceWithCategory, Service } from '@/utils/types/service';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useServices } from '@/hooks/useServices';
@@ -13,6 +14,7 @@ import { FilePlus, Download, PlusCircle, Server, Code, Briefcase } from 'lucide-
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import { useDisclosure } from '@/hooks/useDisclosure';
 
 interface ServiceCatalogProps {
   isAdmin?: boolean;
@@ -24,6 +26,9 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
   const [filteredServices, setFilteredServices] = useState<ServiceWithCategory[]>([]);
   const { userHasPermission } = useAuth();
   const location = useLocation();
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Determine if we're in the admin configuration view based on the URL or prop
   const isAdminView = isAdmin || location.pathname.includes('/admin/service-catalogue-configuration');
@@ -65,8 +70,18 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
   };
 
   const handleAddService = () => {
-    toast.info("Creating new service...");
-    // In a real application, this would open a modal or navigate to a form
+    setSelectedService(null); // Ensure we're creating a new service, not editing
+    onOpen();
+  };
+
+  const handleSubmitService = (values: any) => {
+    setIsSubmitting(true);
+    // In a real application, this would call an API to create/update the service
+    setTimeout(() => {
+      setIsSubmitting(false);
+      onClose();
+      toast.success(selectedService ? "Service updated successfully" : "Service created successfully");
+    }, 500);
   };
 
   // Sample statistics for dashboard cards
@@ -257,6 +272,16 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
             </Card>
           </Tabs>
         )}
+
+        {/* Service Dialog for creating/editing services */}
+        <ServiceDialog
+          isOpen={isOpen}
+          onClose={onClose}
+          service={selectedService || undefined}
+          categories={categories || []}
+          onSubmit={handleSubmitService}
+          isSubmitting={isSubmitting}
+        />
       </div>
     </PageTransition>
   );

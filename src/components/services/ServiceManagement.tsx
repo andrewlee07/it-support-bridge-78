@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { useServices } from '@/hooks/useServices';
 import { useAuth } from '@/contexts/AuthContext';
-import { ServiceWithCategory } from '@/utils/types/service';
+import { ServiceWithCategory, Service } from '@/utils/types/service';
 import ServiceManagementDialog from './management/ServiceManagementDialog';
 import ServiceManagementSection from './management/ServiceManagementSection';
 import ServiceDetailDialog from './management/ServiceDetailDialog';
+import ServiceDialog from './ServiceDialog';
 import { toast } from 'sonner';
+import { useDisclosure } from '@/hooks/useDisclosure';
 
 interface ServiceManagementProps {
   inServiceCatalog?: boolean;
@@ -16,9 +18,12 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
   inServiceCatalog = true 
 }) => {
   const { services, categories, isLoading } = useServices();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isManagementOpen, setIsManagementOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceWithCategory | null>(null);
   const { userHasPermission } = useAuth();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null);
 
   const canConfigureCatalog = userHasPermission('Manage Service Catalog Config');
   const canManageContent = userHasPermission('Manage Service Catalog Content') || canConfigureCatalog;
@@ -37,8 +42,18 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
   };
 
   const handleAddService = () => {
-    toast.info("Add service feature is coming soon!");
-    console.log("Add service");
+    setServiceToEdit(null);
+    onOpen();
+  };
+
+  const handleSubmitService = (values: any) => {
+    setIsSubmitting(true);
+    // In a real application, this would call an API to create/update the service
+    setTimeout(() => {
+      setIsSubmitting(false);
+      onClose();
+      toast.success(serviceToEdit ? "Service updated successfully" : "Service created successfully");
+    }, 500);
   };
 
   return (
@@ -50,8 +65,8 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
           onEditService={handleSelectService}
           canConfigureCatalog={canConfigureCatalog}
           isLoading={isLoading}
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
+          isOpen={isManagementOpen}
+          setIsOpen={setIsManagementOpen}
           onAddService={handleAddService}
         />
       )}
@@ -72,6 +87,15 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
         categories={categories}
         onClose={handleCloseServiceDetail}
         canConfigureCatalog={canConfigureCatalog}
+      />
+
+      <ServiceDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        service={serviceToEdit || undefined}
+        categories={categories || []}
+        onSubmit={handleSubmitService}
+        isSubmitting={isSubmitting}
       />
     </>
   );
