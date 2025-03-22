@@ -5,18 +5,30 @@ import { useBugFilters } from '@/hooks/useBugFilters';
 import BugDashboardStats from './BugDashboardStats';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { X, Filter } from 'lucide-react';
+import { X, Filter, ArrowUpDown, Eye, Edit, MoreHorizontal } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface BugListProps {
   bugs: Bug[];
 }
 
 const BugList: React.FC<BugListProps> = ({ bugs }) => {
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  
   const {
     searchQuery,
     setSearchQuery,
@@ -34,11 +46,33 @@ const BugList: React.FC<BugListProps> = ({ bugs }) => {
     resetFilters
   } = useBugFilters(bugs);
 
+  // Handle sorting
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
   // Create bug IDs for display
   const bugsWithFormattedIds = filteredBugs.map((bug, index) => ({
     ...bug,
     formattedId: `BUG${String(index + 1).padStart(5, '0')}`
   }));
+
+  // Sort bugs if needed
+  const sortedBugs = [...bugsWithFormattedIds].sort((a, b) => {
+    if (!sortColumn) return 0;
+    
+    const aValue = sortColumn === 'id' ? a.formattedId : a[sortColumn as keyof typeof a];
+    const bValue = sortColumn === 'id' ? b.formattedId : b[sortColumn as keyof typeof b];
+    
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   const getStatusColor = (status: string): string => {
     switch (status.toLowerCase()) {
@@ -83,6 +117,14 @@ const BugList: React.FC<BugListProps> = ({ bugs }) => {
     }
   };
 
+  // Helper function to render sort indicator
+  const renderSortIndicator = (column: string) => {
+    if (sortColumn === column) {
+      return <span className="ml-1">{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>;
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-4">
       {/* Dashboard Stats - Interactive Filters */}
@@ -96,7 +138,7 @@ const BugList: React.FC<BugListProps> = ({ bugs }) => {
 
       {/* Filter Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card p-4 rounded-lg shadow-sm border">
-        <div className="relative w-full sm:w-auto flex-1 max-w-sm">
+        <div className="relative w-full sm:w-auto flex-1 max-w-md">
           <Input
             placeholder="Search bugs..."
             value={searchQuery}
@@ -229,56 +271,136 @@ const BugList: React.FC<BugListProps> = ({ bugs }) => {
       </div>
 
       {/* Bugs Table */}
-      <div className="rounded-md border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-muted/50 border-b">
-                <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground text-xs uppercase">ID</th>
-                <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground text-xs uppercase">Title</th>
-                <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground text-xs uppercase">Status</th>
-                <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground text-xs uppercase">Severity</th>
-                <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground text-xs uppercase">Priority</th>
-                <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground text-xs uppercase">Assigned To</th>
-                <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground text-xs uppercase">Reported By</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bugsWithFormattedIds.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="p-4 text-center text-muted-foreground">
-                    No bugs found matching your filters
-                  </td>
-                </tr>
-              ) : (
-                bugsWithFormattedIds.map((bug) => (
-                  <tr key={bug.id} className="border-b hover:bg-muted/50 transition-colors">
-                    <td className="p-4 align-middle font-mono text-xs">{bug.formattedId}</td>
-                    <td className="p-4 align-middle">{bug.title}</td>
-                    <td className="p-4 align-middle">
-                      <Badge variant="outline" className={cn("capitalize", getStatusColor(bug.status))}>
+      <Table>
+        <TableHeader className="bg-muted/50">
+          <TableRow>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/70 w-[110px]"
+              onClick={() => handleSort('id')}
+            >
+              <div className="flex items-center">
+                ID {renderSortIndicator('id')}
+                <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
+              </div>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/70"
+              onClick={() => handleSort('title')}
+            >
+              <div className="flex items-center">
+                Title {renderSortIndicator('title')}
+                <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
+              </div>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/70"
+              onClick={() => handleSort('status')}
+            >
+              <div className="flex items-center">
+                Status {renderSortIndicator('status')}
+                <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
+              </div>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/70"
+              onClick={() => handleSort('severity')}
+            >
+              <div className="flex items-center">
+                Severity {renderSortIndicator('severity')}
+                <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
+              </div>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer hover:bg-muted/70"
+              onClick={() => handleSort('priority')}
+            >
+              <div className="flex items-center">
+                Priority {renderSortIndicator('priority')}
+                <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
+              </div>
+            </TableHead>
+            <TableHead>Assigned To</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sortedBugs.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                No bugs found matching your filters
+              </TableCell>
+            </TableRow>
+          ) : (
+            sortedBugs.map((bug) => (
+              <TableRow key={bug.id} className="border-b hover:bg-muted/50">
+                <TableCell className="font-medium font-mono text-sm">
+                  {bug.formattedId}
+                </TableCell>
+                <TableCell>
+                  <div>
+                    <p className="font-medium">{bug.title}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-1">
+                      {bug.description || "No description available"}
+                    </p>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className={cn("capitalize", getStatusColor(bug.status))}>
                         {bug.status.replace('-', ' ')}
-                      </Badge>
-                    </td>
-                    <td className="p-4 align-middle">
-                      <Badge variant="outline" className={cn("capitalize", getSeverityColor(bug.severity))}>
-                        {bug.severity}
-                      </Badge>
-                    </td>
-                    <td className="p-4 align-middle">
-                      <Badge variant="outline" className={cn("capitalize", getPriorityColor(bug.priority))}>
-                        {bug.priority}
-                      </Badge>
-                    </td>
-                    <td className="p-4 align-middle">{bug.assignedDeveloper || "-"}</td>
-                    <td className="p-4 align-middle">{bug.reportedBy || bug.createdBy || "-"}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {statusOptions.map((status) => (
+                        <DropdownMenuItem key={status}>
+                          {status}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={cn("capitalize", getSeverityColor(bug.severity))}>
+                    {bug.severity}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={cn("capitalize", getPriorityColor(bug.priority))}>
+                    {bug.priority}
+                  </Badge>
+                </TableCell>
+                <TableCell>{bug.assignedDeveloper || "-"}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" size="icon" className="h-8 w-8">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" className="h-8 w-8">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Assign User</DropdownMenuItem>
+                        <DropdownMenuItem>Change Status</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive">
+                          Mark as Duplicate
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };

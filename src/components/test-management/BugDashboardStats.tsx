@@ -3,6 +3,7 @@ import React from 'react';
 import { Bug } from '@/utils/types/test/bug';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { AlertCircle, Clock, Fire, AlertTriangle } from 'lucide-react';
 
 interface BugDashboardStatsProps {
   bugs: Bug[];
@@ -22,7 +23,7 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
   const openBugs = bugs.filter(bug => bug.status === 'open').length;
   const inProgressBugs = bugs.filter(bug => bug.status === 'in-progress').length;
   const criticalBugs = bugs.filter(bug => bug.severity === 'critical').length;
-  const highBugs = bugs.filter(bug => bug.severity === 'high').length;
+  const highPriorityBugs = bugs.filter(bug => bug.priority === 'high').length;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -39,8 +40,8 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
               <p className="text-sm font-medium text-muted-foreground">Open Bugs</p>
               <h3 className="text-3xl font-bold mt-1">{openBugs}</h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <span className="text-blue-600 text-xl">📝</span>
+            <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6 text-blue-500" />
             </div>
           </div>
         </CardContent>
@@ -59,8 +60,8 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
               <p className="text-sm font-medium text-muted-foreground">In Progress</p>
               <h3 className="text-3xl font-bold mt-1">{inProgressBugs}</h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
-              <span className="text-yellow-600 text-xl">⚙️</span>
+            <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
+              <Clock className="h-6 w-6 text-yellow-500" />
             </div>
           </div>
         </CardContent>
@@ -79,8 +80,8 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
               <p className="text-sm font-medium text-muted-foreground">Critical Bugs</p>
               <h3 className="text-3xl font-bold mt-1">{criticalBugs}</h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-              <span className="text-red-600 text-xl">🔥</span>
+            <div className="h-12 w-12 rounded-full bg-red-500/10 flex items-center justify-center">
+              <Fire className="h-6 w-6 text-red-500" />
             </div>
           </div>
         </CardContent>
@@ -97,10 +98,10 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
           <div className="flex justify-between items-center">
             <div>
               <p className="text-sm font-medium text-muted-foreground">High Priority</p>
-              <h3 className="text-3xl font-bold mt-1">{highBugs}</h3>
+              <h3 className="text-3xl font-bold mt-1">{highPriorityBugs}</h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center">
-              <span className="text-orange-600 text-xl">⚠️</span>
+            <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
+              <AlertTriangle className="h-6 w-6 text-orange-500" />
             </div>
           </div>
         </CardContent>
