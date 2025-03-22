@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { useDisclosure } from '@/hooks/useDisclosure';
+import { cn } from '@/lib/utils';
 
 interface ServiceCatalogProps {
   isAdmin?: boolean;
@@ -29,6 +30,14 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Card filters state
+  const [cardFilters, setCardFilters] = useState({
+    all: false,
+    hardware: false,
+    software: false,
+    business: false
+  });
   
   // Determine if we're in the admin configuration view based on the URL or prop
   const isAdminView = isAdmin || location.pathname.includes('/admin/service-catalogue-configuration');
@@ -38,26 +47,84 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
 
   useEffect(() => {
     if (services) {
-      if (activeTab === 'all') {
-        setFilteredServices(services);
+      let filtered = [...services];
+      
+      // Apply card filters first if any are active
+      const isAnyCardFilterActive = Object.values(cardFilters).some(value => value);
+      
+      if (isAnyCardFilterActive) {
+        if (cardFilters.all) {
+          // Show all services when "all" is selected
+          filtered = services;
+        } else {
+          filtered = services.filter(service => 
+            (cardFilters.hardware && (
+              service.category.name.toLowerCase().includes('hardware') ||
+              service.category.name.toLowerCase().includes('equipment')
+            )) ||
+            (cardFilters.software && (
+              service.category.name.toLowerCase().includes('software') ||
+              service.category.name.toLowerCase().includes('application')
+            )) ||
+            (cardFilters.business && (
+              service.category.name.toLowerCase().includes('business') ||
+              service.category.name.toLowerCase().includes('service')
+            ))
+          );
+        }
+      } else if (activeTab === 'all') {
+        filtered = services;
       } else if (activeTab === 'hardware') {
-        setFilteredServices(services.filter(service => 
+        filtered = services.filter(service => 
           service.category.name.toLowerCase().includes('hardware') ||
           service.category.name.toLowerCase().includes('equipment')
-        ));
+        );
       } else if (activeTab === 'software') {
-        setFilteredServices(services.filter(service => 
+        filtered = services.filter(service => 
           service.category.name.toLowerCase().includes('software') ||
           service.category.name.toLowerCase().includes('application')
-        ));
+        );
       } else if (activeTab === 'business') {
-        setFilteredServices(services.filter(service => 
+        filtered = services.filter(service => 
           service.category.name.toLowerCase().includes('business') ||
           service.category.name.toLowerCase().includes('service')
-        ));
+        );
       }
+      
+      setFilteredServices(filtered);
     }
-  }, [services, activeTab]);
+  }, [services, activeTab, cardFilters]);
+
+  const toggleCardFilter = (filterName: 'all' | 'hardware' | 'software' | 'business') => {
+    // If toggling 'all', set only 'all' to true and others to false
+    if (filterName === 'all') {
+      setCardFilters({
+        all: !cardFilters.all,
+        hardware: false,
+        software: false,
+        business: false
+      });
+      return;
+    }
+    
+    // For other filters, toggle the selected one and set 'all' to false
+    setCardFilters({
+      ...cardFilters,
+      [filterName]: !cardFilters[filterName],
+      all: false
+    });
+  };
+
+  const resetFilters = () => {
+    setCardFilters({
+      all: false,
+      hardware: false,
+      software: false,
+      business: false
+    });
+  };
+
+  const hasActiveFilters = Object.values(cardFilters).some(value => value);
 
   const handleServiceSelect = (service: ServiceWithCategory) => {
     console.log('Service selected:', service);
@@ -116,6 +183,12 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
           </div>
           
           <div className="flex items-center gap-2">
+            {hasActiveFilters && (
+              <Button variant="outline" size="sm" onClick={resetFilters} className="h-9 flex items-center gap-1">
+                <PlusCircle className="h-4 w-4" /> Clear Filters
+              </Button>
+            )}
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="bg-secondary/50 border border-border/20 hover:bg-muted">
@@ -140,14 +213,30 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
               </Button>
             )}
             
-            {canManageContent && !isAdminView && <ServiceManagement />}
+            {canManageContent && !isAdminView && (
+              <Button 
+                variant="outline" 
+                onClick={() => ServiceManagement}
+                className="bg-secondary/50 border border-border/20 hover:bg-muted"
+                title="Advanced service management options including categories and configurations"
+              >
+                <Server className="mr-2 h-4 w-4" />
+                Manage Catalog
+              </Button>
+            )}
           </div>
         </div>
         
         {/* Dashboard Stats Cards (Only show in non-admin view) */}
         {!isAdminView && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+            <Card 
+              className={cn(
+                "bg-secondary/50 border border-border/20 shadow-sm cursor-pointer transition-colors",
+                cardFilters.all ? "bg-blue-50 border-blue-200" : ""
+              )}
+              onClick={() => toggleCardFilter('all')}
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-3 py-4">
                   <p className="text-sm font-medium text-muted-foreground">All Services</p>
@@ -156,7 +245,13 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+            <Card 
+              className={cn(
+                "bg-secondary/50 border border-border/20 shadow-sm cursor-pointer transition-colors",
+                cardFilters.hardware ? "bg-blue-50 border-blue-200" : ""
+              )}
+              onClick={() => toggleCardFilter('hardware')}
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-3 py-4">
                   <div className="flex items-center">
@@ -168,7 +263,13 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+            <Card 
+              className={cn(
+                "bg-secondary/50 border border-border/20 shadow-sm cursor-pointer transition-colors",
+                cardFilters.software ? "bg-blue-50 border-blue-200" : ""
+              )}
+              onClick={() => toggleCardFilter('software')}
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-3 py-4">
                   <div className="flex items-center">
@@ -180,7 +281,13 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
               </CardContent>
             </Card>
 
-            <Card className="bg-secondary/50 border border-border/20 shadow-sm">
+            <Card 
+              className={cn(
+                "bg-secondary/50 border border-border/20 shadow-sm cursor-pointer transition-colors",
+                cardFilters.business ? "bg-blue-50 border-blue-200" : ""
+              )}
+              onClick={() => toggleCardFilter('business')}
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-3 py-4">
                   <div className="flex items-center">
@@ -282,6 +389,8 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
           onSubmit={handleSubmitService}
           isSubmitting={isSubmitting}
         />
+        
+        {canManageContent && !isAdminView && <ServiceManagement />}
       </div>
     </PageTransition>
   );

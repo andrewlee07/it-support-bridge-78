@@ -15,6 +15,20 @@ interface ServiceListProps {
   isLoading?: boolean;
 }
 
+// Helper function to format service IDs to SRV00001 format
+const formatServiceId = (id: string): string => {
+  // Extract numeric part if it exists (e.g., "srv-1" -> "1")
+  const numericPart = id.split('-')[1];
+  
+  if (numericPart && !isNaN(parseInt(numericPart))) {
+    // Format as SRV00001, SRV00002, etc.
+    return `SRV${numericPart.padStart(5, '0')}`;
+  }
+  
+  // If for some reason we can't extract a numeric part, return original
+  return id;
+};
+
 const ServiceList: React.FC<ServiceListProps> = ({
   services,
   categories,
@@ -23,6 +37,12 @@ const ServiceList: React.FC<ServiceListProps> = ({
   onAddService,
   isLoading = false
 }) => {
+  // Format the service IDs in the services list
+  const formattedServices = services.map(service => ({
+    ...service,
+    formattedId: formatServiceId(service.id)
+  }));
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -50,7 +70,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
       )}
       
       <ServiceTable 
-        services={services} 
+        services={formattedServices} 
         onSelect={onSelect} 
         onEditService={onEditService} 
       />
