@@ -3,7 +3,7 @@ import React from 'react';
 import { Bug } from '@/utils/types/test/bug';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { AlertCircle, Clock, Fire, AlertTriangle } from 'lucide-react';
+import { AlertCircle, Clock, Flame, AlertTriangle } from 'lucide-react';
 
 interface BugDashboardStatsProps {
   bugs: Bug[];
@@ -81,7 +81,7 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
               <h3 className="text-3xl font-bold mt-1">{criticalBugs}</h3>
             </div>
             <div className="h-12 w-12 rounded-full bg-red-500/10 flex items-center justify-center">
-              <Fire className="h-6 w-6 text-red-500" />
+              <Flame className="h-6 w-6 text-red-500" />
             </div>
           </div>
         </CardContent>
