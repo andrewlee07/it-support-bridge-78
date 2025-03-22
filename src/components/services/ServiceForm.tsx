@@ -207,7 +207,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {users.map((user) => (
                       <SelectItem key={user.id} value={user.id}>
                         {user.name}
@@ -236,7 +236,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {mockTeams.map((team) => (
                       <SelectItem key={team.id} value={team.id}>
                         {team.name}
@@ -265,7 +265,7 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {users.map((user) => (
                       <SelectItem key={user.id} value={user.id}>
                         {user.name}
@@ -314,3 +314,4 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 };
 
 export default ServiceForm;
+
