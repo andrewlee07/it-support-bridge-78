@@ -10,9 +10,10 @@ interface ServiceTableProps {
   services: (ServiceWithCategory & { formattedId?: string })[];
   onSelect?: (service: ServiceWithCategory) => void;
   onEditService?: (service: ServiceWithCategory) => void;
+  onEdit?: (serviceId: string) => void; // Adding this property to match what's being passed
 }
 
-const ServiceTable: React.FC<ServiceTableProps> = ({ services, onSelect, onEditService }) => {
+const ServiceTable: React.FC<ServiceTableProps> = ({ services, onSelect, onEditService, onEdit }) => {
   return (
     <div className="rounded-md border overflow-hidden">
       <Table>
@@ -49,13 +50,17 @@ const ServiceTable: React.FC<ServiceTableProps> = ({ services, onSelect, onEditS
               </TableCell>
               <TableCell>{service.supportHours || 'Not specified'}</TableCell>
               <TableCell className="text-right">
-                {onEditService && (
+                {(onEditService || onEdit) && (
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onEditService(service);
+                      if (onEditService) {
+                        onEditService(service);
+                      } else if (onEdit) {
+                        onEdit(service.id);
+                      }
                     }}
                   >
                     <Edit className="h-4 w-4" />
