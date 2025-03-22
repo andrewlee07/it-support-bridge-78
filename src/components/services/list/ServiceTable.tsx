@@ -39,7 +39,8 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
     <div className="border rounded-md">
       <Table>
         <TableHeader>
-          <TableRow className="border-b border-border/10">
+          <TableRow className="bg-muted/50">
+            <TableHead>Service ID</TableHead>
             <TableHead>Service Name</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Status</TableHead>
@@ -49,7 +50,7 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
         <TableBody>
           {services.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
                 No services found matching your criteria
               </TableCell>
             </TableRow>
@@ -57,9 +58,12 @@ const ServiceTable: React.FC<ServiceTableProps> = ({
             services.map((service) => (
               <TableRow 
                 key={service.id}
-                className="cursor-pointer hover:bg-muted/20 border-b border-border/10"
+                className="cursor-pointer hover:bg-muted/50 border-b border-border/10"
                 onClick={() => handleRowClick(service)}
               >
+                <TableCell className="font-mono text-xs text-muted-foreground">
+                  {service.id}
+                </TableCell>
                 <TableCell>
                   <div>
                     <p className="font-medium">{service.name}</p>

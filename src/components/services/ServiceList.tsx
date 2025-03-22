@@ -44,7 +44,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
   return (
     <div className="space-y-4">
       {onAddService && (
-        <div className="flex justify-end">
+        <div className="flex justify-end mb-4">
           <ServiceAddButton onAddService={onAddService} />
         </div>
       )}

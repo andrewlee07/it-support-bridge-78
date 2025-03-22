@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useServices } from '@/hooks/useServices';
 import { useAuth } from '@/contexts/AuthContext';
-import { FilePlus, Download } from 'lucide-react';
+import { FilePlus, Download, PlusCircle, Server, Code, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
@@ -21,6 +21,7 @@ interface ServiceCatalogProps {
 const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
   const { services, categories, isLoading } = useServices();
   const [activeTab, setActiveTab] = useState('all');
+  const [filteredServices, setFilteredServices] = useState<ServiceWithCategory[]>([]);
   const { userHasPermission } = useAuth();
   const location = useLocation();
   
@@ -29,6 +30,29 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
   
   const canManageContent = userHasPermission('Manage Service Catalog Content') || 
                           userHasPermission('Manage Service Catalog Config');
+
+  useEffect(() => {
+    if (services) {
+      if (activeTab === 'all') {
+        setFilteredServices(services);
+      } else if (activeTab === 'hardware') {
+        setFilteredServices(services.filter(service => 
+          service.category.name.toLowerCase().includes('hardware') ||
+          service.category.name.toLowerCase().includes('equipment')
+        ));
+      } else if (activeTab === 'software') {
+        setFilteredServices(services.filter(service => 
+          service.category.name.toLowerCase().includes('software') ||
+          service.category.name.toLowerCase().includes('application')
+        ));
+      } else if (activeTab === 'business') {
+        setFilteredServices(services.filter(service => 
+          service.category.name.toLowerCase().includes('business') ||
+          service.category.name.toLowerCase().includes('service')
+        ));
+      }
+    }
+  }, [services, activeTab]);
 
   const handleServiceSelect = (service: ServiceWithCategory) => {
     console.log('Service selected:', service);
@@ -40,11 +64,25 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
     toast.success(`Exporting service catalog as ${type.toUpperCase()}`);
   };
 
+  const handleAddService = () => {
+    toast.info("Creating new service...");
+    // In a real application, this would open a modal or navigate to a form
+  };
+
   // Sample statistics for dashboard cards
   const totalServices = services?.length || 0;
-  const popularServices = 8;
-  const newServices = 5;
-  const myRequestedServices = 3;
+  const hardwareServices = services?.filter(s => 
+    s.category.name.toLowerCase().includes('hardware') || 
+    s.category.name.toLowerCase().includes('equipment')
+  ).length || 0;
+  const softwareServices = services?.filter(s => 
+    s.category.name.toLowerCase().includes('software') || 
+    s.category.name.toLowerCase().includes('application')
+  ).length || 0;
+  const businessServices = services?.filter(s => 
+    s.category.name.toLowerCase().includes('business') || 
+    s.category.name.toLowerCase().includes('service')
+  ).length || 0;
 
   return (
     <PageTransition>
@@ -80,6 +118,13 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
               </DropdownMenuContent>
             </DropdownMenu>
             
+            {canManageContent && (
+              <Button onClick={handleAddService} className="bg-primary hover:bg-primary/90">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add Service
+              </Button>
+            )}
+            
             {canManageContent && !isAdminView && <ServiceManagement />}
           </div>
         </div>
@@ -90,7 +135,7 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
             <Card className="bg-secondary/50 border border-border/20 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-3 py-4">
-                  <p className="text-sm font-medium text-muted-foreground">Total Services</p>
+                  <p className="text-sm font-medium text-muted-foreground">All Services</p>
                   <div className="text-4xl font-bold">{totalServices}</div>
                 </div>
               </CardContent>
@@ -99,8 +144,11 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
             <Card className="bg-secondary/50 border border-border/20 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-3 py-4">
-                  <p className="text-sm font-medium text-muted-foreground">Popular Services</p>
-                  <div className="text-4xl font-bold">{popularServices}</div>
+                  <div className="flex items-center">
+                    <Server className="h-5 w-5 mr-2 text-blue-500" />
+                    <p className="text-sm font-medium text-muted-foreground">Hardware Services</p>
+                  </div>
+                  <div className="text-4xl font-bold">{hardwareServices}</div>
                 </div>
               </CardContent>
             </Card>
@@ -108,8 +156,11 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
             <Card className="bg-secondary/50 border border-border/20 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-3 py-4">
-                  <p className="text-sm font-medium text-muted-foreground">New Services</p>
-                  <div className="text-4xl font-bold">{newServices}</div>
+                  <div className="flex items-center">
+                    <Code className="h-5 w-5 mr-2 text-purple-500" />
+                    <p className="text-sm font-medium text-muted-foreground">Software Services</p>
+                  </div>
+                  <div className="text-4xl font-bold">{softwareServices}</div>
                 </div>
               </CardContent>
             </Card>
@@ -117,8 +168,11 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
             <Card className="bg-secondary/50 border border-border/20 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex flex-col items-center justify-center space-y-3 py-4">
-                  <p className="text-sm font-medium text-muted-foreground">My Requested</p>
-                  <div className="text-4xl font-bold">{myRequestedServices}</div>
+                  <div className="flex items-center">
+                    <Briefcase className="h-5 w-5 mr-2 text-amber-500" />
+                    <p className="text-sm font-medium text-muted-foreground">Business Services</p>
+                  </div>
+                  <div className="text-4xl font-bold">{businessServices}</div>
                 </div>
               </CardContent>
             </Card>
@@ -131,71 +185,72 @@ const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ isAdmin = false }) => {
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
               <TabsTrigger value="all">All Services</TabsTrigger>
-              <TabsTrigger value="popular">Popular</TabsTrigger>
-              <TabsTrigger value="new">New</TabsTrigger>
-              <TabsTrigger value="requested">My Requested</TabsTrigger>
+              <TabsTrigger value="hardware">Hardware Services</TabsTrigger>
+              <TabsTrigger value="software">Software Services</TabsTrigger>
+              <TabsTrigger value="business">Business Services</TabsTrigger>
             </TabsList>
             
             <Card className="bg-secondary/50 border border-border/20">
               <TabsContent value="all" className="mt-0">
                 <CardHeader>
-                  <CardTitle>Available Services</CardTitle>
+                  <CardTitle>All Services</CardTitle>
                   <CardDescription>Browse all available IT services</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ServiceList 
-                    services={services || []} 
+                    services={filteredServices || []} 
                     categories={categories || []}
                     onSelect={handleServiceSelect}
                     isLoading={isLoading}
+                    onAddService={canManageContent ? handleAddService : undefined}
                   />
                 </CardContent>
               </TabsContent>
               
-              <TabsContent value="popular" className="mt-0">
+              <TabsContent value="hardware" className="mt-0">
                 <CardHeader>
-                  <CardTitle>Popular Services</CardTitle>
-                  <CardDescription>Most frequently requested services</CardDescription>
+                  <CardTitle>Hardware Services</CardTitle>
+                  <CardDescription>Browse all hardware and equipment services</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {/* For demo purposes, we'll show the same service list */}
                   <ServiceList 
-                    services={(services || []).slice(0, 3)} 
+                    services={filteredServices || []} 
                     categories={categories || []}
                     onSelect={handleServiceSelect}
                     isLoading={isLoading}
+                    onAddService={canManageContent ? handleAddService : undefined}
                   />
                 </CardContent>
               </TabsContent>
               
-              <TabsContent value="new" className="mt-0">
+              <TabsContent value="software" className="mt-0">
                 <CardHeader>
-                  <CardTitle>New Services</CardTitle>
-                  <CardDescription>Recently added services</CardDescription>
+                  <CardTitle>Software Services</CardTitle>
+                  <CardDescription>Browse all software and application services</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {/* For demo purposes, we'll show the same service list */}
                   <ServiceList 
-                    services={(services || []).slice(0, 2)} 
+                    services={filteredServices || []} 
                     categories={categories || []}
                     onSelect={handleServiceSelect}
                     isLoading={isLoading}
+                    onAddService={canManageContent ? handleAddService : undefined}
                   />
                 </CardContent>
               </TabsContent>
               
-              <TabsContent value="requested" className="mt-0">
+              <TabsContent value="business" className="mt-0">
                 <CardHeader>
-                  <CardTitle>My Requested Services</CardTitle>
-                  <CardDescription>Services you have previously requested</CardDescription>
+                  <CardTitle>Business Services</CardTitle>
+                  <CardDescription>Browse all business-related services</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {/* For demo purposes, we'll show the same service list */}
                   <ServiceList 
-                    services={(services || []).slice(0, 1)} 
+                    services={filteredServices || []} 
                     categories={categories || []}
                     onSelect={handleServiceSelect}
                     isLoading={isLoading}
+                    onAddService={canManageContent ? handleAddService : undefined}
                   />
                 </CardContent>
               </TabsContent>
