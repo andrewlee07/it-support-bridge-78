@@ -16,7 +16,6 @@ import { PlusCircle, X, Download } from 'lucide-react';
 import BugForm from './BugForm';
 import { useToast } from '@/hooks/use-toast';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import BugDashboardStats from './BugDashboardStats';
 
 const BugsTab = () => {
   const [showBugForm, setShowBugForm] = useState(false);
@@ -110,9 +109,6 @@ const BugsTab = () => {
           </Button>
         </div>
       </div>
-      
-      {/* Dashboard Stats Cards */}
-      <BugDashboardStats bugs={typedBugs} />
       
       <Card>
         {showBugForm ? (

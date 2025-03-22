@@ -6,17 +6,15 @@ import { Bug } from '@/utils/types/test/bug';
 import { BugStatus } from '@/utils/types/test/testStatus';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Bug as BugIcon, Eye, Edit, MoreHorizontal } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import BugForm from './BugForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import BugTable from './BugTable';
 import { useNavigate } from 'react-router-dom';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import BugFilters from './BugFilters';
+import { useBugFilters } from '@/hooks/useBugFilters';
+import BugDashboardStats from './BugDashboardStats';
 
 interface BugListProps {
   bugs?: Bug[];
@@ -28,9 +26,6 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
   const navigate = useNavigate();
   const [selectedBug, setSelectedBug] = useState<Bug | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [severityFilter, setSeverityFilter] = useState<string | null>(null);
 
   // Fetch bugs - only if initialBugs is not provided
   const { data: bugsResponse, isLoading, isError, refetch } = useQuery({
@@ -65,17 +60,25 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
   const allBugs = initialBugs || 
     (bugsResponse?.data ? convertApiBugsToBugs(bugsResponse.data) : []);
 
-  // Apply filters
-  const displayBugs = allBugs.filter(bug => {
-    const matchesSearch = searchQuery === '' || 
-      bug.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bug.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === null || bug.status === statusFilter;
-    const matchesSeverity = severityFilter === null || bug.severity === severityFilter;
-    
-    return matchesSearch && matchesStatus && matchesSeverity;
-  });
+  // Use the bug filters hook
+  const {
+    searchQuery,
+    statusFilter,
+    severityFilter,
+    priorityFilter,
+    setSearchQuery,
+    setStatusFilter,
+    setSeverityFilter,
+    setPriorityFilter,
+    statusOptions,
+    severityOptions,
+    priorityOptions,
+    filteredBugs,
+    hasActiveFilters,
+    resetFilters,
+    getBugCountByStatus,
+    getBugCountBySeverity
+  } = useBugFilters(allBugs);
 
   // Quick status updates
   const handleStatusUpdate = async (id: string, status: BugStatus) => {
@@ -135,16 +138,32 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
   }
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
-        <input
-          type="text"
-          placeholder="Search bugs..."
-          className="px-3 py-2 border rounded-md w-full max-w-sm"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+    <div className="w-full space-y-6">
+      {/* Dashboard stats that act as filters */}
+      <BugDashboardStats 
+        bugs={allBugs} 
+        onStatusClick={setStatusFilter}
+        onSeverityClick={setSeverityFilter}
+        activeStatusFilter={statusFilter}
+        activeSeverityFilter={severityFilter}
+      />
+      
+      {/* Filters */}
+      <BugFilters
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        severityFilter={severityFilter}
+        setSeverityFilter={setSeverityFilter}
+        priorityFilter={priorityFilter}
+        setPriorityFilter={setPriorityFilter}
+        hasActiveFilters={hasActiveFilters}
+        resetFilters={resetFilters}
+        statusOptions={statusOptions}
+        severityOptions={severityOptions}
+        priorityOptions={priorityOptions}
+      />
       
       {isLoading && !initialBugs ? (
         // Loading skeleton
@@ -157,14 +176,10 @@ const BugList: React.FC<BugListProps> = ({ bugs: initialBugs }) => {
         </div>
       ) : (
         <BugTable 
-          bugs={displayBugs}
+          bugs={filteredBugs}
           onView={viewBug}
           onEdit={editBug}
           onStatusUpdate={handleStatusUpdate}
-          onStatusFilterChange={setStatusFilter}
-          onSeverityFilterChange={setSeverityFilter}
-          statusFilter={statusFilter}
-          severityFilter={severityFilter}
         />
       )}
 
