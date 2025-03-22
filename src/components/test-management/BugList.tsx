@@ -20,6 +20,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Link } from 'react-router-dom';
 
 interface BugListProps {
   bugs: Bug[];
@@ -334,7 +335,12 @@ const BugList: React.FC<BugListProps> = ({ bugs }) => {
             sortedBugs.map((bug) => (
               <TableRow key={bug.id} className="border-b hover:bg-muted/50">
                 <TableCell className="font-medium font-mono text-sm">
-                  {bug.formattedId}
+                  <Link 
+                    to={`/bug-detail/${bug.id}`} 
+                    className="text-primary hover:underline"
+                  >
+                    {bug.formattedId}
+                  </Link>
                 </TableCell>
                 <TableCell>
                   <div>
@@ -373,7 +379,13 @@ const BugList: React.FC<BugListProps> = ({ bugs }) => {
                 <TableCell>{bug.assignedDeveloper || "-"}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      as={Link}
+                      to={`/bug-detail/${bug.id}`}
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8">
