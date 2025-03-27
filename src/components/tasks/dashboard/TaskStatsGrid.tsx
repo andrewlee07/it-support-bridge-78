@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ClipboardList, Clock, PauseCircle, AlertCircle } from 'lucide-react';
 import { TaskStats } from '@/utils/types/taskTypes';
 
@@ -11,46 +11,55 @@ interface TaskStatsGridProps {
 const TaskStatsGrid: React.FC<TaskStatsGridProps> = ({ taskStats }) => {
   if (!taskStats) return null;
 
-  const renderStatusCard = (title: string, count: number, icon: React.ReactNode, color: string) => (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <div className={color}>
-          {icon}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{count}</div>
-      </CardContent>
-    </Card>
-  );
-
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-      {renderStatusCard(
-        "New Tasks", 
-        taskStats.newTasks, 
-        <ClipboardList className="h-4 w-4" />, 
-        "text-blue-500"
-      )}
-      {renderStatusCard(
-        "In Progress", 
-        taskStats.inProgressTasks, 
-        <Clock className="h-4 w-4" />, 
-        "text-purple-500"
-      )}
-      {renderStatusCard(
-        "On Hold", 
-        taskStats.onHoldTasks, 
-        <PauseCircle className="h-4 w-4" />, 
-        "text-yellow-500"
-      )}
-      {renderStatusCard(
-        "Overdue", 
-        taskStats.overdueCount, 
-        <AlertCircle className="h-4 w-4" />, 
-        "text-red-500"
-      )}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <Card>
+        <CardContent className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">New Tasks</p>
+            <p className="text-2xl font-bold">{taskStats.newTasks}</p>
+          </div>
+          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900/20">
+            <ClipboardList className="h-6 w-6 text-blue-700 dark:text-blue-300" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">In Progress</p>
+            <p className="text-2xl font-bold">{taskStats.inProgressTasks}</p>
+          </div>
+          <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center dark:bg-purple-900/20">
+            <Clock className="h-6 w-6 text-purple-700 dark:text-purple-300" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">On Hold</p>
+            <p className="text-2xl font-bold">{taskStats.onHoldTasks}</p>
+          </div>
+          <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center dark:bg-yellow-900/20">
+            <PauseCircle className="h-6 w-6 text-yellow-700 dark:text-yellow-300" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">Overdue</p>
+            <p className="text-2xl font-bold">{taskStats.overdueCount}</p>
+          </div>
+          <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center dark:bg-red-900/20">
+            <AlertCircle className="h-6 w-6 text-red-700 dark:text-red-300" />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

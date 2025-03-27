@@ -41,7 +41,9 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
             <p className="text-sm font-medium text-muted-foreground mb-1">Total Bugs</p>
             <p className="text-2xl font-bold">{totalBugs}</p>
           </div>
-          <BarChart2 className="h-8 w-8 text-muted-foreground opacity-75" />
+          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900/20">
+            <BarChart2 className="h-6 w-6 text-blue-700 dark:text-blue-300" />
+          </div>
         </CardContent>
       </Card>
 
@@ -54,7 +56,9 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
             <p className="text-sm font-medium text-muted-foreground mb-1">Open Bugs</p>
             <p className="text-2xl font-bold">{openBugs}</p>
           </div>
-          <AlertCircle className="h-8 w-8 text-blue-500 opacity-75" />
+          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900/20">
+            <AlertCircle className="h-6 w-6 text-blue-700 dark:text-blue-300" />
+          </div>
         </CardContent>
       </Card>
 
@@ -67,7 +71,9 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
             <p className="text-sm font-medium text-muted-foreground mb-1">In Progress</p>
             <p className="text-2xl font-bold">{inProgressBugs}</p>
           </div>
-          <Clock className="h-8 w-8 text-yellow-500 opacity-75" />
+          <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center dark:bg-yellow-900/20">
+            <Clock className="h-6 w-6 text-yellow-700 dark:text-yellow-300" />
+          </div>
         </CardContent>
       </Card>
 
@@ -80,7 +86,9 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
             <p className="text-sm font-medium text-muted-foreground mb-1">Critical Bugs</p>
             <p className="text-2xl font-bold">{criticalBugs}</p>
           </div>
-          <Flame className="h-8 w-8 text-red-500 opacity-75" />
+          <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center dark:bg-red-900/20">
+            <Flame className="h-6 w-6 text-red-700 dark:text-red-300" />
+          </div>
         </CardContent>
       </Card>
     </div>
