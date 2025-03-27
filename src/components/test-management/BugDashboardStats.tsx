@@ -32,7 +32,7 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
           "cursor-pointer hover:shadow-md transition-all border-2",
           activeStatusFilter === 'open' ? "border-primary bg-primary/5" : "border-transparent"
         )}
-        onClick={() => onStatusClick?.(activeStatusFilter === 'open' ? null : 'open')}
+        onClick={() => onStatusClick?.('open')}
       >
         <CardContent className="p-6">
           <div className="flex justify-between items-center">
@@ -52,7 +52,7 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
           "cursor-pointer hover:shadow-md transition-all border-2",
           activeStatusFilter === 'in-progress' ? "border-primary bg-primary/5" : "border-transparent"
         )}
-        onClick={() => onStatusClick?.(activeStatusFilter === 'in-progress' ? null : 'in-progress')}
+        onClick={() => onStatusClick?.('in-progress')}
       >
         <CardContent className="p-6">
           <div className="flex justify-between items-center">
@@ -72,7 +72,7 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
           "cursor-pointer hover:shadow-md transition-all border-2",
           activeSeverityFilter === 'critical' ? "border-primary bg-primary/5" : "border-transparent"
         )}
-        onClick={() => onSeverityClick?.(activeSeverityFilter === 'critical' ? null : 'critical')}
+        onClick={() => onSeverityClick?.('critical')}
       >
         <CardContent className="p-6">
           <div className="flex justify-between items-center">
@@ -92,7 +92,7 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
           "cursor-pointer hover:shadow-md transition-all border-2",
           activeSeverityFilter === 'high' ? "border-primary bg-primary/5" : "border-transparent"
         )}
-        onClick={() => onSeverityClick?.(activeSeverityFilter === 'high' ? null : 'high')}
+        onClick={() => onSeverityClick?.('high')}
       >
         <CardContent className="p-6">
           <div className="flex justify-between items-center">
