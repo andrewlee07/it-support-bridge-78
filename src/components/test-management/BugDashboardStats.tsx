@@ -2,8 +2,7 @@
 import React from 'react';
 import { Bug } from '@/utils/types/test/bug';
 import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { AlertCircle, Clock, Flame, AlertTriangle } from 'lucide-react';
+import { AlertCircle, Clock, Flame, AlertTriangle, BarChart2 } from 'lucide-react';
 
 interface BugDashboardStatsProps {
   bugs: Bug[];
@@ -20,90 +19,68 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
   activeStatusFilter,
   activeSeverityFilter
 }) => {
+  const totalBugs = bugs.length;
   const openBugs = bugs.filter(bug => bug.status === 'open').length;
   const inProgressBugs = bugs.filter(bug => bug.status === 'in-progress').length;
   const criticalBugs = bugs.filter(bug => bug.severity === 'critical').length;
   const highPriorityBugs = bugs.filter(bug => bug.priority === 'high').length;
 
+  const isFilterActive = (type: 'status' | 'severity', value: string) => {
+    return (type === 'status' && activeStatusFilter === value) || 
+           (type === 'severity' && activeSeverityFilter === value);
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card 
-        className={cn(
-          "cursor-pointer hover:shadow-md transition-all border-2",
-          activeStatusFilter === 'open' ? "border-primary bg-primary/5" : "border-transparent"
-        )}
+        className={`cursor-pointer transition-colors ${isFilterActive('status', 'all') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''}`}
+        onClick={() => onStatusClick?.(null)}
+      >
+        <CardContent className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">Total Bugs</p>
+            <p className="text-2xl font-bold">{totalBugs}</p>
+          </div>
+          <BarChart2 className="h-8 w-8 text-muted-foreground opacity-75" />
+        </CardContent>
+      </Card>
+
+      <Card 
+        className={`cursor-pointer transition-colors ${isFilterActive('status', 'open') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''}`}
         onClick={() => onStatusClick?.('open')}
       >
-        <CardContent className="p-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Open Bugs</p>
-              <h3 className="text-3xl font-bold mt-1">{openBugs}</h3>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-blue-500" />
-            </div>
+        <CardContent className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">Open Bugs</p>
+            <p className="text-2xl font-bold">{openBugs}</p>
           </div>
+          <AlertCircle className="h-8 w-8 text-blue-500 opacity-75" />
         </CardContent>
       </Card>
 
       <Card 
-        className={cn(
-          "cursor-pointer hover:shadow-md transition-all border-2",
-          activeStatusFilter === 'in-progress' ? "border-primary bg-primary/5" : "border-transparent"
-        )}
+        className={`cursor-pointer transition-colors ${isFilterActive('status', 'in-progress') ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800' : ''}`}
         onClick={() => onStatusClick?.('in-progress')}
       >
-        <CardContent className="p-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">In Progress</p>
-              <h3 className="text-3xl font-bold mt-1">{inProgressBugs}</h3>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
-              <Clock className="h-6 w-6 text-yellow-500" />
-            </div>
+        <CardContent className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">In Progress</p>
+            <p className="text-2xl font-bold">{inProgressBugs}</p>
           </div>
+          <Clock className="h-8 w-8 text-yellow-500 opacity-75" />
         </CardContent>
       </Card>
 
       <Card 
-        className={cn(
-          "cursor-pointer hover:shadow-md transition-all border-2",
-          activeSeverityFilter === 'critical' ? "border-primary bg-primary/5" : "border-transparent"
-        )}
+        className={`cursor-pointer transition-colors ${isFilterActive('severity', 'critical') ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : ''}`}
         onClick={() => onSeverityClick?.('critical')}
       >
-        <CardContent className="p-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Critical Bugs</p>
-              <h3 className="text-3xl font-bold mt-1">{criticalBugs}</h3>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-red-500/10 flex items-center justify-center">
-              <Flame className="h-6 w-6 text-red-500" />
-            </div>
+        <CardContent className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">Critical Bugs</p>
+            <p className="text-2xl font-bold">{criticalBugs}</p>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        className={cn(
-          "cursor-pointer hover:shadow-md transition-all border-2",
-          activeSeverityFilter === 'high' ? "border-primary bg-primary/5" : "border-transparent"
-        )}
-        onClick={() => onSeverityClick?.('high')}
-      >
-        <CardContent className="p-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">High Priority</p>
-              <h3 className="text-3xl font-bold mt-1">{highPriorityBugs}</h3>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
-              <AlertTriangle className="h-6 w-6 text-orange-500" />
-            </div>
-          </div>
+          <Flame className="h-8 w-8 text-red-500 opacity-75" />
         </CardContent>
       </Card>
     </div>
