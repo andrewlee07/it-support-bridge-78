@@ -12,7 +12,10 @@ const mockBugs: Bug[] = [
     severity: 'critical',
     priority: 'high',
     assignedDeveloper: 'John Smith',
-    reportedDate: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'user1',
+    stepsToReproduce: ['Open login page', 'Click login button', 'Nothing happens']
   },
   {
     id: '2',
@@ -22,7 +25,10 @@ const mockBugs: Bug[] = [
     severity: 'high',
     priority: 'medium',
     assignedDeveloper: 'Jane Doe',
-    reportedDate: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'user2',
+    stepsToReproduce: ['Enter search term', 'Click search', 'Results don\'t match query']
   },
   {
     id: '3',
@@ -32,7 +38,10 @@ const mockBugs: Bug[] = [
     severity: 'medium',
     priority: 'medium',
     assignedDeveloper: null,
-    reportedDate: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'user1',
+    stepsToReproduce: ['Navigate to dashboard', 'Observe pie chart area', 'Chart is missing or broken']
   },
   {
     id: '4',
@@ -42,7 +51,10 @@ const mockBugs: Bug[] = [
     severity: 'low',
     priority: 'low',
     assignedDeveloper: 'Alex Wilson',
-    reportedDate: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'user3',
+    stepsToReproduce: ['Open app on iPhone 13', 'View in portrait mode', 'Observe layout issues']
   },
   {
     id: '5',
@@ -52,7 +64,10 @@ const mockBugs: Bug[] = [
     severity: 'critical',
     priority: 'high',
     assignedDeveloper: null,
-    reportedDate: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'user2',
+    stepsToReproduce: ['Make repeated API calls', 'Observe no rate limiting being applied']
   },
 ];
 
