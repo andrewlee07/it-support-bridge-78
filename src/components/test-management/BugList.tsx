@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Bug } from '@/utils/types/test/bug';
 import { useBugFilters } from '@/hooks/useBugFilters';
@@ -378,7 +379,6 @@ const BugList: React.FC<BugListProps> = ({ bugs }) => {
                 <TableCell>{bug.assignedDeveloper || "-"}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    {/* Fixed button - using Link component directly inside onClick instead of 'as' prop */}
                     <Link to={`/bug-detail/${bug.id}`}>
                       <Button 
                         variant="outline" 

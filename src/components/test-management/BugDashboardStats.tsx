@@ -29,8 +29,8 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card 
         className={cn(
-          "cursor-pointer hover:shadow-md transition-shadow",
-          activeStatusFilter === 'open' ? "ring-2 ring-primary" : ""
+          "cursor-pointer hover:shadow-md transition-all border-2",
+          activeStatusFilter === 'open' ? "border-primary bg-primary/5" : "border-transparent"
         )}
         onClick={() => onStatusClick?.(activeStatusFilter === 'open' ? null : 'open')}
       >
@@ -49,8 +49,8 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
 
       <Card 
         className={cn(
-          "cursor-pointer hover:shadow-md transition-shadow",
-          activeStatusFilter === 'in-progress' ? "ring-2 ring-primary" : ""
+          "cursor-pointer hover:shadow-md transition-all border-2",
+          activeStatusFilter === 'in-progress' ? "border-primary bg-primary/5" : "border-transparent"
         )}
         onClick={() => onStatusClick?.(activeStatusFilter === 'in-progress' ? null : 'in-progress')}
       >
@@ -69,8 +69,8 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
 
       <Card 
         className={cn(
-          "cursor-pointer hover:shadow-md transition-shadow",
-          activeSeverityFilter === 'critical' ? "ring-2 ring-primary" : ""
+          "cursor-pointer hover:shadow-md transition-all border-2",
+          activeSeverityFilter === 'critical' ? "border-primary bg-primary/5" : "border-transparent"
         )}
         onClick={() => onSeverityClick?.(activeSeverityFilter === 'critical' ? null : 'critical')}
       >
@@ -89,8 +89,8 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
 
       <Card 
         className={cn(
-          "cursor-pointer hover:shadow-md transition-shadow",
-          activeSeverityFilter === 'high' ? "ring-2 ring-primary" : ""
+          "cursor-pointer hover:shadow-md transition-all border-2",
+          activeSeverityFilter === 'high' ? "border-primary bg-primary/5" : "border-transparent"
         )}
         onClick={() => onSeverityClick?.(activeSeverityFilter === 'high' ? null : 'high')}
       >
