@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import Breadcrumb from '@/components/shared/Breadcrumb';
 import { StatusMappingTable } from '@/components/admin/status-sync/StatusMappingTable';
 import { useStatusSynchronization } from '@/hooks/useStatusSynchronization';
+import { defaultStatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
 
 const ProcessConfiguration = () => {
   const breadcrumbItems = [
@@ -18,6 +19,10 @@ const ProcessConfiguration = () => {
   ];
 
   const { settings, updateSettings, isLoading } = useStatusSynchronization();
+
+  // Use default mappings if settings are undefined
+  const mappings = settings?.releaseToBacklogMapping || defaultStatusSynchronizationSettings.releaseToBacklogMapping;
+  const bugMappings = settings?.releaseToBugMapping || defaultStatusSynchronizationSettings.releaseToBugMapping;
 
   const moduleLinks = [
     { name: 'Incident Configuration', path: '/admin/incident-configuration' },
@@ -114,10 +119,10 @@ const ProcessConfiguration = () => {
               </CardHeader>
               <CardContent>
                 <StatusMappingTable 
-                  mappings={(settings?.releaseToBacklogMapping || {})} 
-                  bugMappings={(settings?.releaseToBugMapping || {})}
+                  mappings={mappings} 
+                  bugMappings={bugMappings}
                   onUpdate={() => {}}
-                  settings={settings}
+                  settings={settings || defaultStatusSynchronizationSettings}
                   updateSettings={updateSettings}
                   isLoading={isLoading}
                 />

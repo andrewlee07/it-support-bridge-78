@@ -9,6 +9,7 @@ import { useMandatoryFields } from '@/hooks/useMandatoryFields';
 import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
 import { StatusMappingTable } from '@/components/admin/status-sync/StatusMappingTable';
 import { useStatusSynchronization } from '@/hooks/useStatusSynchronization';
+import { defaultStatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
 
 const ReleaseConfiguration = () => {
   const breadcrumbItems = [
@@ -18,6 +19,10 @@ const ReleaseConfiguration = () => {
 
   const { mandatoryFields, updateMandatoryFields, isLoading } = useMandatoryFields('release');
   const { settings, updateSettings, isLoading: isSyncLoading } = useStatusSynchronization();
+
+  // Use default mappings if settings are undefined
+  const mappings = settings?.releaseToBacklogMapping || defaultStatusSynchronizationSettings.releaseToBacklogMapping;
+  const bugMappings = settings?.releaseToBugMapping || defaultStatusSynchronizationSettings.releaseToBugMapping;
 
   return (
     <PageTransition>
@@ -58,10 +63,10 @@ const ReleaseConfiguration = () => {
           
           <TabsContent value="sync">
             <StatusMappingTable 
-              mappings={(settings?.releaseToBacklogMapping || {})} 
-              bugMappings={(settings?.releaseToBugMapping || {})}
+              mappings={mappings}
+              bugMappings={bugMappings}
               onUpdate={() => {}}
-              settings={settings}
+              settings={settings || defaultStatusSynchronizationSettings}
               updateSettings={updateSettings}
               isLoading={isSyncLoading}
             />
