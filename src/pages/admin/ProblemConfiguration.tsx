@@ -6,11 +6,13 @@ import Breadcrumb from '@/components/shared/Breadcrumb';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
 import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
-import { Database, Settings, GitBranch, BookOpen, AlertTriangle, ArrowUpRight } from 'lucide-react';
+import { Database, Settings, GitBranch, BookOpen, AlertTriangle, ArrowUpRight, Bell } from 'lucide-react';
 import ProblemGeneralSettings from '@/components/admin/problem-configuration/ProblemGeneralSettings';
 import RootCauseAnalysisSettings from '@/components/admin/problem-configuration/RootCauseAnalysisSettings';
 import KnownErrorSettings from '@/components/admin/problem-configuration/KnownErrorSettings';
 import EscalationRulesSettings from '@/components/admin/problem-configuration/EscalationRulesSettings';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const ProblemConfiguration = () => {
   const breadcrumbItems = [
@@ -25,11 +27,22 @@ const ProblemConfiguration = () => {
       <div className="space-y-6">
         <Breadcrumb items={breadcrumbItems} />
         
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Problem Management Configuration</h1>
-          <p className="text-muted-foreground mt-1">
-            Configure settings for problem management
-          </p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Problem Management Configuration</h1>
+            <p className="text-muted-foreground mt-1">
+              Configure settings for problem management
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" asChild>
+              <Link to="/admin/notification-configuration">
+                <Bell className="h-4 w-4 mr-2" />
+                Notification Settings
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="general">
