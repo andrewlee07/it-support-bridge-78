@@ -1,13 +1,39 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import ScheduleBasedRules from '@/components/notifications/routing/ScheduleBasedRules';
 import { Button } from '@/components/ui/button';
 import { Plus, Clock, Bell } from 'lucide-react';
 import { toast } from 'sonner';
+import { ChannelMappingType } from '@/utils/types/eventBus/channelMappingTypes';
 
 // This component wraps the protected ScheduleBasedRules with additional functionality
 const CustomScheduleBasedRules = () => {
+  // Default values for channel mappings that satisfy the required properties
+  const defaultChannelMapping: ChannelMappingType = {
+    inWindow: "primary@example.com",
+    outOfWindow: "secondary@example.com"
+  };
+
+  // Initialize schedule rule state with proper types
+  const [initializedRules] = useState([
+    {
+      id: "default-rule",
+      name: "Default Schedule",
+      active: true,
+      schedule: {
+        days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+        timeRanges: [{ start: "09:00", end: "17:00" }]
+      },
+      channelMappings: {
+        email: defaultChannelMapping,
+        sms: defaultChannelMapping,
+        slack: defaultChannelMapping,
+        teams: defaultChannelMapping
+      }
+    }
+  ]);
+
   const handleAddSchedule = () => {
     toast.success('New schedule rule created successfully');
   };
@@ -35,8 +61,8 @@ const CustomScheduleBasedRules = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Use the protected component */}
-          <ScheduleBasedRules />
+          {/* Pass initialized rules to ensure proper type consistency */}
+          <ScheduleBasedRules initialRules={initializedRules} />
         </CardContent>
       </Card>
       
