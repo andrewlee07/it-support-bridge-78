@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { PORTAL_APPROVAL_DETAIL } from '@/utils/routes/portalRouteConstants';
 
 interface ApprovalItemProps {
   title: string;
@@ -20,17 +21,17 @@ const ApprovalItem: React.FC<ApprovalItemProps> = ({
   id,
   status = 'pending'
 }) => {
-  // Determine the URL based on request type
-  const getUrl = () => {
+  // Determine the type for the URL
+  const getType = () => {
     switch (requestType) {
       case 'change':
-        return `/changes/${id}`;
+        return 'changes';
       case 'release':
-        return `/releases/${id}`;
+        return 'releases';
       case 'service-request':
-        return `/service-requests/${id.replace('SR', '')}`;
+        return 'service-requests';
       default:
-        return `/${requestType}s/${id}`;
+        return requestType + 's';
     }
   };
   
@@ -49,7 +50,7 @@ const ApprovalItem: React.FC<ApprovalItemProps> = ({
   };
   
   return (
-    <Link to={getUrl()} className="block">
+    <Link to={PORTAL_APPROVAL_DETAIL(id, getType())} className="block">
       <div className="flex justify-between items-start border-b pb-3 hover:bg-muted/20 -mx-2 px-2 pt-2 rounded">
         <div className="space-y-1">
           <div className="font-medium text-sm">{title}</div>

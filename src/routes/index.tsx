@@ -2,6 +2,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import MainLayout from '@/layouts/MainLayout';
+import PortalLayout from '@/layouts/PortalLayout';
 import Login from '@/pages/Login';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ErrorPage from '@/pages/ErrorPage';
@@ -20,11 +21,24 @@ import { releaseRoutes } from './releaseRoutes';
 import { taskRoutes } from './taskRoutes';
 import { miscRoutes } from './miscRoutes';
 import { securityRoutes } from './securityRoutes';
+import { portalRoutes } from './portalRoutes';
 
 const router = createBrowserRouter([
   {
     path: '/login',
     element: React.createElement(Login)
+  },
+  // Portal routes should go in their own layout
+  {
+    element: React.createElement(ProtectedRoute, null, 
+      React.createElement(PortalLayout)
+    ),
+    errorElement: React.createElement(ErrorPage),
+    children: portalRoutes.map(route => ({
+      ...route,
+      // Remove leading slash if it exists to make it relative to parent
+      path: route.path?.startsWith('/') ? route.path.substring(1) : route.path,
+    }))
   },
   {
     path: '/',

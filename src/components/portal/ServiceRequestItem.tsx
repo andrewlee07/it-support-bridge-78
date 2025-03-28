@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { PORTAL_SERVICE_REQUEST_DETAIL } from '@/utils/routes/portalRouteConstants';
 
 interface ServiceRequestItemProps {
   title: string;
@@ -21,7 +23,7 @@ const ServiceRequestItem: React.FC<ServiceRequestItemProps> = ({
   const requestId = id.replace(/SR0*/, '');
   
   return (
-    <Link to={`/service-requests/${requestId}`} className="block p-3 rounded-md hover:bg-accent transition-colors">
+    <Link to={PORTAL_SERVICE_REQUEST_DETAIL(requestId)} className="block p-3 rounded-md hover:bg-accent transition-colors">
       <div className="space-y-1">
         <h4 className="text-sm font-medium">{title}</h4>
         <div className="flex justify-between items-center">

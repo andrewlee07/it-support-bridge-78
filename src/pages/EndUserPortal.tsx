@@ -8,19 +8,24 @@ import PortalCard from '@/components/portal/PortalCard';
 import StatusWidget from '@/components/portal/StatusWidget';
 import IncidentItem from '@/components/portal/IncidentItem';
 import ServiceRequestItem from '@/components/portal/ServiceRequestItem';
-import PortalHeader from '@/components/portal/PortalHeader';
 import KnowledgeArticlesList from '@/components/portal/KnowledgeArticlesList';
 import AISearch from '@/components/portal/AISearch';
+import { Link } from 'react-router-dom';
+import { 
+  PORTAL_NEW_SERVICE_REQUEST, 
+  PORTAL_NEW_INCIDENT,
+  PORTAL_MY_APPROVALS,
+  PORTAL_MY_INCIDENTS,
+  PORTAL_MY_REQUESTS,
+  PORTAL_KNOWLEDGE_ARTICLE 
+} from '@/utils/routes/portalRouteConstants';
 
 const EndUserPortal: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-      {/* Portal Header */}
-      <PortalHeader />
-
+    <div>
       {/* Hero Search Section */}
       <section className="bg-gradient-to-r from-purple-900/20 to-purple-600/20 p-8 md:p-16 flex flex-col items-center justify-center text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-6">How can we help?</h1>
@@ -37,7 +42,7 @@ const EndUserPortal: React.FC = () => {
             title="Request Something" 
             icon={<CheckCircle className="h-10 w-10 text-primary" />}
             description="Browse the catalog for services and items you need"
-            to="/portal/service-request"
+            to={PORTAL_NEW_SERVICE_REQUEST}
           />
 
           {/* Knowledge Base */}
@@ -53,7 +58,7 @@ const EndUserPortal: React.FC = () => {
             title="Get Help" 
             icon={<HelpCircle className="h-10 w-10 text-primary" />}
             description="Contact support to make a request, or report a problem"
-            to="/portal/incident"
+            to={PORTAL_NEW_INCIDENT}
           />
 
           {/* My Approvals */}
@@ -61,7 +66,7 @@ const EndUserPortal: React.FC = () => {
             title="My Approvals" 
             icon={<ClipboardCheck className="h-10 w-10 text-primary" />}
             description="View and manage your pending approval requests"
-            to="/portal/my-approvals"
+            to={PORTAL_MY_APPROVALS}
           />
         </div>
 
@@ -108,7 +113,12 @@ const EndUserPortal: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
           {/* My Open Incidents */}
           <div className="card p-5 border rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">My Open Incidents</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">My Open Incidents</h3>
+              <Link to={PORTAL_MY_INCIDENTS}>
+                <Button variant="link" size="sm" className="text-xs">View All</Button>
+              </Link>
+            </div>
             <div className="space-y-4">
               <IncidentItem 
                 title="Rain is leaking in from the DNS Server"
@@ -139,7 +149,12 @@ const EndUserPortal: React.FC = () => {
 
           {/* My Open Requests */}
           <div className="card p-5 border rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium mb-4">My Open Requests</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">My Open Requests</h3>
+              <Link to={PORTAL_MY_REQUESTS}>
+                <Button variant="link" size="sm" className="text-xs">View All</Button>
+              </Link>
+            </div>
             <div className="space-y-4">
               <ServiceRequestItem 
                 title="New laptop request"

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, FileText } from 'lucide-react';
+import { PORTAL_KNOWLEDGE_ARTICLE } from '@/utils/routes/portalRouteConstants';
 
 interface ArticleItemProps {
   title: string;
@@ -20,7 +21,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({
   const articleId = url.split('/').pop();
   
   return (
-    <Link to={`/knowledge/${articleId}`} className="block">
+    <Link to={PORTAL_KNOWLEDGE_ARTICLE(articleId || '')} className="block">
       <div className="p-3 rounded-md hover:bg-accent transition-colors">
         <div className="flex items-start gap-2">
           <FileText className="h-4 w-4 mt-0.5 text-primary" />

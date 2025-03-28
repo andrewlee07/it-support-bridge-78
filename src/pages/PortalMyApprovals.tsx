@@ -4,8 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import PortalHeader from '@/components/portal/PortalHeader';
 import ApprovalItem from '@/components/portal/ApprovalItem';
+import PageTransition from '@/components/shared/PageTransition';
+import { PORTAL } from '@/utils/routes/portalRouteConstants';
 
 const PortalMyApprovals: React.FC = () => {
   const { user } = useAuth();
@@ -47,53 +48,49 @@ const PortalMyApprovals: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-      <PortalHeader />
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Link to="/portal" className="inline-flex items-center text-sm text-primary hover:text-primary/80">
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Back to Portal
-          </Link>
-        </div>
-        
-        <div className="grid gap-6">
-          <h1 className="text-2xl font-bold">My Approvals</h1>
-          
-          <Card className="p-6">
-            <h2 className="text-lg font-medium mb-4">Pending Your Approval</h2>
-            
-            {pendingApprovals.length > 0 ? (
-              <div className="space-y-4">
-                {pendingApprovals.map((approval) => (
-                  <ApprovalItem
-                    key={`${approval.requestType}-${approval.id}`}
-                    id={approval.id}
-                    title={approval.title}
-                    requestType={approval.requestType}
-                    date={approval.date}
-                    time={approval.time}
-                    status={approval.status}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>You don't have any pending approvals</p>
-              </div>
-            )}
-          </Card>
-          
-          <Card className="p-6">
-            <h2 className="text-lg font-medium mb-4">Recently Reviewed</h2>
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No recently reviewed approvals</p>
-            </div>
-          </Card>
-        </div>
+    <PageTransition>
+      <div className="mb-6">
+        <Link to={PORTAL} className="inline-flex items-center text-sm text-primary hover:text-primary/80">
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          Back to Portal
+        </Link>
       </div>
-    </div>
+      
+      <div className="grid gap-6">
+        <h1 className="text-2xl font-bold">My Approvals</h1>
+        
+        <Card className="p-6">
+          <h2 className="text-lg font-medium mb-4">Pending Your Approval</h2>
+          
+          {pendingApprovals.length > 0 ? (
+            <div className="space-y-4">
+              {pendingApprovals.map((approval) => (
+                <ApprovalItem
+                  key={`${approval.requestType}-${approval.id}`}
+                  id={approval.id}
+                  title={approval.title}
+                  requestType={approval.requestType}
+                  date={approval.date}
+                  time={approval.time}
+                  status={approval.status}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>You don't have any pending approvals</p>
+            </div>
+          )}
+        </Card>
+        
+        <Card className="p-6">
+          <h2 className="text-lg font-medium mb-4">Recently Reviewed</h2>
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No recently reviewed approvals</p>
+          </div>
+        </Card>
+      </div>
+    </PageTransition>
   );
 };
 
