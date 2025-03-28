@@ -58,6 +58,7 @@ const CustomRecipientMappingConfig = () => {
             <p className="text-muted-foreground">
               Advanced recipient mapping will be available in a future update
             </p>
+            <Bell className="h-5 w-5 text-muted-foreground my-2" />
             <Button variant="outline" disabled>Coming Soon</Button>
           </div>
         </CardContent>

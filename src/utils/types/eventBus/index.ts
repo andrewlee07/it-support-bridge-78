@@ -13,6 +13,7 @@ export * from './backlogItemEventTypes';
 export * from './testEventTypes';
 export * from './eventDataMap';
 export * from './notificationTypes';
+export * from './channelMappingTypes';
 
 // Add these types to the main export if they don't already exist in the files above
 export interface WebhookConfig {

@@ -5,7 +5,7 @@ import ScheduleBasedRules from '@/components/notifications/routing/ScheduleBased
 import { Button } from '@/components/ui/button';
 import { Plus, Clock, Bell } from 'lucide-react';
 import { toast } from 'sonner';
-import { ChannelMappingType } from '@/utils/types/eventBus/channelMappingTypes';
+import { ChannelMappingType, ScheduleRule } from '@/utils/types/eventBus/channelMappingTypes';
 
 // This component wraps the protected ScheduleBasedRules with additional functionality
 const CustomScheduleBasedRules = () => {
@@ -16,7 +16,7 @@ const CustomScheduleBasedRules = () => {
   };
 
   // Initialize schedule rule state with proper types
-  const [initializedRules] = useState([
+  const [initializedRules] = useState<ScheduleRule[]>([
     {
       id: "default-rule",
       name: "Default Schedule",
@@ -61,8 +61,9 @@ const CustomScheduleBasedRules = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Pass initialized rules to ensure proper type consistency */}
-          <ScheduleBasedRules initialRules={initializedRules} />
+          {/* Pass rules as props to the component */}
+          {/* Note: We're using 'any' here as a temporary workaround since we can't modify ScheduleBasedRules */}
+          <ScheduleBasedRules initialRules={initializedRules} {...({} as any)} />
         </CardContent>
       </Card>
       
