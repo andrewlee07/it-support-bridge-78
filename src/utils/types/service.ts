@@ -52,6 +52,7 @@ export interface ServiceCategory {
 
 export type ServiceStatus = 'active' | 'inactive' | 'maintenance' | 'deprecated';
 export type SupportHours = 'Business Hours (9am-5pm)' | 'Extended Hours (8am-8pm)' | '24/7 Support' | 'Limited Support' | 'not-specified';
+export type ServiceType = 'technical' | 'business';
 
 export const SERVICE_SUPPORT_HOURS: SupportHours[] = [
   'Business Hours (9am-5pm)',
@@ -67,6 +68,7 @@ export interface Service {
   description: string;
   categoryId: string;
   status: ServiceStatus;
+  serviceType: ServiceType;
   owner?: string;
   supportContact?: string;
   supportContactId?: string;
@@ -75,20 +77,22 @@ export interface Service {
   documentationUrl?: string;
   supportHours?: SupportHours;
   slaId?: string;
-  price?: string; // Adding this to match the mock data
-  approvalRequired?: boolean; // Adding this to match the mock data
+  price?: string;
+  approvalRequired?: boolean;
   createdAt: Date;
   updatedAt: Date;
-  // New fields for relationships
+  // Relationship fields
+  parentServiceId?: string; // If this is a child service
   relatedServiceIds?: string[]; // IDs of related services
-  parentServiceId?: string;     // ID of parent service if this is a sub-service/module
+  technicalServiceIds?: string[]; // For business services, the technical services they depend on
+  businessServiceIds?: string[]; // For technical services, the business services they support
 }
 
 export interface ServiceRelationship {
   id: string;
   sourceServiceId: string;
   targetServiceId: string;
-  relationshipType: 'depends-on' | 'parent-child' | 'component-of' | 'related-to';
+  relationshipType: 'depends-on' | 'parent-child' | 'technical-business' | 'related-to';
   description?: string;
   strength?: 'weak' | 'medium' | 'strong';
 }
@@ -100,6 +104,9 @@ export interface ServiceWithCategory extends Service {
 export interface ServiceWithRelationships extends ServiceWithCategory {
   relationships: ServiceRelationship[];
   children?: ServiceWithRelationships[]; // For hierarchical representation
+  parentService?: ServiceWithCategory; // Parent service if this is a child
+  technicalServices?: ServiceWithCategory[]; // For business services
+  businessServices?: ServiceWithCategory[]; // For technical services
 }
 
 // Business unit related types
@@ -136,4 +143,27 @@ export interface ServiceKnowledge {
   relationshipType: ServiceKnowledgeRelationshipType;
   isPrimary?: boolean;
   displayOrder?: number;
+}
+
+// Client contract types
+export interface ClientContract {
+  id: string;
+  name: string;
+  clientName: string;
+  description: string;
+  startDate: Date;
+  endDate?: Date;
+  status: 'active' | 'pending' | 'completed' | 'terminated';
+  businessServiceIds: string[]; // Business services linked to this contract
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ContractServiceAssociation {
+  id: string;
+  contractId: string;
+  serviceId: string; // Business service ID
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

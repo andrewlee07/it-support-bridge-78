@@ -9,8 +9,9 @@ import ServiceDetailDialog from './management/ServiceDetailDialog';
 import ServiceDialog from './ServiceDialog';
 import { toast } from 'sonner';
 import { useDisclosure } from '@/hooks/useDisclosure';
-import { Server } from 'lucide-react';
+import { Server, Cog, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface ServiceManagementProps {
   inServiceCatalog?: boolean;
@@ -26,6 +27,7 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serviceToEdit, setServiceToEdit] = useState<Service | null>(null);
+  const navigate = useNavigate();
 
   const canConfigureCatalog = userHasPermission('Manage Service Catalog Config');
   const canManageContent = userHasPermission('Manage Service Catalog Content') || canConfigureCatalog;
@@ -61,20 +63,38 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
   const openManagement = () => {
     setIsManagementOpen(true);
   };
+  
+  const navigateToServiceManagement = () => {
+    navigate('/service-catalog-management');
+  };
 
   return (
     <>
       {inServiceCatalog && (
         <>
-          <Button 
-            variant="outline" 
-            onClick={openManagement}
-            className="bg-secondary/50 border border-border/20 hover:bg-muted"
-            title="Advanced catalog management including categories and service organization"
-          >
-            <Server className="mr-2 h-4 w-4" />
-            Manage Catalog
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline" 
+              onClick={openManagement}
+              className="bg-secondary/50 border border-border/20 hover:bg-muted"
+              title="Manage services and their details"
+            >
+              <Server className="mr-2 h-4 w-4" />
+              Manage Services
+            </Button>
+            
+            {canConfigureCatalog && (
+              <Button 
+                variant="outline" 
+                onClick={navigateToServiceManagement}
+                className="bg-secondary/50 border border-border/20 hover:bg-muted"
+                title="Advanced service catalog management including relationships and client contracts"
+              >
+                <Cog className="mr-2 h-4 w-4" />
+                Advanced Management
+              </Button>
+            )}
+          </div>
           
           <ServiceManagementDialog
             services={services}
@@ -105,6 +125,7 @@ const ServiceManagement: React.FC<ServiceManagementProps> = ({
         categories={categories}
         onClose={handleCloseServiceDetail}
         canConfigureCatalog={canConfigureCatalog}
+        availableServices={services || []}
       />
 
       <ServiceDialog

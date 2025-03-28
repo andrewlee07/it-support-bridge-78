@@ -1,7 +1,5 @@
 
-/**
- * Type definitions for notification channel mapping
- */
+// Define channel mapping types
 
 export interface ChannelMappingType {
   inWindow: string;
