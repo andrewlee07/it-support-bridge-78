@@ -1,5 +1,5 @@
 
-import { Service, ServiceCategory, ServiceWithCategory, ServiceRelationship } from '@/utils/types/service';
+import { Service, ServiceCategory, ServiceWithCategory, ServiceRelationship, ServiceWithRelationships } from '@/utils/types/service';
 
 // Sample services data
 const services: Service[] = [
@@ -197,19 +197,20 @@ export const getRelatedServices = (serviceId: string): ServiceWithCategory[] => 
 };
 
 // Function to get a service with its relationships
-export const getServiceWithRelationships = (serviceId: string) => {
+export const getServiceWithRelationships = (serviceId: string): ServiceWithRelationships | null => {
   const service = services.find(s => s.id === serviceId);
   if (!service) return null;
   
   const serviceWithCategory = enrichServiceWithCategory(service);
   const relationships = getServiceRelationships(serviceId);
+  
   const dependsOn = relationships
     .filter(rel => rel.sourceServiceId === serviceId && rel.relationshipType === 'depends-on')
     .map(rel => {
       const targetService = services.find(s => s.id === rel.targetServiceId);
       return targetService ? enrichServiceWithCategory(targetService) : null;
     })
-    .filter(Boolean);
+    .filter((service): service is ServiceWithCategory => service !== null);
   
   const supportedBy = relationships
     .filter(rel => rel.targetServiceId === serviceId && rel.relationshipType === 'supports')
@@ -217,7 +218,7 @@ export const getServiceWithRelationships = (serviceId: string) => {
       const sourceService = services.find(s => s.id === rel.sourceServiceId);
       return sourceService ? enrichServiceWithCategory(sourceService) : null;
     })
-    .filter(Boolean);
+    .filter((service): service is ServiceWithCategory => service !== null);
   
   const componentOf = relationships
     .filter(rel => rel.sourceServiceId === serviceId && rel.relationshipType === 'component-of')
@@ -225,14 +226,33 @@ export const getServiceWithRelationships = (serviceId: string) => {
       const targetService = services.find(s => s.id === rel.targetServiceId);
       return targetService ? enrichServiceWithCategory(targetService) : null;
     })
-    .filter(Boolean);
+    .filter((service): service is ServiceWithCategory => service !== null);
+
+  // Add additional relationship types
+  const children = relationships
+    .filter(rel => rel.sourceServiceId === serviceId && rel.relationshipType === 'parent-child')
+    .map(rel => {
+      const targetService = services.find(s => s.id === rel.targetServiceId);
+      return targetService ? enrichServiceWithCategory(targetService) : null;
+    })
+    .filter((service): service is ServiceWithCategory => service !== null);
+  
+  const technical = relationships
+    .filter(rel => rel.sourceServiceId === serviceId && rel.relationshipType === 'technical-business')
+    .map(rel => {
+      const targetService = services.find(s => s.id === rel.targetServiceId);
+      return targetService ? enrichServiceWithCategory(targetService) : null;
+    })
+    .filter((service): service is ServiceWithCategory => service !== null);
   
   return {
     ...serviceWithCategory,
     relationships: {
       dependsOn,
       supportedBy,
-      componentOf
+      componentOf,
+      children,
+      technical
     }
   };
 };
@@ -252,3 +272,21 @@ export const getServiceById = (id: string): Service | undefined => {
 export const getServiceCategoryById = (id: string): ServiceCategory | undefined => {
   return serviceCategories.find(category => category.id === id);
 };
+
+// Get services grouped by category
+export const getServicesByCategory = () => {
+  const result: Record<string, ServiceWithCategory[]> = {};
+  
+  serviceCategories.forEach(category => {
+    const categoryServices = services
+      .filter(service => service.categoryId === category.id)
+      .map(service => enrichServiceWithCategory(service));
+    
+    if (categoryServices.length > 0) {
+      result[category.id] = categoryServices;
+    }
+  });
+  
+  return result;
+};
+
