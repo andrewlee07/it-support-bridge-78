@@ -1,9 +1,9 @@
 
-import { Service, ServiceWithCategory } from '@/utils/types/service';
+import { Service, ServiceWithCategory, ServiceRelationship, ServiceWithRelationships } from '@/utils/types/service';
 import { serviceCategories } from './categories';
 import { teams } from './teams';
 import { mockServiceTicketCounts } from './analytics';
-import { mockServiceRelationships } from './types';
+import { mockServiceRelationships } from '@/hooks/service-topology/mockRelationships';
 import { v4 as uuidv4 } from 'uuid';
 
 // Technical services
@@ -213,13 +213,40 @@ const mockServicesWithCategories: ServiceWithCategory[] = mockServices.map(servi
   };
 });
 
-// Services with relationships
-// const mockServicesWithRelationships: ServiceWithRelationships[] = mockServices.map(service => {
-//   return {
-//     ...service,
-//     relationships: getServiceRelationships(service.id)
-//   };
-// });
+// Get service with relationships
+export const getServiceWithRelationships = (serviceId: string): ServiceWithRelationships => {
+  const service = mockServices.find(s => s.id === serviceId);
+  
+  if (!service) {
+    throw new Error(`Service with ID ${serviceId} not found`);
+  }
+  
+  const category = serviceCategories.find(cat => cat.id === service.categoryId) || {
+    id: 'unknown',
+    name: 'Unknown Category',
+    description: 'Unknown',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  
+  // Get relationships where this service is involved
+  const relationships = mockServiceRelationships.filter(
+    rel => rel.sourceServiceId === serviceId || rel.targetServiceId === serviceId
+  );
+  
+  return {
+    ...service,
+    category,
+    relationships
+  };
+};
+
+// Get service relationships
+export const getServiceRelationships = (serviceId: string): ServiceRelationship[] => {
+  return mockServiceRelationships.filter(
+    rel => rel.sourceServiceId === serviceId || rel.targetServiceId === serviceId
+  );
+};
 
 export const getAllServices = (): Service[] => {
   return [...mockServices]; 
@@ -247,6 +274,25 @@ export const getServicesByCategory = (): Record<string, Service[]> => {
   });
   
   return servicesByCategory;
+};
+
+// Functions for business/technical services
+export const getBusinessServices = (): Service[] => {
+  return mockServices.filter(service => service.serviceType === 'business');
+};
+
+export const getTechnicalServices = (): Service[] => {
+  return mockServices.filter(service => service.serviceType === 'technical');
+};
+
+// Function to get client contracts for services
+export const getClientContracts = () => {
+  return []; // Mock implementation - would return client contracts in a real application
+};
+
+// Function to get business services for a contract
+export const getBusinessServicesForContract = (contractId: string) => {
+  return []; // Mock implementation - would return business services for a contract in a real application
 };
 
 export { mockServices, mockServicesWithCategories, mockServiceTicketCounts };

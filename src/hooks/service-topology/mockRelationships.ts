@@ -1,76 +1,91 @@
 
 import { ServiceRelationship } from '@/utils/types/service';
 
-// Mock relationship data (in a real app, this would come from an API)
+// Mock service relationships for development and testing
 export const mockServiceRelationships: ServiceRelationship[] = [
   // Parent-child relationships
   {
     id: 'rel-1',
-    sourceServiceId: 'srv-1',
-    targetServiceId: 'srv-2',
+    sourceServiceId: 'service-4', // Workstation Support (child)
+    targetServiceId: 'service-2', // Network Infrastructure (parent)
     relationshipType: 'parent-child',
-    description: 'Email service is a parent service to authentication service',
-    strength: 'strong'
+    strength: 'strong',
+    description: 'Workstation support depends on network infrastructure'
   },
-  // Technical-business relationships
   {
     id: 'rel-2',
-    sourceServiceId: 'srv-1', // Technical service (Email)
-    targetServiceId: 'srv-8', // Business service (Contact Centre)
-    relationshipType: 'technical-business',
-    description: 'Email service supports Contact Centre operations',
-    strength: 'medium'
-  },
-  {
-    id: 'rel-3',
-    sourceServiceId: 'srv-2', // Technical service (Authentication)
-    targetServiceId: 'srv-3', // Business service (CRM)
-    relationshipType: 'technical-business',
-    description: 'Authentication service supports CRM operations',
-    strength: 'strong'
-  },
-  // More parent-child relationships
-  {
-    id: 'rel-4',
-    sourceServiceId: 'srv-3', // Parent - CRM
-    targetServiceId: 'srv-4', // Child - Sales Pipeline
+    sourceServiceId: 'service-5', // Data Backup (child)
+    targetServiceId: 'service-6', // Cloud Infrastructure (parent)
     relationshipType: 'parent-child',
-    description: 'CRM is a parent service to Sales Pipeline',
-    strength: 'strong'
+    strength: 'strong',
+    description: 'Data backup relies on cloud infrastructure'
   },
-  // Direct dependencies
-  {
-    id: 'rel-5',
-    sourceServiceId: 'srv-5', // Office Suite
-    targetServiceId: 'srv-4', // Sales Pipeline
-    relationshipType: 'depends-on',
-    description: 'Sales Pipeline depends on Office Suite for document generation',
-    strength: 'medium'
-  },
+  
   // Technical-business relationships
   {
-    id: 'rel-6',
-    sourceServiceId: 'srv-7', // Technical service (Network)
-    targetServiceId: 'srv-8', // Business service (Contact Centre)
+    id: 'rel-3',
+    sourceServiceId: 'service-1', // Email System (technical)
+    targetServiceId: 'service-7', // HR Platform (business)
     relationshipType: 'technical-business',
-    description: 'Network infrastructure supports Contact Centre operations',
-    strength: 'strong'
+    strength: 'medium',
+    description: 'Email system supports HR platform communications'
   },
-  // Additional relationships
+  {
+    id: 'rel-4',
+    sourceServiceId: 'service-2', // Network Infrastructure (technical)
+    targetServiceId: 'service-8', // Financial Systems (business)
+    relationshipType: 'technical-business',
+    strength: 'strong',
+    description: 'Network infrastructure supports financial systems'
+  },
+  {
+    id: 'rel-5',
+    sourceServiceId: 'service-6', // Cloud Infrastructure (technical)
+    targetServiceId: 'service-9', // Customer Service Platform (business)
+    relationshipType: 'technical-business',
+    strength: 'strong',
+    description: 'Cloud infrastructure hosts customer service platform'
+  },
+  {
+    id: 'rel-6',
+    sourceServiceId: 'service-3', // Security Services (technical)
+    targetServiceId: 'service-8', // Financial Systems (business)
+    relationshipType: 'technical-business',
+    strength: 'strong',
+    description: 'Security services protect financial systems'
+  },
   {
     id: 'rel-7',
-    sourceServiceId: 'srv-6', // VoIP
-    targetServiceId: 'srv-8', // Contact Centre
+    sourceServiceId: 'service-1', // Email System (technical)
+    targetServiceId: 'service-12', // Document Management (business)
     relationshipType: 'technical-business',
-    description: 'VoIP system supports Contact Centre operations',
-    strength: 'strong'
+    strength: 'medium',
+    description: 'Email system supports document sharing'
   },
+  
+  // Related-to relationships
   {
     id: 'rel-8',
-    sourceServiceId: 'srv-1', // Email
-    targetServiceId: 'srv-3', // CRM
-    relationshipType: 'technical-business',
-    description: 'Email service supports CRM for notifications',
-    strength: 'medium'
+    sourceServiceId: 'service-7', // HR Platform (business)
+    targetServiceId: 'service-8', // Financial Systems (business)
+    relationshipType: 'related-to',
+    strength: 'medium',
+    description: 'HR and Financial systems share employee data'
+  },
+  {
+    id: 'rel-9',
+    sourceServiceId: 'service-9', // Customer Service Platform (business)
+    targetServiceId: 'service-11', // Corporate Website (business)
+    relationshipType: 'related-to',
+    strength: 'weak',
+    description: 'Customer service links to website for knowledge base'
+  },
+  {
+    id: 'rel-10',
+    sourceServiceId: 'service-3', // Security Services (technical)
+    targetServiceId: 'service-6', // Cloud Infrastructure (technical)
+    relationshipType: 'related-to',
+    strength: 'strong',
+    description: 'Security services protect cloud infrastructure'
   }
 ];
