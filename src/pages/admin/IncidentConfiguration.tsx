@@ -44,6 +44,8 @@ const IncidentConfiguration = () => {
             <TabsTrigger value="sla">SLA Settings</TabsTrigger>
             <TabsTrigger value="business-hours">Business Hours</TabsTrigger>
             <TabsTrigger value="autoclose">Auto-Close</TabsTrigger>
+            <TabsTrigger value="priority">Priority & Impact Matrix</TabsTrigger>
+            <TabsTrigger value="notification">Notification Rules</TabsTrigger>
             <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
             <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
           </TabsList>
@@ -80,6 +82,44 @@ const IncidentConfiguration = () => {
             <Form {...form}>
               <AutoCloseConfigurationTab moduleType="incident" />
             </Form>
+          </TabsContent>
+
+          <TabsContent value="priority">
+            <Card>
+              <CardHeader>
+                <CardTitle>Priority & Impact Matrix</CardTitle>
+                <CardDescription>Configure how impact and urgency determine incident priority</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium">Priority Matrix Configuration</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Configure how impact and urgency levels determine incident priority
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="notification">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notification Rules</CardTitle>
+                <CardDescription>Configure automated notifications for incident events</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium">Incident Notification Rules</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Configure when notifications are sent and to whom based on incident attributes
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="dropdowns">

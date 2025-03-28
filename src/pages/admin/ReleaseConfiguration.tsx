@@ -42,6 +42,8 @@ const ReleaseConfiguration = () => {
             <TabsTrigger value="workflow">Workflow</TabsTrigger>
             <TabsTrigger value="sync">Status Synchronization</TabsTrigger>
             <TabsTrigger value="approvals">Approval Process</TabsTrigger>
+            <TabsTrigger value="templates">Release Templates</TabsTrigger>
+            <TabsTrigger value="deployment">Deployment Settings</TabsTrigger>
             <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
           </TabsList>
           
@@ -79,7 +81,52 @@ const ReleaseConfiguration = () => {
                 <CardDescription>Configure release approval process settings</CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Approval process settings content */}
+                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium">Release Approval Workflow</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Configure approval roles, stages, and requirements for releases
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="templates">
+            <Card>
+              <CardHeader>
+                <CardTitle>Release Templates</CardTitle>
+                <CardDescription>Configure standard release templates</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium">Release Template Management</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Configure standardized templates for different types of releases
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="deployment">
+            <Card>
+              <CardHeader>
+                <CardTitle>Deployment Settings</CardTitle>
+                <CardDescription>Configure release deployment settings</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium">Deployment Configuration</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Configure deployment environments, schedules, and integration with CI/CD tools
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

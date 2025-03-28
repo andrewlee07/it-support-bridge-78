@@ -36,6 +36,7 @@ const BugConfiguration = () => {
             <TabsTrigger value="workflow">Workflow</TabsTrigger>
             <TabsTrigger value="severity">Severity Settings</TabsTrigger>
             <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
+            <TabsTrigger value="templates">Bug Templates</TabsTrigger>
             <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
           </TabsList>
           
@@ -67,6 +68,25 @@ const BugConfiguration = () => {
               </CardHeader>
               <CardContent>
                 <BugDropdownFieldsTab />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="templates">
+            <Card>
+              <CardHeader>
+                <CardTitle>Bug Templates</CardTitle>
+                <CardDescription>Configure standard templates for bug reporting</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium">Bug Templates Configuration</h3>
+                    <p className="text-muted-foreground mt-1">
+                      Configure standardized bug templates to streamline reporting
+                    </p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
