@@ -1,69 +1,44 @@
 
-// Release management
-export type ReleaseType = 'major' | 'minor' | 'patch' | 'emergency';
-
 export type ReleaseStatus = 'Planned' | 'In Progress' | 'Deployed' | 'Cancelled';
 
-export type ReleaseApprovalStatus = 'pending' | 'approved' | 'rejected';
+export interface Release {
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  status: ReleaseStatus;
+  plannedDate: Date;
+  deploymentDate?: Date;
+  owner: string;
+  assignedTeam?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  approvalStatus: 'pending' | 'approved' | 'rejected';
+  approvedBy?: string;
+  approvedAt?: Date;
+  items: ReleaseItem[];
+  audit: ReleaseAuditEntry[];
+  
+  // Backward compatibility fields
+  releaseDate?: Date;
+  releaseNotes?: string;
+  changeLog?: string[];
+}
 
-// Release item can link to other entities
 export interface ReleaseItem {
   id: string;
   releaseId: string;
   itemId: string;
-  itemType: 'change' | 'incident' | 'asset';
+  itemType: 'backlog' | 'change' | 'bug' | 'incident';
   addedAt: Date;
   addedBy: string;
 }
 
-export interface Release {
+export interface ReleaseAuditEntry {
   id: string;
-  title: string;
-  version: string;
-  type: ReleaseType;
-  description: string;
-  plannedDate: Date | string;
-  status: ReleaseStatus;
-  owner: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-  approvalStatus: ReleaseApprovalStatus;
-  approvedAt?: Date | string;
-  approvedBy?: string;
-  items: ReleaseItem[];
-  audit: any[];
-}
-
-// Release metrics
-export interface ReleaseMetrics {
-  totalReleases: number;
-  deployedReleases: number;
-  pendingReleases: number;
-  cancelledReleases: number;
-  releasesByType: {
-    major: number;
-    minor: number;
-    patch: number;
-    emergency: number;
-  };
-  releasesByMonth: {
-    month: string;
-    count: number;
-  }[];
-  successRate: number;
-  // Adding properties expected by the ReleaseMetrics component
-  statusCounts: {
-    Planned: number;
-    'In Progress': number;
-    Deployed: number;
-    Cancelled: number;
-  };
-  typeCounts: {
-    major: number;
-    minor: number;
-    patch: number;
-    emergency: number;
-  };
-  upcomingReleases: number;
-  deployedThisMonth: number;
+  entityId: string;
+  entityType: 'release';
+  message: string;
+  performedBy: string;
+  timestamp: Date;
 }

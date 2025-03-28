@@ -1,3 +1,4 @@
+
 // Add the missing types for Attachment and Comment
 export interface Attachment {
   id: string;
@@ -71,6 +72,13 @@ export interface BacklogStats {
   byPriority: Record<string, number>;
   byPoint: Record<string, number>;
 }
+
+// Add explicit type definitions for BacklogItemStatus, BacklogItemPriority, and BacklogItemType
+export type BacklogItemStatus = 'open' | 'in-progress' | 'ready' | 'blocked' | 'completed' | 'deferred';
+
+export type BacklogItemPriority = 'highest' | 'high' | 'medium' | 'low' | 'lowest';
+
+export type BacklogItemType = 'story' | 'bug' | 'task' | 'epic' | 'feature' | 'improvement';
 
 // Add support for dependsOn to BacklogItem
 export interface BacklogItem {
