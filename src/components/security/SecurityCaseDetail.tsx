@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, AlertCircle, ClipboardList, Bug } from 'lucide-react';
 import { getUserNameById } from '@/utils/userUtils';
 import { Link } from 'react-router-dom';
 
@@ -102,6 +102,44 @@ const SecurityCaseDetail: React.FC<SecurityCaseDetailProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Create from Security Case Actions - NEW SECTION */}
+      {!isInline && (
+        <div className="pt-2">
+          <h4 className="text-sm font-medium text-muted-foreground mb-2">Create Related Items</h4>
+          <div className="grid grid-cols-2 gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center justify-center"
+              onClick={() => window.location.href = `/security/case/${securityCase.id}/create-incident`}
+            >
+              <AlertCircle className="h-4 w-4 mr-2" />
+              Create Incident
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center justify-center"
+              onClick={() => window.location.href = `/security/case/${securityCase.id}/create-task`}
+            >
+              <ClipboardList className="h-4 w-4 mr-2" />
+              Create Task
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center justify-center"
+              onClick={() => window.location.href = `/security/case/${securityCase.id}/create-bug`}
+            >
+              <Bug className="h-4 w-4 mr-2" />
+              Create Bug
+            </Button>
+          </div>
+        </div>
+      )}
       
       <div>
         <h4 className="text-sm font-medium text-muted-foreground mb-2">Investigation Steps</h4>

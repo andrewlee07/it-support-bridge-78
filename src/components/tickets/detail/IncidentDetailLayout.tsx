@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Ticket } from '@/utils/types/ticket';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Mail, Phone, BookPlus, Save } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, BookPlus, Save, AlertCircle, Bug, ClipboardList, Megaphone } from 'lucide-react';
 import { format } from 'date-fns';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
@@ -292,6 +291,50 @@ const IncidentDetailLayout: React.FC<IncidentDetailLayoutProps> = ({
                       {resolutionSLAProgress}% time remaining
                     </p>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Create from Incident Actions Card - NEW SECTION */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">Create from Incident</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center" 
+                    onClick={() => window.location.href = `/incidents/${ticket.id}/create-problem`}
+                  >
+                    <AlertCircle className="h-4 w-4 mr-2" />
+                    Create Problem
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center"
+                    onClick={() => window.location.href = `/incidents/${ticket.id}/create-bug`}
+                  >
+                    <Bug className="h-4 w-4 mr-2" />
+                    Create Bug
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center"
+                    onClick={() => window.location.href = `/incidents/${ticket.id}/create-task`}
+                  >
+                    <ClipboardList className="h-4 w-4 mr-2" />
+                    Create Task
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center justify-center"
+                    onClick={() => window.location.href = `/incidents/${ticket.id}/create-announcement`}
+                  >
+                    <Megaphone className="h-4 w-4 mr-2" />
+                    Create Announcement
+                  </Button>
                 </CardContent>
               </Card>
 
