@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import RecipientMappingConfig from '@/components/notifications/routing/RecipientMappingConfig';
 import { KnownErrorRecipientMapping } from '@/utils/types/eventBus/knownErrorEventTypes';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Bell } from 'lucide-react';
 import { toast } from 'sonner';
 
 // This component wraps the protected RecipientMappingConfig with additional functionality

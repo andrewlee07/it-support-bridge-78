@@ -5,7 +5,7 @@ import PageTransition from '@/components/shared/PageTransition';
 import Breadcrumb from '@/components/shared/Breadcrumb';
 import { Database, Users, Calendar, GitBranch } from 'lucide-react';
 import RoutingRulesManager from '@/components/notifications/routing/RoutingRulesManager';
-import ScheduleBasedRules from '@/components/notifications/routing/ScheduleBasedRules';
+import CustomScheduleBasedRules from '@/components/notifications/routing/CustomScheduleBasedRules';
 import CustomRecipientMappingConfig from '@/components/notifications/routing/CustomRecipientMappingConfig';
 import RuleConditionBuilder from '@/components/notifications/routing/RuleConditionBuilder';
 
@@ -62,7 +62,7 @@ const NotificationRoutingRules = () => {
           </TabsContent>
           
           <TabsContent value="schedules">
-            <ScheduleBasedRules />
+            <CustomScheduleBasedRules />
           </TabsContent>
         </Tabs>
       </div>
