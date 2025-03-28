@@ -59,3 +59,25 @@ export interface KnownErrorResolvedEvent {
   fixedInVersion?: string;
   relatedChangeId?: string;
 }
+
+/**
+ * Common interface for known error event data
+ */
+export interface KnownErrorEventData {
+  id: string;
+  knownErrorId: string;
+  title: string;
+  description?: string;
+  status?: 'active' | 'resolved';
+  severity?: string;
+  category?: string;
+  workaround?: string;
+  permanentFix?: string;
+  scheduledFixDate?: string;
+  resolution?: string;
+  problemId?: string;
+  relatedIncidents?: string[];
+  affectedServices?: string[];
+  updatedFields?: string[];
+  tenantId?: string;
+}
