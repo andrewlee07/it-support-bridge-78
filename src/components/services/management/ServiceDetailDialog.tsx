@@ -75,189 +75,152 @@ const ServiceDetailDialog: React.FC<ServiceDetailDialogProps> = ({
   };
 
   return (
-    <Dialog open={!!service} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={!!service} onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center">
-            <DialogTitle>Service: {service.name}</DialogTitle>
-            {getServiceTypeLabel()}
+          <div className="flex items-center justify-between">
+            <DialogTitle className="flex items-center">
+              Service: {service.name}
+              {getServiceTypeLabel()}
+            </DialogTitle>
           </div>
           <DialogDescription>
-            Manage service details, relationships, and client contracts
+            Service ID: {service.id} | Category: {service.category.name}
           </DialogDescription>
         </DialogHeader>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="details">Details</TabsTrigger>
+
+        <Tabs defaultValue="details" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="details">Service Details</TabsTrigger>
             <TabsTrigger value="relationships">Relationships</TabsTrigger>
-            {serviceWithRelationships?.serviceType === 'business' && (
-              <TabsTrigger value="contracts">Client Contracts</TabsTrigger>
-            )}
+            <TabsTrigger value="support">Support</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="details">
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium">
-                  Service Name
-                </label>
-                <Input id="name" defaultValue={service.name} 
-                  disabled={!canConfigureCatalog} />
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="category" className="text-sm font-medium">
-                  Category
-                </label>
-                <Select disabled={!canConfigureCatalog} defaultValue={service.categoryId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories?.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="description" className="text-sm font-medium">
-                  Description
-                </label>
+          <TabsContent value="details" className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <h3 className="text-lg font-medium">Description</h3>
                 <Textarea 
-                  id="description" 
+                  readOnly={!canConfigureCatalog}
+                  className="mt-2"
+                  rows={4}
                   defaultValue={service.description}
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
               
-              <div className="space-y-2">
-                <label htmlFor="status" className="text-sm font-medium">
-                  Status
-                </label>
-                <Select defaultValue={service.status}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="maintenance">Maintenance</SelectItem>
-                    <SelectItem value="deprecated">Deprecated</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-1">Status</h3>
+                  <Select disabled={!canConfigureCatalog} defaultValue={service.status}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="maintenance">Maintenance</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="deprecated">Deprecated</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium mb-1">Category</h3>
+                  <Select disabled={!canConfigureCatalog} defaultValue={service.categoryId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <label htmlFor="serviceType" className="text-sm font-medium">
-                  Service Type
-                </label>
-                <Select 
-                  defaultValue={serviceWithRelationships?.serviceType || 'technical'}
-                  disabled={!canConfigureCatalog}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select service type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="technical">Technical Service</SelectItem>
-                    <SelectItem value="business">Business Service</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div>
+                <h3 className="text-sm font-medium mb-1">Documentation URL</h3>
+                <Input 
+                  readOnly={!canConfigureCatalog}
+                  defaultValue={service.documentationUrl || ''}
+                  placeholder="https://docs.example.com/service"
+                />
               </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="supportContact" className="text-sm font-medium">
-                  Support Contact
-                </label>
-                <Select defaultValue={service.supportContactId || "none"}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select support contact" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="user-1">John Doe</SelectItem>
-                    <SelectItem value="user-2">Jane Smith</SelectItem>
-                    <SelectItem value="user-4">Morgan Lee</SelectItem>
-                  </SelectContent>
-                </Select>
+            </div>
+            
+            {canConfigureCatalog && (
+              <div className="flex justify-end">
+                <Button onClick={handleUpdateService} disabled={isUpdating}>
+                  {isUpdating ? 'Updating...' : 'Update Service'}
+                </Button>
               </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="serviceOwner" className="text-sm font-medium">
-                  Service Owner
-                </label>
-                <Select defaultValue={service.serviceOwnerId || "none"}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select service owner" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="user-1">John Doe</SelectItem>
-                    <SelectItem value="user-5">Casey Wilson</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="supportHours" className="text-sm font-medium">
-                  Support Hours
-                </label>
-                <Select defaultValue={service.supportHours || "not-specified"}>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="relationships" className="space-y-4 pt-4">
+            {serviceWithRelationships && (
+              <ServiceRelationshipManager 
+                service={serviceWithRelationships}
+                availableServices={availableServices}
+                canEdit={canConfigureCatalog}
+                onUpdateRelationships={handleUpdateRelationships}
+              />
+            )}
+          </TabsContent>
+          
+          <TabsContent value="support" className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-sm font-medium mb-1">Support Hours</h3>
+                <Select disabled={!canConfigureCatalog} defaultValue={service.supportHours}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select support hours" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="not-specified">Not specified</SelectItem>
                     <SelectItem value="Business Hours (9am-5pm)">Business Hours (9am-5pm)</SelectItem>
                     <SelectItem value="Extended Hours (8am-8pm)">Extended Hours (8am-8pm)</SelectItem>
                     <SelectItem value="24/7 Support">24/7 Support</SelectItem>
-                    <SelectItem value="Limited Support">Limited Support</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div>
+                <h3 className="text-sm font-medium mb-1">Support Team</h3>
+                <Input 
+                  readOnly={!canConfigureCatalog}
+                  defaultValue={service.supportTeamId}
+                />
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-medium mb-1">Support Contact</h3>
+                <Input 
+                  readOnly={!canConfigureCatalog}
+                  defaultValue={service.supportContactId}
+                />
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-medium mb-1">Service Owner</h3>
+                <Input 
+                  readOnly={!canConfigureCatalog}
+                  defaultValue={service.serviceOwnerId}
+                />
+              </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="relationships">
-            {serviceWithRelationships ? (
-              <ServiceRelationshipManager 
-                service={serviceWithRelationships}
-                onUpdateRelationships={handleUpdateRelationships}
-                availableServices={availableServices.filter(s => s.id !== service.id)}
-              />
-            ) : (
-              <div className="text-center p-4">
-                <p className="text-muted-foreground">Loading relationships...</p>
+            
+            {canConfigureCatalog && (
+              <div className="flex justify-end">
+                <Button onClick={handleUpdateService} disabled={isUpdating}>
+                  {isUpdating ? 'Updating...' : 'Update Support Info'}
+                </Button>
               </div>
             )}
           </TabsContent>
-          
-          <TabsContent value="contracts">
-            {serviceWithRelationships?.serviceType === 'business' ? (
-              <div className="py-4">
-                <h3 className="text-lg font-medium mb-2">Client Contracts</h3>
-                {/* This would normally display contracts associated with this business service */}
-                <p className="text-muted-foreground">
-                  Manage client contracts from the Contracts tab in Service Catalog Management.
-                </p>
-              </div>
-            ) : null}
-          </TabsContent>
         </Tabs>
-        
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
-          <Button onClick={handleUpdateService} disabled={isUpdating}>
-            {isUpdating ? 'Updating...' : 'Save Changes'}
-          </Button>
-        </div>
       </DialogContent>
     </Dialog>
   );
