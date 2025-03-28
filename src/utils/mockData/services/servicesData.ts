@@ -1,489 +1,205 @@
 
-import { ServiceWithCategory, Service, ServiceType, ServiceRelationship } from '@/utils/types/service';
-import { serviceCategories } from './categories';
+import { 
+  Service, 
+  ServiceWithCategory, 
+  ServiceCategory, 
+  ServiceRelationship,
+  ClientContract,
+  ServiceWithRelationships
+} from '@/utils/types/service';
+import { getCategoryById } from '../serviceCategories';
 
-// Mock services
-export const services: ServiceWithCategory[] = [
+// Mock service data
+const mockServices: Service[] = [
   {
     id: 'srv-1',
-    name: 'Laptop Request',
-    description: 'Request a new or replacement laptop',
-    categoryId: 'cat-1',
+    name: 'Email Service',
+    description: 'Corporate email service',
+    categoryId: 'CAT-001',
     status: 'active',
-    serviceType: 'technical',
-    owner: 'user-1',
-    price: 'Medium',
-    approvalRequired: true,
-    category: serviceCategories[0],
+    serviceType: 'technical', // Added serviceType
+    supportContactId: 'usr-1',
     supportTeamId: 'team-1',
     supportHours: 'Business Hours (9am-5pm)',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    businessServiceIds: ['srv-8']
+    serviceOwnerId: 'usr-2',
+    documentationUrl: 'https://docs.example.com/email',
+    createdAt: new Date(2023, 0, 15),
+    updatedAt: new Date(2023, 1, 20)
   },
   {
     id: 'srv-2',
-    name: 'Software Installation',
-    description: 'Request installation of approved software',
-    categoryId: 'cat-2',
+    name: 'Authentication Service',
+    description: 'User authentication and authorization',
+    categoryId: 'CAT-001',
     status: 'active',
-    serviceType: 'technical',
-    owner: 'user-2',
-    price: 'Low',
-    approvalRequired: false,
-    category: serviceCategories[1],
+    serviceType: 'technical', // Added serviceType
+    supportContactId: 'usr-3',
     supportTeamId: 'team-1',
-    supportHours: 'Business Hours (9am-5pm)',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    businessServiceIds: ['srv-8', 'srv-9']
+    supportHours: '24/7 Support',
+    serviceOwnerId: 'usr-4',
+    documentationUrl: 'https://docs.example.com/auth',
+    createdAt: new Date(2023, 0, 10),
+    updatedAt: new Date(2023, 2, 5)
   },
   {
     id: 'srv-3',
-    name: 'VPN Access',
-    description: 'Request VPN access for remote work',
-    categoryId: 'cat-3',
+    name: 'Customer Relationship Management',
+    description: 'Customer management system',
+    categoryId: 'CAT-002',
     status: 'active',
-    serviceType: 'technical',
-    owner: 'user-1',
-    price: 'Low',
-    approvalRequired: true,
-    category: serviceCategories[2],
+    serviceType: 'business', // Added serviceType
+    supportContactId: 'usr-5',
     supportTeamId: 'team-2',
     supportHours: '24/7 Support',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    businessServiceIds: ['srv-8']
+    serviceOwnerId: 'usr-6',
+    documentationUrl: 'https://docs.example.com/crm',
+    createdAt: new Date(2023, 1, 1),
+    updatedAt: new Date(2023, 3, 12)
   },
   {
     id: 'srv-4',
-    name: 'Password Reset',
-    description: 'Reset password for corporate accounts',
-    categoryId: 'cat-4',
+    name: 'Sales Pipeline',
+    description: 'Sales pipeline management',
+    categoryId: 'CAT-002',
     status: 'active',
-    serviceType: 'technical',
-    owner: 'user-3',
-    price: 'Free',
-    approvalRequired: false,
-    category: serviceCategories[3],
-    supportTeamId: 'team-3',
-    supportHours: '24/7 Support',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    businessServiceIds: ['srv-8', 'srv-10']
+    serviceType: 'business', // Added serviceType
+    supportContactId: 'usr-7',
+    supportTeamId: 'team-2',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'usr-8',
+    documentationUrl: 'https://docs.example.com/sales',
+    createdAt: new Date(2023, 1, 15),
+    updatedAt: new Date(2023, 3, 20)
   },
   {
     id: 'srv-5',
-    name: 'Technical Support',
-    description: 'Get technical assistance for IT issues',
-    categoryId: 'cat-5',
+    name: 'Office Productivity Suite',
+    description: 'Document and spreadsheet applications',
+    categoryId: 'CAT-003',
     status: 'active',
-    serviceType: 'technical',
-    owner: 'user-2',
-    price: 'Free',
-    approvalRequired: false,
-    category: serviceCategories[4],
-    supportTeamId: 'team-1',
-    supportHours: 'Business Hours (9am-5pm)',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    businessServiceIds: ['srv-8', 'srv-9', 'srv-10']
+    serviceType: 'technical', // Added serviceType
+    supportContactId: 'usr-9',
+    supportTeamId: 'team-3',
+    supportHours: 'Extended Hours (8am-8pm)',
+    serviceOwnerId: 'usr-10',
+    documentationUrl: 'https://docs.example.com/office',
+    createdAt: new Date(2023, 2, 1),
+    updatedAt: new Date(2023, 4, 10)
   },
   {
     id: 'srv-6',
-    name: 'Monitor Request',
-    description: 'Request an additional monitor',
-    categoryId: 'cat-1',
+    name: 'VoIP Phone System',
+    description: 'Voice over IP telephone system',
+    categoryId: 'CAT-004',
     status: 'active',
-    serviceType: 'technical',
-    owner: 'user-1',
-    price: 'Medium',
-    approvalRequired: true,
-    category: serviceCategories[0],
-    supportTeamId: 'team-1',
-    supportHours: 'Business Hours (9am-5pm)',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    parentServiceId: 'srv-1',
-    businessServiceIds: ['srv-8']
-  },
-  {
-    id: 'srv-7',
-    name: 'Software License',
-    description: 'Request a license for software',
-    categoryId: 'cat-2',
-    status: 'inactive',
-    serviceType: 'technical',
-    owner: 'user-2',
-    price: 'High',
-    approvalRequired: true,
-    category: serviceCategories[1],
-    supportTeamId: 'team-1',
-    supportHours: 'Business Hours (9am-5pm)',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    parentServiceId: 'srv-2',
-    businessServiceIds: ['srv-9']
-  },
-  // Business Services
-  {
-    id: 'srv-8',
-    name: 'Contact Centre',
-    description: 'End-to-end customer contact services',
-    categoryId: 'cat-5',
-    status: 'active',
-    serviceType: 'business',
-    owner: 'user-3',
-    price: 'High',
-    approvalRequired: true,
-    category: serviceCategories[4],
+    serviceType: 'technical', // Added serviceType
+    supportContactId: 'usr-11',
     supportTeamId: 'team-3',
     supportHours: '24/7 Support',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    technicalServiceIds: ['srv-1', 'srv-2', 'srv-3', 'srv-4', 'srv-5', 'srv-6']
-  },
-  {
-    id: 'srv-9',
-    name: 'IT Development',
-    description: 'Software development and maintenance services',
-    categoryId: 'cat-2',
-    status: 'active',
-    serviceType: 'business',
-    owner: 'user-2',
-    price: 'High',
-    approvalRequired: true,
-    category: serviceCategories[1],
-    supportTeamId: 'team-1',
-    supportHours: 'Business Hours (9am-5pm)',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    technicalServiceIds: ['srv-2', 'srv-5', 'srv-7']
-  },
-  {
-    id: 'srv-10',
-    name: 'Payroll Processing',
-    description: 'End-to-end payroll processing services',
-    categoryId: 'cat-4',
-    status: 'active',
-    serviceType: 'business',
-    owner: 'user-1',
-    price: 'Medium',
-    approvalRequired: true,
-    category: serviceCategories[3],
-    supportTeamId: 'team-2',
-    supportHours: 'Business Hours (9am-5pm)',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    technicalServiceIds: ['srv-4', 'srv-5']
+    serviceOwnerId: 'usr-12',
+    documentationUrl: 'https://docs.example.com/voip',
+    createdAt: new Date(2023, 2, 15),
+    updatedAt: new Date(2023, 4, 20)
   }
 ];
 
-// Mock service relationships
-export const serviceRelationships: ServiceRelationship[] = [
-  // Parent-child relationships
-  {
-    id: 'rel-1',
-    sourceServiceId: 'srv-6', // Monitor Request (Child)
-    targetServiceId: 'srv-1', // Laptop Request (Parent)
-    relationshipType: 'parent-child',
-    strength: 'strong'
-  },
-  {
-    id: 'rel-2',
-    sourceServiceId: 'srv-7', // Software License (Child)
-    targetServiceId: 'srv-2', // Software Installation (Parent)
-    relationshipType: 'parent-child',
-    strength: 'strong'
-  },
-  // Technical to business service relationships
-  {
-    id: 'rel-3',
-    sourceServiceId: 'srv-1', // Laptop Request (Technical)
-    targetServiceId: 'srv-8', // Contact Centre (Business)
-    relationshipType: 'technical-business',
-    strength: 'medium'
-  },
-  {
-    id: 'rel-4',
-    sourceServiceId: 'srv-2', // Software Installation (Technical)
-    targetServiceId: 'srv-8', // Contact Centre (Business)
-    relationshipType: 'technical-business',
-    strength: 'medium'
-  },
-  {
-    id: 'rel-5',
-    sourceServiceId: 'srv-2', // Software Installation (Technical)
-    targetServiceId: 'srv-9', // IT Development (Business)
-    relationshipType: 'technical-business',
-    strength: 'strong'
-  },
-  {
-    id: 'rel-6',
-    sourceServiceId: 'srv-3', // VPN Access (Technical)
-    targetServiceId: 'srv-8', // Contact Centre (Business)
-    relationshipType: 'technical-business',
-    strength: 'weak'
-  },
-  {
-    id: 'rel-7',
-    sourceServiceId: 'srv-4', // Password Reset (Technical)
-    targetServiceId: 'srv-8', // Contact Centre (Business)
-    relationshipType: 'technical-business',
-    strength: 'medium'
-  },
-  {
-    id: 'rel-8',
-    sourceServiceId: 'srv-4', // Password Reset (Technical)
-    targetServiceId: 'srv-10', // Payroll Processing (Business)
-    relationshipType: 'technical-business',
-    strength: 'medium'
-  },
-  {
-    id: 'rel-9',
-    sourceServiceId: 'srv-5', // Technical Support (Technical)
-    targetServiceId: 'srv-8', // Contact Centre (Business)
-    relationshipType: 'technical-business',
-    strength: 'strong'
-  },
-  {
-    id: 'rel-10',
-    sourceServiceId: 'srv-5', // Technical Support (Technical)
-    targetServiceId: 'srv-9', // IT Development (Business)
-    relationshipType: 'technical-business',
-    strength: 'medium'
-  },
-  {
-    id: 'rel-11',
-    sourceServiceId: 'srv-5', // Technical Support (Technical)
-    targetServiceId: 'srv-10', // Payroll Processing (Business)
-    relationshipType: 'technical-business',
-    strength: 'medium'
-  },
-  {
-    id: 'rel-12',
-    sourceServiceId: 'srv-6', // Monitor Request (Technical)
-    targetServiceId: 'srv-8', // Contact Centre (Business)
-    relationshipType: 'technical-business',
-    strength: 'weak'
-  },
-  {
-    id: 'rel-13',
-    sourceServiceId: 'srv-7', // Software License (Technical)
-    targetServiceId: 'srv-9', // IT Development (Business)
-    relationshipType: 'technical-business',
-    strength: 'strong'
-  }
-];
-
-// Mock client contracts
-export const clientContracts = [
+// Sample client contracts
+const mockClientContracts: ClientContract[] = [
   {
     id: 'contract-1',
-    name: 'Lloyds Contact Centre Support',
+    name: 'Lloyds Support Agreement',
     clientName: 'Lloyds Bank',
-    description: 'Contact centre support for Lloyds Bank customer inquiries',
+    description: 'IT support services for Lloyds Bank corporate offices',
     startDate: new Date(2023, 0, 1),
-    endDate: new Date(2025, 11, 31),
-    status: 'active',
-    businessServiceIds: ['srv-8'], // Contact Centre
-    createdAt: new Date(),
-    updatedAt: new Date()
+    endDate: new Date(2023, 11, 31),
+    status: 'active', // Using the correct status type
+    businessServiceIds: ['srv-3', 'srv-4'],
+    createdAt: new Date(2022, 11, 15),
+    updatedAt: new Date(2022, 11, 15)
   },
   {
     id: 'contract-2',
-    name: 'Home Office IT Support',
-    clientName: 'Home Office',
-    description: 'Comprehensive IT support for Home Office operations',
-    startDate: new Date(2023, 3, 1),
-    endDate: new Date(2026, 2, 31),
-    status: 'active',
-    businessServiceIds: ['srv-8', 'srv-9'], // Contact Centre and IT Development
-    createdAt: new Date(),
-    updatedAt: new Date()
+    name: 'Home Office IT Services',
+    clientName: 'UK Home Office',
+    description: 'Comprehensive IT services for Home Office locations',
+    startDate: new Date(2023, 2, 1),
+    endDate: new Date(2024, 1, 28),
+    status: 'active', // Using the correct status type
+    businessServiceIds: ['srv-3'],
+    createdAt: new Date(2023, 1, 10),
+    updatedAt: new Date(2023, 1, 10)
   },
   {
     id: 'contract-3',
-    name: 'ABC Corp Payroll Services',
-    clientName: 'ABC Corporation',
-    description: 'Payroll processing services for ABC Corporation',
-    startDate: new Date(2023, 6, 1),
-    endDate: new Date(2025, 5, 30),
-    status: 'active',
-    businessServiceIds: ['srv-10'], // Payroll Processing
-    createdAt: new Date(),
-    updatedAt: new Date()
+    name: 'NHS Digital Support',
+    clientName: 'NHS Digital',
+    description: 'Technical support for NHS Digital platforms',
+    startDate: new Date(2022, 6, 1),
+    endDate: new Date(2023, 5, 30),
+    status: 'pending', // Using the correct status type
+    businessServiceIds: ['srv-4'],
+    createdAt: new Date(2022, 5, 15),
+    updatedAt: new Date(2022, 5, 15)
   }
 ];
 
-// Helper functions
-export const getAllServices = (): ServiceWithCategory[] => {
-  return [...services];
+// Export functions to interact with the mock data
+export const getAllServices = (): Service[] => {
+  return [...mockServices];
 };
 
-export const getTechnicalServices = (): ServiceWithCategory[] => {
-  return services.filter(service => service.serviceType === 'technical');
+export const getServiceById = (id: string): Service | undefined => {
+  return mockServices.find(service => service.id === id);
+};
+
+export const getServicesWithCategories = (): ServiceWithCategory[] => {
+  return mockServices.map(service => {
+    const category = getCategoryById(service.categoryId);
+    return {
+      ...service,
+      category: category || { id: 'unknown', name: 'Unknown Category' }
+    };
+  });
 };
 
 export const getBusinessServices = (): ServiceWithCategory[] => {
-  return services.filter(service => service.serviceType === 'business');
+  return getServicesWithCategories().filter(service => service.serviceType === 'business');
 };
 
-export const getServiceById = (id: string): ServiceWithCategory | undefined => {
-  return services.find(service => service.id === id);
+export const getTechnicalServices = (): ServiceWithCategory[] => {
+  return getServicesWithCategories().filter(service => service.serviceType === 'technical');
 };
 
-export const getServicesByCategory = (): Record<string, ServiceWithCategory[]> => {
-  const result: Record<string, ServiceWithCategory[]> = {};
-  
-  serviceCategories.forEach(category => {
-    const categoryServices = services.filter(service => service.categoryId === category.id);
-    if (categoryServices.length > 0) {
-      result[category.name] = categoryServices;
-    }
-  });
-  
-  return result;
+// Client contract functions
+export const getClientContracts = (): ClientContract[] => {
+  return [...mockClientContracts];
 };
 
-export const getServiceRelationships = (): ServiceRelationship[] => {
-  return [...serviceRelationships];
+export const getClientContractById = (id: string): ClientContract | undefined => {
+  return mockClientContracts.find(contract => contract.id === id);
 };
 
-export const getServiceWithRelationships = (serviceId: string) => {
-  const service = getServiceById(serviceId);
-  if (!service) return undefined;
-  
-  const relationships = serviceRelationships.filter(rel => 
-    rel.sourceServiceId === serviceId || rel.targetServiceId === serviceId
-  );
-  
-  // Get child services
-  const childRelationships = serviceRelationships.filter(rel => 
-    rel.targetServiceId === serviceId && rel.relationshipType === 'parent-child'
-  );
-  
-  const children = childRelationships.map(rel => 
-    getServiceById(rel.sourceServiceId)
-  ).filter(Boolean) as ServiceWithCategory[];
-  
-  // Get parent service
-  const parentRelationship = serviceRelationships.find(rel => 
-    rel.sourceServiceId === serviceId && rel.relationshipType === 'parent-child'
-  );
-  
-  const parentService = parentRelationship ? 
-    getServiceById(parentRelationship.targetServiceId) : undefined;
-  
-  // Get technical or business services based on service type
-  let technicalServices: ServiceWithCategory[] = [];
-  let businessServices: ServiceWithCategory[] = [];
-  
-  if (service.serviceType === 'business') {
-    // Get technical services that support this business service
-    const techRelationships = serviceRelationships.filter(rel => 
-      rel.targetServiceId === serviceId && rel.relationshipType === 'technical-business'
-    );
-    
-    technicalServices = techRelationships.map(rel => 
-      getServiceById(rel.sourceServiceId)
-    ).filter(Boolean) as ServiceWithCategory[];
-  } else {
-    // Get business services supported by this technical service
-    const busRelationships = serviceRelationships.filter(rel => 
-      rel.sourceServiceId === serviceId && rel.relationshipType === 'technical-business'
-    );
-    
-    businessServices = busRelationships.map(rel => 
-      getServiceById(rel.targetServiceId)
-    ).filter(Boolean) as ServiceWithCategory[];
-  }
-  
-  return {
-    ...service,
-    relationships,
-    children,
-    parentService,
-    technicalServices,
-    businessServices
-  };
-};
-
-export const addService = (service: Service): ServiceWithCategory => {
-  const category = serviceCategories.find(cat => cat.id === service.categoryId);
-  
-  if (!category) {
-    throw new Error(`Category with ID ${service.categoryId} not found`);
-  }
-  
-  const newService: ServiceWithCategory = {
-    ...service,
-    id: `srv-${services.length + 1}`,
-    category,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  };
-  
-  services.push(newService);
-  return newService;
-};
-
-export const updateService = (updatedService: Service): ServiceWithCategory => {
-  const index = services.findIndex(service => service.id === updatedService.id);
-  
-  if (index === -1) {
-    throw new Error(`Service with ID ${updatedService.id} not found`);
-  }
-  
-  const category = serviceCategories.find(cat => cat.id === updatedService.categoryId);
-  
-  if (!category) {
-    throw new Error(`Category with ID ${updatedService.categoryId} not found`);
-  }
-  
-  const updatedServiceWithCategory: ServiceWithCategory = {
-    ...updatedService,
-    category,
-    updatedAt: new Date()
-  };
-  
-  services[index] = updatedServiceWithCategory;
-  return updatedServiceWithCategory;
-};
-
-export const createServiceRelationship = (relationship: Omit<ServiceRelationship, 'id'>): ServiceRelationship => {
-  const newRelationship: ServiceRelationship = {
-    ...relationship,
-    id: `rel-${serviceRelationships.length + 1}`
-  };
-  
-  serviceRelationships.push(newRelationship);
-  return newRelationship;
-};
-
-export const removeServiceRelationship = (id: string): boolean => {
-  const index = serviceRelationships.findIndex(rel => rel.id === id);
-  if (index === -1) return false;
-  
-  serviceRelationships.splice(index, 1);
-  return true;
-};
-
-export const getClientContracts = () => {
-  return [...clientContracts];
-};
-
-export const getContractsForBusinessService = (serviceId: string) => {
-  return clientContracts.filter(contract => 
-    contract.businessServiceIds.includes(serviceId)
-  );
-};
-
-export const getBusinessServicesForContract = (contractId: string) => {
-  const contract = clientContracts.find(c => c.id === contractId);
+export const getBusinessServicesForContract = (contractId: string): ServiceWithCategory[] => {
+  const contract = getClientContractById(contractId);
   if (!contract) return [];
   
-  return contract.businessServiceIds.map(id => 
-    getServiceById(id)
-  ).filter(Boolean) as ServiceWithCategory[];
+  return getBusinessServices().filter(service => 
+    contract.businessServiceIds.includes(service.id)
+  );
+};
+
+// Function to get service relationships
+export const getServiceWithRelationships = (serviceId: string): ServiceWithRelationships | null => {
+  const service = getServicesWithCategories().find(s => s.id === serviceId);
+  if (!service) return null;
+  
+  // In a real app, you would fetch actual relationships from an API
+  // Here we're just returning a mock response
+  return {
+    ...service,
+    relationships: [],
+    children: [],
+    technicalServices: service.serviceType === 'business' ? getTechnicalServices().slice(0, 2) : [],
+    businessServices: service.serviceType === 'technical' ? getBusinessServices().slice(0, 2) : []
+  };
 };

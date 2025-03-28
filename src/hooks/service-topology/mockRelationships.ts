@@ -30,7 +30,7 @@ export const mockServiceRelationships: ServiceRelationship[] = [
     id: 'rel-4',
     sourceServiceId: 'srv-5',
     targetServiceId: 'srv-4',
-    relationshipType: 'component-of',
+    relationshipType: 'related-to',
     strength: 'strong'
   },
   {
