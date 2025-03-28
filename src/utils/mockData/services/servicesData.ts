@@ -1,266 +1,252 @@
 
-import { 
-  Service, 
-  ServiceWithCategory, 
-  ServiceCategory, 
-  ServiceRelationship,
-  ClientContract,
-  ServiceWithRelationships
-} from '@/utils/types/service';
-import { getCategoryById } from '../serviceCategories';
+import { Service, ServiceWithCategory } from '@/utils/types/service';
+import { serviceCategories } from './categories';
+import { teams } from './teams';
+import { mockServiceTicketCounts } from './analytics';
+import { mockServiceRelationships } from './types';
+import { v4 as uuidv4 } from 'uuid';
 
-// Mock service data
-const mockServices: Service[] = [
+// Technical services
+const technicalServices: Service[] = [
   {
-    id: 'srv-1',
-    name: 'Email Service',
-    description: 'Corporate email service',
-    categoryId: 'CAT-001',
+    id: 'service-1',
+    name: 'Email System',
+    description: 'Corporate email services including Exchange and webmail',
+    categoryId: 'cat-2',
     status: 'active',
-    serviceType: 'technical', // Added serviceType
-    supportContactId: 'usr-1',
+    supportContactId: 'user-3',
     supportTeamId: 'team-1',
     supportHours: 'Business Hours (9am-5pm)',
-    serviceOwnerId: 'usr-2',
-    documentationUrl: 'https://docs.example.com/email',
-    createdAt: new Date(2023, 0, 15),
-    updatedAt: new Date(2023, 1, 20)
-  },
-  {
-    id: 'srv-2',
-    name: 'Authentication Service',
-    description: 'User authentication and authorization',
-    categoryId: 'CAT-001',
-    status: 'active',
-    serviceType: 'technical', // Added serviceType
-    supportContactId: 'usr-3',
-    supportTeamId: 'team-1',
-    supportHours: '24/7 Support',
-    serviceOwnerId: 'usr-4',
-    documentationUrl: 'https://docs.example.com/auth',
-    createdAt: new Date(2023, 0, 10),
-    updatedAt: new Date(2023, 2, 5)
-  },
-  {
-    id: 'srv-3',
-    name: 'Customer Relationship Management',
-    description: 'Customer management system',
-    categoryId: 'CAT-002',
-    status: 'active',
-    serviceType: 'business', // Added serviceType
-    supportContactId: 'usr-5',
-    supportTeamId: 'team-2',
-    supportHours: '24/7 Support',
-    serviceOwnerId: 'usr-6',
-    documentationUrl: 'https://docs.example.com/crm',
-    createdAt: new Date(2023, 1, 1),
-    updatedAt: new Date(2023, 3, 12)
-  },
-  {
-    id: 'srv-4',
-    name: 'Sales Pipeline',
-    description: 'Sales pipeline management',
-    categoryId: 'CAT-002',
-    status: 'active',
-    serviceType: 'business', // Added serviceType
-    supportContactId: 'usr-7',
-    supportTeamId: 'team-2',
-    supportHours: 'Business Hours (9am-5pm)',
-    serviceOwnerId: 'usr-8',
-    documentationUrl: 'https://docs.example.com/sales',
-    createdAt: new Date(2023, 1, 15),
-    updatedAt: new Date(2023, 3, 20)
-  },
-  {
-    id: 'srv-5',
-    name: 'Office Productivity Suite',
-    description: 'Document and spreadsheet applications',
-    categoryId: 'CAT-003',
-    status: 'active',
-    serviceType: 'technical', // Added serviceType
-    supportContactId: 'usr-9',
-    supportTeamId: 'team-3',
-    supportHours: 'Extended Hours (8am-8pm)',
-    serviceOwnerId: 'usr-10',
-    documentationUrl: 'https://docs.example.com/office',
-    createdAt: new Date(2023, 2, 1),
-    updatedAt: new Date(2023, 4, 10)
-  },
-  {
-    id: 'srv-6',
-    name: 'VoIP Phone System',
-    description: 'Voice over IP telephone system',
-    categoryId: 'CAT-004',
-    status: 'active',
-    serviceType: 'technical', // Added serviceType
-    supportContactId: 'usr-11',
-    supportTeamId: 'team-3',
-    supportHours: '24/7 Support',
-    serviceOwnerId: 'usr-12',
-    documentationUrl: 'https://docs.example.com/voip',
-    createdAt: new Date(2023, 2, 15),
-    updatedAt: new Date(2023, 4, 20)
-  },
-  {
-    id: 'srv-7',
-    name: 'Network Infrastructure',
-    description: 'Corporate network infrastructure',
-    categoryId: 'CAT-001',
-    status: 'active',
+    serviceOwnerId: 'user-2',
     serviceType: 'technical',
-    supportContactId: 'usr-1',
-    supportTeamId: 'team-1',
-    supportHours: '24/7 Support',
-    serviceOwnerId: 'usr-2',
-    documentationUrl: 'https://docs.example.com/network',
-    createdAt: new Date(2023, 3, 1),
-    updatedAt: new Date(2023, 4, 15)
+    documentationUrl: 'https://docs.example.com/email',
+    createdAt: new Date('2023-01-10'),
+    updatedAt: new Date('2023-06-15')
   },
   {
-    id: 'srv-8',
-    name: 'Contact Centre',
-    description: 'Customer contact centre operations',
-    categoryId: 'CAT-005',
+    id: 'service-2',
+    name: 'Network Infrastructure',
+    description: 'Corporate network including WiFi, VPN, and internet connectivity',
+    categoryId: 'cat-3',
     status: 'active',
-    serviceType: 'business',
-    supportContactId: 'usr-5',
+    supportContactId: 'user-4',
+    supportTeamId: 'team-2',
+    supportHours: '24/7 Support',
+    serviceOwnerId: 'user-4',
+    serviceType: 'technical',
+    documentationUrl: 'https://docs.example.com/network',
+    createdAt: new Date('2023-01-15'),
+    updatedAt: new Date('2023-07-20')
+  },
+  {
+    id: 'service-3',
+    name: 'Security Services',
+    description: 'Security tools including antivirus, firewall, and security compliance',
+    categoryId: 'cat-4',
+    status: 'active',
+    supportContactId: 'user-5',
+    supportTeamId: 'team-3',
+    supportHours: '24/7 Support',
+    serviceOwnerId: 'user-5',
+    serviceType: 'technical',
+    documentationUrl: 'https://docs.example.com/security',
+    createdAt: new Date('2023-02-01'),
+    updatedAt: new Date('2023-08-10')
+  },
+  {
+    id: 'service-4',
+    name: 'Workstation Support',
+    description: 'Desktop and laptop support for corporate devices',
+    categoryId: 'cat-1',
+    status: 'active',
+    supportContactId: 'user-6',
+    supportTeamId: 'team-1',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'user-2',
+    serviceType: 'technical',
+    documentationUrl: 'https://docs.example.com/workstations',
+    createdAt: new Date('2023-02-15'),
+    updatedAt: new Date('2023-07-01')
+  },
+  {
+    id: 'service-5',
+    name: 'Data Backup & Recovery',
+    description: 'Enterprise backup solution for servers and critical workstations',
+    categoryId: 'cat-2',
+    status: 'active',
+    supportContactId: 'user-3',
     supportTeamId: 'team-2',
     supportHours: 'Extended Hours (8am-8pm)',
-    serviceOwnerId: 'usr-6',
-    documentationUrl: 'https://docs.example.com/contact-centre',
-    createdAt: new Date(2023, 3, 10),
-    updatedAt: new Date(2023, 5, 1)
+    serviceOwnerId: 'user-4',
+    serviceType: 'technical',
+    documentationUrl: 'https://docs.example.com/backup',
+    createdAt: new Date('2023-03-01'),
+    updatedAt: new Date('2023-09-05')
+  },
+  {
+    id: 'service-6',
+    name: 'Cloud Infrastructure',
+    description: 'AWS and Azure cloud resources and management',
+    categoryId: 'cat-2',
+    status: 'active',
+    supportContactId: 'user-4',
+    supportTeamId: 'team-3',
+    supportHours: '24/7 Support',
+    serviceOwnerId: 'user-5',
+    serviceType: 'technical',
+    documentationUrl: 'https://docs.example.com/cloud',
+    createdAt: new Date('2023-03-15'),
+    updatedAt: new Date('2023-10-01')
   }
 ];
 
-// Sample client contracts
-const mockClientContracts: ClientContract[] = [
+// Business services
+const businessServices: Service[] = [
   {
-    id: 'contract-1',
-    name: 'Lloyds Support Agreement',
-    clientName: 'Lloyds Bank',
-    description: 'IT support services for Lloyds Bank corporate offices',
-    startDate: new Date(2023, 0, 1),
-    endDate: new Date(2023, 11, 31),
-    status: 'active', // Using the correct status type
-    businessServiceIds: ['srv-3', 'srv-4', 'srv-8'],
-    createdAt: new Date(2022, 11, 15),
-    updatedAt: new Date(2022, 11, 15)
+    id: 'service-7',
+    name: 'HR Technology Platform',
+    description: 'Employee management system, time tracking, and benefits administration',
+    categoryId: 'cat-2',
+    status: 'active',
+    supportContactId: 'user-3',
+    supportTeamId: 'team-1',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'user-2',
+    serviceType: 'business',
+    documentationUrl: 'https://docs.example.com/hr-platform',
+    createdAt: new Date('2023-04-01'),
+    updatedAt: new Date('2023-10-15')
   },
   {
-    id: 'contract-2',
-    name: 'Home Office IT Services',
-    clientName: 'UK Home Office',
-    description: 'Comprehensive IT services for Home Office locations',
-    startDate: new Date(2023, 2, 1),
-    endDate: new Date(2024, 1, 28),
-    status: 'active', // Using the correct status type
-    businessServiceIds: ['srv-3', 'srv-8'],
-    createdAt: new Date(2023, 1, 10),
-    updatedAt: new Date(2023, 1, 10)
+    id: 'service-8',
+    name: 'Financial Systems',
+    description: 'Accounting, payroll, and financial reporting systems',
+    categoryId: 'cat-2',
+    status: 'active',
+    supportContactId: 'user-4',
+    supportTeamId: 'team-2',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'user-4',
+    serviceType: 'business',
+    documentationUrl: 'https://docs.example.com/finance',
+    createdAt: new Date('2023-04-15'),
+    updatedAt: new Date('2023-11-01')
   },
   {
-    id: 'contract-3',
-    name: 'NHS Digital Support',
-    clientName: 'NHS Digital',
-    description: 'Technical support for NHS Digital platforms',
-    startDate: new Date(2022, 6, 1),
-    endDate: new Date(2023, 5, 30),
-    status: 'pending', // Using the correct status type
-    businessServiceIds: ['srv-4'],
-    createdAt: new Date(2022, 5, 15),
-    updatedAt: new Date(2022, 5, 15)
+    id: 'service-9',
+    name: 'Customer Service Platform',
+    description: 'Customer relationship management and support ticketing',
+    categoryId: 'cat-5',
+    status: 'active',
+    supportContactId: 'user-5',
+    supportTeamId: 'team-3',
+    supportHours: 'Extended Hours (8am-8pm)',
+    serviceOwnerId: 'user-5',
+    serviceType: 'business',
+    documentationUrl: 'https://docs.example.com/customer-service',
+    createdAt: new Date('2023-05-01'),
+    updatedAt: new Date('2023-11-15')
+  },
+  {
+    id: 'service-10',
+    name: 'Project Management Tools',
+    description: 'Project tracking, collaboration, and reporting tools',
+    categoryId: 'cat-2',
+    status: 'active',
+    supportContactId: 'user-6',
+    supportTeamId: 'team-1',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'user-2',
+    serviceType: 'business',
+    documentationUrl: 'https://docs.example.com/project-mgmt',
+    createdAt: new Date('2023-05-15'),
+    updatedAt: new Date('2023-12-01')
+  },
+  {
+    id: 'service-11',
+    name: 'Corporate Website',
+    description: 'Public-facing corporate website and content management system',
+    categoryId: 'cat-2',
+    status: 'maintenance',
+    supportContactId: 'user-3',
+    supportTeamId: 'team-2',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'user-4',
+    serviceType: 'business',
+    documentationUrl: 'https://docs.example.com/website',
+    createdAt: new Date('2023-06-01'),
+    updatedAt: new Date('2023-12-15')
+  },
+  {
+    id: 'service-12',
+    name: 'Document Management',
+    description: 'Enterprise document storage, sharing, and collaboration',
+    categoryId: 'cat-2',
+    status: 'active',
+    supportContactId: 'user-4',
+    supportTeamId: 'team-3',
+    supportHours: 'Business Hours (9am-5pm)',
+    serviceOwnerId: 'user-5',
+    serviceType: 'business',
+    documentationUrl: 'https://docs.example.com/document-mgmt',
+    createdAt: new Date('2023-06-15'),
+    updatedAt: new Date('2024-01-01')
   }
 ];
 
-// Export functions to interact with the mock data
+// Combine all services
+const mockServices: Service[] = [...technicalServices, ...businessServices];
+
+// Create services with category information
+const mockServicesWithCategories: ServiceWithCategory[] = mockServices.map(service => {
+  const category = serviceCategories.find(cat => cat.id === service.categoryId) || {
+    id: 'unknown',
+    name: 'Unknown Category',
+    description: 'Unknown',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+  
+  return {
+    ...service,
+    category
+  };
+});
+
+// Services with relationships
+// const mockServicesWithRelationships: ServiceWithRelationships[] = mockServices.map(service => {
+//   return {
+//     ...service,
+//     relationships: getServiceRelationships(service.id)
+//   };
+// });
+
 export const getAllServices = (): Service[] => {
-  return [...mockServices];
+  return [...mockServices]; 
 };
 
 export const getServiceById = (id: string): Service | undefined => {
   return mockServices.find(service => service.id === id);
 };
 
-export const getServicesWithCategories = (): ServiceWithCategory[] => {
-  return mockServices.map(service => {
-    const category = getCategoryById(service.categoryId);
-    return {
-      ...service,
-      category: category || { id: 'unknown', name: 'Unknown Category' }
-    };
+// Function to get services by category
+export const getServicesByCategory = (): Record<string, Service[]> => {
+  const servicesByCategory: Record<string, Service[]> = {};
+  
+  // Initialize with empty arrays for each category
+  serviceCategories.forEach(category => {
+    servicesByCategory[category.name] = [];
   });
+  
+  // Add services to their respective categories
+  mockServices.forEach(service => {
+    const category = serviceCategories.find(cat => cat.id === service.categoryId);
+    if (category) {
+      servicesByCategory[category.name].push(service);
+    }
+  });
+  
+  return servicesByCategory;
 };
 
-export const getBusinessServices = (): ServiceWithCategory[] => {
-  return getServicesWithCategories().filter(service => service.serviceType === 'business');
-};
-
-export const getTechnicalServices = (): ServiceWithCategory[] => {
-  return getServicesWithCategories().filter(service => service.serviceType === 'technical');
-};
-
-// Client contract functions
-export const getClientContracts = (): ClientContract[] => {
-  return [...mockClientContracts];
-};
-
-export const getClientContractById = (id: string): ClientContract | undefined => {
-  return mockClientContracts.find(contract => contract.id === id);
-};
-
-export const getBusinessServicesForContract = (contractId: string): ServiceWithCategory[] => {
-  const contract = getClientContractById(contractId);
-  if (!contract) return [];
-  
-  return getBusinessServices().filter(service => 
-    contract.businessServiceIds.includes(service.id)
-  );
-};
-
-// Function to get service relationships
-export const getServiceWithRelationships = (serviceId: string): ServiceWithRelationships | null => {
-  const service = getServicesWithCategories().find(s => s.id === serviceId);
-  if (!service) return null;
-  
-  // Get relationships from mock data
-  const relationships = getServiceRelationships(serviceId);
-  
-  // Get technical services that support this business service
-  const technicalServices = service.serviceType === 'business' 
-    ? getTechnicalServices().slice(0, 2) 
-    : [];
-  
-  // Get business services that this technical service supports
-  const businessServices = service.serviceType === 'technical' 
-    ? getBusinessServices().slice(0, 2) 
-    : [];
-  
-  // Get child services (for parent/child relationships)
-  const childServices = getServiceRelationships(serviceId)
-    .filter(rel => rel.relationshipType === 'parent-child' && rel.sourceServiceId === serviceId)
-    .map(rel => {
-      const childService = getServicesWithCategories().find(s => s.id === rel.targetServiceId);
-      return childService;
-    })
-    .filter(Boolean) as ServiceWithCategory[];
-  
-  return {
-    ...service,
-    relationships,
-    children: childServices,
-    technicalServices,
-    businessServices
-  };
-};
-
-// Get relationships for a specific service
-export const getServiceRelationships = (serviceId: string): ServiceRelationship[] => {
-  // In a real app, this would come from an API
-  // For now, filter from our mock relationships
-  const relationships = [...mockServiceRelationships];
-  
-  return relationships.filter(
-    rel => rel.sourceServiceId === serviceId || rel.targetServiceId === serviceId
-  );
-};
+export { mockServices, mockServicesWithCategories, mockServiceTicketCounts };
