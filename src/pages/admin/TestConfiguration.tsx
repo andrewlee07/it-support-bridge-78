@@ -7,6 +7,11 @@ import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowC
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import TestGeneralSettings from '@/components/admin/test-configuration/TestGeneralSettings';
+import TestTemplatesTab from '@/components/admin/test-configuration/TestTemplatesTab';
+import TestAutomationTab from '@/components/admin/test-configuration/TestAutomationTab';
+import TestCustomFieldsTab from '@/components/admin/test-configuration/TestCustomFieldsTab';
+import { Settings, FileText, TestTube, Database } from 'lucide-react';
 
 const TestConfiguration = () => {
   const breadcrumbItems = [
@@ -28,33 +33,36 @@ const TestConfiguration = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="workflow">
+        <Tabs defaultValue="general">
           <TabsList className="mb-4">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="workflow">Test Workflow</TabsTrigger>
-            <TabsTrigger value="templates">Test Templates</TabsTrigger>
-            <TabsTrigger value="automation">Test Automation</TabsTrigger>
-            <TabsTrigger value="fields">Custom Fields</TabsTrigger>
-            <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
+            <TabsTrigger value="general" className="flex items-center">
+              <Settings className="h-4 w-4 mr-2" />
+              General
+            </TabsTrigger>
+            <TabsTrigger value="workflow" className="flex items-center">
+              <TestTube className="h-4 w-4 mr-2" />
+              Test Workflow
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center">
+              <FileText className="h-4 w-4 mr-2" />
+              Test Templates
+            </TabsTrigger>
+            <TabsTrigger value="automation" className="flex items-center">
+              <Settings className="h-4 w-4 mr-2" />
+              Test Automation
+            </TabsTrigger>
+            <TabsTrigger value="fields" className="flex items-center">
+              <Database className="h-4 w-4 mr-2" />
+              Custom Fields
+            </TabsTrigger>
+            <TabsTrigger value="mandatoryfields" className="flex items-center">
+              <Database className="h-4 w-4 mr-2" />
+              Mandatory Fields
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="general">
-            <Card>
-              <CardHeader>
-                <CardTitle>General Settings</CardTitle>
-                <CardDescription>Configure general test management settings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-                  <div className="text-center">
-                    <h3 className="text-lg font-medium">Test General Settings</h3>
-                    <p className="text-muted-foreground mt-1">
-                      Configure global settings for test management
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <TestGeneralSettings />
           </TabsContent>
           
           <TabsContent value="workflow" className="space-y-4">
@@ -62,56 +70,15 @@ const TestConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="templates" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Test Case Templates</CardTitle>
-                <CardDescription>
-                  Configure test case templates and standardized formats
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-                  <div className="text-center">
-                    <h3 className="text-lg font-medium">Test Template Management</h3>
-                    <p className="text-muted-foreground mt-1">
-                      Create and manage templates for test cases, test plans, and test cycles
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <TestTemplatesTab />
           </TabsContent>
           
           <TabsContent value="automation" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Test Automation Settings</CardTitle>
-                <CardDescription>
-                  Configure integration with test automation tools
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-                  <div className="text-center">
-                    <h3 className="text-lg font-medium">Test Automation Integration</h3>
-                    <p className="text-muted-foreground mt-1">
-                      Configure connections to test automation frameworks and CI/CD pipelines
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <TestAutomationTab />
           </TabsContent>
           
           <TabsContent value="fields" className="space-y-4">
-            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-              <div className="text-center">
-                <h3 className="text-lg font-medium">Test Custom Fields</h3>
-                <p className="text-muted-foreground mt-1">
-                  Configure custom fields for test cases and test execution
-                </p>
-              </div>
-            </div>
+            <TestCustomFieldsTab />
           </TabsContent>
           
           <TabsContent value="mandatoryfields">
