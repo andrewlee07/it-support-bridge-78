@@ -9,9 +9,9 @@ import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowC
 import { Database, Settings, GitBranch, BookOpen, AlertTriangle, ArrowUpRight, Bell } from 'lucide-react';
 import ProblemGeneralSettings from '@/components/admin/problem-configuration/ProblemGeneralSettings';
 import RootCauseAnalysisSettings from '@/components/admin/problem-configuration/RootCauseAnalysisSettings';
-import KnownErrorSettings from '@/components/admin/problem-configuration/KnownErrorSettings';
+import CustomKnownErrorSettings from '@/components/admin/problem-configuration/CustomKnownErrorSettings';
 import EscalationRulesSettings from '@/components/admin/problem-configuration/EscalationRulesSettings';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
 
 const ProblemConfiguration = () => {
@@ -86,7 +86,7 @@ const ProblemConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="knownerrors">
-            <KnownErrorSettings />
+            <CustomKnownErrorSettings />
           </TabsContent>
           
           <TabsContent value="escalation">
