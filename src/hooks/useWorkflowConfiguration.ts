@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ConfigurableEntityType } from '@/utils/types/configuration';
@@ -92,6 +91,16 @@ const getDefaultWorkflowStages = (entityType: ConfigurableEntityType): WorkflowS
         { id: 'stage-4', name: 'Deployed', order: 4, isActive: true, isRequired: true },
         { id: 'stage-5', name: 'Under Maintenance', order: 5, isActive: true },
         { id: 'stage-6', name: 'Retired', order: 6, isActive: true }
+      ];
+    case 'test':
+      return [
+        { id: 'stage-1', name: 'Draft', order: 1, isActive: true, isRequired: true },
+        { id: 'stage-2', name: 'Ready', order: 2, isActive: true, isRequired: true },
+        { id: 'stage-3', name: 'In Progress', order: 3, isActive: true, isRequired: true },
+        { id: 'stage-4', name: 'Blocked', order: 4, isActive: true },
+        { id: 'stage-5', name: 'Passed', order: 5, isActive: true, isRequired: true },
+        { id: 'stage-6', name: 'Failed', order: 6, isActive: true },
+        { id: 'stage-7', name: 'Skipped', order: 7, isActive: true }
       ];
     default:
       return [

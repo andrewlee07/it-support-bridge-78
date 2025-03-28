@@ -1,4 +1,3 @@
-
 import { StatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
 import { MandatoryFieldConfig, ConfigurableEntityType } from '@/utils/types/configuration';
 import { synchronizeBacklogItemsForRelease } from '@/utils/mockData/backlog/backlogReleaseOperations';
@@ -118,7 +117,20 @@ let mandatoryFieldsConfig: Record<ConfigurableEntityType, MandatoryFieldConfig[]
     { fieldName: 'fixDetails', displayName: 'Fix Details', isRequired: false, entityType: 'bug', description: 'Details about how the bug was fixed', isResolutionField: true },
     { fieldName: 'verificationNotes', displayName: 'Verification Notes', isRequired: false, entityType: 'bug', description: 'Notes from verifying the bug fix', isResolutionField: true }
   ],
-  'user': []
+  'user': [],
+  'test': [
+    { fieldName: 'title', displayName: 'Test Title', isRequired: true, entityType: 'test', description: 'The title of the test case' },
+    { fieldName: 'description', displayName: 'Description', isRequired: true, entityType: 'test', description: 'A detailed description of the test case' },
+    { fieldName: 'steps', displayName: 'Test Steps', isRequired: true, entityType: 'test', description: 'Step-by-step instructions to perform the test' },
+    { fieldName: 'expectedResults', displayName: 'Expected Results', isRequired: true, entityType: 'test', description: 'The expected outcomes of the test' },
+    { fieldName: 'assignedTester', displayName: 'Assigned Tester', isRequired: false, entityType: 'test', description: 'The person assigned to execute this test' },
+    { fieldName: 'priority', displayName: 'Priority', isRequired: false, entityType: 'test', description: 'The priority level of the test case' },
+    { fieldName: 'testType', displayName: 'Test Type', isRequired: false, entityType: 'test', description: 'The type of test (functional, integration, etc.)' },
+    { fieldName: 'testNotes', displayName: 'Test Notes', isRequired: false, entityType: 'test', description: 'Additional notes about the test case' },
+    { fieldName: 'executionStatus', displayName: 'Execution Status', isRequired: false, entityType: 'test', description: 'The current execution status of the test' },
+    { fieldName: 'executionNotes', displayName: 'Execution Notes', isRequired: false, entityType: 'test', description: 'Notes about the test execution', isResolutionField: true },
+    { fieldName: 'actualResults', displayName: 'Actual Results', isRequired: false, entityType: 'test', description: 'The actual results of the test execution', isResolutionField: true }
+  ]
 };
 
 // Get status synchronization settings
