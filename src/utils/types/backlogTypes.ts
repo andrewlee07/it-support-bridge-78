@@ -1,47 +1,82 @@
-
-// For backlog items
-export type BacklogItemStatus = 'open' | 'in-progress' | 'review' | 'done' | 'blocked';
-export type BacklogItemPriority = 'high' | 'medium' | 'low';
-export type BacklogItemType = 'feature' | 'bug' | 'technical-debt' | 'improvement';
+export type BacklogItemType = 'feature' | 'bug' | 'task' | 'enhancement' | 'technical-debt';
+export type BacklogItemStatus = 
+  'open' | 
+  'in-progress' | 
+  'ready' | 
+  'blocked' | 
+  'completed' | 
+  'deferred';
+export type BacklogItemPriority = 'critical' | 'high' | 'medium' | 'low';
 
 export interface BacklogItem {
   id: string;
   title: string;
   description: string;
-  status: string; // Using string for flexibility
-  priority: string;
-  type: string;
+  status: BacklogItemStatus;
+  priority: BacklogItemPriority;
+  type: BacklogItemType;
+  assignee?: string;
+  creator: string;
+  releaseId?: string;
+  relatedItemId?: string;
+  relatedItemType?: 'bug' | 'testcase';
   storyPoints?: number;
-  sprint?: string | null;
-  assignedTo?: string | null;
-  createdBy: string;
+  dueDate?: Date;
   createdAt: Date;
-  updatedAt: Date;
-  dueDate?: Date | null;
-  completedAt?: Date | null;
-  comments?: any[];
-  attachments?: any[];
-  labels?: string[];
-  sourceId?: string;
-  sourceType?: string;
-}
-
-export interface Sprint {
-  id: string;
-  name: string;
-  startDate: Date;
-  endDate: Date;
-  status: 'planning' | 'active' | 'completed' | 'cancelled';
-  goal: string;
-  items: string[]; // Array of backlog item IDs
+  updatedAt?: Date;
+  labels: string[];
+  testCoverage?: BacklogTestCoverage;
+  passedTests?: number;
+  failedTests?: number;
+  totalTests?: number;
+  attachments?: Attachment[];
+  comments?: Comment[];
+  watchers?: Watcher[];
+  history?: HistoryEvent[];
+  relatedBugIds?: string[];
 }
 
 export interface BacklogTestCoverage {
-  backlogItemId: string;
-  totalTestCases: number;
-  passedTestCases: number;
-  failedTestCases: number;
-  blockedTestCases: number;
-  notRunTestCases: number;
-  coverage: number; // Percentage
+  coveragePercentage?: number;
+  covered?: number;
+  total?: number;
+  passedTests?: number;
+  failedTests?: number;
+  skippedTests?: number;
+  pendingTests?: number;
+  tests?: any[];
+  lastRun?: Date;
+  passed?: number;
+  failed?: number;
+}
+
+export interface Attachment {
+  id: string;
+  filename: string;
+  url: string;
+  uploadedBy: string;
+  uploadDate: Date;
+}
+
+export interface Comment {
+  id: string;
+  text: string;
+  author: string;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface Watcher {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+}
+
+export interface HistoryEvent {
+  id: string;
+  timestamp: Date;
+  user: string;
+  action: string;
+  details: string;
 }

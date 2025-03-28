@@ -1,6 +1,8 @@
+
 import { StatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
 import { MandatoryFieldConfig, ConfigurableEntityType } from '@/utils/types/configuration';
 import { synchronizeBacklogItemsForRelease } from '@/utils/mockData/backlog/backlogReleaseOperations';
+import { BacklogItemStatus } from '@/utils/types/backlogTypes';
 
 // Simulate API delay
 const apiDelay = () => new Promise(resolve => setTimeout(resolve, 500));
@@ -14,8 +16,8 @@ let statusSynchronizationSettings: StatusSynchronizationSettings = {
   releaseToBacklogMapping: {
     'Planned': 'open',
     'In Progress': 'in-progress',
-    'Deployed': 'completed',
-    'Cancelled': 'deferred'
+    'Deployed': 'completed' as BacklogItemStatus,
+    'Cancelled': 'deferred' as BacklogItemStatus
   },
   releaseToBugMapping: {
     'Planned': 'open', 

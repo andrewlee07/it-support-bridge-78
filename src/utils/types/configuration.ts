@@ -1,73 +1,107 @@
-// Configuration types for dropdown fields
-export type ConfigurableEntityType = 'ticket' | 'asset' | 'change' | 'user' | 'incident' | 'service-request' | 'backlog' | 'release' | 'problem' | 'bug' | 'test';
 
-export interface DropdownOption {
-  id: string;
-  label: string;
-  value: string;
-  isActive: boolean;
-  sortOrder: number;
-}
+export type ConfigurableEntityType = 
+  'release' | 
+  'ticket' | 
+  'backlog' | 
+  'incident' | 
+  'change' | 
+  'service-request' | 
+  'problem' | 
+  'asset' | 
+  'bug' | 
+  'user' | 
+  'test';
 
-export interface ConfigurableDropdown {
-  id: string;
-  entityType: ConfigurableEntityType;
-  fieldName: string;
-  displayName: string;
-  options: DropdownOption[];
-  isRequired: boolean;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Configuration settings for dropdown fields in admin panel
-export interface DropdownConfigFormProps {
-  isNew: boolean;
-  configId: string | null;
-  entityType: ConfigurableEntityType;
-  onClose: () => void;
-}
-
-// System configuration types
-export interface SystemConfiguration {
-  id: string;
-  moduleType: ConfigurableEntityType;
-  settingName: string;
-  settingDisplayName: string;
-  settingValue: string;
-  settingDataType: 'string' | 'number' | 'boolean' | 'date';
-  description: string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Module-specific configuration interface
-export interface ModuleConfiguration {
-  id: string;
-  moduleType: ConfigurableEntityType;
-  configType: 'sla' | 'workflow' | 'autoClose' | 'notification' | 'general';
-  configName: string;
-  configDisplayName: string;
-  configValue: string;
-  description: string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Configuration for mandatory fields
 export interface MandatoryFieldConfig {
   fieldName: string;
   displayName: string;
   isRequired: boolean;
   entityType: ConfigurableEntityType;
-  description?: string;
-  isResolutionField?: boolean; // Flag to identify resolution-related fields
+  description: string;
+  isResolutionField?: boolean;
 }
 
-// Updated module configuration to include mandatory fields
-export interface ModuleConfigurationWithMandatory extends ModuleConfiguration {
-  mandatoryFields?: MandatoryFieldConfig[];
+export interface DropdownOption {
+  id: string;
+  label: string;
+  value: string;
+  color?: string;
+  isDefault?: boolean;
+  order: number;
+}
+
+export interface ConfigurableDropdown {
+  id: string;
+  name: string;
+  entity: ConfigurableEntityType;
+  field: string;
+  options: DropdownOption[];
+}
+
+export interface DropdownConfigFormProps {
+  entityType: ConfigurableEntityType;
+  fieldName: string;
+  fieldLabel: string;
+  options: DropdownOption[];
+  onSave: (options: DropdownOption[]) => void;
+  onCancel: () => void;
+  isCreateMode?: boolean;
+}
+
+// SLA Type definition
+export interface SLA {
+  id: string;
+  name: string;
+  description: string;
+  entityType: ConfigurableEntityType;
+  priorityLevels: {
+    [key: string]: {
+      responseTime: number;
+      responseTimeUnit: 'minutes' | 'hours' | 'days';
+      resolutionTime: number;
+      resolutionTimeUnit: 'minutes' | 'hours' | 'days';
+    }
+  };
+  workingHours: {
+    start: string;
+    end: string;
+    timezone: string;
+    workDays: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
+  };
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Risk Assessment related types
+export interface RiskAssessmentQuestionOption {
+  id: string;
+  text: string;
+  value: number;
+}
+
+export interface RiskAssessmentQuestion {
+  id: string;
+  text: string;
+  description?: string;
+  options: RiskAssessmentQuestionOption[];
+  category: string;
+  weight: number;
+  isRequired: boolean;
+  order: number;
+}
+
+export interface RiskAssessmentAnswer {
+  questionId: string;
+  selectedOptionId: string;
+  value: number;
+}
+
+export type RiskLevel = 'low' | 'medium' | 'high';
+
+export interface RiskThreshold {
+  id: string;
+  level: RiskLevel;
+  minScore: number;
+  maxScore: number;
 }
