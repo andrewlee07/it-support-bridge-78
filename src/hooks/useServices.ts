@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ServiceWithCategory, ServiceCategory } from '@/utils/types/service';
-import { getServicesWithCategories, getAllServiceCategories } from '@/utils/mockData/services';
+import { getAllServices, getAllServiceCategories } from '@/utils/mockData/services';
 
 interface UseServicesResult {
   services: ServiceWithCategory[] | null;
@@ -10,10 +10,25 @@ interface UseServicesResult {
   error: Error | null;
 }
 
-const fetchServices = async (): Promise<ServiceWithCategory[]> => {
+// Create a function to combine services with their categories
+const fetchServicesWithCategories = async (): Promise<ServiceWithCategory[]> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  return getServicesWithCategories();
+  
+  const services = getAllServices();
+  const categories = getAllServiceCategories();
+  
+  // Map services to include their category information
+  return services.map(service => {
+    const category = categories.find(c => c.id === service.categoryId);
+    if (!category) {
+      throw new Error(`Category not found for service: ${service.id}`);
+    }
+    return {
+      ...service,
+      category
+    };
+  });
 };
 
 const fetchCategories = async (): Promise<ServiceCategory[]> => {
@@ -29,7 +44,7 @@ export const useServices = (): UseServicesResult => {
     isLoading: isServicesLoading
   } = useQuery({
     queryKey: ['services'],
-    queryFn: fetchServices
+    queryFn: fetchServicesWithCategories
   });
 
   const { 
