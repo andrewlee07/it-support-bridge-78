@@ -80,4 +80,58 @@ export interface KnownErrorEventData {
   affectedServices?: string[];
   updatedFields?: string[];
   tenantId?: string;
+  // New fields for routing
+  routingInfo?: {
+    priority?: 'low' | 'medium' | 'high' | 'critical';
+    audience?: string[];
+    shouldEscalate?: boolean;
+    channelPreferences?: string[];
+  };
+}
+
+/**
+ * Routing rules types for known error events
+ */
+export interface KnownErrorRoutingRule {
+  id: string;
+  name: string;
+  description?: string;
+  conditions: Array<{
+    field: string;
+    operator: string;
+    value: any;
+  }>;
+  targetChannels: string[];
+  isActive: boolean;
+  priority: number;
+}
+
+/**
+ * Schedule-based routing for known error events
+ */
+export interface KnownErrorScheduleRule {
+  id: string;
+  name: string;
+  description?: string;
+  timeWindows: Array<{
+    startTime: string;
+    endTime: string;
+    daysOfWeek: number[];
+  }>;
+  timezone: string;
+  targetChannels: string[];
+  fallbackChannels?: string[];
+  isActive: boolean;
+}
+
+/**
+ * Recipient mapping for known error events
+ */
+export interface KnownErrorRecipientMapping {
+  id: string;
+  eventType: KnownErrorEventType;
+  severity: string;
+  recipients: string[];
+  recipientGroups: string[];
+  isActive: boolean;
 }

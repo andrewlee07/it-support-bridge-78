@@ -6,7 +6,7 @@ import Breadcrumb from '@/components/shared/Breadcrumb';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
 import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
-import { Database, Settings, GitBranch, BookOpen, AlertTriangle, ArrowUpRight, Bell } from 'lucide-react';
+import { Database, Settings, GitBranch, BookOpen, AlertTriangle, ArrowUpRight, Bell, GitMerge } from 'lucide-react';
 import ProblemGeneralSettings from '@/components/admin/problem-configuration/ProblemGeneralSettings';
 import RootCauseAnalysisSettings from '@/components/admin/problem-configuration/RootCauseAnalysisSettings';
 import CustomKnownErrorSettings from '@/components/admin/problem-configuration/CustomKnownErrorSettings';
@@ -36,6 +36,12 @@ const ProblemConfiguration = () => {
           </div>
           
           <div className="flex items-center space-x-2">
+            <Button variant="outline" asChild>
+              <Link to="/admin/notification-routing-rules">
+                <GitMerge className="h-4 w-4 mr-2" />
+                Routing Rules
+              </Link>
+            </Button>
             <Button variant="outline" asChild>
               <Link to="/admin/notification-configuration">
                 <Bell className="h-4 w-4 mr-2" />
