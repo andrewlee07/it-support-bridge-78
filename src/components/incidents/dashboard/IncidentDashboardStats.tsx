@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertCircle, AlertTriangle, Clock, BarChart2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface IncidentDashboardStatsProps {
   totalTickets: number;
@@ -23,7 +24,10 @@ const IncidentDashboardStats: React.FC<IncidentDashboardStatsProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card 
-        className={`cursor-pointer transition-colors ${cardFilters.includes('all') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''}`}
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('all') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''
+        )}
         onClick={() => toggleCardFilter('all')}
       >
         <CardContent className="p-6 flex items-center justify-between">
@@ -38,7 +42,10 @@ const IncidentDashboardStats: React.FC<IncidentDashboardStatsProps> = ({
       </Card>
 
       <Card 
-        className={`cursor-pointer transition-colors ${cardFilters.includes('active') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''}`}
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('active') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''
+        )}
         onClick={() => toggleCardFilter('active')}
       >
         <CardContent className="p-6 flex items-center justify-between">
@@ -53,7 +60,10 @@ const IncidentDashboardStats: React.FC<IncidentDashboardStatsProps> = ({
       </Card>
 
       <Card 
-        className={`cursor-pointer transition-colors ${cardFilters.includes('critical') ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : ''}`}
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('critical') ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : ''
+        )}
         onClick={() => toggleCardFilter('critical')}
       >
         <CardContent className="p-6 flex items-center justify-between">
@@ -68,7 +78,10 @@ const IncidentDashboardStats: React.FC<IncidentDashboardStatsProps> = ({
       </Card>
 
       <Card 
-        className={`cursor-pointer transition-colors ${cardFilters.includes('pending') ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800' : ''}`}
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('pending') ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800' : ''
+        )}
         onClick={() => toggleCardFilter('pending')}
       >
         <CardContent className="p-6 flex items-center justify-between">

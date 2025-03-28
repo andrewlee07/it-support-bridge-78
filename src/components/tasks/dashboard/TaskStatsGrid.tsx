@@ -3,17 +3,30 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ClipboardList, Clock, PauseCircle, AlertCircle } from 'lucide-react';
 import { TaskStats } from '@/utils/types/taskTypes';
+import { cn } from '@/lib/utils';
 
 interface TaskStatsGridProps {
   taskStats: TaskStats | null;
+  cardFilters?: string[];
+  toggleCardFilter?: (filter: string) => void;
 }
 
-const TaskStatsGrid: React.FC<TaskStatsGridProps> = ({ taskStats }) => {
+const TaskStatsGrid: React.FC<TaskStatsGridProps> = ({ 
+  taskStats, 
+  cardFilters = [], 
+  toggleCardFilter = () => {} 
+}) => {
   if (!taskStats) return null;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card>
+      <Card 
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('new') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''
+        )}
+        onClick={() => toggleCardFilter('new')}
+      >
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">New Tasks</p>
@@ -25,7 +38,13 @@ const TaskStatsGrid: React.FC<TaskStatsGridProps> = ({ taskStats }) => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card 
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('in-progress') ? 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800' : ''
+        )}
+        onClick={() => toggleCardFilter('in-progress')}
+      >
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">In Progress</p>
@@ -37,7 +56,13 @@ const TaskStatsGrid: React.FC<TaskStatsGridProps> = ({ taskStats }) => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card 
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('on-hold') ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800' : ''
+        )}
+        onClick={() => toggleCardFilter('on-hold')}
+      >
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">On Hold</p>
@@ -49,7 +74,13 @@ const TaskStatsGrid: React.FC<TaskStatsGridProps> = ({ taskStats }) => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card 
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('overdue') ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : ''
+        )}
+        onClick={() => toggleCardFilter('overdue')}
+      >
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">Overdue</p>

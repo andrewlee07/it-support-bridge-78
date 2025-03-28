@@ -10,17 +10,31 @@ import {
   Bug,
   BarChart4,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StatCardsProps {
   testStatsData: any;
   isLoadingTestStats: boolean;
+  cardFilters?: string[];
+  toggleCardFilter?: (filter: string) => void;
 }
 
-const StatCards: React.FC<StatCardsProps> = ({ testStatsData, isLoadingTestStats }) => {
+const StatCards: React.FC<StatCardsProps> = ({ 
+  testStatsData, 
+  isLoadingTestStats, 
+  cardFilters = [], 
+  toggleCardFilter = () => {} 
+}) => {
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {/* Total Test Cases Card */}
-      <Card>
+      <Card 
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('total') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''
+        )}
+        onClick={() => toggleCardFilter('total')}
+      >
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">
@@ -41,7 +55,13 @@ const StatCards: React.FC<StatCardsProps> = ({ testStatsData, isLoadingTestStats
       </Card>
       
       {/* Pass Rate Card */}
-      <Card>
+      <Card 
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('pass-rate') ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : ''
+        )}
+        onClick={() => toggleCardFilter('pass-rate')}
+      >
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">
@@ -64,7 +84,13 @@ const StatCards: React.FC<StatCardsProps> = ({ testStatsData, isLoadingTestStats
       </Card>
       
       {/* Open Bugs Card */}
-      <Card>
+      <Card 
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('bugs') ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : ''
+        )}
+        onClick={() => toggleCardFilter('bugs')}
+      >
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">
@@ -85,7 +111,13 @@ const StatCards: React.FC<StatCardsProps> = ({ testStatsData, isLoadingTestStats
       </Card>
       
       {/* Test Cycle Progress Card */}
-      <Card>
+      <Card 
+        className={cn(
+          "cursor-pointer transition-colors",
+          cardFilters.includes('cycle-progress') ? 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800' : ''
+        )}
+        onClick={() => toggleCardFilter('cycle-progress')}
+      >
         <CardContent className="p-6 flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground mb-1">
