@@ -47,6 +47,9 @@ export interface HistoryEvent {
   oldValue?: string;
   newValue?: string;
   field?: string;
+  changedBy?: string;
+  changedAt?: Date;
+  previousValue?: any;
 }
 
 export type HistoryEntry = HistoryEvent;
@@ -62,6 +65,11 @@ export interface BacklogTestCoverage {
   blocked: number;
   notRun: number;
   totalTests?: number;
+  passedTests?: number;
+  failedTests?: number;
+  coveragePercentage?: number;
+  covered?: number;
+  total?: number;
 }
 
 // For BacklogStats
@@ -76,9 +84,9 @@ export interface BacklogStats {
 // Add explicit type definitions for BacklogItemStatus, BacklogItemPriority, and BacklogItemType
 export type BacklogItemStatus = 'open' | 'in-progress' | 'ready' | 'blocked' | 'completed' | 'deferred';
 
-export type BacklogItemPriority = 'highest' | 'high' | 'medium' | 'low' | 'lowest';
+export type BacklogItemPriority = 'highest' | 'high' | 'medium' | 'low' | 'lowest' | 'critical';
 
-export type BacklogItemType = 'story' | 'bug' | 'task' | 'epic' | 'feature' | 'improvement';
+export type BacklogItemType = 'story' | 'bug' | 'task' | 'epic' | 'feature' | 'improvement' | 'enhancement' | 'technical-debt';
 
 // Add support for dependsOn to BacklogItem
 export interface BacklogItem {
@@ -111,6 +119,7 @@ export interface BacklogItem {
   dependsOn?: string[];
   relatedTestCaseIds?: string[];
   createdBy?: string;
+  relatedBugIds?: string[];
 }
 
 export const calculateReleaseCapacity = (points: number, velocity: number): number => {

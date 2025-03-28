@@ -6,9 +6,9 @@ import { BacklogItemStatus, BacklogItemPriority, BacklogItemType } from '@/utils
 export const backlogItemSchema = z.object({
   title: z.string().min(3, { message: 'Title must be at least 3 characters.' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
-  status: z.enum(['open', 'in-progress', 'ready', 'blocked', 'completed', 'deferred'] as [BacklogItemStatus, ...BacklogItemStatus[]]),
-  priority: z.enum(['critical', 'high', 'medium', 'low'] as [BacklogItemPriority, ...BacklogItemPriority[]]),
-  type: z.enum(['feature', 'bug', 'task', 'enhancement', 'technical-debt'] as [BacklogItemType, ...BacklogItemType[]]),
+  status: z.enum(['open', 'in-progress', 'ready', 'blocked', 'completed', 'deferred'] as unknown as [BacklogItemStatus, ...BacklogItemStatus[]]),
+  priority: z.enum(['highest', 'high', 'medium', 'low', 'lowest', 'critical'] as unknown as [BacklogItemPriority, ...BacklogItemPriority[]]),
+  type: z.enum(['feature', 'bug', 'task', 'epic', 'enhancement', 'technical-debt', 'improvement', 'story'] as unknown as [BacklogItemType, ...BacklogItemType[]]),
   assignee: z.string().optional(),
   releaseId: z.string().optional(),
   relatedItemId: z.string().optional(),

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Ticket } from '@/utils/types';
 
-interface TicketDetailViewProps {
+export interface TicketDetailViewProps {
   ticket: Ticket;
   onClose: () => void;
 }
