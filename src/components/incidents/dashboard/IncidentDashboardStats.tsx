@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { AlertCircle, AlertTriangle, Clock, BarChart2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { BarChart2, Clock, AlertCircle, AlertTriangle } from 'lucide-react';
+import StatCardGrid from '@/components/dashboard/StatCardGrid';
 
 interface IncidentDashboardStatsProps {
   totalTickets: number;
@@ -21,80 +20,47 @@ const IncidentDashboardStats: React.FC<IncidentDashboardStatsProps> = ({
   cardFilters,
   toggleCardFilter
 }) => {
+  const cards = [
+    {
+      id: 'all',
+      title: 'Total Incidents',
+      value: totalTickets,
+      icon: BarChart2,
+      iconColor: 'text-blue-700 dark:text-blue-300',
+      iconBgColor: 'bg-blue-100 dark:bg-blue-900/20',
+    },
+    {
+      id: 'active',
+      title: 'Active Incidents',
+      value: activeTicketsCount,
+      icon: Clock,
+      iconColor: 'text-blue-700 dark:text-blue-300',
+      iconBgColor: 'bg-blue-100 dark:bg-blue-900/20',
+    },
+    {
+      id: 'critical',
+      title: 'Critical Incidents',
+      value: criticalTicketsCount,
+      icon: AlertCircle,
+      iconColor: 'text-red-700 dark:text-red-300',
+      iconBgColor: 'bg-red-100 dark:bg-red-900/20',
+    },
+    {
+      id: 'pending',
+      title: 'Pending Incidents',
+      value: pendingTicketsCount,
+      icon: AlertTriangle,
+      iconColor: 'text-amber-700 dark:text-amber-300',
+      iconBgColor: 'bg-amber-100 dark:bg-amber-900/20',
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card 
-        className={cn(
-          "cursor-pointer transition-colors",
-          cardFilters.includes('all') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''
-        )}
-        onClick={() => toggleCardFilter('all')}
-      >
-        <CardContent className="p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Total Incidents</p>
-            <p className="text-2xl font-bold">{totalTickets}</p>
-          </div>
-          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900/20">
-            <BarChart2 className="h-6 w-6 text-blue-700 dark:text-blue-300" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        className={cn(
-          "cursor-pointer transition-colors",
-          cardFilters.includes('active') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''
-        )}
-        onClick={() => toggleCardFilter('active')}
-      >
-        <CardContent className="p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Active Incidents</p>
-            <p className="text-2xl font-bold">{activeTicketsCount}</p>
-          </div>
-          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900/20">
-            <Clock className="h-6 w-6 text-blue-700 dark:text-blue-300" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        className={cn(
-          "cursor-pointer transition-colors",
-          cardFilters.includes('critical') ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : ''
-        )}
-        onClick={() => toggleCardFilter('critical')}
-      >
-        <CardContent className="p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Critical Incidents</p>
-            <p className="text-2xl font-bold">{criticalTicketsCount}</p>
-          </div>
-          <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center dark:bg-red-900/20">
-            <AlertCircle className="h-6 w-6 text-red-700 dark:text-red-300" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        className={cn(
-          "cursor-pointer transition-colors",
-          cardFilters.includes('pending') ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800' : ''
-        )}
-        onClick={() => toggleCardFilter('pending')}
-      >
-        <CardContent className="p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Pending Incidents</p>
-            <p className="text-2xl font-bold">{pendingTicketsCount}</p>
-          </div>
-          <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center dark:bg-amber-900/20">
-            <AlertTriangle className="h-6 w-6 text-amber-700 dark:text-amber-300" />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <StatCardGrid 
+      cards={cards} 
+      activeCardIds={cardFilters} 
+      onCardClick={toggleCardFilter} 
+    />
   );
 };
 

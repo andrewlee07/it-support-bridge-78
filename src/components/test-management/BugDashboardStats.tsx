@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Bug } from '@/utils/types/test/bug';
-import { Card, CardContent } from '@/components/ui/card';
-import { AlertCircle, Clock, Flame, AlertTriangle, BarChart2 } from 'lucide-react';
+import { BarChart2, AlertCircle, Clock, Flame } from 'lucide-react';
+import StatCardGrid from '@/components/dashboard/StatCardGrid';
 
 interface BugDashboardStatsProps {
   bugs: Bug[];
@@ -23,75 +23,66 @@ const BugDashboardStats: React.FC<BugDashboardStatsProps> = ({
   const openBugs = bugs.filter(bug => bug.status === 'open').length;
   const inProgressBugs = bugs.filter(bug => bug.status === 'in-progress').length;
   const criticalBugs = bugs.filter(bug => bug.severity === 'critical').length;
-  const highPriorityBugs = bugs.filter(bug => bug.priority === 'high').length;
 
-  const isFilterActive = (type: 'status' | 'severity', value: string) => {
-    return (type === 'status' && activeStatusFilter === value) || 
-           (type === 'severity' && activeSeverityFilter === value);
+  const handleClick = (id: string) => {
+    if (id === 'all') {
+      onStatusClick?.(null);
+    } else if (id === 'open') {
+      onStatusClick?.('open');
+    } else if (id === 'in-progress') {
+      onStatusClick?.('in-progress');
+    } else if (id === 'critical') {
+      onSeverityClick?.('critical');
+    }
   };
 
+  const activeCardIds = [];
+  if (activeStatusFilter === null && activeSeverityFilter === null) activeCardIds.push('all');
+  if (activeStatusFilter === 'open') activeCardIds.push('open');
+  if (activeStatusFilter === 'in-progress') activeCardIds.push('in-progress');
+  if (activeSeverityFilter === 'critical') activeCardIds.push('critical');
+
+  const cards = [
+    {
+      id: 'all',
+      title: 'Total Bugs',
+      value: totalBugs,
+      icon: BarChart2,
+      iconColor: 'text-blue-700 dark:text-blue-300',
+      iconBgColor: 'bg-blue-100 dark:bg-blue-900/20',
+    },
+    {
+      id: 'open',
+      title: 'Open Bugs',
+      value: openBugs,
+      icon: AlertCircle,
+      iconColor: 'text-blue-700 dark:text-blue-300',
+      iconBgColor: 'bg-blue-100 dark:bg-blue-900/20',
+    },
+    {
+      id: 'in-progress',
+      title: 'In Progress',
+      value: inProgressBugs,
+      icon: Clock,
+      iconColor: 'text-yellow-700 dark:text-yellow-300',
+      iconBgColor: 'bg-yellow-100 dark:bg-yellow-900/20',
+    },
+    {
+      id: 'critical',
+      title: 'Critical Bugs',
+      value: criticalBugs,
+      icon: Flame,
+      iconColor: 'text-red-700 dark:text-red-300',
+      iconBgColor: 'bg-red-100 dark:bg-red-900/20',
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card 
-        className={`cursor-pointer transition-colors ${isFilterActive('status', 'all') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''}`}
-        onClick={() => onStatusClick?.(null)}
-      >
-        <CardContent className="p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Total Bugs</p>
-            <p className="text-2xl font-bold">{totalBugs}</p>
-          </div>
-          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900/20">
-            <BarChart2 className="h-6 w-6 text-blue-700 dark:text-blue-300" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        className={`cursor-pointer transition-colors ${isFilterActive('status', 'open') ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800' : ''}`}
-        onClick={() => onStatusClick?.('open')}
-      >
-        <CardContent className="p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Open Bugs</p>
-            <p className="text-2xl font-bold">{openBugs}</p>
-          </div>
-          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900/20">
-            <AlertCircle className="h-6 w-6 text-blue-700 dark:text-blue-300" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        className={`cursor-pointer transition-colors ${isFilterActive('status', 'in-progress') ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800' : ''}`}
-        onClick={() => onStatusClick?.('in-progress')}
-      >
-        <CardContent className="p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">In Progress</p>
-            <p className="text-2xl font-bold">{inProgressBugs}</p>
-          </div>
-          <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center dark:bg-yellow-900/20">
-            <Clock className="h-6 w-6 text-yellow-700 dark:text-yellow-300" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        className={`cursor-pointer transition-colors ${isFilterActive('severity', 'critical') ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : ''}`}
-        onClick={() => onSeverityClick?.('critical')}
-      >
-        <CardContent className="p-6 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">Critical Bugs</p>
-            <p className="text-2xl font-bold">{criticalBugs}</p>
-          </div>
-          <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center dark:bg-red-900/20">
-            <Flame className="h-6 w-6 text-red-700 dark:text-red-300" />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <StatCardGrid 
+      cards={cards} 
+      activeCardIds={activeCardIds} 
+      onCardClick={handleClick} 
+    />
   );
 };
 
