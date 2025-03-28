@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ServiceWithCategory, ServiceCategory } from '@/utils/types/service';
-import { getAllServices, getAllServiceCategories } from '@/utils/mockData/services';
+import { getServicesWithCategories, getAllServiceCategories } from '@/utils/mockData/services';
 
 interface UseServicesResult {
   services: ServiceWithCategory[] | null;
@@ -13,7 +13,7 @@ interface UseServicesResult {
 const fetchServices = async (): Promise<ServiceWithCategory[]> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  return getAllServices();
+  return getServicesWithCategories();
 };
 
 const fetchCategories = async (): Promise<ServiceCategory[]> => {

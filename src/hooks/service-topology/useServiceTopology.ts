@@ -10,6 +10,7 @@ import {
   buildServiceTree,
   getRelatedServices
 } from './topologyUtils';
+import { getServiceRelationships } from '@/utils/mockData/services/servicesData';
 
 export function useServiceTopology(services: ServiceWithCategory[]) {
   const [relationships, setRelationships] = useState<ServiceRelationship[]>([]);

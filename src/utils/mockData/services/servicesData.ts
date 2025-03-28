@@ -100,6 +100,36 @@ const mockServices: Service[] = [
     documentationUrl: 'https://docs.example.com/voip',
     createdAt: new Date(2023, 2, 15),
     updatedAt: new Date(2023, 4, 20)
+  },
+  {
+    id: 'srv-7',
+    name: 'Network Infrastructure',
+    description: 'Corporate network infrastructure',
+    categoryId: 'CAT-001',
+    status: 'active',
+    serviceType: 'technical',
+    supportContactId: 'usr-1',
+    supportTeamId: 'team-1',
+    supportHours: '24/7 Support',
+    serviceOwnerId: 'usr-2',
+    documentationUrl: 'https://docs.example.com/network',
+    createdAt: new Date(2023, 3, 1),
+    updatedAt: new Date(2023, 4, 15)
+  },
+  {
+    id: 'srv-8',
+    name: 'Contact Centre',
+    description: 'Customer contact centre operations',
+    categoryId: 'CAT-005',
+    status: 'active',
+    serviceType: 'business',
+    supportContactId: 'usr-5',
+    supportTeamId: 'team-2',
+    supportHours: 'Extended Hours (8am-8pm)',
+    serviceOwnerId: 'usr-6',
+    documentationUrl: 'https://docs.example.com/contact-centre',
+    createdAt: new Date(2023, 3, 10),
+    updatedAt: new Date(2023, 5, 1)
   }
 ];
 
@@ -113,7 +143,7 @@ const mockClientContracts: ClientContract[] = [
     startDate: new Date(2023, 0, 1),
     endDate: new Date(2023, 11, 31),
     status: 'active', // Using the correct status type
-    businessServiceIds: ['srv-3', 'srv-4'],
+    businessServiceIds: ['srv-3', 'srv-4', 'srv-8'],
     createdAt: new Date(2022, 11, 15),
     updatedAt: new Date(2022, 11, 15)
   },
@@ -125,7 +155,7 @@ const mockClientContracts: ClientContract[] = [
     startDate: new Date(2023, 2, 1),
     endDate: new Date(2024, 1, 28),
     status: 'active', // Using the correct status type
-    businessServiceIds: ['srv-3'],
+    businessServiceIds: ['srv-3', 'srv-8'],
     createdAt: new Date(2023, 1, 10),
     updatedAt: new Date(2023, 1, 10)
   },
@@ -193,13 +223,44 @@ export const getServiceWithRelationships = (serviceId: string): ServiceWithRelat
   const service = getServicesWithCategories().find(s => s.id === serviceId);
   if (!service) return null;
   
-  // In a real app, you would fetch actual relationships from an API
-  // Here we're just returning a mock response
+  // Get relationships from mock data
+  const relationships = getServiceRelationships(serviceId);
+  
+  // Get technical services that support this business service
+  const technicalServices = service.serviceType === 'business' 
+    ? getTechnicalServices().slice(0, 2) 
+    : [];
+  
+  // Get business services that this technical service supports
+  const businessServices = service.serviceType === 'technical' 
+    ? getBusinessServices().slice(0, 2) 
+    : [];
+  
+  // Get child services (for parent/child relationships)
+  const childServices = getServiceRelationships(serviceId)
+    .filter(rel => rel.relationshipType === 'parent-child' && rel.sourceServiceId === serviceId)
+    .map(rel => {
+      const childService = getServicesWithCategories().find(s => s.id === rel.targetServiceId);
+      return childService;
+    })
+    .filter(Boolean) as ServiceWithCategory[];
+  
   return {
     ...service,
-    relationships: [],
-    children: [],
-    technicalServices: service.serviceType === 'business' ? getTechnicalServices().slice(0, 2) : [],
-    businessServices: service.serviceType === 'technical' ? getBusinessServices().slice(0, 2) : []
+    relationships,
+    children: childServices,
+    technicalServices,
+    businessServices
   };
+};
+
+// Get relationships for a specific service
+export const getServiceRelationships = (serviceId: string): ServiceRelationship[] => {
+  // In a real app, this would come from an API
+  // For now, filter from our mock relationships
+  const relationships = [...mockServiceRelationships];
+  
+  return relationships.filter(
+    rel => rel.sourceServiceId === serviceId || rel.targetServiceId === serviceId
+  );
 };

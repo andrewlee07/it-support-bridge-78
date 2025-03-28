@@ -9,7 +9,7 @@ import {
   ServiceRelationship,
   ServiceWithRelationships
 } from '@/utils/types/service';
-import { getServiceRelationships } from '@/utils/mockData/services/servicesData';
+import { getServiceWithRelationships } from '@/utils/mockData/services/servicesData';
 import ServiceRelationshipDialog from './ServiceRelationshipDialog';
 import RelationshipItem from './RelationshipItem';
 import { toast } from 'sonner';
