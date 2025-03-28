@@ -2,7 +2,6 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Breadcrumb from '@/components/shared/Breadcrumb';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
@@ -10,6 +9,11 @@ import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowC
 import { StatusMappingTable } from '@/components/admin/status-sync/StatusMappingTable';
 import { useStatusSynchronization } from '@/hooks/useStatusSynchronization';
 import { defaultStatusSynchronizationSettings } from '@/utils/types/StatusSynchronizationSettings';
+import ReleaseGeneralSettings from '@/components/admin/release-configuration/ReleaseGeneralSettings';
+import ReleaseApprovalSettings from '@/components/admin/release-configuration/ReleaseApprovalSettings';
+import ReleaseTemplatesTab from '@/components/admin/release-configuration/ReleaseTemplatesTab';
+import DeploymentSettingsTab from '@/components/admin/release-configuration/DeploymentSettingsTab';
+import { Settings, Workflow, GitCompare, CheckCircle, FileText, Upload, Database } from 'lucide-react';
 
 const ReleaseConfiguration = () => {
   const breadcrumbItems = [
@@ -38,25 +42,38 @@ const ReleaseConfiguration = () => {
 
         <Tabs defaultValue="general">
           <TabsList className="mb-4">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="workflow">Workflow</TabsTrigger>
-            <TabsTrigger value="sync">Status Synchronization</TabsTrigger>
-            <TabsTrigger value="approvals">Approval Process</TabsTrigger>
-            <TabsTrigger value="templates">Release Templates</TabsTrigger>
-            <TabsTrigger value="deployment">Deployment Settings</TabsTrigger>
-            <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
+            <TabsTrigger value="general" className="flex items-center">
+              <Settings className="h-4 w-4 mr-2" />
+              General
+            </TabsTrigger>
+            <TabsTrigger value="workflow" className="flex items-center">
+              <Workflow className="h-4 w-4 mr-2" />
+              Workflow
+            </TabsTrigger>
+            <TabsTrigger value="sync" className="flex items-center">
+              <GitCompare className="h-4 w-4 mr-2" />
+              Status Synchronization
+            </TabsTrigger>
+            <TabsTrigger value="approvals" className="flex items-center">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Approval Process
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center">
+              <FileText className="h-4 w-4 mr-2" />
+              Release Templates
+            </TabsTrigger>
+            <TabsTrigger value="deployment" className="flex items-center">
+              <Upload className="h-4 w-4 mr-2" />
+              Deployment Settings
+            </TabsTrigger>
+            <TabsTrigger value="mandatoryfields" className="flex items-center">
+              <Database className="h-4 w-4 mr-2" />
+              Mandatory Fields
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="general">
-            <Card>
-              <CardHeader>
-                <CardTitle>General Settings</CardTitle>
-                <CardDescription>Configure general release management settings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* General settings content */}
-              </CardContent>
-            </Card>
+            <ReleaseGeneralSettings />
           </TabsContent>
           
           <TabsContent value="workflow">
@@ -75,60 +92,15 @@ const ReleaseConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="approvals">
-            <Card>
-              <CardHeader>
-                <CardTitle>Approval Process</CardTitle>
-                <CardDescription>Configure release approval process settings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-                  <div className="text-center">
-                    <h3 className="text-lg font-medium">Release Approval Workflow</h3>
-                    <p className="text-muted-foreground mt-1">
-                      Configure approval roles, stages, and requirements for releases
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ReleaseApprovalSettings />
           </TabsContent>
           
           <TabsContent value="templates">
-            <Card>
-              <CardHeader>
-                <CardTitle>Release Templates</CardTitle>
-                <CardDescription>Configure standard release templates</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-                  <div className="text-center">
-                    <h3 className="text-lg font-medium">Release Template Management</h3>
-                    <p className="text-muted-foreground mt-1">
-                      Configure standardized templates for different types of releases
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ReleaseTemplatesTab />
           </TabsContent>
           
           <TabsContent value="deployment">
-            <Card>
-              <CardHeader>
-                <CardTitle>Deployment Settings</CardTitle>
-                <CardDescription>Configure release deployment settings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-                  <div className="text-center">
-                    <h3 className="text-lg font-medium">Deployment Configuration</h3>
-                    <p className="text-muted-foreground mt-1">
-                      Configure deployment environments, schedules, and integration with CI/CD tools
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <DeploymentSettingsTab />
           </TabsContent>
           
           <TabsContent value="mandatoryfields">
