@@ -3,6 +3,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PageTransition from '@/components/shared/PageTransition';
 import Breadcrumb from '@/components/shared/Breadcrumb';
+import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
 
 const TestConfiguration = () => {
   const breadcrumbItems = [
@@ -30,14 +31,7 @@ const TestConfiguration = () => {
           </TabsList>
 
           <TabsContent value="workflow" className="space-y-4">
-            <div className="flex h-64 items-center justify-center border rounded-lg p-8 bg-muted/30">
-              <div className="text-center">
-                <h3 className="text-lg font-medium">Test Workflow Configuration</h3>
-                <p className="text-muted-foreground mt-1">
-                  Configure test case lifecycle and execution workflow
-                </p>
-              </div>
-            </div>
+            <WorkflowConfigurationTab entityType="test" />
           </TabsContent>
           
           <TabsContent value="templates" className="space-y-4">

@@ -5,10 +5,10 @@ import PageTransition from '@/components/shared/PageTransition';
 import PageHeader from '@/components/admin/change-configuration/PageHeader';
 import DropdownFieldsTab from '@/components/admin/change-configuration/DropdownFieldsTab';
 import RiskAssessmentTabs from '@/components/admin/change-configuration/RiskAssessmentTabs';
-import WorkflowSettingsTab from '@/components/admin/change-configuration/WorkflowSettingsTab';
 import Breadcrumb from '@/components/shared/Breadcrumb';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
+import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
 
 const ChangeConfiguration = () => {
   const breadcrumbItems = [
@@ -41,7 +41,7 @@ const ChangeConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="workflow" className="space-y-4">
-            <WorkflowSettingsTab />
+            <WorkflowConfigurationTab entityType="change" />
           </TabsContent>
           
           <TabsContent value="mandatoryfields">

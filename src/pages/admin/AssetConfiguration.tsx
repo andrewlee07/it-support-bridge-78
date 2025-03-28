@@ -8,6 +8,9 @@ import { ConfigurableEntityType } from '@/utils/types';
 import DropdownConfigList from '@/components/settings/dropdowns/DropdownConfigList';
 import DropdownConfigForm from '@/components/settings/dropdowns/DropdownConfigForm';
 import Breadcrumb from '@/components/shared/Breadcrumb';
+import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
+import { useMandatoryFields } from '@/hooks/useMandatoryFields';
+import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 
 const AssetConfiguration = () => {
   const [selectedConfigId, setSelectedConfigId] = useState<string | null>(null);
@@ -18,6 +21,8 @@ const AssetConfiguration = () => {
     queryKey: ['dropdownConfigurations', entityType],
     queryFn: () => dropdownConfigurationApi.getDropdownConfigurationsByEntity(entityType),
   });
+
+  const { mandatoryFields, updateMandatoryFields, isLoading: isMandatoryLoading } = useMandatoryFields('asset');
 
   const handleAddNew = () => {
     setIsAddingNew(true);
@@ -55,8 +60,14 @@ const AssetConfiguration = () => {
         <Tabs defaultValue="dropdowns">
           <TabsList className="mb-4">
             <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
+            <TabsTrigger value="workflow">Workflow</TabsTrigger>
             <TabsTrigger value="lifecycle">Lifecycle Settings</TabsTrigger>
+            <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="workflow">
+            <WorkflowConfigurationTab entityType="asset" />
+          </TabsContent>
 
           <TabsContent value="dropdowns" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -103,6 +114,15 @@ const AssetConfiguration = () => {
                 </p>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="mandatoryfields">
+            <MandatoryFieldsConfig
+              entityType="asset"
+              fields={mandatoryFields}
+              onSave={updateMandatoryFields}
+              isLoading={isMandatoryLoading}
+            />
           </TabsContent>
         </Tabs>
       </div>

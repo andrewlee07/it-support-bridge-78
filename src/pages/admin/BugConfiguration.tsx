@@ -8,6 +8,7 @@ import BugDropdownFieldsTab from '@/components/admin/bug-configuration/BugDropdo
 import BugSeverityConfiguration from '@/components/admin/BugSeverityConfiguration';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
+import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
 
 const BugConfiguration = () => {
   const breadcrumbItems = [
@@ -32,6 +33,7 @@ const BugConfiguration = () => {
         <Tabs defaultValue="general">
           <TabsList className="mb-4">
             <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="workflow">Workflow</TabsTrigger>
             <TabsTrigger value="severity">Severity Settings</TabsTrigger>
             <TabsTrigger value="dropdowns">Dropdown Fields</TabsTrigger>
             <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
@@ -47,6 +49,10 @@ const BugConfiguration = () => {
                 {/* General settings content */}
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="workflow">
+            <WorkflowConfigurationTab entityType="bug" />
           </TabsContent>
           
           <TabsContent value="severity">

@@ -8,12 +8,16 @@ import { Info, ArrowRightCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import Breadcrumb from '@/components/shared/Breadcrumb';
+import { StatusMappingTable } from '@/components/admin/status-sync/StatusMappingTable';
+import { useStatusSynchronization } from '@/hooks/useStatusSynchronization';
 
 const ProcessConfiguration = () => {
   const breadcrumbItems = [
     { label: 'Admin Settings', path: '/admin-settings' },
     { label: 'Process Configuration' }
   ];
+
+  const { settings, updateSettings, isLoading } = useStatusSynchronization();
 
   const moduleLinks = [
     { name: 'Incident Configuration', path: '/admin/incident-configuration' },
@@ -109,7 +113,14 @@ const ProcessConfiguration = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Status synchronization configuration options will appear here.</p>
+                <StatusMappingTable 
+                  mappings={(settings?.releaseToBacklogMapping || {})} 
+                  bugMappings={(settings?.releaseToBugMapping || {})}
+                  onUpdate={() => {}}
+                  settings={settings}
+                  updateSettings={updateSettings}
+                  isLoading={isLoading}
+                />
               </CardContent>
             </Card>
           </TabsContent>

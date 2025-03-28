@@ -6,6 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Breadcrumb from '@/components/shared/Breadcrumb';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
+import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
+import { StatusMappingTable } from '@/components/admin/status-sync/StatusMappingTable';
+import { useStatusSynchronization } from '@/hooks/useStatusSynchronization';
 
 const ReleaseConfiguration = () => {
   const breadcrumbItems = [
@@ -14,6 +17,7 @@ const ReleaseConfiguration = () => {
   ];
 
   const { mandatoryFields, updateMandatoryFields, isLoading } = useMandatoryFields('release');
+  const { settings, updateSettings, isLoading: isSyncLoading } = useStatusSynchronization();
 
   return (
     <PageTransition>
@@ -31,6 +35,7 @@ const ReleaseConfiguration = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="workflow">Workflow</TabsTrigger>
+            <TabsTrigger value="sync">Status Synchronization</TabsTrigger>
             <TabsTrigger value="approvals">Approval Process</TabsTrigger>
             <TabsTrigger value="mandatoryfields">Mandatory Fields</TabsTrigger>
           </TabsList>
@@ -48,15 +53,18 @@ const ReleaseConfiguration = () => {
           </TabsContent>
           
           <TabsContent value="workflow">
-            <Card>
-              <CardHeader>
-                <CardTitle>Workflow Settings</CardTitle>
-                <CardDescription>Configure release workflow and statuses</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Workflow settings content */}
-              </CardContent>
-            </Card>
+            <WorkflowConfigurationTab entityType="release" />
+          </TabsContent>
+          
+          <TabsContent value="sync">
+            <StatusMappingTable 
+              mappings={(settings?.releaseToBacklogMapping || {})} 
+              bugMappings={(settings?.releaseToBugMapping || {})}
+              onUpdate={() => {}}
+              settings={settings}
+              updateSettings={updateSettings}
+              isLoading={isSyncLoading}
+            />
           </TabsContent>
           
           <TabsContent value="approvals">

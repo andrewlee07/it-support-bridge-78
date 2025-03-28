@@ -12,6 +12,7 @@ import DropdownFieldsTab from '@/components/admin/change-configuration/DropdownF
 import BusinessHoursConfigurationTab from '@/components/admin/BusinessHoursConfigurationTab';
 import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
+import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
 
 const IncidentConfiguration = () => {
   const breadcrumbItems = [
@@ -39,6 +40,7 @@ const IncidentConfiguration = () => {
         <Tabs defaultValue="general">
           <TabsList className="mb-4">
             <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="workflow">Workflow</TabsTrigger>
             <TabsTrigger value="sla">SLA Settings</TabsTrigger>
             <TabsTrigger value="business-hours">Business Hours</TabsTrigger>
             <TabsTrigger value="autoclose">Auto-Close</TabsTrigger>
@@ -56,6 +58,10 @@ const IncidentConfiguration = () => {
                 {/* General settings content */}
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="workflow">
+            <WorkflowConfigurationTab entityType="incident" />
           </TabsContent>
           
           <TabsContent value="sla">

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Breadcrumb from '@/components/shared/Breadcrumb';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { useMandatoryFields } from '@/hooks/useMandatoryFields';
+import WorkflowConfigurationTab from '@/components/admin/configuration/WorkflowConfigurationTab';
 
 const ProblemConfiguration = () => {
   const breadcrumbItems = [
@@ -54,15 +55,7 @@ const ProblemConfiguration = () => {
               </TabsContent>
               
               <TabsContent value="workflow">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Workflow Settings</CardTitle>
-                    <CardDescription>Configure problem workflow settings</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Workflow settings content */}
-                  </CardContent>
-                </Card>
+                <WorkflowConfigurationTab entityType="problem" />
               </TabsContent>
               
               <TabsContent value="mandatoryfields">
