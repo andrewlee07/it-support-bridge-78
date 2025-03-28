@@ -1,24 +1,43 @@
 
-// Asset types
-import { AuditEntry } from './audit';
-
-export type AssetStatus = 'available' | 'in-use' | 'maintenance' | 'retired';
-export type AssetType = 'hardware' | 'software' | 'license' | 'other';
-
 export interface Asset {
   id: string;
   name: string;
-  type: AssetType;
+  description: string;
   status: AssetStatus;
-  assignedTo?: string;
-  purchaseDate?: Date;
+  type: AssetType;
+  category: string;
+  purchaseDate: Date;
   expiryDate?: Date;
-  manufacturer?: string;
-  model?: string;
-  serialNumber?: string;
+  cost: number;
+  assignedTo?: string;
   location?: string;
+  manufacturer: string;
+  model: string;
+  serialNumber: string;
+  customFields?: Record<string, any>;
+  tags?: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  lastMaintenanceDate?: Date;
+  nextMaintenanceDate?: Date;
+  maintenanceFrequency?: string;
+  notes?: string;
+}
+
+export type AssetStatus = 'active' | 'inactive' | 'maintenance' | 'retired' | 'lost' | 'on-order';
+export type AssetType = 'hardware' | 'software' | 'service' | 'furniture' | 'vehicle' | 'other';
+
+export interface AssetMaintenance {
+  id: string;
+  assetId: string;
+  maintenanceType: 'preventive' | 'corrective' | 'predictive' | 'condition-based';
+  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
+  description: string;
+  scheduledDate: Date;
+  completedDate?: Date;
+  technician?: string;
+  cost?: number;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
-  audit: AuditEntry[];
 }

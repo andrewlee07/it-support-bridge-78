@@ -1,7 +1,7 @@
 
 import { delay, createApiSuccessResponse, createApiErrorResponse } from '../mockData/apiHelpers';
 import { ApiResponse } from '../types';
-import { Task } from '../types/taskTypes';
+import { Task, TaskStats } from '../types/taskTypes';
 
 export const createTask = async (
   taskData: Partial<Task>
@@ -20,13 +20,18 @@ export const createTask = async (
       assignedTo: taskData.assignedTo || null,
       createdAt: new Date(),
       updatedAt: new Date(),
-      dueDate: taskData.dueDate || null,
+      dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
       completedAt: null,
       estimatedHours: taskData.estimatedHours || 0,
       actualHours: 0,
       attachments: [],
       relatedItemId: taskData.relatedItemId || null,
-      relatedItemType: taskData.relatedItemType || null
+      relatedItemType: taskData.relatedItemType || null,
+      checklist: taskData.checklist || [],
+      dependsOn: taskData.dependsOn || [],
+      blockedBy: taskData.blockedBy || [],
+      isTemplate: taskData.isTemplate || false,
+      templateId: taskData.templateId
     };
     
     return createApiSuccessResponse(newTask);
@@ -133,7 +138,9 @@ export const fetchTasks = async (
         completedAt: null,
         estimatedHours: 4,
         actualHours: 0,
-        attachments: []
+        attachments: [],
+        relatedItemId: null,
+        relatedItemType: null
       },
       {
         id: 'TASK-1002',
@@ -150,7 +157,9 @@ export const fetchTasks = async (
         completedAt: null,
         estimatedHours: 2,
         actualHours: 1,
-        attachments: []
+        attachments: [],
+        relatedItemId: null,
+        relatedItemType: null
       }
     ];
     
@@ -160,18 +169,44 @@ export const fetchTasks = async (
   }
 };
 
-export const getTaskStats = async (userId?: string): Promise<ApiResponse<any>> => {
+export const getTaskStats = async (userId?: string): Promise<ApiResponse<TaskStats>> => {
   try {
     await delay(300);
     
     // Mock stats data
-    const stats = {
-      totalTasks: 35,
+    const stats: TaskStats = {
+      total: 35,
+      overdue: 7,
+      dueToday: 3,
+      byStatus: {
+        'new': 10,
+        'open': 5,
+        'in-progress': 15,
+        'on-hold': 5,
+        'ready': 0,
+        'blocked': 0,
+        'completed': 3,
+        'cancelled': 2,
+        'deferred': 0
+      },
+      byPriority: {
+        'critical': 4,
+        'high': 11,
+        'medium': 15,
+        'low': 5
+      },
+      byAssignee: {
+        'user-1': 7,
+        'user-2': 12,
+        'user-3': 8,
+        'user-4': 8
+      },
+      completedThisWeek: 12,
+      completedThisMonth: 32,
+      averageCompletionTime: 1.5,
       newTasks: 10,
       inProgressTasks: 15,
       onHoldTasks: 5,
-      completedTasks: 3,
-      cancelledTasks: 2,
       overdueCount: 7
     };
     
@@ -202,12 +237,54 @@ export const getTasksDueToday = async (userId?: string): Promise<ApiResponse<Tas
         completedAt: null,
         estimatedHours: 1,
         actualHours: 0,
-        attachments: []
+        attachments: [],
+        relatedItemId: null,
+        relatedItemType: null
       }
     ];
     
     return createApiSuccessResponse(tasks);
   } catch (error) {
     return createApiErrorResponse('Failed to fetch tasks due today', 500);
+  }
+};
+
+// Add reminder API functions
+export const createReminder = async (data: any): Promise<ApiResponse<any>> => {
+  try {
+    await delay(300);
+    return createApiSuccessResponse({
+      id: `reminder-${Math.floor(Math.random() * 10000)}`,
+      ...data,
+      createdAt: new Date()
+    });
+  } catch (error) {
+    return createApiErrorResponse('Failed to create reminder', 500);
+  }
+};
+
+export const updateReminder = async (id: string, data: any): Promise<ApiResponse<any>> => {
+  try {
+    await delay(300);
+    return createApiSuccessResponse({
+      id,
+      ...data,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    return createApiErrorResponse('Failed to update reminder', 500);
+  }
+};
+
+export const snoozeReminder = async (id: string, snoozedUntil: Date): Promise<ApiResponse<any>> => {
+  try {
+    await delay(300);
+    return createApiSuccessResponse({
+      id,
+      snoozedUntil,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    return createApiErrorResponse('Failed to snooze reminder', 500);
   }
 };
