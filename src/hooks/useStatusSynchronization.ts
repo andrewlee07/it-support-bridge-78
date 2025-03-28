@@ -10,6 +10,7 @@ import {
   updateMandatoryFieldsConfig,
   synchronizeReleaseStatus
 } from '@/api/statusSynchronization';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useStatusSynchronization = () => {
   const [settings, setSettings] = useState<StatusSynchronizationSettings>({
@@ -44,7 +45,13 @@ export const useStatusSynchronization = () => {
       
       // Fetch mandatory fields
       const fields = await getMandatoryFieldsConfig('release');
-      setMandatoryFields(fields);
+      
+      // Ensure all fields have IDs
+      const fieldsWithIds = fields.map(field => 
+        field.id ? field : { ...field, id: uuidv4() }
+      );
+      
+      setMandatoryFields(fieldsWithIds);
       
       setError(null);
     } catch (err) {
@@ -86,8 +93,13 @@ export const useStatusSynchronization = () => {
   const updateMandatoryFields = async (fields: MandatoryFieldConfig[]) => {
     setIsLoading(true);
     try {
-      await updateMandatoryFieldsConfig('release', fields);
-      setMandatoryFields(fields);
+      // Ensure all fields have IDs before saving
+      const fieldsWithIds = fields.map(field => 
+        field.id ? field : { ...field, id: uuidv4() }
+      );
+      
+      await updateMandatoryFieldsConfig('release', fieldsWithIds);
+      setMandatoryFields(fieldsWithIds);
     } catch (err) {
       toast({
         title: 'Error',

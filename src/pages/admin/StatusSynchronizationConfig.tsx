@@ -17,6 +17,7 @@ import PageTransition from '@/components/shared/PageTransition';
 import Breadcrumb from '@/components/shared/Breadcrumb';
 import MandatoryFieldsConfig from '@/components/admin/configuration/MandatoryFieldsConfig';
 import { MandatoryFieldConfig } from '@/utils/types/configuration';
+import { v4 as uuidv4 } from 'uuid';
 
 const StatusSynchronizationConfig = () => {
   const { toast } = useToast();
@@ -48,7 +49,11 @@ const StatusSynchronizationConfig = () => {
   };
 
   const handleSaveMandatoryFields = (fields: MandatoryFieldConfig[]) => {
-    updateMandatoryFields(fields);
+    // Ensure all fields have an ID before saving
+    const fieldsWithIds = fields.map(field => 
+      field.id ? field : { ...field, id: uuidv4() }
+    );
+    updateMandatoryFields(fieldsWithIds);
   };
 
   const breadcrumbItems = [
@@ -148,11 +153,11 @@ const StatusSynchronizationConfig = () => {
               <MandatoryFieldsConfig
                 entityType="release"
                 fields={mandatoryFields || [
-                  { fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'release', description: 'The name of the release' },
-                  { fieldName: 'version', displayName: 'Version', isRequired: false, entityType: 'release', description: 'The version number of the release' },
-                  { fieldName: 'description', displayName: 'Description', isRequired: false, entityType: 'release', description: 'A detailed description of the release' },
-                  { fieldName: 'plannedDate', displayName: 'Planned Date', isRequired: false, entityType: 'release', description: 'The planned release date' },
-                  { fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'release', description: 'The current status of the release' }
+                  { id: uuidv4(), fieldName: 'title', displayName: 'Title', isRequired: true, entityType: 'release', description: 'The name of the release' },
+                  { id: uuidv4(), fieldName: 'version', displayName: 'Version', isRequired: false, entityType: 'release', description: 'The version number of the release' },
+                  { id: uuidv4(), fieldName: 'description', displayName: 'Description', isRequired: false, entityType: 'release', description: 'A detailed description of the release' },
+                  { id: uuidv4(), fieldName: 'plannedDate', displayName: 'Planned Date', isRequired: false, entityType: 'release', description: 'The planned release date' },
+                  { id: uuidv4(), fieldName: 'status', displayName: 'Status', isRequired: true, entityType: 'release', description: 'The current status of the release' }
                 ]}
                 onSave={handleSaveMandatoryFields}
                 isLoading={isLoading}

@@ -9,6 +9,7 @@ import { AlertTriangle, Save, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { v4 as uuidv4 } from 'uuid';
 
 interface MandatoryFieldsConfigProps {
   entityType: ConfigurableEntityType;
@@ -23,7 +24,12 @@ const MandatoryFieldsConfig: React.FC<MandatoryFieldsConfigProps> = ({
   onSave,
   isLoading = false,
 }) => {
-  const [mandatoryFields, setMandatoryFields] = useState<MandatoryFieldConfig[]>(fields);
+  // Ensure all field items have IDs by adding them if missing
+  const fieldsWithIds = fields.map(field => 
+    field.id ? field : { ...field, id: uuidv4() }
+  );
+  
+  const [mandatoryFields, setMandatoryFields] = useState<MandatoryFieldConfig[]>(fieldsWithIds);
   const [hasChanges, setHasChanges] = useState(false);
   const { toast } = useToast();
 
@@ -38,7 +44,11 @@ const MandatoryFieldsConfig: React.FC<MandatoryFieldsConfigProps> = ({
   };
 
   const handleSave = () => {
-    onSave(mandatoryFields);
+    // Ensure all fields have IDs before saving
+    const fieldsToSave = mandatoryFields.map(field => 
+      field.id ? field : { ...field, id: uuidv4() }
+    );
+    onSave(fieldsToSave);
     setHasChanges(false);
     toast({
       title: "Mandatory fields updated",
@@ -47,7 +57,7 @@ const MandatoryFieldsConfig: React.FC<MandatoryFieldsConfigProps> = ({
   };
 
   const handleReset = () => {
-    setMandatoryFields(fields);
+    setMandatoryFields(fieldsWithIds);
     setHasChanges(false);
   };
 
@@ -100,7 +110,7 @@ const MandatoryFieldsConfig: React.FC<MandatoryFieldsConfigProps> = ({
           </TableHeader>
           <TableBody>
             {mandatoryFields.map((field) => (
-              <TableRow key={field.fieldName} className={field.isResolutionField ? "bg-blue-50" : ""}>
+              <TableRow key={field.id || field.fieldName} className={field.isResolutionField ? "bg-blue-50" : ""}>
                 <TableCell className="font-medium">
                   {field.displayName}
                   {field.isResolutionField && (

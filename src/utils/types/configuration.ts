@@ -37,7 +37,7 @@ export type ConfigurableEntityType =
   | 'release';
 
 export interface MandatoryFieldConfig {
-  id: string;
+  id?: string; // Make id optional to allow objects without id
   entityType: ConfigurableEntityType;
   fieldName: string;
   displayName: string;
