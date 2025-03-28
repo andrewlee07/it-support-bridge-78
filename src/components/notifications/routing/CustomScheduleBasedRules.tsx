@@ -38,6 +38,14 @@ const CustomScheduleBasedRules = () => {
     toast.success('New schedule rule created successfully');
   };
 
+  const handleRuleChange = (updatedRule: ScheduleRule) => {
+    toast.success(`Rule "${updatedRule.name}" updated successfully`);
+  };
+
+  const handleRuleDelete = (ruleId: string) => {
+    toast.success(`Rule deleted successfully`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -61,9 +69,12 @@ const CustomScheduleBasedRules = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Pass rules as props to the component */}
-          {/* Note: We're using 'any' here as a temporary workaround since we can't modify ScheduleBasedRules */}
-          <ScheduleBasedRules initialRules={initializedRules} {...({} as any)} />
+          {/* Pass rules as props to the component with proper type casting */}
+          <ScheduleBasedRules 
+            initialRules={initializedRules} 
+            onRuleChange={handleRuleChange}
+            onRuleDelete={handleRuleDelete}
+          />
         </CardContent>
       </Card>
       

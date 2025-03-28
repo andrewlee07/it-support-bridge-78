@@ -1,56 +1,170 @@
 
-// Re-export all event types for easier imports
-export * from './eventTypeDefinitions';
-export * from './coreTypes';
-export * from './sourceTypes';
-export * from './problemEventTypes';
-export * from './reminderEventTypes';
-export * from './taskEventTypes';
-export * from './knowledgeEventTypes';
-export * from './knownErrorEventTypes';
-export * from './releaseEventTypes';
-export * from './backlogItemEventTypes';
-export * from './testEventTypes';
-export * from './eventDataMap';
-export * from './notificationTypes';
+// Define common EventType for consistent usage across components
+export type EventType = 
+  | 'ticket.created' 
+  | 'ticket.updated' 
+  | 'ticket.assigned' 
+  | 'ticket.resolved' 
+  | 'ticket.closed' 
+  | 'ticket.reopened'
+  | 'incident.created'
+  | 'incident.updated'
+  | 'incident.assigned'
+  | 'incident.resolved'
+  | 'incident.closed'
+  | 'incident.reopened'
+  | 'incident.updated.critical'
+  | 'incident.resolved.success'
+  | 'incident.resolved.partial'
+  | 'incident.created.p1'
+  | 'incident.created.p2'
+  | 'incident.created.p3'
+  | 'incident.created.p4'
+  | 'incident.escalated'
+  | 'incident.escalated.critical'
+  | 'incident.escalated.high'
+  | 'security.created'
+  | 'security.updated'
+  | 'security.assigned'
+  | 'security.resolved'
+  | 'security.closed'
+  | 'security.reopened'
+  | 'security.created.high'
+  | 'security.created.medium'
+  | 'security.created.low'
+  | 'security.escalated'
+  | 'security.escalated.critical'
+  | 'security.investigation.updated'
+  | 'security.breach.detected'
+  | 'security.compliance.issue'
+  | 'service.created'
+  | 'service.updated'
+  | 'service.assigned'
+  | 'service.resolved'
+  | 'service.closed'
+  | 'service.reopened'
+  | 'service.approved'
+  | 'service.rejected'
+  | 'service.created.high'
+  | 'service.created.medium'
+  | 'service.created.low'
+  | 'change.created'
+  | 'change.updated'
+  | 'change.approved'
+  | 'change.rejected'
+  | 'change.implemented'
+  | 'change.implemented.success'
+  | 'change.implemented.failure'
+  | 'change.implemented.partial'
+  | 'change.rollback'
+  | 'change.emergency.created'
+  | 'change.emergency.approved'
+  | 'change.submitted'
+  | 'change.reviewed'
+  | 'change.tested'
+  | 'change.canceled'
+  | 'problem.created'
+  | 'problem.updated'
+  | 'problem.assigned'
+  | 'problem.rootCauseIdentified'
+  | 'problem.workaroundAvailable'
+  | 'problem.resolved'
+  | 'problem.closed'
+  | 'problem.created.critical'
+  | 'problem.created.high'
+  | 'problem.resolved.success'
+  | 'problem.resolved.partial'
+  | 'sla.warning'
+  | 'sla.warning.response'
+  | 'sla.warning.resolution'
+  | 'sla.warning.update'
+  | 'sla.warning.approaching'
+  | 'sla.warning.imminent'
+  | 'sla.breached'
+  | 'sla.breached.response'
+  | 'sla.breached.resolution'
+  | 'sla.breached.update'
+  | 'task.created'
+  | 'task.updated'
+  | 'task.assigned'
+  | 'task.dueDateApproaching'
+  | 'task.overdue'
+  | 'task.completed'
+  | 'task.statusChanged'
+  | 'task.overdue.critical'
+  | 'task.overdue.high'
+  | 'task.overdue.medium'
+  | 'task.completed.success'
+  | 'task.completed.partial'
+  | 'task.deleted'
+  | 'release.created'
+  | 'release.updated'
+  | 'release.deployed'
+  | 'release.planApproved'
+  | 'release.readyForTest'
+  | 'release.testCompleted'
+  | 'release.scheduledDeployment'
+  | 'release.deploymentStarted'
+  | 'release.deploymentCompleted'
+  | 'release.deploymentCompleted.success'
+  | 'release.deploymentCompleted.failure'
+  | 'release.deploymentCompleted.partial'
+  | 'release.rollback'
+  | 'release.verified'
+  | 'release.buildStarted'
+  | 'release.buildCompleted'
+  | 'release.buildCompleted.success'
+  | 'release.buildCompleted.failure'
+  | 'release.canceled'
+  | 'asset.created'
+  | 'asset.updated'
+  | 'asset.retired'
+  | 'asset.expiring'
+  | 'asset.expiring.approaching'
+  | 'asset.expiring.imminent'
+  | 'asset.maintenance.scheduled'
+  | 'test.created'
+  | 'test.executed'
+  | 'test.passed'
+  | 'test.failed'
+  | 'test.failed.critical'
+  | 'test.failed.high'
+  | 'knowledge.created'
+  | 'knowledge.updated'
+  | 'knowledge.published'
+  | 'knownError.created'
+  | 'knownError.updated'
+  | 'knownError.workaroundUpdated'
+  | 'knownError.planToFix'
+  | 'knownError.resolved'
+  | 'backlogItem.created'
+  | 'backlogItem.priorityChanged'
+  | 'backlogItem.addedToSprint'
+  | 'backlogItem.removedFromSprint'
+  | 'backlogItem.statusChanged'
+  | 'backlogItem.readyForReview'
+  | 'backlogItem.completed'
+  | 'backlogItem.completed.success'
+  | 'backlogItem.completed.partial'
+  | 'reminder.upcoming'
+  | 'reminder.upcoming.approaching'
+  | 'reminder.upcoming.imminent'
+  | 'reminder.due'
+  | 'reminder.recurring'
+  | 'reminder.snoozed'
+  | 'reminder.canceled'
+  | 'testCase.created'
+  | 'testCase.updated'
+  | 'testExecution.scheduled'
+  | 'testExecution.started'
+  | 'testExecution.failed'
+  | 'testExecution.failed.critical'
+  | 'testExecution.failed.high'
+  | 'testExecution.completed'
+  | 'testExecution.completed.success'
+  | 'testExecution.completed.partial'
+  | 'testExecution.blocked';
+
+// Export additional types
 export * from './channelMappingTypes';
-
-// Add these types to the main export if they don't already exist in the files above
-export interface WebhookConfig {
-  id: string;
-  name: string;
-  url: string;
-  events?: string[];
-  eventTypes?: string[];
-  enabled?: boolean;
-  active?: boolean;
-  secret?: string;
-  headers?: Record<string, string>;
-  createdAt: string;
-  updatedAt: string;
-  authentication?: {
-    type: 'none' | 'basic' | 'bearer' | 'custom';
-    token?: string;
-    username?: string;
-    password?: string;
-    customHeader?: string;
-  };
-}
-
-export interface WebhookDeliveryLog {
-  id: string;
-  webhookId: string;
-  eventId: string;
-  timestamp?: string;
-  requestTimestamp?: string;
-  responseTimestamp?: string;
-  requestBody?: string;
-  responseStatus?: number;
-  statusCode?: number;
-  responseBody?: string;
-  status?: 'success' | 'failed';
-  success?: boolean;
-  error?: string;
-  retries?: number;
-  retryCount?: number;
-}
+export * from './notificationTypes';

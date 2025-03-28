@@ -42,7 +42,7 @@ const CustomRecipientMappingConfig = () => {
         </CardHeader>
         <CardContent>
           {/* Use the protected component with our custom handlers */}
-          <RecipientMappingConfig />
+          <RecipientMappingConfig onMappingChange={handleMappingChange} />
         </CardContent>
       </Card>
       
