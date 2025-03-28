@@ -1,32 +1,43 @@
 
-export interface BusinessHours {
+export interface BusinessHoursConfig {
   id: string;
   name: string;
-  startTime: string; // In format "HH:MM" (24-hour)
-  endTime: string;   // In format "HH:MM" (24-hour)
-  workingDays: WorkingDay[];
-  timeZone: string;  // IANA time zone name (e.g., "Europe/London")
-  dstRules: DaylightSavingRule[];
-  entityType: 'incident' | 'service-request';
-  isActive: boolean;
+  description: string;
+  timeZone: string;
+  monday: DaySchedule;
+  tuesday: DaySchedule;
+  wednesday: DaySchedule;
+  thursday: DaySchedule;
+  friday: DaySchedule;
+  saturday: DaySchedule;
+  sunday: DaySchedule;
+  holidays: Holiday[];
+  isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type WorkingDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export interface DaySchedule {
+  isWorkingDay: boolean;
+  workingHours: TimeRange[];
+}
 
-export interface DaylightSavingRule {
+export interface TimeRange {
+  start: string; // HH:MM format
+  end: string; // HH:MM format
+}
+
+export interface Holiday {
   id: string;
   name: string;
-  startDate: Date;  // When DST starts
-  endDate: Date;    // When DST ends
-  offsetMinutes: number; // Typically 60 (1 hour)
-  year: number;
-  isActive: boolean;
+  date: Date;
+  description?: string;
+  recurring: boolean;
 }
 
 export interface SLACalculationOptions {
-  pauseOutsideBusinessHours: boolean;
-  pauseDuringPendingStatus: boolean;
+  includeBusinessHoursOnly: boolean;
   businessHoursId?: string;
+  excludeWeekends: boolean;
+  excludeHolidays: boolean;
 }

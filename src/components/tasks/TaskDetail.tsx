@@ -1,143 +1,82 @@
 
 import React from 'react';
-import { Task, getTaskStatusVisuals, getTaskPriorityVisuals } from '@/utils/types/taskTypes';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { CalendarIcon, CheckSquare, Clock, Edit, Trash } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
+import { CalendarIcon, Clock, User } from 'lucide-react';
+import { Task } from '@/utils/types/taskTypes';
 
 interface TaskDetailProps {
   task: Task;
-  onEdit?: () => void;
-  onDelete?: () => void;
 }
 
-const TaskDetail: React.FC<TaskDetailProps> = ({ task, onEdit, onDelete }) => {
-  const statusVisuals = getTaskStatusVisuals(task.status);
-  const priorityVisuals = getTaskPriorityVisuals(task.priority);
-  
+const TaskDetail: React.FC<TaskDetailProps> = ({ task }) => {
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-2xl">{task.title}</CardTitle>
-            <CardDescription className="mt-1">
-              Task ID: {task.id}
-            </CardDescription>
-          </div>
-          <div className="flex space-x-2">
-            <Badge className={statusVisuals.badge}>{task.status}</Badge>
-            <Badge className={priorityVisuals.badge}>{task.priority}</Badge>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        <div>
-          <h3 className="text-lg font-medium mb-2">Description</h3>
-          <div className="bg-muted/30 p-4 rounded-md whitespace-pre-wrap">
-            {task.description || 'No description provided.'}
-          </div>
+    <Card className="mb-6">
+      <CardContent className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <h2 className="text-2xl font-bold">{task.title}</h2>
+          <Badge 
+            variant={
+              task.status === 'completed' ? 'success' :
+              task.status === 'in-progress' ? 'default' :
+              task.status === 'on-hold' ? 'warning' : 'secondary'
+            }
+          >
+            {task.status}
+          </Badge>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="text-sm font-medium mb-1">Status</h3>
-            <div className="flex items-center">
-              <Badge className={statusVisuals.badge}>{task.status}</Badge>
-            </div>
+        <div className="flex gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4 text-muted-foreground" />
+            <span>{task.assignee || 'Unassigned'}</span>
           </div>
           
-          <div>
-            <h3 className="text-sm font-medium mb-1">Priority</h3>
-            <div className="flex items-center">
-              <Badge className={priorityVisuals.badge}>{task.priority}</Badge>
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="text-sm font-medium mb-1">Assigned To</h3>
-            <div>{task.assignedTo || 'Unassigned'}</div>
-          </div>
-          
-          <div>
-            <h3 className="text-sm font-medium mb-1">Created By</h3>
-            <div>{task.createdBy}</div>
-          </div>
-          
-          <div>
-            <h3 className="text-sm font-medium mb-1">Created At</h3>
-            <div className="flex items-center">
-              <CalendarIcon className="h-4 w-4 mr-1" />
-              {format(new Date(task.createdAt), 'PPP')}
-            </div>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span>{task.estimatedHours || 0} hours</span>
           </div>
           
           {task.dueDate && (
-            <div>
-              <h3 className="text-sm font-medium mb-1">Due Date</h3>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                {format(new Date(task.dueDate), 'PPP')}
-              </div>
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+              <span>Due {formatDistanceToNow(new Date(task.dueDate), { addSuffix: true })}</span>
             </div>
           )}
-          
-          <div>
-            <h3 className="text-sm font-medium mb-1">Estimated Hours</h3>
-            <div>{task.estimatedHours || 'Not estimated'}</div>
-          </div>
-          
-          <div>
-            <h3 className="text-sm font-medium mb-1">Actual Hours</h3>
-            <div>{task.actualHours || 0}</div>
-          </div>
         </div>
         
-        {task.checklist && task.checklist.length > 0 && (
-          <div>
-            <h3 className="text-lg font-medium mb-2">Checklist</h3>
-            <div className="space-y-2">
-              {task.checklist.map((item) => (
-                <div key={item.id} className="flex items-start">
-                  <CheckSquare className={`h-5 w-5 mr-2 ${item.completed ? 'text-green-500' : 'text-gray-400'}`} />
-                  <div className={item.completed ? 'line-through text-muted-foreground' : ''}>
-                    {item.text}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <Separator className="my-4" />
         
-        {task.relatedItemId && (
+        <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-medium mb-2">Related Item</h3>
+            <h3 className="font-medium mb-2">Description</h3>
+            <p className="text-muted-foreground">{task.description}</p>
+          </div>
+          
+          {task.checklist && task.checklist.length > 0 && (
             <div>
-              Type: {task.relatedItemType}<br />
-              ID: {task.relatedItemId}
+              <h3 className="font-medium mb-2">Checklist</h3>
+              <ul className="space-y-2">
+                {task.checklist.map(item => (
+                  <li key={item.id} className="flex items-start gap-2">
+                    <input 
+                      type="checkbox" 
+                      checked={item.completed} 
+                      readOnly 
+                      className="mt-1"
+                    />
+                    <span className={item.completed ? 'line-through text-muted-foreground' : ''}>
+                      {item.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </CardContent>
-      
-      <CardFooter className="flex justify-end space-x-2 pt-6">
-        {onEdit && (
-          <Button variant="outline" onClick={onEdit}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-        )}
-        
-        {onDelete && (
-          <Button variant="destructive" onClick={onDelete}>
-            <Trash className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
-        )}
-      </CardFooter>
     </Card>
   );
 };

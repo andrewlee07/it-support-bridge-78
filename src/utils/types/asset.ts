@@ -22,10 +22,27 @@ export interface Asset {
   nextMaintenanceDate?: Date;
   maintenanceFrequency?: string;
   notes?: string;
+  audit?: any[];
 }
 
-export type AssetStatus = 'active' | 'inactive' | 'maintenance' | 'retired' | 'lost' | 'on-order';
-export type AssetType = 'hardware' | 'software' | 'service' | 'furniture' | 'vehicle' | 'other';
+export type AssetStatus = 
+  | 'active' 
+  | 'inactive' 
+  | 'maintenance' 
+  | 'retired' 
+  | 'lost' 
+  | 'on-order'
+  | 'available'
+  | 'in-use';
+
+export type AssetType = 
+  | 'hardware' 
+  | 'software' 
+  | 'service' 
+  | 'furniture' 
+  | 'vehicle' 
+  | 'other'
+  | 'license';
 
 export interface AssetMaintenance {
   id: string;

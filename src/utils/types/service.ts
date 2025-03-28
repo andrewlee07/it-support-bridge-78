@@ -17,6 +17,7 @@ export interface Service {
   parentServiceId?: string;
   technicalServiceIds?: string[];
   businessServiceIds?: string[];
+  category?: ServiceCategory; // For compatibility
 }
 
 export interface ServiceCategory {
@@ -55,6 +56,9 @@ export interface ServiceWithRelationships extends ServiceWithCategory {
     technical?: ServiceWithCategory[];
     business?: ServiceWithCategory[];
     related?: ServiceWithCategory[];
+    filter?: (predicate: (value: ServiceWithCategory, index: number, array: ServiceWithCategory[]) => boolean) => ServiceWithCategory[];
+    map?: <U>(callback: (value: ServiceWithCategory, index: number, array: ServiceWithCategory[]) => U) => U[];
+    length?: number;
   };
 }
 
@@ -80,6 +84,9 @@ export interface BusinessUnit {
   id: string;
   name: string;
   description: string;
+  managerIds?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface ServiceBusinessUnit {
@@ -87,6 +94,7 @@ export interface ServiceBusinessUnit {
   serviceId: string;
   businessUnitId: string;
   criticality: ServiceBusinessUnitCriticality;
+  notes?: string;
 }
 
 export type ServiceBusinessUnitCriticality = 'critical' | 'high' | 'medium' | 'low';
@@ -108,6 +116,10 @@ export interface ServiceKnowledge {
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
+  knowledgeArticleId?: string;
+  relationshipType?: string;
+  isPrimary?: boolean;
+  displayOrder?: number;
 }
 
 export type ServiceKnowledgeRelationshipType = 'faqs' | 'troubleshooting' | 'howto' | 'documentation';
@@ -123,8 +135,11 @@ export interface ClientContract {
   renewalDate?: Date;
   contactPerson: string;
   contactEmail: string;
-  status: 'active' | 'expired' | 'pending' | 'terminated';
+  status: 'active' | 'expired' | 'pending' | 'terminated' | 'completed';
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
+  name?: string;
+  description?: string;
+  businessServiceIds?: string[];
 }

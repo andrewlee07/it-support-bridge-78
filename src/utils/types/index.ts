@@ -1,4 +1,3 @@
-
 // API Response Type
 export interface ApiError {
   message: string;
@@ -116,7 +115,6 @@ export interface ChangeRequest {
   closureReason?: ClosureReason;
   closureNotes?: string;
   assessmentScore?: number;
-  assessmentRiskLevel?: RiskLevel;
   assessmentAnswers?: RiskAssessmentAnswer[];
   relatedItemIds?: string[];
 }
@@ -190,3 +188,174 @@ export * from './taskTypes';
 export * from './test';
 export * from './service';
 export * from './asset';
+export * from './configuration';
+export * from './sla';
+export * from './api';
+
+// Make sure we have all the necessary export types for ApiError
+export interface ApiError {
+  message: string;
+  code: number;
+}
+
+// Define RiskAssessmentQuestion
+export interface RiskAssessmentQuestion {
+  id: string;
+  question: string;
+  description?: string;
+  weight: number;
+  active: boolean;
+  answers: RiskAssessmentQuestionOption[];
+  isRequired?: boolean;
+}
+
+export interface RiskAssessmentQuestionOption {
+  id: string;
+  text: string;
+  value: number;
+}
+
+export interface RiskAssessmentAnswer {
+  questionId: string;
+  selectedOptionId: string;
+  value: number;
+}
+
+export type RiskLevel = 'low' | 'medium' | 'high';
+
+export interface RiskThreshold {
+  id: string;
+  level: RiskLevel;
+  minScore: number;
+  maxScore: number;
+}
+
+// Export ChangeStatus and related types
+export type ChangeStatus = 
+  | 'draft' 
+  | 'pending' 
+  | 'approved' 
+  | 'implementing' 
+  | 'implemented' 
+  | 'failed' 
+  | 'cancelled' 
+  | 'rejected'
+  | 'submitted'
+  | 'in-progress'
+  | 'completed';
+
+export type ChangeCategory = 'standard' | 'normal' | 'emergency';
+export type ClosureReason = 'successful' | 'successful-with-issues' | 'rolled-back' | 'failed';
+export type ApproverRole = 'it' | 'user' | 'change-manager';
+
+export interface ChangeRequest {
+  id: string;
+  title: string;
+  description: string;
+  status: ChangeStatus;
+  priority: string;
+  category: ChangeCategory;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+  startDate: Date;
+  endDate: Date;
+  implementationPlan: string;
+  rollbackPlan: string;
+  approverRoles?: ApproverRole[];
+  approvers?: string[];
+  approvalStatus?: Record<string, boolean>;
+  closureReason?: ClosureReason;
+  closureNotes?: string;
+  assessmentScore?: number;
+  assessmentAnswers?: RiskAssessmentAnswer[];
+  relatedItemIds?: string[];
+  
+  // Additional fields needed for compatibility
+  approvedBy?: string;
+  approvedAt?: Date;
+  implementor?: string;
+  audit?: any[];
+  riskScore?: number;
+  riskLevel?: RiskLevel;
+  type?: string;
+  assignedTo?: string;
+}
+
+// Announcement types
+export type AnnouncementStatus = 'active' | 'draft' | 'expired';
+export type AnnouncementPriority = 'low' | 'medium' | 'high' | 'critical';
+export type AnnouncementType = 'outage' | 'maintenance' | 'information' | 'other';
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  status: AnnouncementStatus;
+  priority: AnnouncementPriority;
+  type: AnnouncementType;
+  createdBy: string;
+  creatorName: string;
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+  expiresAt?: Date | string;
+  relatedIncidentId?: string;
+  audienceGroups?: string[];
+  publishedAt?: Date;
+}
+
+// User types
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  department?: string;
+  title?: string;
+  avatarUrl?: string;
+  isActive: boolean;
+  lastLogin?: Date;
+  createdAt: Date;
+}
+
+export type UserRole = 'admin' | 'manager' | 'user' | 'technician' | 'it' | 'change-manager' | 'agent' | 'developer' | 'problem-manager' | 'release-manager' | 'service-catalog-manager' | 'knowledge-author' | 'knowledge-reviewer';
+
+// Define AuditEntry
+export interface AuditEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  details: string;
+  timestamp: Date;
+  ipAddress?: string;
+  changedFields?: Record<string, { oldValue: any; newValue: any }>;
+  performedBy?: string;
+  message?: string;
+}
+
+// Define PaginatedResponse for consistent usage
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// Email related types
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
+  description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isActive: boolean;
+  variables: string[];
+}
