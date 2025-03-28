@@ -22,6 +22,9 @@ export const useBacklogFetch = () => {
         } else if (response.data) {
           // If response is a PaginatedResponse object, extract the data property
           setBacklogItems(response.data);
+        } else if (response.items) {
+          // Some responses might use 'items' instead of 'data'
+          setBacklogItems(response.items);
         } else {
           console.error('Unexpected response format:', response);
           toast.error('Failed to load backlog items: unexpected data format');
