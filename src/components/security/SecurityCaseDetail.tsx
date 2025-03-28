@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -37,26 +37,26 @@ export interface SecurityCaseDetailProps {
   isInline?: boolean;
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return format(date, 'MMM dd, yyyy');
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'Active': return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
-    case 'Pending': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
-    case 'Resolved': return 'bg-green-100 text-green-800 hover:bg-green-100';
-    default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
-  }
-};
-
 const SecurityCaseDetail: React.FC<SecurityCaseDetailProps> = ({ 
   securityCase, 
   open = false, 
   onClose = () => {}, 
   isInline = false 
 }) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, 'MMM dd, yyyy');
+  };
+  
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Active': return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
+      case 'Pending': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
+      case 'Resolved': return 'bg-green-100 text-green-800 hover:bg-green-100';
+      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
+    }
+  };
+
   const detailContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-start">
@@ -104,7 +104,7 @@ const SecurityCaseDetail: React.FC<SecurityCaseDetailProps> = ({
         </div>
       </div>
       
-      {/* Create from Security Case Actions */}
+      {/* Create Related Items */}
       {!isInline && (
         <CreateRelatedItemsCard 
           sourceId={securityCase.id}

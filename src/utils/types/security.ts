@@ -36,6 +36,13 @@ export interface SecurityCase {
     createdBy: string;
     createdAt: string;
   }[];
+  relatedItems?: {
+    id: string;
+    type: string;
+    title: string;
+    status: string;
+    createdAt?: string;
+  }[];
   relatedAssets?: string[];
   relatedTickets?: string[];
   attachments?: {
