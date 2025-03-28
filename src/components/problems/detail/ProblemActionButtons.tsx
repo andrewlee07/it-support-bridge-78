@@ -1,11 +1,13 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, RefreshCcw } from 'lucide-react';
+import { AlertCircle, FileText } from 'lucide-react';
+import CreateKnownErrorDialog from '../CreateKnownErrorDialog';
+import { Problem } from '@/utils/types/problem';
+import { toast } from 'sonner';
 
 interface ProblemActionButtonsProps {
+  problem: Problem;
   canClose: boolean;
   canReopen: boolean;
   isClosed: boolean;
@@ -13,97 +15,70 @@ interface ProblemActionButtonsProps {
   onReopenProblem: (reason: string) => void;
 }
 
-const ProblemActionButtons = ({ 
-  canClose, 
-  canReopen, 
-  isClosed, 
-  onCloseProblem, 
-  onReopenProblem 
-}: ProblemActionButtonsProps) => {
-  const [isClosingDialogOpen, setIsClosingDialogOpen] = useState(false);
-  const [isReopenDialogOpen, setIsReopenDialogOpen] = useState(false);
-  const [closureNotes, setClosureNotes] = useState('');
-  const [reopenReason, setReopenReason] = useState('');
-
-  const handleCloseProblemClick = () => {
-    onCloseProblem(closureNotes);
-    setIsClosingDialogOpen(false);
-    setClosureNotes('');
+const ProblemActionButtons: React.FC<ProblemActionButtonsProps> = ({
+  problem,
+  canClose,
+  canReopen,
+  isClosed,
+  onCloseProblem,
+  onReopenProblem
+}) => {
+  const [knownErrorDialogOpen, setKnownErrorDialogOpen] = useState(false);
+  const [closeProblemDialogOpen, setCloseProblemDialogOpen] = useState(false);
+  const [reopenDialogOpen, setReopenDialogOpen] = useState(false);
+  
+  const handleCreateKnownError = (knownErrorId: string) => {
+    toast.success(`Created Known Error #${knownErrorId} from this problem`);
+    // In a real app, we'd update the problem with the relation
   };
-
-  const handleReopenProblemClick = () => {
-    onReopenProblem(reopenReason);
-    setIsReopenDialogOpen(false);
-    setReopenReason('');
-  };
-
+  
   return (
-    <div className="flex space-x-2">
-      {canClose && !isClosed && (
-        <Dialog open={isClosingDialogOpen} onOpenChange={setIsClosingDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="flex items-center">
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Close Problem
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Close Problem</DialogTitle>
-              <DialogDescription>
-                Add any final notes before closing this problem record.
-              </DialogDescription>
-            </DialogHeader>
-            <Textarea
-              value={closureNotes}
-              onChange={(e) => setClosureNotes(e.target.value)}
-              placeholder="Add any final notes..."
-              className="min-h-[100px]"
-            />
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsClosingDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleCloseProblemClick}>
-                Close Problem
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+    <div className="flex flex-wrap gap-2 justify-end">
+      {!isClosed && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1"
+          onClick={() => setKnownErrorDialogOpen(true)}
+        >
+          <AlertCircle className="h-4 w-4" />
+          <span>Create Known Error</span>
+        </Button>
+      )}
+      
+      {canClose && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            // Simple implementation - would show dialog in real app
+            onCloseProblem("Problem closed after resolution.");
+          }}
+        >
+          Close Problem
+        </Button>
       )}
       
       {canReopen && (
-        <Dialog open={isReopenDialogOpen} onOpenChange={setIsReopenDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center">
-              <RefreshCcw className="mr-2 h-4 w-4" />
-              Reopen Problem
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Reopen Problem</DialogTitle>
-              <DialogDescription>
-                Provide a reason for reopening this problem record.
-              </DialogDescription>
-            </DialogHeader>
-            <Textarea
-              value={reopenReason}
-              onChange={(e) => setReopenReason(e.target.value)}
-              placeholder="Reason for reopening..."
-              className="min-h-[100px]"
-            />
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsReopenDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleReopenProblemClick}>
-                Reopen Problem
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            // Simple implementation - would show dialog in real app
+            onReopenProblem("Problem reopened for further investigation.");
+          }}
+        >
+          Reopen Problem
+        </Button>
       )}
+      
+      {/* Known Error Dialog */}
+      <CreateKnownErrorDialog
+        open={knownErrorDialogOpen}
+        onOpenChange={setKnownErrorDialogOpen}
+        problem={problem}
+        onSuccess={handleCreateKnownError}
+      />
     </div>
   );
 };

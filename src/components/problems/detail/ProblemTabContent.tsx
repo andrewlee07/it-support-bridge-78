@@ -1,13 +1,12 @@
 
 import React from 'react';
-import { Problem } from '@/utils/types/problem';
 import { TabsContent } from '@/components/ui/tabs';
+import { Problem } from '@/utils/types/problem';
 import ProblemDetails from '../ProblemDetails';
-import ProblemActivity from '../ProblemActivity';
 import ProblemUpdateForm from '../ProblemUpdateForm';
 import ProblemResolveForm from '../ProblemResolveForm';
 import ProblemNoteForm from '../ProblemNoteForm';
-import KnownErrorForm from '../KnownErrorForm';
+import RelatedItemsCard from '@/components/shared/RelatedItemsCard';
 
 interface ProblemTabContentProps {
   activeTab: string;
@@ -20,7 +19,7 @@ interface ProblemTabContentProps {
   setActiveTab: (tab: string) => void;
 }
 
-const ProblemTabContent = ({
+const ProblemTabContent: React.FC<ProblemTabContentProps> = ({
   activeTab,
   problem,
   isClosed,
@@ -29,64 +28,105 @@ const ProblemTabContent = ({
   onAddNote,
   onCreateKnownError,
   setActiveTab
-}: ProblemTabContentProps) => {
+}) => {
+  // Create mock relatedItems for demo purposes - in a real app this would come from the problem
+  const relatedItems = [
+    ...(problem.relatedIncidents || []).map(incidentId => ({
+      id: incidentId,
+      title: `Incident ${incidentId}`,
+      type: 'incident' as const,
+      status: 'resolved',
+      url: `/incidents/${incidentId}`
+    }))
+  ];
+  
+  if (problem.knownErrorId) {
+    relatedItems.push({
+      id: problem.knownErrorId,
+      title: `Known Error: ${problem.title}`,
+      type: 'knownError' as const,
+      status: 'active',
+      url: `/problems/known-errors/${problem.knownErrorId}`
+    });
+  }
+  
   return (
     <>
-      <TabsContent value="details" className="pt-2">
-        <ProblemDetails problem={problem} />
+      {/* Details Tab */}
+      <TabsContent value="details" className="mt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <ProblemDetails problem={problem} />
+          </div>
+          <div>
+            <RelatedItemsCard 
+              items={relatedItems}
+              title="Related Items"
+              description="Items associated with this problem"
+            />
+          </div>
+        </div>
       </TabsContent>
       
-      <TabsContent value="activity" className="pt-2">
-        <ProblemActivity auditEntries={problem.audit} />
-      </TabsContent>
-      
+      {/* Update Tab */}
       {!isClosed && (
-        <>
-          <TabsContent value="update" className="pt-2">
-            <div className="border p-6 rounded-md bg-muted/10">
-              <ProblemUpdateForm 
-                problem={problem} 
-                onSubmit={onUpdateProblem} 
-                onCancel={() => setActiveTab('details')}
-              />
+        <TabsContent value="update" className="mt-4">
+          <div className="border p-4 rounded-md bg-muted/30">
+            <ProblemUpdateForm 
+              problem={problem} 
+              onSubmit={(data) => {
+                onUpdateProblem(data);
+                setActiveTab('details');
+              }}
+              onCancel={() => setActiveTab('details')}
+            />
+          </div>
+        </TabsContent>
+      )}
+      
+      {/* Resolve Tab */}
+      {!isClosed && problem.status !== 'resolved' && problem.status !== 'known-error' && (
+        <TabsContent value="resolve" className="mt-4">
+          <ProblemResolveForm 
+            problem={problem}
+            onSubmit={(data) => {
+              onResolveProblem(data);
+              setActiveTab('details');
+            }}
+            onCancel={() => setActiveTab('details')}
+          />
+        </TabsContent>
+      )}
+      
+      {/* Add Note Tab */}
+      {!isClosed && (
+        <TabsContent value="note" className="mt-4">
+          <div className="border p-4 rounded-md bg-muted/30">
+            <ProblemNoteForm 
+              onSubmit={(note) => {
+                onAddNote(note);
+                setActiveTab('details');
+              }}
+              onCancel={() => setActiveTab('details')}
+            />
+          </div>
+        </TabsContent>
+      )}
+      
+      {/* Create Known Error Tab */}
+      {!isClosed && problem.status !== 'known-error' && (
+        <TabsContent value="known-error" className="mt-4">
+          <div className="border p-4 rounded-md bg-muted/30">
+            <h2 className="text-xl font-semibold mb-4">Create Known Error</h2>
+            <p className="text-muted-foreground mb-4">
+              Create a known error record from this problem. This will document the issue and any available workarounds.
+            </p>
+            {/* The form would be here, but we're using a dialog approach instead */}
+            <div className="flex justify-end">
+              <Button onClick={() => setActiveTab('details')}>Cancel</Button>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="resolve" className="pt-2">
-            <div className="border p-6 rounded-md bg-muted/10">
-              <ProblemResolveForm 
-                problem={problem} 
-                onSubmit={onResolveProblem} 
-                onCancel={() => setActiveTab('details')}
-              />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="note" className="pt-2">
-            <div className="border p-6 rounded-md bg-muted/10">
-              <ProblemNoteForm 
-                onSubmit={(note) => {
-                  onAddNote(note);
-                  setActiveTab('details');
-                }} 
-                onCancel={() => setActiveTab('details')}
-              />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="kedb" className="pt-2">
-            <div className="border p-6 rounded-md bg-muted/10">
-              <KnownErrorForm 
-                problem={problem} 
-                onSubmit={(data) => {
-                  onCreateKnownError(data);
-                  setActiveTab('details')}
-                } 
-                onCancel={() => setActiveTab('details')}
-              />
-            </div>
-          </TabsContent>
-        </>
+          </div>
+        </TabsContent>
       )}
     </>
   );

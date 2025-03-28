@@ -1,154 +1,78 @@
 
-import { 
-  fetchTasks, 
-  fetchTaskById, 
-  createTask, 
-  updateTask, 
-  deleteTask,
-  addTaskNote,
-  getTaskStats,
-  getTasksDueToday,
-  fetchTaskTemplates,
-  fetchTaskDependencies
-} from '@/utils/mockData/tasks/taskOperations';
+import { delay, createApiSuccessResponse, createApiErrorResponse } from '../mockData/apiHelpers';
+import { ApiResponse } from '../types';
+import { Task } from '../types/taskTypes';
 
-// Just re-export the functions from taskOperations
-export { 
-  fetchTasks, 
-  fetchTaskById, 
-  createTask, 
-  updateTask, 
-  deleteTask,
-  addTaskNote,
-  getTaskStats,
-  getTasksDueToday,
-  fetchTaskTemplates,
-  fetchTaskDependencies
-};
-
-// Add new API functions for reminders
-export const createReminder = async (reminder) => {
-  // For now, we'll mock this functionality
-  console.log("Creating reminder:", reminder);
-  return {
-    success: true,
-    data: {
-      id: `reminder-${Date.now()}`,
-      ...reminder,
+export const createTask = async (
+  taskData: Partial<Task>
+): Promise<ApiResponse<Task>> => {
+  try {
+    await delay(800);
+    
+    const newTask: Task = {
+      id: `TASK-${Math.floor(Math.random() * 10000)}`,
+      title: taskData.title || 'New Task',
+      description: taskData.description || '',
+      status: 'open',
+      priority: taskData.priority || 'medium',
+      category: taskData.category || 'general',
+      createdBy: taskData.creator || 'user-1',
+      assignedTo: taskData.assignedTo || null,
       createdAt: new Date(),
-    }
-  };
-};
-
-export const updateReminder = async (id, reminderData) => {
-  // For now, we'll mock this functionality
-  console.log("Updating reminder:", id, reminderData);
-  return {
-    success: true,
-    data: {
-      id,
-      ...reminderData,
       updatedAt: new Date(),
-    }
-  };
+      dueDate: taskData.dueDate || null,
+      completedAt: null,
+      estimatedHours: taskData.estimatedHours || 0,
+      actualHours: 0,
+      attachments: [],
+      relatedItemId: taskData.relatedItemId || null,
+      relatedItemType: taskData.relatedItemType || null
+    };
+    
+    return createApiSuccessResponse(newTask);
+  } catch (error) {
+    return createApiErrorResponse('Failed to create task', 500);
+  }
 };
 
-export const fetchReminders = async (userId) => {
-  // Mock data for now
-  return {
-    success: true,
-    data: []
-  };
+export const getTaskById = async (taskId: string): Promise<ApiResponse<Task>> => {
+  try {
+    await delay(300);
+    
+    // In a real app, you would fetch this from a database
+    const task: Task = {
+      id: taskId,
+      title: `Task ${taskId}`,
+      description: 'This is a sample task description',
+      status: 'open',
+      priority: 'medium',
+      category: 'general',
+      createdBy: 'user-1',
+      assignedTo: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      dueDate: null,
+      completedAt: null,
+      estimatedHours: 2,
+      actualHours: 0,
+      attachments: [],
+      relatedItemId: null,
+      relatedItemType: null
+    };
+    
+    return createApiSuccessResponse(task);
+  } catch (error) {
+    return createApiErrorResponse('Failed to fetch task', 500);
+  }
 };
 
-export const deleteReminder = async (id) => {
-  // Mock data for now
-  console.log("Deleting reminder:", id);
-  return {
-    success: true
-  };
-};
-
-export const snoozeReminder = async (id, duration) => {
-  // Mock data for now
-  console.log("Snoozing reminder:", id, "for", duration);
-  return {
-    success: true,
-    data: {
-      id,
-      snoozedUntil: new Date(Date.now() + duration),
-    }
-  };
-};
-
-// Time tracking functions
-export const startTimeTracking = async (taskId, userId) => {
-  console.log("Starting time tracking:", taskId, userId);
-  return {
-    success: true,
-    data: {
-      id: `time-entry-${Date.now()}`,
-      taskId,
-      userId,
-      startTime: new Date(),
-    }
-  };
-};
-
-export const stopTimeTracking = async (timeEntryId, description) => {
-  console.log("Stopping time tracking:", timeEntryId, description);
-  const endTime = new Date();
-  return {
-    success: true,
-    data: {
-      id: timeEntryId,
-      endTime,
-      description
-    }
-  };
-};
-
-export const addChecklistItem = async (taskId, itemText) => {
-  console.log("Adding checklist item:", taskId, itemText);
-  return {
-    success: true,
-    data: {
-      id: `checklist-${Date.now()}`,
-      text: itemText,
-      completed: false,
-      createdAt: new Date()
-    }
-  };
-};
-
-export const updateChecklistItem = async (taskId, itemId, updates) => {
-  console.log("Updating checklist item:", taskId, itemId, updates);
-  return {
-    success: true,
-    data: {
-      id: itemId,
-      ...updates,
-      updatedAt: new Date()
-    }
-  };
-};
-
-export const deleteChecklistItem = async (taskId, itemId) => {
-  console.log("Deleting checklist item:", taskId, itemId);
-  return {
-    success: true
-  };
-};
-
-// Task duplication
-export const duplicateTask = async (taskId, options = {}) => {
-  console.log("Duplicating task:", taskId, options);
-  return {
-    success: true,
-    data: {
-      id: `task-${Date.now()}`,
-      // Original task data would be duplicated here
-      createdAt: new Date()
-    }
-  };
+export const completeTask = async (taskId: string): Promise<ApiResponse<boolean>> => {
+  try {
+    await delay(300);
+    
+    // In a real app, you would update the task in a database
+    return createApiSuccessResponse(true);
+  } catch (error) {
+    return createApiErrorResponse('Failed to complete task', 500);
+  }
 };
