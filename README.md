@@ -1,4 +1,6 @@
-# Welcome to your Lovable project
+# IT Support Application
+
+This project is a sample IT service management application built with Vite, React and TypeScript. It provides dashboards, backlog tracking, asset management, security cases and a self-service user portal.
 
 ## Project info
 
@@ -30,7 +32,7 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # Step 3: Install the necessary dependencies.
-npm i
+npm install
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
@@ -50,15 +52,54 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Local development
 
-This project is built with .
+The project requires a recent Node.js version (18+). Useful scripts include:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `npm run dev` – start the development server.
+- `npm run build` – create a production build.
+- `npm run lint` – run ESLint over the source code.
+- `npm run test` – execute the unit tests with Vitest.
+- `npm run test:ui` – open the Vitest UI.
+- `npm run test:coverage` – generate coverage reports.
+
+## Testing guidelines
+
+Unit tests live next to their components or utilities under `src/`. New features should include tests using [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/). Run all tests with:
+
+```sh
+npm run test
+```
+
+Coverage reports are output to the `coverage/` directory when running `npm run test:coverage`.
+
+## Environment and configuration
+
+The application works out of the box with the default configuration. The only environment variable currently used is `NODE_ENV` to control logging in production vs development.
+
+## Directory overview
+
+- `src/components` – reusable UI components.
+- `src/pages` – page level components used for routing.
+- `src/utils` – helper utilities, mock API modules and common types.
+- `src/routes.tsx` – main application route definitions.
+- `docs/routes.md` – security routing guide.
+
+## Routing documentation
+
+Detailed instructions for integrating security routes can be found in [docs/routes.md](docs/routes.md).
+
+## API and data layer
+
+Mock API modules under `src/utils/api/` return sample data for development and testing. Data type definitions live in `src/utils/types/` and are reused throughout the app.
+
+## Contribution & license
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing. This project is released under the [proprietary license](LICENSE).
+
+## Changelog
+
+Major feature additions and fixes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## How can I deploy this project?
 
